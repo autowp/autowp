@@ -1,6 +1,5 @@
 import type {OnDestroy} from '@angular/core';
 
-import {DOCUMENT} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -33,28 +32,33 @@ import {Coords, defaults, px, Selection, setStyle, Touch} from './Jcrop';
   templateUrl: './jcrop.component.html',
   styleUrl: './jcrop.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // Jcrop builds its handles/borders/tracker overlay with raw document.createElement() calls, not
-  // this component's own template - Angular's emulated encapsulation only stamps its scoping
-  // attribute onto elements it renders itself, so those .jcrop-* selectors would silently match
-  // nothing under the default encapsulation. Global scope here is what angular.json's top-level
-  // `styles` array already gave this stylesheet before it moved here.
+  // Jcrop used to build its handles/borders/tracker/image overlay with raw document.createElement()
+  // calls rather than this component's own template - Angular's emulated encapsulation only stamps
+  // its scoping attribute onto elements it renders itself, so those .jcrop-* selectors would silently
+  // match nothing under the default encapsulation. Every element is template-owned now (#workingImg
+  // and #img2 were the last two built imperatively), so this could in principle switch back to
+  // emulated encapsulation - left as None for now since nothing has verified that switch is safe
+  // (e.g. any external/global CSS still expecting to reach .jcrop-* unscoped). Global scope here is
+  // what angular.json's top-level `styles` array already gave this stylesheet before it moved here.
   // eslint-disable-next-line @angular-eslint/use-component-view-encapsulation
   encapsulation: ViewEncapsulation.None,
   // Nothing here calls document.addEventListener()/removeEventListener() itself to track an active
   // drag - Angular has no equivalent to attaching/detaching a document-level listener conditionally,
   // so these are permanently bound (from the moment this component is created, well before #init()
-  // ever runs) and just forward every event unconditionally; the on*() methods below are what
-  // actually gate on whether a drag is in progress (#trackerBtndown/#trackerIstouch).
+  // ever runs) and just forward every event unconditionally; the mouse/touch move/up/end on*()
+  // methods below are what actually gate on whether a drag is in progress
+  // (#trackerBtndown/#trackerIstouch). onDocumentTouchStart is the exception - it's unconditional by
+  // design, same as it was as a plain document.addEventListener() call (see its own comment).
   host: {
     '(document:mousemove)': 'onDocumentMouseMove($event)',
     '(document:mouseup)': 'onDocumentMouseUp($event)',
     '(document:touchend)': 'onDocumentTouchEnd($event)',
     '(document:touchmove)': 'onDocumentTouchMove($event)',
+    '(document:touchstart)': 'onDocumentTouchStart($event)',
   },
 })
 export class JcropComponent implements OnDestroy {
   readonly #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  readonly #document = inject(DOCUMENT);
   readonly #window = browserWindow();
 
   readonly src = input.required<string>();
@@ -67,8 +71,8 @@ export class JcropComponent implements OnDestroy {
 
   private readonly holderRef = viewChild.required<ElementRef<HTMLDivElement>>('holder');
   private readonly selRef = viewChild.required<ElementRef<HTMLDivElement>>('sel');
-  private readonly imgHolderRef = viewChild.required<ElementRef<HTMLDivElement>>('imgHolder');
-  private readonly trackerRef = viewChild.required<ElementRef<HTMLDivElement>>('tracker');
+  private readonly workingImgRef = viewChild.required<ElementRef<HTMLImageElement>>('workingImg');
+  private readonly img2Ref = viewChild.required<ElementRef<HTMLImageElement>>('img2');
 
   // Whether the resize handles/dragbars are shown - driven by Selection#disableHandles()/
   // enableHandles() via the setHandlesVisible callback passed into it below, and read directly by
@@ -86,6 +90,36 @@ export class JcropComponent implements OnDestroy {
   // started from it is in progress) by #activateTrackerHandlers()/#finishTrackerDrag() below.
   protected readonly trackerZIndex = signal(290);
 
+  // The #tracker template element's height/width/left/top - unlike cursor/z-index above, these never
+  // change once #init() computes them from the loaded image's size and the boundary option, but
+  // they still depend on that runtime state, so they're signals (set once in #init()) rather than
+  // static CSS. left and top always take the same value (-boundary), hence one signal for both.
+  protected readonly trackerHeight = signal(0);
+  protected readonly trackerWidth = signal(0);
+  protected readonly trackerOffset = signal(0);
+
+  // The #holder template element's height/width - same reasoning as the trackerHeight/trackerWidth
+  // signals above: fixed once #init() computes them from the loaded image's size, but that's still
+  // runtime state, so a signal instead of static CSS.
+  protected readonly holderHeight = signal(0);
+  protected readonly holderWidth = signal(0);
+
+  // #img2's height/width - the crop-preview <img> clipped inside #imgHolder (jcrop.component.html),
+  // always the same size as #holder above. Unlike #workingImg's height/width (see origimgVisible and
+  // #init() below), nothing reads this element's layout back synchronously after #init() sets it, so
+  // a signal is safe here.
+  protected readonly img2Height = signal(0);
+  protected readonly img2Width = signal(0);
+
+  // The real <img> template element's display/visibility - true (its default) until #init() hides it
+  // once #workingImg (a second, static template <img> - see #init() below) is ready to show in its
+  // place, and back to true in ngOnDestroy() to restore it. #workingImg's own height/width, by
+  // contrast, stay a direct setStyle() call in #init() rather than a signal: #presize() and the
+  // offsetHeight/offsetWidth reads right after both need that size actually committed to the DOM
+  // synchronously - a signal only takes effect on Angular's next change-detection pass, which would
+  // leave #workingImg (and everything sized off it) built from the wrong dimensions.
+  protected readonly origimgVisible = signal(true);
+
   // Everything below is Jcrop's own former per-instance state - it used to belong to a separately
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
   // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). All of it is
@@ -95,9 +129,7 @@ export class JcropComponent implements OnDestroy {
   // that has happened - everything else here only ever runs from inside #init() itself.
   #initialized = false;
   #win!: Window;
-  #origimg!: HTMLImageElement;
   #img!: HTMLImageElement;
-  #imgHolder!: HTMLDivElement;
   #div!: HTMLDivElement;
   #boundx!: number;
   #boundy!: number;
@@ -118,10 +150,6 @@ export class JcropComponent implements OnDestroy {
   #trackerIstouch: boolean | undefined;
   #trackerOnDone: PositionCallback = function () {};
   #trackerOnMove: PositionCallback = function () {};
-  // Starts as a placeholder div, replaced with a real <img> further down in #init() -
-  // #moveto() (inside Selection, via the getImg2 getter passed to it) is the only thing that reads
-  // this afterward, so the placeholder is never actually rendered.
-  #img2!: HTMLElement;
   #options!: InternalOptions;
   #xscale!: number;
   #yscale!: number;
@@ -130,7 +158,7 @@ export class JcropComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (!this.#initialized) return;
     this.#div.remove();
-    setStyle(this.#origimg, {display: '', visibility: 'visible'});
+    this.origimgVisible.set(true);
   }
 
   // Called by the host page's own "select all" button via viewChild() - the crop dialogs each keep
@@ -257,6 +285,18 @@ export class JcropComponent implements OnDestroy {
     this.#finishTrackerDrag(this.#touch.cfilter(e));
   }
 
+  // This is a hack for iOS5 to support drag/move touch functionality. Note that e.currentTarget is
+  // always `document` here (Angular attaches this the same way a plain document.addEventListener()
+  // call would - not delegated), so the `instanceof Element` check below never passes and
+  // stopPropagation() never actually runs - jQuery's .hasClass() had the equivalent guard
+  // (elem.nodeType === 1) built in, silently no-opping for a Document node rather than throwing;
+  // preserved as dead-but-safe rather than "fixed" to e.target, since that would be a behavior change
+  // from the original.
+  protected onDocumentTouchStart(e: TouchEvent): void {
+    const target = e.currentTarget;
+    if (target instanceof Element && target.classList.contains('jcrop-tracker')) e.stopPropagation();
+  }
+
   // The vendored plugin's own single closure-based factory function, ported first to a class and
   // then merged directly onto this component: everything that used to be a local variable closed
   // over by every nested function is now a private field, and the standalone Touch/Selection/Coords
@@ -274,30 +314,8 @@ export class JcropComponent implements OnDestroy {
     this.#win = win;
     this.#options = {...defaults};
 
-    // imgHolder's styling (height/width/z-index/overflow/position) never changes at runtime, so
-    // it's static CSS on its template element (jcrop.component.html/.scss) instead of set here.
-    this.#imgHolder = this.imgHolderRef().nativeElement;
-
     this.#mergeOptions(opt);
 
-    // The values are SET on the image(s) for the interface. If the original image has any of these
-    // set, they will be reset. However, on ngOnDestroy() the original image's character in the DOM
-    // will be as it was left.
-    const imgStyle: Partial<CSSStyleDeclaration> = {
-      border: 'none',
-      left: '0',
-      margin: '0',
-      padding: '0',
-      position: 'absolute',
-      top: '0',
-      visibility: 'visible',
-    };
-
-    this.#origimg = origimg;
-
-    if (origimg.tagName !== 'IMG') {
-      throw new Error('Only img is supported');
-    }
     // Fix size of crop image.
     // Necessary when crop image is within a hidden element when page is loaded.
     if (origimg.width !== 0 && origimg.height !== 0) {
@@ -312,43 +330,43 @@ export class JcropComponent implements OnDestroy {
       setStyle(origimg, {height: px(tempImage.height), width: px(tempImage.width)});
     }
 
-    const img = origimg.cloneNode(true) as HTMLImageElement;
+    // #workingImg is a static template <img> now (jcrop.component.html), not a runtime clone of
+    // origimg - its src is bound the same way origimg's own is ([src]="src()"), and its static
+    // styling (position/border/margin/padding/top/left/visibility) is a plain template attribute
+    // instead of set here. Its height/width, unlike #holder/#tracker below, stay a direct setStyle()
+    // call rather than a signal - #presize() and the offsetWidth/offsetHeight reads right after both
+    // need that size committed to the DOM synchronously, and a signal only takes effect on Angular's
+    // next change-detection pass (same reasoning as origimgVisible above).
+    const img = this.workingImgRef().nativeElement;
     this.#img = img;
-    img.removeAttribute('id');
-    setStyle(img, imgStyle);
-    setStyle(img, {display: ''});
 
     setStyle(img, {height: px(origimg.offsetHeight), width: px(origimg.offsetWidth)});
-    setStyle(origimg, {display: 'none'});
+    this.origimgVisible.set(false);
 
-    // #holder is already positioned right where the clone belongs (jcrop.component.html declares it
-    // immediately after the real <img>) - append the clone straight into it instead of first
-    // attaching it as origimg's sibling and reparenting it in afterward. offsetWidth/offsetHeight
-    // below only need the clone attached to the DOM somewhere, not specifically to this parent.
-    const div = this.holderRef().nativeElement;
-    this.#div = div;
-    div.append(img);
+    this.#div = this.holderRef().nativeElement;
 
     this.#presize(img, this.#options.boxWidth, this.#options.boxHeight);
 
     this.#boundx = img.offsetWidth;
     this.#boundy = img.offsetHeight;
     // backgroundColor/position are static CSS on .jcrop-holder (jcrop.component.scss); only the
-    // image-dependent size is set here.
-    setStyle(div, {height: px(this.#boundy), width: px(this.#boundx)});
+    // image-dependent size is a signal, bound in the template (holderHeight/holderWidth).
+    this.holderHeight.set(this.#boundy);
+    this.holderWidth.set(this.#boundx);
 
     const bound = this.#options.boundary;
-    const trk = this.trackerRef().nativeElement;
-    // position is static CSS on .jcrop-tracker; z-index is the trackerZIndex signal (bound in the
-    // template), toggled by Tracker itself between 290 and 450 at runtime.
-    setStyle(trk, {
-      height: px(this.#boundy + bound * 2),
-      left: px(-bound),
-      top: px(-bound),
-      width: px(this.#boundx + bound * 2),
-    });
+    // position is static CSS on .jcrop-tracker; height/width/left/top/z-index are all signals bound
+    // in the template (trackerHeight/trackerWidth/trackerOffset/trackerZIndex) instead of setStyle().
+    this.trackerHeight.set(this.#boundy + bound * 2);
+    this.trackerWidth.set(this.#boundx + bound * 2);
+    this.trackerOffset.set(-bound);
 
-    this.#img2 = this.#document.createElement('div');
+    // #img2's own src/static styling are template bindings, same as #workingImg above - unlike its
+    // height/width, nothing reads it back synchronously afterward, so those ARE signals
+    // (img2Height/img2Width) rather than a direct setStyle() call.
+    const img2 = this.img2Ref().nativeElement;
+    this.img2Height.set(this.#boundy);
+    this.img2Width.set(this.#boundx);
     // position/zIndex are static CSS on the sel template element (jcrop.component.html).
     const sel = this.selRef().nativeElement;
 
@@ -377,20 +395,9 @@ export class JcropComponent implements OnDestroy {
     this.#bgopacity = this.#options.bgOpacity;
 
     // Selection Module {{{
-    // This is a hack for iOS5 to support drag/move touch functionality. Note that e.currentTarget
-    // is always `document` here (this listener is bound directly on it, not delegated), so the
-    // `instanceof Element` check below never passes and stopPropagation() never actually runs -
-    // jQuery's .hasClass() had the equivalent guard (elem.nodeType === 1) built in, silently
-    // no-opping for a Document node rather than throwing; preserved as dead-but-safe rather than
-    // "fixed" to e.target, since that would be a behavior change from the original.
-    this.#document.addEventListener('touchstart', function (e) {
-      const target = e.currentTarget;
-      if (target instanceof Element && target.classList.contains('jcrop-tracker')) e.stopPropagation();
-    });
-
     this.#selection = new Selection(
       img,
-      () => this.#img2,
+      img2,
       sel,
       this.#bgopacity,
       (ord) => this.#createDragger(ord),
@@ -403,12 +410,6 @@ export class JcropComponent implements OnDestroy {
         this.handlesVisible.set(visible);
       },
     );
-
-    this.#img2 = this.#document.createElement('img');
-    (this.#img2 as HTMLImageElement).src = img.getAttribute('src') ?? '';
-    setStyle(this.#img2, imgStyle);
-    setStyle(this.#img2, {display: '', height: px(this.#boundy), width: px(this.#boundx)});
-    this.#imgHolder.append(this.#img2);
 
     this.#docOffset = this.#getPos(img);
 

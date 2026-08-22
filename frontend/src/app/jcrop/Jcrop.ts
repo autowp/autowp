@@ -315,18 +315,18 @@ export class Coords {
 // touchDragStart() below, the same way it already does for the "move" tracker overlay via
 // createDragger/createTouchDragger directly. Kept independent of Touch by taking its
 // touch-specific bit (how to build a touch-drag handler) as a plain function rather than the Touch
-// object itself. `coords` is taken as the real collaborator object it
-// is (not individually wrapped getters), since by the time Selection needs it, it already exists
-// and never gets replaced.
+// object itself. `coords`/`img2` are taken as the real collaborator objects they are (not
+// individually wrapped getters), since by the time Selection needs them, they already exist and
+// never get replaced.
 export class Selection {
   #awake: boolean | undefined;
 
   constructor(
     private readonly img: HTMLImageElement,
-    // img2 starts as a placeholder div and is replaced with a real <img> right after Selection is
-    // constructed (see JcropComponent's own img2 field for why) - a getter so #moveto() always
-    // styles whichever element is current by the time it's actually called, not the placeholder.
-    private readonly getImg2: () => HTMLElement,
+    // The crop-preview image clipped inside #imgHolder (jcrop.component.html) - a real, static
+    // template element now, so (unlike img/sel/coords below) it never needed a getter or a
+    // placeholder swap in the first place.
+    private readonly img2: HTMLImageElement,
     private readonly sel: HTMLDivElement,
     private readonly bgopacity: number,
     private readonly createDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
@@ -399,7 +399,7 @@ export class Selection {
   }
 
   #moveto(x: number, y: number): void {
-    setStyle(this.getImg2(), {left: px(-x), top: px(-y)});
+    setStyle(this.img2, {left: px(-x), top: px(-y)});
     setStyle(this.sel, {left: px(x), top: px(y)});
   }
 

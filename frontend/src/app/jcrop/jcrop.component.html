@@ -1,23 +1,36 @@
-<img alt="" [src]="src()" (load)="onLoad($event)" />
+<img
+  alt=""
+  [src]="src()"
+  [style.display]="origimgVisible() ? '' : 'none'"
+  [style.visibility]="origimgVisible() ? 'visible' : ''"
+  (load)="onLoad($event)"
+/>
 <!--
   Jcrop's fixed-identity container elements - declared here, already nested the way #init()
-  (jcrop.component.ts) expects them, so it doesn't have to build them with document.createElement()
-  or reparent them into place itself. The one thing #init() still appends here imperatively is the
-  cloned working <img> (into #holder) - it can't be a static element since it's a runtime clone of
-  the img above. Classes/inline styles below are exactly what #init() used to set imperatively for
-  properties that never change at runtime - anything that does from runtime layout math (size,
-  position while dragging) is still set from there. What toggles for a reason Angular can already
-  see instead - #hdlHolder's visibility (Selection#disableHandles()/enableHandles()) and #tracker's
-  cursor/z-index (the component's own drag-mode changes) - is driven by signals instead (handlesVisible,
-  trackerCursor, trackerZIndex). Likewise, every mousedown/touchstart below is exactly what #init() and the
-  Selection class (Jcrop.ts) used to attach imperatively with addEventListener() - all of these
-  elements are static and permanent for the life of this component, so there's no need to
-  attach/detach anything by hand. #tracker/#selectionTracker call straight into the drag logic
-  (onTrackerMouseDown et al.); the handle/dragbar elements instead forward through
-  onDragMouseDown/onDragTouchStart, passing along the fixed ordinal each one already knows, since
-  Selection itself no longer listens for DOM events at all - see Selection#dragStart/touchDragStart.
+  (jcrop.component.ts) expects them, so it doesn't have to build any of them with
+  document.createElement() or reparent them into place itself. #workingImg and #img2 are the latest
+  to move here: they used to be a runtime clone of the real <img> above (origimg.cloneNode(true)) and
+  a runtime document.createElement('img') respectively, both now just bound the same way the real
+  <img>'s own src is ([src]="src()"). Classes/inline styles below are exactly what #init() used to set
+  imperatively for properties that never change at runtime - anything that does from runtime layout
+  math (size, position while dragging) is either still set imperatively (#workingImg's own
+  height/width - see the origimgVisible comment in jcrop.component.ts for why; and #sel's
+  size/position, updated on every drag frame by Selection - not shown here since Selection owns it
+  directly, not #init()) or, where it's fixed by a one-time computation instead, driven by a signal:
+  #hdlHolder's visibility (Selection#disableHandles()/enableHandles()) via handlesVisible; #holder's
+  and #img2's height/width (computed in #init() from the loaded image's size) via
+  holderHeight/holderWidth and img2Height/img2Width; and #tracker's cursor/z-index (the component's
+  own drag-mode changes) plus its height/width/left/top (that same one-time #init() computation) via
+  trackerCursor/trackerZIndex/trackerHeight/trackerWidth/trackerOffset. Likewise, every
+  mousedown/touchstart below is exactly what #init() and the Selection class (Jcrop.ts) used to
+  attach imperatively with addEventListener() - all of these elements are static and permanent for the
+  life of this component, so there's no need to attach/detach anything by hand.
+  #tracker/#selectionTracker call straight into the drag logic (onTrackerMouseDown et al.); the
+  handle/dragbar elements instead forward through onDragMouseDown/onDragTouchStart, passing along the
+  fixed ordinal each one already knows, since Selection itself no longer listens for DOM events at all
+  - see Selection#dragStart/touchDragStart.
 -->
-<div #holder class="jcrop-holder">
+<div #holder class="jcrop-holder" [style.height.px]="holderHeight()" [style.width.px]="holderWidth()">
   <div #sel style="position: absolute; z-index: 600">
     <div #imgHolder style="position: absolute; overflow: hidden; height: 100%; width: 100%; z-index: 310">
       <!-- Fully static: opacity/position come from .jcrop-vline/.jcrop-hline (jcrop.component.scss),
@@ -34,6 +47,14 @@
         (mousedown)="onSelectionTrackerMouseDown($event)"
         (touchstart)="onSelectionTrackerTouchStart($event)"
       ></div>
+      <img
+        #img2
+        alt=""
+        style="position: absolute; border: none; margin: 0; padding: 0; top: 0; left: 0; visibility: visible"
+        [src]="src()"
+        [style.height.px]="img2Height()"
+        [style.width.px]="img2Width()"
+      />
     </div>
     <div #hdlHolder style="height: 100%; width: 100%; z-index: 320" [style.display]="handlesVisible() ? '' : 'none'">
       <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline since
@@ -128,11 +149,20 @@
     </div>
   </div>
   <div
-    #tracker
     class="jcrop-tracker"
     [style.cursor]="trackerCursor()"
     [style.z-index]="trackerZIndex()"
+    [style.height.px]="trackerHeight()"
+    [style.width.px]="trackerWidth()"
+    [style.left.px]="trackerOffset()"
+    [style.top.px]="trackerOffset()"
     (mousedown)="onTrackerMouseDown($event)"
     (touchstart)="onTrackerTouchStart($event)"
   ></div>
+  <img
+    #workingImg
+    alt=""
+    style="position: absolute; border: none; margin: 0; padding: 0; top: 0; left: 0; visibility: visible"
+    [src]="src()"
+  />
 </div>
