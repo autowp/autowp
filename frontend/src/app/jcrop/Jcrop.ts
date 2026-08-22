@@ -28,19 +28,16 @@
  *
  * }}}
  *
- * The plugin's own orchestrating factory function (constructing and wiring up Touch/Selection/
- * Coords, driving the drag/resize state machine) now lives directly on JcropComponent - there's
- * only ever one consumer, so a separate "Jcrop instance" object was pure indirection. The
- * document-level drag-tracking state (what used to be a separate Tracker class) lives there too now,
- * for the same reason: every collaborator it needed (mouseAbs/touchCfilter/notifySelectionSettled/
- * setZIndex) was already a closure over JcropComponent itself, so the class was pure indirection as
- * well. What remains here are the three collaborator classes that actually own a distinct piece of
- * DOM/state, plus the option types/defaults and small DOM helpers they and JcropComponent both need.
+ * The plugin's own orchestrating factory function (constructing and wiring up Selection/Coords,
+ * driving the drag/resize state machine) now lives directly on JcropComponent - there's only ever
+ * one consumer, so a separate "Jcrop instance" object was pure indirection. The document-level
+ * drag-tracking state and touch handling (what used to be separate Tracker and Touch classes) live
+ * there too now, for the same reason: every collaborator either needed (mouseAbs/touchCfilter/
+ * notifySelectionSettled/setZIndex/getPos/startDragMode/setDocOffset/onNewSelection) was already a
+ * closure over JcropComponent itself, so both classes were pure indirection. What remains here are
+ * the two collaborator classes that actually own a distinct piece of DOM/state, plus the option
+ * types/defaults and small DOM helpers they and JcropComponent both need.
  */
-
-function hasTouchSupport(win: Window): boolean {
-  return 'ontouchstart' in win || win.navigator.maxTouchPoints > 0;
-}
 
 export interface JcropCrop {
   h: number;
@@ -90,10 +87,11 @@ export type InternalOptions = DefaultedOptions & JcropOptions;
 
 export type Point = [number, number];
 
-// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: Touch#cfilter() copies the
-// active touch's page coordinates onto the event itself so mouseAbs() can read event.pageX/pageY
-// the same way regardless of whether the drag started from a mouse or touch listener - TouchEvent
-// doesn't carry its own pageX/pageY (only the individual Touch entries in its touch lists do).
+// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: JcropComponent's own
+// #touchCfilter() copies the active touch's page coordinates onto the event itself so mouseAbs() can
+// read event.pageX/pageY the same way regardless of whether the drag started from a mouse or touch
+// listener - TouchEvent doesn't carry its own pageX/pageY (only the individual Touch entries in its
+// touch lists do).
 export type JcropMouseEvent = (MouseEvent | TouchEvent) & {pageX?: number; pageY?: number};
 
 export type PositionCallback = (pos: Point) => void;
@@ -313,20 +311,23 @@ export class Coords {
 // mousedown/touchstart on the static handle/dragbar/tracker elements directly in its own template
 // (same for borders, which need no interaction at all) and forwards them into dragStart()/
 // touchDragStart() below, the same way it already does for the "move" tracker overlay via
-// createDragger/createTouchDragger directly. Kept independent of Touch by taking its
-// touch-specific bit (how to build a touch-drag handler) as a plain function rather than the Touch
-// object itself. `coords`/`img2` are taken as the real collaborator objects they are (not
-// individually wrapped getters), since by the time Selection needs them, they already exist and
-// never get replaced.
+// createDragger/createTouchDragger directly. Kept independent of JcropComponent's own touch handling
+// by taking its touch-specific bit (how to build a touch-drag handler) as a plain function rather
+// than depending on that state directly. `coords`/`img2`/`sel` are taken as the real collaborator
+// objects they are (not individually wrapped getters), since by the time Selection needs them, they
+// already exist and never get replaced.
 export class Selection {
   #awake: boolean | undefined;
 
   constructor(
-    private readonly img: HTMLImageElement,
     // The crop-preview image clipped inside #imgHolder (jcrop.component.html) - a real, static
-    // template element now, so (unlike img/sel/coords below) it never needed a getter or a
-    // placeholder swap in the first place.
+    // template element now, so (unlike sel below) it never needed a getter or a placeholder swap in
+    // the first place.
     private readonly img2: HTMLImageElement,
+    // #moveto()/#resize() below write this element's left/top/height/width directly, continuously,
+    // on every drag frame - a JcropComponent signal would add at least one change-detection pass of
+    // lag between a mousemove and the box actually following it, so this (and img2 above) stays a
+    // plain DOM node rather than a signal-driven template binding, unlike sel's own display below.
     private readonly sel: HTMLDivElement,
     private readonly bgopacity: number,
     private readonly createDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
@@ -336,6 +337,11 @@ export class Selection {
     // Handle/dragbar visibility is a JcropComponent signal ([style.display] on the #hdlHolder
     // template element), not a style this class sets directly any more.
     private readonly setHandlesVisible: (visible: boolean) => void,
+    // sel's own display and #workingImg's opacity - unlike its left/top/height/width above, these
+    // only change once per drag gesture (awake/asleep, dimmed/undimmed), not on every frame, so
+    // JcropComponent signals are safe here with no perceptible lag.
+    private readonly setSelVisible: (visible: boolean) => void,
+    private readonly setImgOpacity: (opacity: number) => void,
   ) {
     this.disableHandles();
   }
@@ -378,7 +384,7 @@ export class Selection {
 
   release(): void {
     this.disableHandles();
-    setStyle(this.sel, {display: 'none'});
+    this.setSelVisible(false);
 
     this.#setBgOpacity(1);
 
@@ -415,58 +421,14 @@ export class Selection {
 
   #setBgOpacity(opacity: number, force?: boolean): void {
     if (!this.#awake && !force) return;
-    setStyle(this.img, {opacity: String(opacity)});
+    this.setImgOpacity(opacity);
   }
 
   #show(): void {
-    setStyle(this.sel, {display: ''});
+    this.setSelVisible(true);
 
     this.#setBgOpacity(this.bgopacity, true);
 
     this.#awake = true;
-  }
-}
-
-// Normalizes touch input for the rest of Jcrop: computes whether touch is supported once at
-// construction, copies a touch event's active-finger page coordinates onto the event itself
-// (cfilter), and builds touch-flavored equivalents of the mouse drag/new-selection entry points.
-// `startDragMode`/`onNewSelection` stay outside this class (passed in) since they belong to
-// JcropComponent's own drag-mode/selection logic, not to touch handling specifically - mousedown and
-// touchstart both ultimately call the same logic, just filtered through cfilter() or not first.
-export class Touch {
-  readonly support: boolean;
-
-  constructor(
-    win: Window,
-    private readonly img: HTMLImageElement,
-    private readonly getOptions: () => InternalOptions,
-    private readonly getPos: (el: HTMLElement) => Point,
-    private readonly mouseAbs: (e: JcropMouseEvent) => Point,
-    private readonly startDragMode: (mode: DragMode, pos: Point, touch?: boolean) => void,
-    private readonly setDocOffset: (pos: Point) => void,
-    private readonly onNewSelection: (e: JcropMouseEvent) => void,
-  ) {
-    const touchSupport = this.getOptions().touchSupport;
-    this.support = touchSupport === true || touchSupport === false ? touchSupport : hasTouchSupport(win);
-  }
-
-  cfilter(e: JcropMouseEvent): JcropMouseEvent {
-    const touch = (e as TouchEvent).changedTouches[0];
-    e.pageX = touch.pageX;
-    e.pageY = touch.pageY;
-    return e;
-  }
-
-  createDragger(ord: DragMode): (e: JcropMouseEvent) => void {
-    return (e: JcropMouseEvent): void => {
-      this.setDocOffset(this.getPos(this.img));
-      this.startDragMode(ord, this.mouseAbs(this.cfilter(e)), true);
-      e.stopPropagation();
-      e.preventDefault();
-    };
-  }
-
-  newSelection(e: JcropMouseEvent): void {
-    this.onNewSelection(this.cfilter(e));
   }
 }

@@ -25,7 +25,7 @@ import type {
   PositionCallback,
 } from './Jcrop';
 
-import {Coords, defaults, px, Selection, setStyle, Touch} from './Jcrop';
+import {Coords, defaults, px, Selection, setStyle} from './Jcrop';
 
 @Component({
   selector: 'app-jcrop',
@@ -120,6 +120,21 @@ export class JcropComponent implements OnDestroy {
   // leave #workingImg (and everything sized off it) built from the wrong dimensions.
   protected readonly origimgVisible = signal(true);
 
+  // #sel's own display - whether the selection box (and everything clipped/nested inside it: borders,
+  // handles, the #img2 crop-preview) is shown at all. Driven by Selection#release()/#show() via the
+  // setSelVisible callback passed into it below, false until the first selection - matching
+  // handlesVisible's own initial value - since #sel would otherwise flash unstyled before #init() has
+  // run. Unlike sel's left/top/height/width (still direct setStyle() calls inside Selection, since
+  // those change on every drag frame - see Jcrop.ts), this only flips once per drag gesture, so a
+  // signal adds no perceptible lag.
+  protected readonly selVisible = signal(false);
+
+  // #workingImg's opacity - dimmed while a selection is awake (Selection#show()'s bgopacity), restored
+  // to fully opaque on release() - via the setImgOpacity callback passed into Selection below. Same
+  // reasoning as selVisible: a state transition, not a per-frame update, so a signal is safe. 1 (fully
+  // opaque) is #workingImg's state before any selection exists yet, matching its default.
+  protected readonly imgOpacity = signal(1);
+
   // Everything below is Jcrop's own former per-instance state - it used to belong to a separately
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
   // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). All of it is
@@ -134,7 +149,10 @@ export class JcropComponent implements OnDestroy {
   #boundx!: number;
   #boundy!: number;
   #coords!: Coords;
-  #touch!: Touch;
+  // Whether this device supports touch - what used to be a separate Touch class's own `support`
+  // field (see Jcrop.ts): computed once in #init() the same way, from #options.touchSupport falling
+  // back to feature-detecting the window if unset.
+  #touchSupport!: boolean;
   #bgopacity!: number;
   #selection!: Selection;
   // Document-level drag-tracking state (what used to be a separate Tracker class - see Jcrop.ts):
@@ -238,8 +256,8 @@ export class JcropComponent implements OnDestroy {
   }
 
   protected onTrackerTouchStart(e: TouchEvent): void {
-    if (!this.#initialized || !this.#touch.support) return;
-    this.#touch.newSelection(e);
+    if (!this.#initialized || !this.#touchSupport) return;
+    this.#newSelection(this.#touchCfilter(e));
   }
 
   protected onSelectionTrackerMouseDown(e: MouseEvent): void {
@@ -248,8 +266,8 @@ export class JcropComponent implements OnDestroy {
   }
 
   protected onSelectionTrackerTouchStart(e: TouchEvent): void {
-    if (!this.#initialized || !this.#touch.support) return;
-    this.#touch.createDragger('move')(e);
+    if (!this.#initialized || !this.#touchSupport) return;
+    this.#createTouchDragger('move')(e);
   }
 
   // Bound on each of the 12 static handle/dragbar template elements (jcrop.component.html), each
@@ -261,7 +279,7 @@ export class JcropComponent implements OnDestroy {
   }
 
   protected onDragTouchStart(ord: Ordinal, e: TouchEvent): void {
-    if (!this.#initialized || !this.#touch.support) return;
+    if (!this.#initialized || !this.#touchSupport) return;
     this.#selection.touchDragStart(ord, e);
   }
 
@@ -277,12 +295,12 @@ export class JcropComponent implements OnDestroy {
 
   protected onDocumentTouchMove(e: TouchEvent): void {
     if (!this.#initialized || !this.#trackerBtndown || !this.#trackerIstouch) return;
-    this.#trackerOnMove(this.#mouseAbs(this.#touch.cfilter(e)));
+    this.#trackerOnMove(this.#mouseAbs(this.#touchCfilter(e)));
   }
 
   protected onDocumentTouchEnd(e: TouchEvent): void {
     if (!this.#initialized || !this.#trackerBtndown || !this.#trackerIstouch) return;
-    this.#finishTrackerDrag(this.#touch.cfilter(e));
+    this.#finishTrackerDrag(this.#touchCfilter(e));
   }
 
   // This is a hack for iOS5 to support drag/move touch functionality. Note that e.currentTarget is
@@ -299,17 +317,20 @@ export class JcropComponent implements OnDestroy {
 
   // The vendored plugin's own single closure-based factory function, ported first to a class and
   // then merged directly onto this component: everything that used to be a local variable closed
-  // over by every nested function is now a private field, and the standalone Touch/Selection/Coords
-  // modules it built as IIFEs (see Jcrop.ts) are collaborator objects constructed here and wired
-  // together explicitly instead. (The would-be fourth module, Tracker, never had a distinct piece of
-  // DOM/state of its own - just fields closing over this component's collaborators - so it's folded
-  // in directly as #trackerBtndown/#trackerIstouch/#trackerOnMove/#trackerOnDone and the
-  // #activateTrackerHandlers()/#finishTrackerDrag() methods below instead of a class in Jcrop.ts.)
+  // over by every nested function is now a private field, and the standalone Selection/Coords modules
+  // it built as IIFEs (see Jcrop.ts) are collaborator objects constructed here and wired together
+  // explicitly instead. (The would-be Tracker and Touch modules never had a distinct piece of
+  // DOM/state of their own - just fields/methods closing over this component's collaborators - so
+  // they're folded in directly instead of classes in Jcrop.ts: Tracker as
+  // #trackerBtndown/#trackerIstouch/#trackerOnMove/#trackerOnDone and the
+  // #activateTrackerHandlers()/#finishTrackerDrag() methods below, Touch as #touchSupport and the
+  // #createTouchDragger()/#touchCfilter() methods below.)
   //
   // A handful of methods below are field arrows rather than ordinary methods -
-  // #getPos/#mouseAbs/#startDragMode/#createDragger/#doneSelect/#selectDrag - because each is handed
-  // to a collaborator (Touch/Selection) by bare reference rather than called directly; an ordinary
-  // method read that way loses its `this` binding the moment something else invokes it.
+  // #getPos/#mouseAbs/#startDragMode/#createDragger/#createTouchDragger/#doneSelect/#selectDrag -
+  // because each is handed to a collaborator (Selection) by bare reference rather than called
+  // directly; an ordinary method read that way loses its `this` binding the moment something else
+  // invokes it.
   #init(origimg: HTMLImageElement, opt: JcropOptions, win: Window): void {
     this.#win = win;
     this.#options = {...defaults};
@@ -374,40 +395,36 @@ export class JcropComponent implements OnDestroy {
     this.#coords = new Coords(this.#boundx, this.#boundy, () => ({xscale: this.#xscale, yscale: this.#yscale}));
     // }}}
 
-    // Touch Module {{{
-    this.#touch = new Touch(
-      win,
-      img,
-      () => this.#options,
-      (el) => this.#getPos(el),
-      (e) => this.#mouseAbs(e),
-      (mode, pos, touch) => {
-        this.#startDragMode(mode, pos, touch);
-      },
-      (pos) => {
-        this.#docOffset = pos;
-      },
-      (e) => {
-        this.#newSelection(e);
-      },
-    );
+    // Whether this device supports touch - #options.touchSupport (an explicit override) wins if set,
+    // otherwise fall back to feature-detecting the window (what used to be Touch's own constructor
+    // logic and the free hasTouchSupport() helper in Jcrop.ts).
+    const touchSupportOption = this.#options.touchSupport;
+    this.#touchSupport =
+      touchSupportOption === true || touchSupportOption === false
+        ? touchSupportOption
+        : 'ontouchstart' in win || win.navigator.maxTouchPoints > 0;
 
     this.#bgopacity = this.#options.bgOpacity;
 
     // Selection Module {{{
     this.#selection = new Selection(
-      img,
       img2,
       sel,
       this.#bgopacity,
       (ord) => this.#createDragger(ord),
-      (ord) => this.#touch.createDragger(ord),
+      (ord) => this.#createTouchDragger(ord),
       this.#coords,
       (c) => {
         this.#options.onSelect.call(this, this.#unscale(c));
       },
       (visible) => {
         this.handlesVisible.set(visible);
+      },
+      (visible) => {
+        this.selVisible.set(visible);
+      },
+      (opacity) => {
+        this.imgOpacity.set(opacity);
       },
     );
 
@@ -528,6 +545,31 @@ export class JcropComponent implements OnDestroy {
       e.preventDefault();
     };
   };
+
+  // The touch equivalent of #createDragger above - what used to be Touch's own createDragger()
+  // (Jcrop.ts), folded in directly since every collaborator it needed was already a closure over
+  // this component anyway. Passes touch=true through to #startDragMode so it activates the tracker
+  // handlers in touch mode (see #trackerIstouch), and runs the event through #touchCfilter() first so
+  // mouseAbs() can read pageX/pageY the same way it does for a mouse event.
+  readonly #createTouchDragger = (ord: DragMode): ((e: JcropMouseEvent) => void) => {
+    return (e: JcropMouseEvent): void => {
+      this.#docOffset = this.#getPos(this.#img);
+
+      this.#startDragMode(ord, this.#mouseAbs(this.#touchCfilter(e)), true);
+      e.stopPropagation();
+      e.preventDefault();
+    };
+  };
+
+  // Copies the active touch's page coordinates onto the event itself so #mouseAbs() can read
+  // event.pageX/pageY the same way regardless of whether the drag started from a mouse or touch
+  // listener - see the JcropMouseEvent comment in Jcrop.ts. What used to be Touch's own cfilter().
+  #touchCfilter(e: JcropMouseEvent): JcropMouseEvent {
+    const touch = (e as TouchEvent).changedTouches[0];
+    e.pageX = touch.pageX;
+    e.pageY = touch.pageY;
+    return e;
+  }
 
   #presize(el: HTMLElement, w: number, h: number): void {
     let nh = el.offsetHeight,
