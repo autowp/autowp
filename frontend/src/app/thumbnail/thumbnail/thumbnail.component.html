@@ -76,7 +76,7 @@
           <span i18n-title title="Comments" class="text-nowrap me-2">
             @if (route(); as route) {
               <a [routerLink]="route">
-                @if (picture.commentsCountNew > 0) {
+                @if (isAuthenticated() && picture.commentsCountNew > 0) {
                   {{
                     picture.commentsCountTotal > picture.commentsCountNew
                       ? picture.commentsCountTotal - picture.commentsCountNew

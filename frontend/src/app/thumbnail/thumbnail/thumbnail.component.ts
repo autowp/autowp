@@ -55,6 +55,7 @@ export class ThumbnailComponent implements OnInit {
     ),
   );
   protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER));
+  protected readonly isAuthenticated = toSignal(this.#auth.authenticated$);
 
   // Built in ngOnInit() (with an explicit injector) rather than as a field initializer, like
   // CommentsComponent's: its TransferState `id` has to be derived from `picture`, a *required*
