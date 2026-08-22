@@ -7,33 +7,32 @@
   (load)="onLoad()"
 />
 <!--
-  Jcrop's fixed-identity container elements - declared here, already nested the way #init()
+  Jcrop's fixed-identity container elements - declared here, already nested the way onLoad()
   (jcrop.component.ts) expects them, so it doesn't have to build any of them with
   document.createElement() or reparent them into place itself. #workingImg and #img2 are the latest
   to move here: they used to be a runtime clone of the real <img> above (origimg.cloneNode(true)) and
   a runtime document.createElement('img') respectively, both now just bound the same way the real
-  <img>'s own src is ([src]="src()"). Classes/inline styles below are exactly what #init() used to set
+  <img>'s own src is ([src]="src()"). Classes/inline styles below are exactly what onLoad() used to set
   imperatively for properties that never change at runtime - anything that does from runtime layout
   math (size, position while dragging) is either still set imperatively (#workingImg's own
   height/width - see the origimgVisible comment in jcrop.component.ts for why) or driven by a signal:
-  #hdlHolder's visibility (set directly by this component, and by Selection's own constructor/release()
-  via the setHandlesVisible callback) via handlesVisible; #sel's own display (Selection#release()/
-  #show()) via selVisible; #workingImg's opacity (that same release()/show() dimming the image while a
-  selection is awake) via imgOpacity; #holder's, #img2's, and #sel's height/width (#holder/#img2
-  computed in #init() from the loaded image's size, #sel resized on every drag frame by
-  Selection#update()/#resize()) via holderHeight/holderWidth, img2Height/img2Width, and
-  selHeight/selWidth; #img2's and #sel's own left/top (Selection#update()/#moveto(), on every drag
-  frame - see the setImg2Position/setSelPosition comments in Jcrop.ts) via img2Left/img2Top and
-  selLeft/selTop; and #tracker's cursor/z-index (the component's own drag-mode changes) plus its
-  height/width/left/top (that same one-time #init() computation) via
-  trackerCursor/trackerZIndex/trackerHeight/trackerWidth/trackerOffset. Likewise,
-  every mousedown/touchstart below is exactly what #init() and the Selection class (Jcrop.ts) used to
-  attach imperatively with addEventListener() - all of these elements are static and permanent for the
-  life of this component, so there's no need to attach/detach anything by hand.
-  #tracker/#selectionTracker call straight into the drag logic (onTrackerMouseDown et al.); the
+  #hdlHolder's visibility (set directly by this component's own #setSelect()/#doneSelect()/
+  #newSelection()) via handlesVisible; #sel's own display (#doneSelect()/#selectionUpdate()) via
+  selVisible; #workingImg's opacity (that same release/show dimming the image while a selection is
+  awake) via imgOpacity; #holder's, #img2's, and #sel's height/width (#holder/#img2 computed in
+  onLoad() from the loaded image's size, #sel resized on every drag frame by #selectionUpdate()) via
+  holderHeight/holderWidth, img2Height/img2Width, and selHeight/selWidth; #img2's and #sel's own
+  left/top (#selectionUpdate(), on every drag frame) via img2Left/img2Top and selLeft/selTop; and
+  #tracker's cursor/z-index (the
+  component's own drag-mode changes) plus its height/width/left/top (that same one-time onLoad()
+  computation) via trackerCursor/trackerZIndex/trackerHeight/trackerWidth/trackerOffset. Likewise,
+  every mousedown/touchstart below is exactly what onLoad() and what used to be a separate Selection
+  class (Jcrop.ts) used to attach imperatively with addEventListener() - all of these elements are
+  static and permanent for the life of this component, so there's no need to attach/detach anything by
+  hand. #tracker/#selectionTracker call straight into the drag logic (onTrackerMouseDown et al.); the
   handle/dragbar elements instead forward through onDragMouseDown/onDragTouchStart, passing along the
-  fixed ordinal each one already knows, since Selection itself no longer listens for DOM events at all
-  - see Selection#dragStart/touchDragStart.
+  fixed ordinal each one already knows straight into #createDragger()/#createTouchDragger()
+  (jcrop.component.ts).
 -->
 <div class="jcrop-holder" [style.height.px]="holderHeight()" [style.width.px]="holderWidth()">
   <div
@@ -46,8 +45,8 @@
   >
     <div #imgHolder style="position: absolute; overflow: hidden; height: 100%; width: 100%; z-index: 310">
       <!-- Fully static: opacity/position come from .jcrop-vline/.jcrop-hline (jcrop.component.scss),
-           and Selection never touches these at all any more (contrast the dragbars/handles below,
-           which still get mousedown/touchstart wired up in Jcrop.ts). -->
+           and nothing touches these at all any more (contrast the dragbars/handles below, which still
+           get mousedown/touchstart wired up to onDragMouseDown/onDragTouchStart below). -->
       <div #borderN class="jcrop-hline"></div>
       <div #borderS class="jcrop-hline bottom"></div>
       <div #borderE class="jcrop-vline right"></div>
@@ -72,9 +71,9 @@
     <div #hdlHolder style="height: 100%; width: 100%; z-index: 320" [style.display]="handlesVisible() ? '' : 'none'">
       <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline since
            it's the one thing genuinely unique per element, not shareable via a class. Each still
-           forwards mousedown/touchstart into Selection (via onDragMouseDown/onDragTouchStart, passing
-           its own fixed ordinal) - fixed in number and identity now, but still real drag targets,
-           unlike the borders above. -->
+           forwards mousedown/touchstart into #createDragger()/#createTouchDragger()
+           (jcrop.component.ts) via onDragMouseDown/onDragTouchStart, passing its own fixed ordinal -
+           fixed in number and identity now, but still real drag targets, unlike the borders above. -->
       <div
         #dragbarN
         class="jcrop-dragbar ord-n"
