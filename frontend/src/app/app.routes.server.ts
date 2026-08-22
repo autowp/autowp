@@ -128,22 +128,25 @@ export const serverRoutes: ServerRoute[] = [
   //
   // `:brand` is the largest and most expensive tree on the site - it is where the crawler spends
   // its time, and where a render costs the most gRPC calls - so server rendering is being turned on
-  // for it a level at a time rather than all at once. So far: the brand page itself, and the three
-  // galleries under it with everything inside them - their index, the `gallery/:identity` view and
-  // the `:identity` picture pages.
+  // for it a level at a time rather than all at once. So far: the brand page itself, the three
+  // galleries under it with everything inside them (their index, the `gallery/:identity` view and
+  // the `:identity` picture pages), the car lists - `:brand/cars` and its per-vehicle-type
+  // `:brand/cars/:vehicle_type` - and the recent-pictures list.
   //
-  // The rest of the tree stays client-rendered for now: cars, engines, concepts, recent and mosts,
-  // and the vehicle tree matched by cataloguePathMatcher, which is the deep half of the catalogue
-  // and the one worth turning on last. Note what that costs while it lasts - a nested catalogue URL
+  // The rest of the tree stays client-rendered for now: engines, concepts and mosts, and the
+  // vehicle tree matched by cataloguePathMatcher, which is the deep half of the catalogue and the
+  // one worth turning on last. Note what that costs while it lasts - a nested catalogue URL
   // that doesn't exist answers 200 with an empty shell rather than a 404, because deciding that
   // requires the render this step skips.
   //
   // Sorted last rather than under `b`, because `:brand` is not a prefix like the ones above: it
   // matches any single segment that isn't one of them.
   {path: ':brand', renderMode: RenderMode.Server},
+  {path: ':brand/cars/**', renderMode: RenderMode.Server},
   {path: ':brand/logotypes/**', renderMode: RenderMode.Server},
   {path: ':brand/mixed/**', renderMode: RenderMode.Server},
   {path: ':brand/other/**', renderMode: RenderMode.Server},
+  {path: ':brand/recent/**', renderMode: RenderMode.Server},
   {path: ':brand/**', renderMode: RenderMode.Client},
 
   // Only reachable by a route that was added without being listed above. Server rather than Client
