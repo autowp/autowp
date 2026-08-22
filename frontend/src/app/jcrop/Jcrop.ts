@@ -36,7 +36,9 @@
  * notifySelectionSettled/setZIndex/getPos/startDragMode/setDocOffset/onNewSelection) was already a
  * closure over JcropComponent itself, so both classes were pure indirection. What remains here are
  * the two collaborator classes that actually own a distinct piece of DOM/state, plus the option
- * types/defaults and small DOM helpers they and JcropComponent both need.
+ * types and small DOM helpers they and JcropComponent both need. The default option values
+ * themselves (what used to be a `defaults` constant here) live directly in JcropComponent's #init()
+ * now, for the same reason - it was the only consumer.
  */
 
 export interface JcropCrop {
@@ -47,29 +49,30 @@ export interface JcropCrop {
 }
 
 // The only options JcropComponent (the sole consumer) ever passes at construction. Everything else
-// the upstream plugin supported (bgOpacity/boundary/minSelect/touchSupport) is still implemented -
-// it just always runs with its DefaultedOptions default now, since nothing here can override it
-// any more.
+// the upstream plugin supported (bgOpacity/boundary/minSelect) is still implemented - it just always
+// runs with its DefaultedOptions default now, since nothing here can override it any more.
 // addClass/aspectRatio/borderOpacity/createBorders/createDragbars/createHandles/disabled/
-// handleOpacity/handleSize/keySupport/maxSize/outerImage were dropped entirely (not just
-// defaulted): each was either dead on arrival (keySupport - no keyboard-nudge support was ever
+// handleOpacity/handleSize/keySupport/maxSize/outerImage/touchSupport were dropped entirely (not
+// just defaulted): each was either dead on arrival (keySupport - no keyboard-nudge support was ever
 // ported into this vendored copy), gated a whole branch behind a falsy sentinel (null/0/[0,0]/
-// false) that, once unoverridable, could never turn truthy again, or - once its DefaultedOptions
-// default became the only value it could ever hold - ended up read only by code that's now static
-// markup instead (border/handle opacity and classes, which per-side/per-corner divs even exist to
-// begin with, and - for createDragbars/createHandles specifically - which of them get their
-// mousedown/touchstart bound directly in the template now instead of via a runtime loop; see
-// jcrop.component.html/.scss).
+// false) that, once unoverridable, could never turn truthy again (touchSupport's null - once it
+// could never be true/false instead, JcropComponent's own #init() always fell through to
+// feature-detecting the window, so the override check itself was dead too), or - once its
+// DefaultedOptions default became the only value it could ever hold - ended up read only by code
+// that's now static markup instead (border/handle opacity and classes, which per-side/per-corner
+// divs even exist to begin with, and - for createDragbars/createHandles specifically - which of
+// them get their mousedown/touchstart bound directly in the template now instead of via a runtime
+// loop; see jcrop.component.html/.scss).
 export interface JcropOptions {
   boxHeight?: number;
   boxWidth?: number;
   minSize?: number[];
-  onSelect?: (crop: JcropCrop) => void;
   setSelect?: number[];
   trueSize?: number[];
 }
 
-// The subset of options `defaults` always supplies a value for - everything else on JcropOptions
+// The subset of options JcropComponent's #init() always supplies a value for (in its own default
+// object literal, spread into #options before opt) - everything else on JcropOptions
 // (setSelect/trueSize) is genuinely optional at runtime, read only behind an
 // `options.hasOwnProperty(...)` check.
 interface DefaultedOptions {
@@ -79,8 +82,6 @@ interface DefaultedOptions {
   boxWidth: number;
   minSelect: number[];
   minSize: number[];
-  onSelect: (crop: JcropCrop) => void;
-  touchSupport: boolean | null;
 }
 
 export type InternalOptions = DefaultedOptions & JcropOptions;
@@ -105,23 +106,6 @@ export type DragMode = 'move' | Ordinal;
 // oppLockCorner only ever maps onto a diagonal - the corner opposite the dragged edge/corner, which
 // getCorner then reads off Coords - so both are typed to this narrower union rather than Ordinal.
 export type Corner = 'ne' | 'nw' | 'se' | 'sw';
-
-// Global Defaults {{{
-export const defaults: DefaultedOptions = {
-  // Styling Options
-  bgOpacity: 0.6,
-  boundary: 2,
-
-  boxHeight: 0,
-  boxWidth: 0,
-
-  minSelect: [0, 0],
-  minSize: [0, 0],
-  // Callbacks / Event Handlers
-  onSelect: function () {},
-
-  touchSupport: null,
-};
 
 // Every element Jcrop creates keeps zero border/padding (either by never setting any, or via
 // imgStyle explicitly zeroing them), so content-box width/height - what a getter needs to return to
@@ -313,22 +297,15 @@ export class Coords {
 // touchDragStart() below, the same way it already does for the "move" tracker overlay via
 // createDragger/createTouchDragger directly. Kept independent of JcropComponent's own touch handling
 // by taking its touch-specific bit (how to build a touch-drag handler) as a plain function rather
-// than depending on that state directly. `coords`/`img2`/`sel` are taken as the real collaborator
-// objects they are (not individually wrapped getters), since by the time Selection needs them, they
-// already exist and never get replaced.
+// than depending on that state directly. `coords` is taken as the real collaborator object it is (not
+// an individually wrapped getter), since by the time Selection needs it, it already exists and never
+// gets replaced. Doesn't hold a DOM reference to #sel/#img2 at all any more - every style it used to
+// set on them directly (display, opacity, position, size) is a JcropComponent signal instead, set
+// through the callbacks below.
 export class Selection {
   #awake: boolean | undefined;
 
   constructor(
-    // The crop-preview image clipped inside #imgHolder (jcrop.component.html) - a real, static
-    // template element now, so (unlike sel below) it never needed a getter or a placeholder swap in
-    // the first place.
-    private readonly img2: HTMLImageElement,
-    // #moveto()/#resize() below write this element's left/top/height/width directly, continuously,
-    // on every drag frame - a JcropComponent signal would add at least one change-detection pass of
-    // lag between a mousemove and the box actually following it, so this (and img2 above) stays a
-    // plain DOM node rather than a signal-driven template binding, unlike sel's own display below.
-    private readonly sel: HTMLDivElement,
     private readonly bgopacity: number,
     private readonly createDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
     private readonly createTouchDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
@@ -337,13 +314,17 @@ export class Selection {
     // Handle/dragbar visibility is a JcropComponent signal ([style.display] on the #hdlHolder
     // template element), not a style this class sets directly any more.
     private readonly setHandlesVisible: (visible: boolean) => void,
-    // sel's own display and #workingImg's opacity - unlike its left/top/height/width above, these
-    // only change once per drag gesture (awake/asleep, dimmed/undimmed), not on every frame, so
-    // JcropComponent signals are safe here with no perceptible lag.
+    // #sel's own display and #workingImg's opacity - these only change once per drag gesture
+    // (awake/asleep, dimmed/undimmed), not on every frame.
     private readonly setSelVisible: (visible: boolean) => void,
     private readonly setImgOpacity: (opacity: number) => void,
+    // #img2's and #sel's own left/top (plus #sel's height/width) - unlike the above, these change on
+    // every drag frame, in #moveto()/#resize() below, but that's no reason they can't be signals too.
+    private readonly setImg2Position: (x: number, y: number) => void,
+    private readonly setSelPosition: (x: number, y: number) => void,
+    private readonly setSelSize: (w: number, h: number) => void,
   ) {
-    this.disableHandles();
+    this.setHandlesVisible(false);
   }
 
   // Forwarded from the mousedown/touchstart bindings on each handle/dragbar's static template
@@ -355,18 +336,6 @@ export class Selection {
 
   touchDragStart(ord: Ordinal, e: JcropMouseEvent): void {
     this.createTouchDragger(ord)(e);
-  }
-
-  disableHandles(): void {
-    this.setHandlesVisible(false);
-  }
-
-  done(): void {
-    this.refresh();
-  }
-
-  enableHandles(): void {
-    this.setHandlesVisible(true);
   }
 
   isAwake(): boolean {
@@ -383,7 +352,7 @@ export class Selection {
   }
 
   release(): void {
-    this.disableHandles();
+    this.setHandlesVisible(false);
     this.setSelVisible(false);
 
     this.#setBgOpacity(1);
@@ -405,12 +374,12 @@ export class Selection {
   }
 
   #moveto(x: number, y: number): void {
-    setStyle(this.img2, {left: px(-x), top: px(-y)});
-    setStyle(this.sel, {left: px(x), top: px(y)});
+    this.setImg2Position(-x, -y);
+    this.setSelPosition(x, y);
   }
 
   #resize(w: number, h: number): void {
-    setStyle(this.sel, {height: px(Math.round(h)), width: px(Math.round(w))});
+    this.setSelSize(Math.round(w), Math.round(h));
   }
 
   #updateVisible(select?: boolean): void {

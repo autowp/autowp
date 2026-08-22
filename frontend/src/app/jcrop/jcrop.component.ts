@@ -1,5 +1,3 @@
-import type {OnDestroy} from '@angular/core';
-
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,7 +23,7 @@ import type {
   PositionCallback,
 } from './Jcrop';
 
-import {Coords, defaults, px, Selection, setStyle} from './Jcrop';
+import {Coords, px, Selection, setStyle} from './Jcrop';
 
 @Component({
   selector: 'app-jcrop',
@@ -57,9 +55,14 @@ import {Coords, defaults, px, Selection, setStyle} from './Jcrop';
     '(document:touchstart)': 'onDocumentTouchStart($event)',
   },
 })
-export class JcropComponent implements OnDestroy {
+export class JcropComponent {
   readonly #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly #window = browserWindow();
+  // Whether this device supports touch - what used to be a separate Touch class's own `support`
+  // field (see Jcrop.ts): computed once here rather than in #init(), since (now that
+  // #options.touchSupport, the one-time "explicit override" option, is gone) it needs nothing from
+  // #init()/#options any more, just #window above.
+  readonly #touchSupport: boolean;
 
   readonly src = input.required<string>();
   readonly pictureWidth = input.required<number>();
@@ -69,15 +72,23 @@ export class JcropComponent implements OnDestroy {
 
   readonly cropChange = output<JcropCrop>();
 
-  private readonly holderRef = viewChild.required<ElementRef<HTMLDivElement>>('holder');
-  private readonly selRef = viewChild.required<ElementRef<HTMLDivElement>>('sel');
+  private readonly origimgRef = viewChild.required<ElementRef<HTMLImageElement>>('origimg');
   private readonly workingImgRef = viewChild.required<ElementRef<HTMLImageElement>>('workingImg');
-  private readonly img2Ref = viewChild.required<ElementRef<HTMLImageElement>>('img2');
 
-  // Whether the resize handles/dragbars are shown - driven by Selection#disableHandles()/
-  // enableHandles() via the setHandlesVisible callback passed into it below, and read directly by
-  // the #hdlHolder template element's [style.display] binding instead of Jcrop imperatively setting
-  // that style itself.
+  constructor() {
+    // Feature-detect the window (what used to be Touch's own constructor logic and the free
+    // hasTouchSupport() helper in Jcrop.ts). #window can be null during SSR, but touch support is
+    // meaningless there anyway, so false is a harmless fallback.
+    this.#touchSupport = this.#window
+      ? 'ontouchstart' in this.#window || this.#window.navigator.maxTouchPoints > 0
+      : false;
+  }
+
+  // Whether the resize handles/dragbars are shown - set directly by this component (#setSelect(),
+  // #doneSelect(), #newSelection() below) and by Selection itself (its own constructor and
+  // release(), via the setHandlesVisible callback passed into it), and read directly by the
+  // #hdlHolder template element's [style.display] binding instead of Jcrop imperatively setting that
+  // style itself.
   protected readonly handlesVisible = signal(false);
 
   // The #tracker template element's cursor - set directly via style manipulation in the vendored
@@ -111,22 +122,36 @@ export class JcropComponent implements OnDestroy {
   protected readonly img2Height = signal(0);
   protected readonly img2Width = signal(0);
 
+  // #img2's own left/top - driven by Selection#update()/#moveto() (Jcrop.ts) via the setImg2Position
+  // callback passed into it below, on every drag frame. Selection no longer needs a reference to the
+  // #img2 DOM node at all any more, now that this is the only thing it ever did with one.
+  protected readonly img2Left = signal(0);
+  protected readonly img2Top = signal(0);
+
+  // #sel's own left/top/height/width - driven by Selection#update()/#moveto()/#resize() (Jcrop.ts) via
+  // the setSelPosition/setSelSize callbacks passed into it below, on every drag frame, the same way
+  // img2Left/img2Top are. Selection no longer needs a reference to the #sel DOM node at all any more,
+  // now that this is the only thing it ever did with one (its display already moved to selVisible
+  // below).
+  protected readonly selLeft = signal(0);
+  protected readonly selTop = signal(0);
+  protected readonly selHeight = signal(0);
+  protected readonly selWidth = signal(0);
+
   // The real <img> template element's display/visibility - true (its default) until #init() hides it
   // once #workingImg (a second, static template <img> - see #init() below) is ready to show in its
-  // place, and back to true in ngOnDestroy() to restore it. #workingImg's own height/width, by
-  // contrast, stay a direct setStyle() call in #init() rather than a signal: #presize() and the
-  // offsetHeight/offsetWidth reads right after both need that size actually committed to the DOM
-  // synchronously - a signal only takes effect on Angular's next change-detection pass, which would
-  // leave #workingImg (and everything sized off it) built from the wrong dimensions.
+  // place. #workingImg's own height/width, by contrast, stay a direct setStyle() call in #init()
+  // rather than a signal: #presize() and the offsetHeight/offsetWidth reads right after both need
+  // that size actually committed to the DOM synchronously - a signal only takes effect on Angular's
+  // next change-detection pass, which would leave #workingImg (and everything sized off it) built
+  // from the wrong dimensions.
   protected readonly origimgVisible = signal(true);
 
   // #sel's own display - whether the selection box (and everything clipped/nested inside it: borders,
   // handles, the #img2 crop-preview) is shown at all. Driven by Selection#release()/#show() via the
   // setSelVisible callback passed into it below, false until the first selection - matching
   // handlesVisible's own initial value - since #sel would otherwise flash unstyled before #init() has
-  // run. Unlike sel's left/top/height/width (still direct setStyle() calls inside Selection, since
-  // those change on every drag frame - see Jcrop.ts), this only flips once per drag gesture, so a
-  // signal adds no perceptible lag.
+  // run.
   protected readonly selVisible = signal(false);
 
   // #workingImg's opacity - dimmed while a selection is awake (Selection#show()'s bgopacity), restored
@@ -140,19 +165,13 @@ export class JcropComponent implements OnDestroy {
   // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). All of it is
   // set once by #init(), when the template's own <img> fires its load event - never in this
   // component's own constructor, so TS's definite-assignment analysis can't see it; #initialized
-  // guards the two externally-triggered entry points (ngOnDestroy/selectAll) against running before
-  // that has happened - everything else here only ever runs from inside #init() itself.
+  // guards selectAll() (the only externally-triggered entry point) against running before that has
+  // happened - everything else here only ever runs from inside #init() itself.
   #initialized = false;
-  #win!: Window;
   #img!: HTMLImageElement;
-  #div!: HTMLDivElement;
   #boundx!: number;
   #boundy!: number;
   #coords!: Coords;
-  // Whether this device supports touch - what used to be a separate Touch class's own `support`
-  // field (see Jcrop.ts): computed once in #init() the same way, from #options.touchSupport falling
-  // back to feature-detecting the window if unset.
-  #touchSupport!: boolean;
   #bgopacity!: number;
   #selection!: Selection;
   // Document-level drag-tracking state (what used to be a separate Tracker class - see Jcrop.ts):
@@ -168,16 +187,22 @@ export class JcropComponent implements OnDestroy {
   #trackerIstouch: boolean | undefined;
   #trackerOnDone: PositionCallback = function () {};
   #trackerOnMove: PositionCallback = function () {};
-  #options!: InternalOptions;
+  // Default option values (what used to be a `defaults` constant in Jcrop.ts) - #init() is the only
+  // consumer, so there's no reason for these to live anywhere else. A real field initializer rather
+  // than a static one: each instance gets its own fresh object this way, so #init() merging opt into
+  // it (and #interfaceUpdate()'s `delete this.#options.setSelect` later) can't mutate a value shared
+  // across every other JcropComponent instance.
+  #options: InternalOptions = {
+    bgOpacity: 0.6,
+    boundary: 2,
+    boxHeight: 0,
+    boxWidth: 0,
+    minSelect: [0, 0],
+    minSize: [0, 0],
+  };
   #xscale!: number;
   #yscale!: number;
   #docOffset!: Point;
-
-  ngOnDestroy(): void {
-    if (!this.#initialized) return;
-    this.#div.remove();
-    this.origimgVisible.set(true);
-  }
 
   // Called by the host page's own "select all" button via viewChild() - the crop dialogs each keep
   // that button (and the aspect/resolution readout next to it) in their own template/layout rather
@@ -188,15 +213,12 @@ export class JcropComponent implements OnDestroy {
     this.#setSelect([0, 0, this.pictureWidth(), this.pictureHeight()]);
   }
 
-  protected onLoad(e: Event): void {
-    if (!(e.target instanceof HTMLImageElement)) {
-      return;
-    }
-    const img = e.target;
+  protected onLoad(): void {
+    const img = this.origimgRef().nativeElement;
 
-    // Both guaranteed by the time a real `load` event can fire: this component's own template is
-    // never rendered server-side (every consumer sits behind a RenderMode.Client route), so
-    // #window is only ever null in a scenario where onLoad() can't be called in the first place.
+    // Guaranteed by the time a real `load` event can fire: this component's own template is never
+    // rendered server-side (every consumer sits behind a RenderMode.Client route), so #window is
+    // only ever null in a scenario where onLoad() can't be called in the first place.
     const win = this.#window;
     if (!win) {
       return;
@@ -227,23 +249,23 @@ export class JcropComponent implements OnDestroy {
 
     const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
 
-    this.#init(
-      img,
-      {
-        boxHeight: height,
-        boxWidth: width,
-        minSize: this.minSize(),
-        onSelect: (crop: JcropCrop) => {
-          // Coords already clamps against [0, boundx]/[0, boundy] in scaled space, but rounding
-          // through xscale/yscale in unscale() can still leave a hair of negative slop after a
-          // drag to the top/left edge - guard against saving that.
-          this.cropChange.emit({...crop, x: Math.max(0, crop.x), y: Math.max(0, crop.y)});
-        },
-        setSelect: [initial.x, initial.y, initial.x + initial.w, initial.y + initial.h],
-        trueSize: [pictureWidth, pictureHeight],
-      },
-      win,
-    );
+    this.#init({
+      boxHeight: height,
+      boxWidth: width,
+      minSize: this.minSize(),
+      setSelect: [initial.x, initial.y, initial.x + initial.w, initial.y + initial.h],
+      trueSize: [pictureWidth, pictureHeight],
+    });
+  }
+
+  // Called wherever the vendored plugin used to call its configurable onSelect option - this is the
+  // sole consumer JcropComponent ever passed for it, so it's a real method now instead of a callback
+  // routed through #options (which never actually varied at runtime).
+  #onSelect(crop: JcropCrop): void {
+    // Coords already clamps against [0, boundx]/[0, boundy] in scaled space, but rounding through
+    // xscale/yscale in unscale() can still leave a hair of negative slop after a drag to the
+    // top/left edge - guard against saving that.
+    this.cropChange.emit({...crop, x: Math.max(0, crop.x), y: Math.max(0, crop.y)});
   }
 
   // Bound directly on the #tracker/#selectionTracker template elements (jcrop.component.html)
@@ -331,11 +353,14 @@ export class JcropComponent implements OnDestroy {
   // because each is handed to a collaborator (Selection) by bare reference rather than called
   // directly; an ordinary method read that way loses its `this` binding the moment something else
   // invokes it.
-  #init(origimg: HTMLImageElement, opt: JcropOptions, win: Window): void {
-    this.#win = win;
-    this.#options = {...defaults};
-
-    this.#mergeOptions(opt);
+  #init(opt: JcropOptions): void {
+    // Guarded the same defensive way onLoad() (the only caller) already did before calling #init() -
+    // that narrowing doesn't carry across the call boundary, so this re-checks rather than asserting
+    // (this codebase avoids non-null assertions on #window - see e.g. AreaComponent/PictureComponent -
+    // in favor of a real check every time it's used).
+    if (!this.#window) return;
+    const origimg = this.origimgRef().nativeElement;
+    this.#options = {...this.#options, ...opt};
 
     // Fix size of crop image.
     // Necessary when crop image is within a hidden element when page is loaded.
@@ -364,8 +389,6 @@ export class JcropComponent implements OnDestroy {
     setStyle(img, {height: px(origimg.offsetHeight), width: px(origimg.offsetWidth)});
     this.origimgVisible.set(false);
 
-    this.#div = this.holderRef().nativeElement;
-
     this.#presize(img, this.#options.boxWidth, this.#options.boxHeight);
 
     this.#boundx = img.offsetWidth;
@@ -382,40 +405,31 @@ export class JcropComponent implements OnDestroy {
     this.trackerWidth.set(this.#boundx + bound * 2);
     this.trackerOffset.set(-bound);
 
-    // #img2's own src/static styling are template bindings, same as #workingImg above - unlike its
-    // height/width, nothing reads it back synchronously afterward, so those ARE signals
-    // (img2Height/img2Width) rather than a direct setStyle() call.
-    const img2 = this.img2Ref().nativeElement;
+    // #img2's own src/static styling are template bindings, same as #workingImg above; its
+    // height/width and left/top are all signals too (img2Height/img2Width/img2Left/img2Top) - unlike
+    // #workingImg, nothing reads #img2's layout back synchronously, and Selection only ever needs to
+    // set its position, not read the element itself, so it never needs a DOM reference at all.
     this.img2Height.set(this.#boundy);
     this.img2Width.set(this.#boundx);
-    // position/zIndex are static CSS on the sel template element (jcrop.component.html).
-    const sel = this.selRef().nativeElement;
+    // position/zIndex are static CSS on the sel template element (jcrop.component.html); its own
+    // left/top/height/width are signals too (selLeft/selTop/selHeight/selWidth) for the same reason
+    // img2's are - Selection only ever needs to set them, not read #sel back, so it never needs a DOM
+    // reference to it at all.
 
     // Coords Module {{{
     this.#coords = new Coords(this.#boundx, this.#boundy, () => ({xscale: this.#xscale, yscale: this.#yscale}));
     // }}}
 
-    // Whether this device supports touch - #options.touchSupport (an explicit override) wins if set,
-    // otherwise fall back to feature-detecting the window (what used to be Touch's own constructor
-    // logic and the free hasTouchSupport() helper in Jcrop.ts).
-    const touchSupportOption = this.#options.touchSupport;
-    this.#touchSupport =
-      touchSupportOption === true || touchSupportOption === false
-        ? touchSupportOption
-        : 'ontouchstart' in win || win.navigator.maxTouchPoints > 0;
-
     this.#bgopacity = this.#options.bgOpacity;
 
     // Selection Module {{{
     this.#selection = new Selection(
-      img2,
-      sel,
       this.#bgopacity,
       (ord) => this.#createDragger(ord),
       (ord) => this.#createTouchDragger(ord),
       this.#coords,
       (c) => {
-        this.#options.onSelect.call(this, this.#unscale(c));
+        this.#onSelect(this.#unscale(c));
       },
       (visible) => {
         this.handlesVisible.set(visible);
@@ -425,6 +439,18 @@ export class JcropComponent implements OnDestroy {
       },
       (opacity) => {
         this.imgOpacity.set(opacity);
+      },
+      (x, y) => {
+        this.img2Left.set(x);
+        this.img2Top.set(y);
+      },
+      (x, y) => {
+        this.selLeft.set(x);
+        this.selTop.set(y);
+      },
+      (w, h) => {
+        this.selWidth.set(w);
+        this.selHeight.set(h);
       },
     );
 
@@ -441,26 +467,21 @@ export class JcropComponent implements OnDestroy {
       (rect[2] ?? 0) / this.#xscale,
       (rect[3] ?? 0) / this.#yscale,
     ]);
-    this.#options.onSelect.call(this, this.#unscale(this.#coords.getFixed()));
-    this.#selection.enableHandles();
+    this.#onSelect(this.#unscale(this.#coords.getFixed()));
+    this.handlesVisible.set(true);
   }
 
   readonly #getPos = (el: HTMLElement): Point => {
+    // Guarded the same defensive way #init() is - see there. [0, 0] is an arbitrary but harmless
+    // fallback for a branch that can't actually be reached (every caller only runs after #init()).
+    if (!this.#window) return [0, 0];
     const rect = el.getBoundingClientRect();
-    return [rect.left + this.#win.scrollX, rect.top + this.#win.scrollY];
+    return [rect.left + this.#window.scrollX, rect.top + this.#window.scrollY];
   };
 
   readonly #mouseAbs = (e: JcropMouseEvent): Point => {
     return [(e.pageX ?? 0) - this.#docOffset[0], (e.pageY ?? 0) - this.#docOffset[1]];
   };
-
-  #mergeOptions(opt: JcropOptions): void {
-    this.#options = {...this.#options, ...opt};
-
-    if (typeof this.#options.onSelect !== 'function') {
-      this.#options.onSelect = function () {};
-    }
-  }
 
   readonly #startDragMode = (mode: DragMode, pos: Point, touch?: boolean): void => {
     this.#docOffset = this.#getPos(this.#img);
@@ -600,8 +621,8 @@ export class JcropComponent implements OnDestroy {
     const c = this.#coords.getFixed();
     const minSelect = this.#options.minSelect;
     if (c.w > minSelect[0] && c.h > minSelect[1]) {
-      this.#selection.enableHandles();
-      this.#selection.done();
+      this.handlesVisible.set(true);
+      this.#selection.refresh();
     } else {
       this.#selection.release();
     }
@@ -610,7 +631,7 @@ export class JcropComponent implements OnDestroy {
 
   #newSelection(e: JcropMouseEvent): void {
     this.#docOffset = this.#getPos(this.#img);
-    this.#selection.disableHandles();
+    this.handlesVisible.set(false);
     this.trackerCursor.set('crosshair');
     const pos = this.#mouseAbs(e);
     this.#coords.setPressed(pos);
@@ -645,7 +666,7 @@ export class JcropComponent implements OnDestroy {
 
     this.#trackerOnDone(this.#mouseAbs(e));
     if (this.#selection.isAwake()) {
-      this.#options.onSelect.call(this, this.#unscale(this.#coords.getFixed()));
+      this.#onSelect(this.#unscale(this.#coords.getFixed()));
     }
 
     this.trackerZIndex.set(290);
@@ -670,7 +691,7 @@ export class JcropComponent implements OnDestroy {
 
     if (Object.hasOwn(this.#options, 'setSelect') && this.#options.setSelect) {
       this.#setSelect(this.#options.setSelect);
-      this.#selection.done();
+      this.#selection.refresh();
       delete this.#options.setSelect;
     }
 
