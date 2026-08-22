@@ -19,7 +19,7 @@ test-chart:
     - sonar-scanner -Dsonar.login=$SONAR_TOKEN
     - echo "$DOCKER_PASSWORD" | helm registry login -u="$DOCKER_USERNAME" --password-stdin docker.io
     - helm dependency update
-    - helm lint
+    - helm lint .
     - kube-linter lint .
     - trivy config --severity MEDIUM,HIGH,CRITICAL --exit-code 1 --config-data ./trusted-registries.yaml . --report=summary
   rules:
