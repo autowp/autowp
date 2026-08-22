@@ -169,26 +169,24 @@ export default defineConfig([
     files: ['**/*.ts'],
   },
   {
-    // jquery.Jcrop.ts is a vendored third-party plugin (github.com/tapmodo/Jcrop), kept close to
-    // upstream so it stays diffable against future updates rather than restructured to this
-    // codebase's own conventions. It also only ever runs client-side (every consumer sits behind a
-    // RenderMode.Client route), so the SSR-safety reasoning behind no-restricted-globals doesn't
-    // apply to its direct `document`/`navigator` use. Placed after every other block that targets
-    // '**/*.ts' (depend, sonarjs, rxjs-x) so these overrides actually win instead of being
-    // reasserted by a later same-glob block.
+    // Jcrop.ts is an image-cropping plugin (originally from github.com/tapmodo/Jcrop). It only ever
+    // runs client-side (every consumer sits behind a RenderMode.Client route), so the SSR-safety
+    // reasoning behind no-restricted-globals doesn't apply to its direct `document`/`navigator` use.
+    // Placed after every other block that targets '**/*.ts' (depend, sonarjs, rxjs-x) so these
+    // overrides actually win instead of being reasserted by a later same-glob block.
     files: ['src/app/jcrop/**/*.ts'],
     rules: {
-      // The plugin is inherently jQuery - that's the dependency being vendored, not a choice this
-      // file makes on its own.
-      'depend/ban-dependencies': 'off',
       'no-restricted-globals': 'off',
-      // Upstream Jcrop idiom: every DOM event handler ends with `return false;` (stop
-      // propagation/prevent default via jQuery's shorthand), which reads as "always returns the
-      // same value" to sonarjs. Kept as-is to stay diffable against upstream.
+      // Every DOM event handler here ends with `return false;` (jQuery's shorthand for stop
+      // propagation + prevent default), which reads as "always returns the same value" to sonarjs -
+      // that's the idiom, not a bug.
       'sonarjs/no-invariant-returns': 'off',
+      // The coordinate/aspect-ratio math (getFixed/getRect in particular) is inherently branchy -
+      // splitting it up to satisfy a complexity budget would risk the geometry itself, which isn't
+      // worth it without a live browser test of drag/resize to check against.
       'sonarjs/cognitive-complexity': 'off',
       // Several call sites intentionally pass a no-op (`function () {}`) as a default/placeholder
-      // handler, matching the upstream plugin.
+      // handler.
       '@typescript-eslint/no-empty-function': 'off',
     },
   },

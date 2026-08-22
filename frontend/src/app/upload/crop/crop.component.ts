@@ -10,9 +10,9 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {browserWindow} from '@utils/browser-window';
 import {BehaviorSubject, combineLatest} from 'rxjs';
 
-import type {JcropCrop, JcropInstance} from '../../jcrop/jquery.Jcrop';
+import type {JcropCrop, JcropInstance} from '../../jcrop/Jcrop';
 
-import Jcrop from '../../jcrop/jquery.Jcrop';
+import Jcrop from '../../jcrop/Jcrop';
 
 @Component({
   selector: 'app-upload-crop',

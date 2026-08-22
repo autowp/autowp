@@ -19,9 +19,9 @@ import {PageEnvService} from '@services/page-env.service';
 import {browserWindow} from '@utils/browser-window';
 import {BehaviorSubject, catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
-import type {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/jquery.Jcrop.js';
+import type {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/Jcrop.js';
 
-import Jcrop from '../../../../jcrop/jquery.Jcrop.js';
+import Jcrop from '../../../../jcrop/Jcrop.js';
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({

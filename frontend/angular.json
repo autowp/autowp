@@ -105,11 +105,8 @@
               "node_modules/leaflet/dist/leaflet.css",
               "src/app/styles.scss",
               "src/app/brandicon.scss",
-              "src/app/jcrop/jquery.Jcrop.scss",
+              "src/app/jcrop/Jcrop.scss",
               "src/assets/flags/flags.scss"
-            ],
-            "scripts": [
-              "node_modules/jquery/dist/jquery.js"
             ],
             "localize": [
               "be",
