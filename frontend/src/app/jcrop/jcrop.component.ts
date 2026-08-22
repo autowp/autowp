@@ -1,7 +1,7 @@
 import type {OnDestroy} from '@angular/core';
 
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, ElementRef, inject, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, inject, input, output, ViewEncapsulation} from '@angular/core';
 import {browserWindow} from '@utils/browser-window';
 
 import type {JcropCrop, JcropInstance} from './Jcrop';
@@ -13,6 +13,13 @@ import Jcrop from './Jcrop';
   templateUrl: './jcrop.component.html',
   styleUrl: './jcrop.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The Jcrop plugin builds its handles/borders/tracker overlay with raw document.createElement()
+  // calls, not this component's own template - Angular's emulated encapsulation only stamps its
+  // scoping attribute onto elements it renders itself, so those .jcrop-* selectors would silently
+  // match nothing under the default encapsulation. Global scope here is what angular.json's
+  // top-level `styles` array already gave this stylesheet before it moved here.
+  // eslint-disable-next-line @angular-eslint/use-component-view-encapsulation
+  encapsulation: ViewEncapsulation.None,
 })
 export class JcropComponent implements OnDestroy {
   readonly #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -80,7 +87,7 @@ export class JcropComponent implements OnDestroy {
 
     const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
 
-    this.#jcrop = Jcrop(
+    this.#jcrop = new Jcrop(
       img,
       {
         boxHeight: height,

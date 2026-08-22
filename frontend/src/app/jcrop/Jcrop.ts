@@ -110,7 +110,7 @@ type InternalOptions = DefaultedOptions & JcropOptions;
 
 type Point = [number, number];
 
-// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: Touch.cfilter() copies the
+// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: Touch#cfilter() copies the
 // active touch's page coordinates onto the event itself so mouseAbs() can read event.pageX/pageY
 // the same way regardless of whether the drag started from a mouse or touch listener - TouchEvent
 // doesn't carry its own pageX/pageY (only the individual Touch entries in its touch lists do).
@@ -156,305 +156,825 @@ const defaults: DefaultedOptions = {
 };
 
 // Every element Jcrop creates keeps zero border/padding (either by never setting any, or via
-// img_css explicitly zeroing them), so content-box width/height - what a getter needs to return to
+// imgStyle explicitly zeroing them), so content-box width/height - what a getter needs to return to
 // stay faithful to the plugin's original jQuery .width()/.height() reads - always equals
 // offsetWidth/offsetHeight here. No box-model conversion needed.
 function setStyle(el: HTMLElement, styles: Partial<CSSStyleDeclaration>): void {
   Object.assign(el.style, styles);
 }
 
-// doc/win are threaded through explicitly rather than read off the global `document`/`window` -
-// this file is a plain factory function, not an Angular class, so it can't inject() them itself.
-// The one caller that can (JcropComponent) gets them the Angular way (DOCUMENT token,
-// browserWindow()) and passes them in.
-function Jcrop(obj: HTMLImageElement, opt: JcropOptions, doc: Document, win: Window): JcropInstance {
-  let xscale: number;
-  let yscale: number;
+function px(n: number): string {
+  return Math.round(n) + 'px';
+}
 
-  let options: InternalOptions = {...defaults};
+function cssClass(cl: string): string {
+  return 'jcrop-' + cl;
+}
 
-  const hdlHolder = doc.createElement('div');
-  setStyle(hdlHolder, {height: '100%', width: '100%', zIndex: '320'});
+// Owns the "new selection" tracker overlay - the invisible full-image click target used both to
+// start a fresh selection drag and, once active, to forward mousemove/touchmove/mouseup/touchend on
+// `document` to whichever move/done callback the caller currently has active (set via
+// activateHandlers(), one call per drag gesture: newSelection() for a fresh drag, startDragMode()
+// for resizing/moving an existing one). Kept independent of Selection/Coords/options - the two
+// things it needs from outside are provided as plain function references so it doesn't have to know
+// about those modules at all: `mouseAbs`/`touchCfilter` (shared, stateful math owned by the outer
+// Jcrop instance) and `notifySelectionSettled` (what to do once a drag ends and the selection has
+// possibly changed - checking whether there's now an awake selection and firing onSelect is the
+// caller's business, not Tracker's).
+class Tracker {
+  #btndown: boolean | undefined;
+  #onDone: PositionCallback = function () {};
+  #onMove: PositionCallback = function () {};
 
-  const imgHolder = doc.createElement('div');
-  setStyle(imgHolder, {height: '100%', overflow: 'hidden', position: 'absolute', width: '100%', zIndex: '310'});
+  constructor(
+    private readonly doc: Document,
+    private readonly trk: HTMLDivElement,
+    private readonly mouseAbs: (e: JcropMouseEvent) => Point,
+    private readonly touchCfilter: (e: JcropMouseEvent) => JcropMouseEvent,
+    private readonly notifySelectionSettled: () => void,
+  ) {}
 
-  // Initialization {{{
-  setOptions(opt);
-  // Initialize the DOM elements for the interface {{{
-  // The values are SET on the image(s) for the interface
-  // If the original image has any of these set, they will be reset
-  // However, if you destroy() the Jcrop instance the original image's
-  // character in the DOM will be as you left it.
-  const imgStyle: Partial<CSSStyleDeclaration> = {
-    border: 'none',
-    left: '0',
-    margin: '0',
-    padding: '0',
-    position: 'absolute',
-    top: '0',
-    visibility: 'visible',
+  activateHandlers(move: PositionCallback, done: PositionCallback, touch?: boolean): boolean {
+    this.#btndown = true;
+    this.#onMove = move;
+    this.#onDone = done;
+    this.#toFront(touch);
+    return false;
+  }
+
+  setCursor(t: string): void {
+    setStyle(this.trk, {cursor: t});
+  }
+
+  #toFront(touch?: boolean): void {
+    setStyle(this.trk, {zIndex: '450'});
+
+    if (touch) {
+      this.doc.addEventListener('touchmove', this.#trackTouchMove);
+      this.doc.addEventListener('touchend', this.#trackTouchEnd);
+    } else {
+      this.doc.addEventListener('mousemove', this.#trackMove);
+      this.doc.addEventListener('mouseup', this.#trackUp);
+    }
+  }
+
+  #toBack(): void {
+    setStyle(this.trk, {zIndex: '290'});
+    this.doc.removeEventListener('mousemove', this.#trackMove);
+    this.doc.removeEventListener('mouseup', this.#trackUp);
+    this.doc.removeEventListener('touchmove', this.#trackTouchMove);
+    this.doc.removeEventListener('touchend', this.#trackTouchEnd);
+  }
+
+  // Field arrows (not methods): registered on `document` via addEventListener/removeEventListener
+  // pairs in #toFront/#toBack, which match handlers by reference - a plain method isn't auto-bound
+  // to `this`, so `this.#trackMove` etc. have to be the same stable, already-bound function object
+  // every time they're read, both to add and to later remove the exact same listener.
+  readonly #trackMove = (e: JcropMouseEvent): boolean => {
+    this.#onMove(this.mouseAbs(e));
+    return false;
   };
 
-  const origimg = obj;
+  readonly #trackUp = (e: JcropMouseEvent): boolean => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  if (origimg.tagName !== 'IMG') {
-    throw new Error('Only img is supported');
-  }
-  // Fix size of crop image.
-  // Necessary when crop image is within a hidden element when page is loaded.
-  if (origimg.width !== 0 && origimg.height !== 0) {
-    // Obtain dimensions from contained img element.
-    setStyle(origimg, {height: px(origimg.height), width: px(origimg.width)});
-  } else {
-    // width/height read 0 above because the source <img> sits inside a hidden (display:none)
-    // container at this point in every browser, not just old IE - load a detached copy to read its
-    // intrinsic dimensions instead.
-    const tempImage = new Image();
-    tempImage.src = origimg.getAttribute('src') ?? '';
-    setStyle(origimg, {height: px(tempImage.height), width: px(tempImage.width)});
-  }
+    if (this.#btndown) {
+      this.#btndown = false;
 
-  const img = origimg.cloneNode(true) as HTMLImageElement;
-  img.removeAttribute('id');
-  setStyle(img, imgStyle);
-  setStyle(img, {display: ''});
+      this.#onDone(this.mouseAbs(e));
+      this.notifySelectionSettled();
 
-  setStyle(img, {height: px(origimg.offsetHeight), width: px(origimg.offsetWidth)});
-  origimg.after(img);
-  setStyle(origimg, {display: 'none'});
+      this.#toBack();
+      this.#onMove = function () {};
+      this.#onDone = function () {};
+    }
 
-  presize(img, options.boxWidth, options.boxHeight);
+    return false;
+  };
 
-  const boundx = img.offsetWidth,
-    boundy = img.offsetHeight,
-    div = doc.createElement('div');
-  setStyle(div, {backgroundColor: 'black', height: px(boundy), position: 'relative', width: px(boundx)});
-  div.classList.add(cssClass('holder'));
-  origimg.after(div);
-  div.append(img);
+  readonly #trackTouchMove = (e: JcropMouseEvent): boolean => {
+    this.#onMove(this.mouseAbs(this.touchCfilter(e)));
+    return false;
+  };
 
-  if (options.addClass) {
-    div.classList.add(options.addClass);
-  }
+  readonly #trackTouchEnd = (e: JcropMouseEvent): boolean => {
+    return this.#trackUp(this.touchCfilter(e));
+  };
+}
 
-  const bound = options.boundary;
-  const trk = newTracker();
-  setStyle(trk, {
-    height: px(boundy + bound * 2),
-    left: px(-bound),
-    position: 'absolute',
-    top: px(-bound),
-    width: px(boundx + bound * 2),
-    zIndex: '290',
-  });
-  trk.addEventListener('mousedown', newSelection);
+// Owns the selection rectangle's coordinate math: the pressed/current corner state (x1/y1/x2/y2)
+// and everything derived from it (aspect-ratio locking, min/max size clamping, bounding to the
+// image). `boundx`/`boundy` never change after construction, so they're plain constructor values;
+// `aspectRatio`/`minSize`/`maxSize` (part of the outer Jcrop options, which get wholesale-reassigned
+// on setOptions()) and `xscale`/`yscale` (recomputed by presize()/interfaceUpdate() outside this
+// class) do change, so those are read live through the two getters instead of copied in once.
+// xlimit/xmin/ylimit/ymin, by contrast, are written from outside (interfaceUpdate()) but read only
+// here, so they're owned outright as private state with a setter.
+class Coords {
+  #x1 = 0;
+  #x2 = 0;
+  #y1 = 0;
+  #y2 = 0;
 
-  let img2: HTMLElement = doc.createElement('div');
-  const sel = doc.createElement('div');
-  setStyle(sel, {position: 'absolute', zIndex: '600'});
-  img.before(sel);
-  sel.append(imgHolder, hdlHolder);
+  #xlimit = 0;
+  #xmin = 0;
+  #ylimit = 0;
+  #ymin = 0;
 
-  function detectSupport(): boolean {
-    if (options.touchSupport === true || options.touchSupport === false) return options.touchSupport;
-    else return hasTouchSupport(win);
+  constructor(
+    private readonly boundx: number,
+    private readonly boundy: number,
+    private readonly getOptions: () => InternalOptions,
+    private readonly getScale: () => {xscale: number; yscale: number},
+  ) {}
+
+  setLimits(xlimit: number, ylimit: number, xmin: number, ymin: number): void {
+    this.#xlimit = xlimit;
+    this.#ylimit = ylimit;
+    this.#xmin = xmin;
+    this.#ymin = ymin;
   }
 
-  // Touch Module {{{
-  const Touch = (function () {
+  setPressed(pos: Point): void {
+    const rebounded = this.#rebound(pos);
+    this.#x2 = this.#x1 = rebounded[0];
+    this.#y2 = this.#y1 = rebounded[1];
+  }
+
+  setCurrent(pos: Point): void {
+    const rebounded = this.#rebound(pos);
+    this.#x2 = rebounded[0];
+    this.#y2 = rebounded[1];
+  }
+
+  moveOffset(offset: Point): void {
+    let ox = offset[0],
+      oy = offset[1];
+
+    if (0 > this.#x1 + ox) {
+      ox -= ox + this.#x1;
+    }
+    if (0 > this.#y1 + oy) {
+      oy -= oy + this.#y1;
+    }
+
+    if (this.boundy < this.#y2 + oy) {
+      oy += this.boundy - (this.#y2 + oy);
+    }
+    if (this.boundx < this.#x2 + ox) {
+      ox += this.boundx - (this.#x2 + ox);
+    }
+
+    this.#x1 += ox;
+    this.#x2 += ox;
+    this.#y1 += oy;
+    this.#y2 += oy;
+  }
+
+  getCorner(ord: Corner): Point {
+    const c = this.getFixed();
+    switch (ord) {
+      case 'ne':
+        return [c.x2, c.y];
+      case 'nw':
+        return [c.x, c.y];
+      case 'se':
+        return [c.x2, c.y2];
+      case 'sw':
+        return [c.x, c.y2];
+    }
+  }
+
+  getFixed(): JcropCrop & {x2: number; y2: number} {
+    const options = this.getOptions();
+    if (!options.aspectRatio) {
+      return this.#getRect();
+    }
+    const {xscale} = this.getScale();
+    // This function could use some optimization I think...
+    const aspect = options.aspectRatio,
+      min_x = options.minSize[0] / xscale,
+      rh = this.#y2 - this.#y1,
+      rha = Math.abs(rh),
+      rw = this.#x2 - this.#x1,
+      rwa = Math.abs(rw),
+      real_ratio = rwa / rha;
+    let // Always reassigned before being read on every path that reads them (the aspect-locked
+      // branch below either recomputes h/w from scratch or never reads this initial value) - kept
+      // explicit rather than left `undefined` so TS's definite-assignment analysis doesn't need to
+      // prove that itself across the branching below.
+      // eslint-disable-next-line no-useless-assignment
+      h = 0,
+      max_x = options.maxSize[0] / xscale,
+      // eslint-disable-next-line no-useless-assignment
+      w = 0,
+      xx,
+      yy;
+
+    if (max_x === 0) {
+      max_x = this.boundx * 10;
+    }
+    if (real_ratio < aspect) {
+      yy = this.#y2;
+      w = rha * aspect;
+      xx = rw < 0 ? this.#x1 - w : w + this.#x1;
+
+      if (xx < 0) {
+        xx = 0;
+        h = Math.abs((xx - this.#x1) / aspect);
+        yy = rh < 0 ? this.#y1 - h : h + this.#y1;
+      } else if (xx > this.boundx) {
+        xx = this.boundx;
+        h = Math.abs((xx - this.#x1) / aspect);
+        yy = rh < 0 ? this.#y1 - h : h + this.#y1;
+      }
+    } else {
+      xx = this.#x2;
+      h = rwa / aspect;
+      yy = rh < 0 ? this.#y1 - h : this.#y1 + h;
+      if (yy < 0) {
+        yy = 0;
+        w = Math.abs((yy - this.#y1) * aspect);
+        xx = rw < 0 ? this.#x1 - w : w + this.#x1;
+      } else if (yy > this.boundy) {
+        yy = this.boundy;
+        w = Math.abs(yy - this.#y1) * aspect;
+        xx = rw < 0 ? this.#x1 - w : w + this.#x1;
+      }
+    }
+
+    // Magic %-)
+    if (xx > this.#x1) {
+      // right side
+      if (xx - this.#x1 < min_x) {
+        xx = this.#x1 + min_x;
+      } else if (xx - this.#x1 > max_x) {
+        xx = this.#x1 + max_x;
+      }
+      if (yy > this.#y1) {
+        yy = this.#y1 + (xx - this.#x1) / aspect;
+      } else {
+        yy = this.#y1 - (xx - this.#x1) / aspect;
+      }
+    } else if (xx < this.#x1) {
+      // left side
+      if (this.#x1 - xx < min_x) {
+        xx = this.#x1 - min_x;
+      } else if (this.#x1 - xx > max_x) {
+        xx = this.#x1 - max_x;
+      }
+      if (yy > this.#y1) {
+        yy = this.#y1 + (this.#x1 - xx) / aspect;
+      } else {
+        yy = this.#y1 - (this.#x1 - xx) / aspect;
+      }
+    }
+
+    if (xx < 0) {
+      this.#x1 -= xx;
+      xx = 0;
+    } else if (xx > this.boundx) {
+      this.#x1 -= xx - this.boundx;
+      xx = this.boundx;
+    }
+
+    if (yy < 0) {
+      this.#y1 -= yy;
+      yy = 0;
+    } else if (yy > this.boundy) {
+      this.#y1 -= yy - this.boundy;
+      yy = this.boundy;
+    }
+
+    return this.#makeObj(this.#flipCoords(this.#x1, this.#y1, xx, yy));
+  }
+
+  #rebound(p: Point): Point {
+    let px0 = p[0],
+      py0 = p[1];
+    if (px0 < 0) px0 = 0;
+    if (py0 < 0) py0 = 0;
+
+    if (px0 > this.boundx) px0 = this.boundx;
+    if (py0 > this.boundy) py0 = this.boundy;
+
+    return [Math.round(px0), Math.round(py0)];
+  }
+
+  #flipCoords(x1: number, y1: number, x2: number, y2: number): [number, number, number, number] {
+    let xa = x1,
+      xb = x2,
+      ya = y1,
+      yb = y2;
+    if (x2 < x1) {
+      xa = x2;
+      xb = x1;
+    }
+    if (y2 < y1) {
+      ya = y2;
+      yb = y1;
+    }
+    return [xa, ya, xb, yb];
+  }
+
+  #getRect(): JcropCrop & {x2: number; y2: number} {
+    let delta;
+    const xsize = this.#x2 - this.#x1,
+      ysize = this.#y2 - this.#y1;
+    const {xscale, yscale} = this.getScale();
+
+    if (this.#xlimit && Math.abs(xsize) > this.#xlimit) {
+      this.#x2 = xsize > 0 ? this.#x1 + this.#xlimit : this.#x1 - this.#xlimit;
+    }
+    if (this.#ylimit && Math.abs(ysize) > this.#ylimit) {
+      this.#y2 = ysize > 0 ? this.#y1 + this.#ylimit : this.#y1 - this.#ylimit;
+    }
+
+    if (this.#ymin / yscale && Math.abs(ysize) < this.#ymin / yscale) {
+      this.#y2 = ysize > 0 ? this.#y1 + this.#ymin / yscale : this.#y1 - this.#ymin / yscale;
+    }
+    if (this.#xmin / xscale && Math.abs(xsize) < this.#xmin / xscale) {
+      this.#x2 = xsize > 0 ? this.#x1 + this.#xmin / xscale : this.#x1 - this.#xmin / xscale;
+    }
+
+    if (this.#x1 < 0) {
+      this.#x2 -= this.#x1;
+      this.#x1 -= this.#x1;
+    }
+    if (this.#y1 < 0) {
+      this.#y2 -= this.#y1;
+      this.#y1 -= this.#y1;
+    }
+    if (this.#x2 < 0) {
+      this.#x1 -= this.#x2;
+      this.#x2 -= this.#x2;
+    }
+    if (this.#y2 < 0) {
+      this.#y1 -= this.#y2;
+      this.#y2 -= this.#y2;
+    }
+    if (this.#x2 > this.boundx) {
+      delta = this.#x2 - this.boundx;
+      this.#x1 -= delta;
+      this.#x2 -= delta;
+    }
+    if (this.#y2 > this.boundy) {
+      delta = this.#y2 - this.boundy;
+      this.#y1 -= delta;
+      this.#y2 -= delta;
+    }
+    if (this.#x1 > this.boundx) {
+      delta = this.#x1 - this.boundy;
+      this.#y2 -= delta;
+      this.#y1 -= delta;
+    }
+    if (this.#y1 > this.boundy) {
+      delta = this.#y1 - this.boundy;
+      this.#y2 -= delta;
+      this.#y1 -= delta;
+    }
+
+    return this.#makeObj(this.#flipCoords(this.#x1, this.#y1, this.#x2, this.#y2));
+  }
+
+  #makeObj(a: [number, number, number, number]): JcropCrop & {x2: number; y2: number} {
     return {
-      cfilter: function (e: JcropMouseEvent): JcropMouseEvent {
-        const touch = (e as TouchEvent).changedTouches[0];
-        e.pageX = touch.pageX;
-        e.pageY = touch.pageY;
-        return e;
-      },
-      createDragger: function (ord: DragMode) {
-        return function (e: JcropMouseEvent): void {
-          if (options.disabled) {
-            return;
-          }
-          docOffset = getPos(img);
-          btndown = true;
-          startDragMode(ord, mouseAbs(Touch.cfilter(e)), true);
-          e.stopPropagation();
-          e.preventDefault();
-        };
-      },
-      isSupported: hasTouchSupport,
-      newSelection: function (e: JcropMouseEvent): void {
-        newSelection(Touch.cfilter(e));
-      },
-      support: detectSupport(),
+      h: a[3] - a[1],
+      w: a[2] - a[0],
+      x: a[0],
+      x2: a[2],
+      y: a[1],
+      y2: a[3],
     };
-  })();
+  }
+}
 
-  // Selection Module {{{
-  const Selection = (function () {
-    let awake: boolean | undefined;
-    const borders: Record<string, HTMLDivElement> = {};
-    const dragbar: Record<string, HTMLDivElement> = {};
-    const handle: Record<string, HTMLDivElement> = {};
-    let hdep = 370;
+// Owns the visible selection box: its resize handles, dragbars, borders, the "move" tracker overlay
+// for dragging an existing selection, and the crop-preview image clipped to it. Kept independent of
+// Touch by taking its two touch-specific bits (whether it's supported, and how to build a
+// touch-drag handler) as plain values/functions rather than the Touch object itself - same
+// decoupling as Tracker. `coords` is taken as the real collaborator object it is (not individually
+// wrapped getters), since by the time Selection needs it, it already exists and never gets replaced.
+class Selection {
+  #awake: boolean | undefined;
+  readonly #borders: Record<string, HTMLDivElement> = {};
+  readonly #dragbar: Record<string, HTMLDivElement> = {};
+  readonly #handle: Record<string, HTMLDivElement> = {};
+  #hdep = 370;
 
-    // Private Methods
-    function insertBorder(type: string): HTMLDivElement {
-      const el = doc.createElement('div');
-      setStyle(el, {opacity: String(options.borderOpacity), position: 'absolute'});
-      el.classList.add(cssClass(type));
-      imgHolder.append(el);
-      return el;
+  constructor(
+    private readonly doc: Document,
+    private readonly img: HTMLImageElement,
+    private readonly imgHolder: HTMLDivElement,
+    private readonly hdlHolder: HTMLDivElement,
+    // img2 starts as a placeholder div and is replaced with a real <img> right after Selection is
+    // constructed (see Jcrop's own img2 field for why) - a getter so #moveto() always styles
+    // whichever element is current by the time it's actually called, not the placeholder.
+    private readonly getImg2: () => HTMLElement,
+    private readonly sel: HTMLDivElement,
+    private readonly bgopacity: number,
+    private readonly touchSupport: boolean,
+    private readonly createDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
+    private readonly createTouchDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
+    private readonly getOptions: () => InternalOptions,
+    private readonly coords: Coords,
+    private readonly notifySelect: (crop: JcropCrop & {x2: number; y2: number}) => void,
+    track: HTMLDivElement,
+  ) {
+    const options = this.getOptions();
+
+    if (Array.isArray(options.createDragbars)) this.#createDragbars(options.createDragbars);
+    if (Array.isArray(options.createHandles)) this.#createHandles(options.createHandles);
+    if (Array.isArray(options.createBorders)) this.#createBorders(options.createBorders);
+
+    track.addEventListener('mousedown', createDragger('move'));
+    if (touchSupport) {
+      track.addEventListener('touchstart', createTouchDragger('move'));
+    }
+    imgHolder.append(track);
+    this.disableHandles();
+  }
+
+  disableHandles(): void {
+    setStyle(this.hdlHolder, {display: 'none'});
+  }
+
+  done(): void {
+    this.refresh();
+  }
+
+  enableHandles(): boolean {
+    setStyle(this.hdlHolder, {display: ''});
+    return true;
+  }
+
+  enableOnly(): void {}
+
+  isAwake(): boolean {
+    return !!this.#awake;
+  }
+
+  refresh(): void {
+    const c = this.coords.getFixed();
+
+    this.coords.setPressed([c.x, c.y]);
+    this.coords.setCurrent([c.x2, c.y2]);
+
+    this.#updateVisible();
+  }
+
+  release(): void {
+    this.disableHandles();
+    setStyle(this.sel, {display: 'none'});
+
+    this.#setBgOpacity(1);
+
+    this.#awake = false;
+  }
+
+  update(select?: boolean): void {
+    const c = this.coords.getFixed();
+
+    this.#resize(c.w, c.h);
+    this.#moveto(c.x, c.y);
+
+    if (!this.#awake) this.#show();
+
+    if (select) {
+      this.notifySelect(c);
+    }
+  }
+
+  #insertBorder(type: string): HTMLDivElement {
+    const el = this.doc.createElement('div');
+    setStyle(el, {opacity: String(this.getOptions().borderOpacity), position: 'absolute'});
+    el.classList.add(cssClass(type));
+    this.imgHolder.append(el);
+    return el;
+  }
+
+  #dragDiv(ord: Ordinal, zi: number): HTMLDivElement {
+    const el = this.doc.createElement('div');
+    el.addEventListener('mousedown', this.createDragger(ord));
+    setStyle(el, {cursor: ord + '-resize', position: 'absolute', zIndex: String(zi)});
+    el.classList.add('ord-' + ord);
+
+    if (this.touchSupport) {
+      el.addEventListener('touchstart', this.createTouchDragger(ord));
     }
 
-    function dragDiv(ord: Ordinal, zi: number): HTMLDivElement {
-      const el = doc.createElement('div');
-      el.addEventListener('mousedown', createDragger(ord));
-      setStyle(el, {cursor: ord + '-resize', position: 'absolute', zIndex: String(zi)});
-      el.classList.add('ord-' + ord);
+    this.hdlHolder.append(el);
+    return el;
+  }
 
-      if (Touch.support) {
-        el.addEventListener('touchstart', Touch.createDragger(ord));
+  #insertHandle(ord: Ordinal): HTMLDivElement {
+    const div = this.#dragDiv(ord, this.#hdep++);
+    setStyle(div, {opacity: String(this.getOptions().handleOpacity)});
+    div.classList.add(cssClass('handle'));
+    const hs = this.getOptions().handleSize;
+
+    if (hs) {
+      setStyle(div, {height: px(hs), width: px(hs)});
+    }
+
+    return div;
+  }
+
+  #insertDragbar(ord: Ordinal): HTMLDivElement {
+    const el = this.#dragDiv(ord, this.#hdep++);
+    el.classList.add('jcrop-dragbar');
+    return el;
+  }
+
+  #createDragbars(li: Ordinal[]): void {
+    for (const ord of li) {
+      this.#dragbar[ord] = this.#insertDragbar(ord);
+    }
+  }
+
+  #createBorders(li: Ordinal[]): void {
+    let cl = '';
+    for (const ord of li) {
+      switch (ord) {
+        case 'e':
+          cl = 'vline right';
+          break;
+        case 'n':
+          cl = 'hline';
+          break;
+        case 's':
+          cl = 'hline bottom';
+          break;
+        case 'w':
+          cl = 'vline';
+          break;
       }
-
-      hdlHolder.append(el);
-      return el;
+      this.#borders[ord] = this.#insertBorder(cl);
     }
+  }
 
-    function insertHandle(ord: Ordinal): HTMLDivElement {
-      const div = dragDiv(ord, hdep++);
-      setStyle(div, {opacity: String(options.handleOpacity)});
-      div.classList.add(cssClass('handle'));
-      const hs = options.handleSize;
+  #createHandles(li: Ordinal[]): void {
+    for (const ord of li) {
+      this.#handle[ord] = this.#insertHandle(ord);
+    }
+  }
 
-      if (hs) {
-        setStyle(div, {height: px(hs), width: px(hs)});
+  #moveto(x: number, y: number): void {
+    setStyle(this.getImg2(), {left: px(-x), top: px(-y)});
+    setStyle(this.sel, {left: px(x), top: px(y)});
+  }
+
+  #resize(w: number, h: number): void {
+    setStyle(this.sel, {height: px(Math.round(h)), width: px(Math.round(w))});
+  }
+
+  #updateVisible(select?: boolean): void {
+    if (this.#awake) {
+      this.update(select);
+    }
+  }
+
+  #setBgOpacity(opacity: number, force?: boolean): void {
+    if (!this.#awake && !force) return;
+    setStyle(this.img, {opacity: String(opacity)});
+  }
+
+  #show(): void {
+    setStyle(this.sel, {display: ''});
+
+    this.#setBgOpacity(this.bgopacity, true);
+
+    this.#awake = true;
+  }
+}
+
+// Normalizes touch input for the rest of Jcrop: computes whether touch is supported once at
+// construction, copies a touch event's active-finger page coordinates onto the event itself
+// (cfilter), and builds touch-flavored equivalents of the mouse drag/new-selection entry points.
+// `startDragMode`/`onNewSelection` stay outside this class (passed in) since they belong to the
+// outer Jcrop instance's own drag-mode/selection logic, not to touch handling specifically -
+// mousedown and touchstart both ultimately call the same logic, just filtered through cfilter() or
+// not first.
+class Touch {
+  readonly support: boolean;
+
+  constructor(
+    win: Window,
+    private readonly img: HTMLImageElement,
+    private readonly getOptions: () => InternalOptions,
+    private readonly getPos: (el: HTMLElement) => Point,
+    private readonly mouseAbs: (e: JcropMouseEvent) => Point,
+    private readonly startDragMode: (mode: DragMode, pos: Point, touch?: boolean) => void,
+    private readonly setDocOffset: (pos: Point) => void,
+    private readonly onNewSelection: (e: JcropMouseEvent) => void,
+  ) {
+    const touchSupport = this.getOptions().touchSupport;
+    this.support = touchSupport === true || touchSupport === false ? touchSupport : hasTouchSupport(win);
+  }
+
+  cfilter(e: JcropMouseEvent): JcropMouseEvent {
+    const touch = (e as TouchEvent).changedTouches[0];
+    e.pageX = touch.pageX;
+    e.pageY = touch.pageY;
+    return e;
+  }
+
+  createDragger(ord: DragMode): (e: JcropMouseEvent) => void {
+    return (e: JcropMouseEvent): void => {
+      if (this.getOptions().disabled) {
+        return;
       }
+      this.setDocOffset(this.getPos(this.img));
+      this.startDragMode(ord, this.mouseAbs(this.cfilter(e)), true);
+      e.stopPropagation();
+      e.preventDefault();
+    };
+  }
 
-      return div;
+  newSelection(e: JcropMouseEvent): void {
+    this.onNewSelection(this.cfilter(e));
+  }
+}
+
+// The vendored plugin's own single closure-based factory function, ported to a class: everything
+// that used to be a local variable closed over by every nested function is now a private field, and
+// the standalone Touch/Selection/Tracker/Coords modules it built as IIFEs (see those classes above)
+// are collaborator objects constructed here and wired together explicitly instead.
+//
+// A handful of methods below are field arrows rather than ordinary methods -
+// #getPos/#mouseAbs/#startDragMode/#createDragger/#newSelection/#doneSelect/#selectDrag - because
+// each is handed to a collaborator (Touch/Selection/Tracker, or a native addEventListener) by bare
+// reference rather than called directly; an ordinary method read that way loses its `this` binding
+// the moment something else invokes it.
+export class Jcrop implements JcropInstance {
+  readonly focus: null = null;
+
+  readonly #origimg: HTMLImageElement;
+  readonly #img: HTMLImageElement;
+  readonly #hdlHolder: HTMLDivElement;
+  readonly #imgHolder: HTMLDivElement;
+  readonly #div: HTMLDivElement;
+  readonly #sel: HTMLDivElement;
+  readonly #boundx: number;
+  readonly #boundy: number;
+  readonly #coords: Coords;
+  readonly #touch: Touch;
+  readonly #bgopacity: number;
+  readonly #selection: Selection;
+  readonly #tracker: Tracker;
+  // Starts as a placeholder div, replaced with a real <img> further down in this same constructor -
+  // #moveto() (inside Selection, via the getImg2 getter passed to it) is the only thing that reads
+  // this afterward, so the placeholder is never actually rendered. Both assignments happen here in
+  // the constructor, never in a method, so this can stay readonly despite being set twice.
+  readonly #img2: HTMLElement;
+
+  #options: InternalOptions;
+
+  // Assigned by #presize()/#interfaceUpdate(), not by a direct `this.x = ...` in the constructor, so
+  // TS's definite-assignment analysis can't see it - always set before anything reads them.
+  #xscale!: number;
+  #yscale!: number;
+  #docOffset!: Point;
+
+  #bgcolor = 'black';
+
+  constructor(
+    obj: HTMLImageElement,
+    opt: JcropOptions,
+    private readonly doc: Document,
+    private readonly win: Window,
+  ) {
+    this.#options = {...defaults};
+
+    this.#hdlHolder = doc.createElement('div');
+    setStyle(this.#hdlHolder, {height: '100%', width: '100%', zIndex: '320'});
+
+    this.#imgHolder = doc.createElement('div');
+    setStyle(this.#imgHolder, {
+      height: '100%',
+      overflow: 'hidden',
+      position: 'absolute',
+      width: '100%',
+      zIndex: '310',
+    });
+
+    // Initialization {{{
+    this.#mergeOptions(opt);
+    // Initialize the DOM elements for the interface {{{
+    // The values are SET on the image(s) for the interface
+    // If the original image has any of these set, they will be reset
+    // However, if you destroy() the Jcrop instance the original image's
+    // character in the DOM will be as you left it.
+    const imgStyle: Partial<CSSStyleDeclaration> = {
+      border: 'none',
+      left: '0',
+      margin: '0',
+      padding: '0',
+      position: 'absolute',
+      top: '0',
+      visibility: 'visible',
+    };
+
+    const origimg = obj;
+    this.#origimg = origimg;
+
+    if (origimg.tagName !== 'IMG') {
+      throw new Error('Only img is supported');
+    }
+    // Fix size of crop image.
+    // Necessary when crop image is within a hidden element when page is loaded.
+    if (origimg.width !== 0 && origimg.height !== 0) {
+      // Obtain dimensions from contained img element.
+      setStyle(origimg, {height: px(origimg.height), width: px(origimg.width)});
+    } else {
+      // width/height read 0 above because the source <img> sits inside a hidden (display:none)
+      // container at this point in every browser, not just old IE - load a detached copy to read
+      // its intrinsic dimensions instead.
+      const tempImage = new Image();
+      tempImage.src = origimg.getAttribute('src') ?? '';
+      setStyle(origimg, {height: px(tempImage.height), width: px(tempImage.width)});
     }
 
-    function insertDragbar(ord: Ordinal): HTMLDivElement {
-      const el = dragDiv(ord, hdep++);
-      el.classList.add('jcrop-dragbar');
-      return el;
+    const img = origimg.cloneNode(true) as HTMLImageElement;
+    this.#img = img;
+    img.removeAttribute('id');
+    setStyle(img, imgStyle);
+    setStyle(img, {display: ''});
+
+    setStyle(img, {height: px(origimg.offsetHeight), width: px(origimg.offsetWidth)});
+    origimg.after(img);
+    setStyle(origimg, {display: 'none'});
+
+    this.#presize(img, this.#options.boxWidth, this.#options.boxHeight);
+
+    this.#boundx = img.offsetWidth;
+    this.#boundy = img.offsetHeight;
+    const div = doc.createElement('div');
+    this.#div = div;
+    setStyle(div, {
+      backgroundColor: 'black',
+      height: px(this.#boundy),
+      position: 'relative',
+      width: px(this.#boundx),
+    });
+    div.classList.add(cssClass('holder'));
+    origimg.after(div);
+    div.append(img);
+
+    if (this.#options.addClass) {
+      div.classList.add(this.#options.addClass);
     }
 
-    function createDragbars(li: Ordinal[]): void {
-      for (const ord of li) {
-        dragbar[ord] = insertDragbar(ord);
-      }
-    }
+    const bound = this.#options.boundary;
+    const trk = this.#newTracker();
+    setStyle(trk, {
+      height: px(this.#boundy + bound * 2),
+      left: px(-bound),
+      position: 'absolute',
+      top: px(-bound),
+      width: px(this.#boundx + bound * 2),
+      zIndex: '290',
+    });
+    trk.addEventListener('mousedown', this.#newSelection);
 
-    function createBorders(li: Ordinal[]): void {
-      let cl = '';
-      for (const ord of li) {
-        switch (ord) {
-          case 'e':
-            cl = 'vline right';
-            break;
-          case 'n':
-            cl = 'hline';
-            break;
-          case 's':
-            cl = 'hline bottom';
-            break;
-          case 'w':
-            cl = 'vline';
-            break;
-        }
-        borders[ord] = insertBorder(cl);
-      }
-    }
+    this.#img2 = doc.createElement('div');
+    const sel = doc.createElement('div');
+    this.#sel = sel;
+    setStyle(sel, {position: 'absolute', zIndex: '600'});
+    img.before(sel);
+    sel.append(this.#imgHolder, this.#hdlHolder);
 
-    function createHandles(li: Ordinal[]): void {
-      for (const ord of li) {
-        handle[ord] = insertHandle(ord);
-      }
-    }
+    // Coords Module {{{
+    this.#coords = new Coords(
+      this.#boundx,
+      this.#boundy,
+      () => this.#options,
+      () => ({xscale: this.#xscale, yscale: this.#yscale}),
+    );
+    // }}}
 
-    function moveto(x: number, y: number): void {
-      setStyle(img2, {left: px(-x), top: px(-y)});
-      setStyle(sel, {left: px(x), top: px(y)});
-    }
+    // Touch Module {{{
+    this.#touch = new Touch(
+      win,
+      img,
+      () => this.#options,
+      (el) => this.#getPos(el),
+      (e) => this.#mouseAbs(e),
+      (mode, pos, touch) => {
+        this.#startDragMode(mode, pos, touch);
+      },
+      (pos) => {
+        this.#docOffset = pos;
+      },
+      (e) => {
+        this.#newSelection(e);
+      },
+    );
 
-    function resize(w: number, h: number): void {
-      setStyle(sel, {height: px(Math.round(h)), width: px(Math.round(w))});
-    }
+    this.#bgopacity = this.#options.bgOpacity;
 
-    function refresh(): void {
-      const c = Coords.getFixed();
-
-      Coords.setPressed([c.x, c.y]);
-      Coords.setCurrent([c.x2, c.y2]);
-
-      updateVisible();
-    }
-
-    // Internal Methods
-    function updateVisible(select?: boolean): void {
-      if (awake) {
-        update(select);
-      }
-    }
-
-    function update(select?: boolean): void {
-      const c = Coords.getFixed();
-
-      resize(c.w, c.h);
-      moveto(c.x, c.y);
-
-      if (!awake) show();
-
-      if (select) {
-        options.onSelect.call(api, unscale(c));
-      }
-    }
-
-    function setBgOpacity(opacity: number, force?: boolean): void {
-      if (!awake && !force) return;
-      setStyle(img, {opacity: String(opacity)});
-    }
-
-    function show(): void {
-      setStyle(sel, {display: ''});
-
-      setBgOpacity(bgopacity, true);
-
-      awake = true;
-    }
-
-    function release(): void {
-      disableHandles();
-      setStyle(sel, {display: 'none'});
-
-      setBgOpacity(1);
-
-      awake = false;
-    }
-
-    function enableHandles(): boolean {
-      setStyle(hdlHolder, {display: ''});
-      return true;
-    }
-
-    function disableHandles(): void {
-      setStyle(hdlHolder, {display: 'none'});
-    }
-
-    function done(): void {
-      refresh();
-    }
-
-    // Insert draggable elements {{{
-    // Insert border divs for outline
-
-    if (Array.isArray(options.createDragbars)) createDragbars(options.createDragbars);
-
-    if (Array.isArray(options.createHandles)) createHandles(options.createHandles);
-
-    if (Array.isArray(options.createBorders)) createBorders(options.createBorders);
-
+    // Selection Module {{{
     // This is a hack for iOS5 to support drag/move touch functionality. Note that e.currentTarget
     // is always `document` here (this listener is bound directly on it, not delegated), so the
     // `instanceof Element` check below never passes and stopPropagation() never actually runs -
@@ -466,447 +986,148 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions, doc: Document, win: Win
       if (target instanceof Element && target.classList.contains('jcrop-tracker')) e.stopPropagation();
     });
 
-    const track = newTracker();
-    setStyle(track, {cursor: 'move', position: 'absolute', zIndex: '360'});
-    track.addEventListener('mousedown', createDragger('move'));
+    const selectionTrack = this.#newTracker();
+    setStyle(selectionTrack, {cursor: 'move', position: 'absolute', zIndex: '360'});
 
-    if (Touch.support) {
-      track.addEventListener('touchstart', Touch.createDragger('move'));
-    }
-
-    imgHolder.append(track);
-    disableHandles();
-
-    return {
-      disableHandles: disableHandles,
-      done: done,
-      enableHandles: enableHandles,
-      enableOnly: function () {},
-      isAwake: function () {
-        return !!awake;
+    this.#selection = new Selection(
+      doc,
+      img,
+      this.#imgHolder,
+      this.#hdlHolder,
+      () => this.#img2,
+      sel,
+      this.#bgopacity,
+      this.#touch.support,
+      (ord) => this.#createDragger(ord),
+      (ord) => this.#touch.createDragger(ord),
+      () => this.#options,
+      this.#coords,
+      (c) => {
+        this.#options.onSelect.call(this, this.#unscale(c));
       },
-      refresh: refresh,
-      release: release,
-      setBgOpacity: setBgOpacity,
-      setCursor: function (cursor: string) {
-        setStyle(track, {cursor});
-      },
-      update: update,
-    };
-  })();
+      selectionTrack,
+    );
 
-  const api: JcropInstance = {
-    cancel: cancelCrop,
-    destroy: destroy,
-
-    disable: disableCrop,
-    enable: enableCrop,
-    focus: null,
-    release: Selection.release,
-    setOptions: setOptionsNew,
-
-    setSelect: setSelect,
-
-    ui: {
-      holder: div,
-      selection: sel,
-    },
-  };
-
-  // Tracker Module {{{
-  const Tracker = (function () {
-    let onDone: PositionCallback = function () {},
-      onMove: PositionCallback = function () {};
-
-    function toFront(touch?: boolean): void {
-      setStyle(trk, {zIndex: '450'});
-
-      if (touch) {
-        doc.addEventListener('touchmove', trackTouchMove);
-        doc.addEventListener('touchend', trackTouchEnd);
-      } else {
-        doc.addEventListener('mousemove', trackMove);
-        doc.addEventListener('mouseup', trackUp);
-      }
-    }
-
-    function toBack(): void {
-      setStyle(trk, {zIndex: '290'});
-      doc.removeEventListener('mousemove', trackMove);
-      doc.removeEventListener('mouseup', trackUp);
-      doc.removeEventListener('touchmove', trackTouchMove);
-      doc.removeEventListener('touchend', trackTouchEnd);
-    }
-
-    function trackMove(e: JcropMouseEvent): boolean {
-      onMove(mouseAbs(e));
-      return false;
-    }
-
-    function trackUp(e: JcropMouseEvent): boolean {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (btndown) {
-        btndown = false;
-
-        onDone(mouseAbs(e));
-
-        if (Selection.isAwake()) {
-          options.onSelect.call(api, unscale(Coords.getFixed()));
+    // Tracker Module {{{
+    this.#tracker = new Tracker(
+      doc,
+      trk,
+      (e) => this.#mouseAbs(e),
+      (e) => this.#touch.cfilter(e),
+      () => {
+        if (this.#selection.isAwake()) {
+          this.#options.onSelect.call(this, this.#unscale(this.#coords.getFixed()));
         }
-
-        toBack();
-        onMove = function () {};
-        onDone = function () {};
-      }
-
-      return false;
-    }
-
-    function activateHandlers(move: PositionCallback, done: PositionCallback, touch?: boolean): boolean {
-      btndown = true;
-      onMove = move;
-      onDone = done;
-      toFront(touch);
-      return false;
-    }
-
-    function trackTouchMove(e: JcropMouseEvent): boolean {
-      onMove(mouseAbs(Touch.cfilter(e)));
-      return false;
-    }
-
-    function trackTouchEnd(e: JcropMouseEvent): boolean {
-      return trackUp(Touch.cfilter(e));
-    }
-
-    function setCursor(t: string): void {
-      setStyle(trk, {cursor: t});
-    }
-
+      },
+    );
     img.before(trk);
-    return {
-      activateHandlers: activateHandlers,
-      setCursor: setCursor,
-    };
-  })();
 
-  // Coords Module {{{
-  const Coords = (function () {
-    let x1 = 0,
-      x2 = 0,
-      y1 = 0,
-      y2 = 0;
+    this.#img2 = doc.createElement('img');
+    (this.#img2 as HTMLImageElement).src = img.getAttribute('src') ?? '';
+    setStyle(this.#img2, imgStyle);
+    setStyle(this.#img2, {display: '', height: px(this.#boundy), width: px(this.#boundx)});
+    this.#imgHolder.append(this.#img2);
 
-    function setPressed(pos: Point): void {
-      const rebounded = rebound(pos);
-      x2 = x1 = rebounded[0];
-      y2 = y1 = rebounded[1];
+    this.#docOffset = this.#getPos(img);
+
+    if (this.#touch.support) {
+      trk.addEventListener('touchstart', (e: JcropMouseEvent) => {
+        this.#touch.newSelection(e);
+      });
     }
 
-    function setCurrent(pos: Point): void {
-      const rebounded = rebound(pos);
-      x2 = rebounded[0];
-      y2 = rebounded[1];
-    }
+    setStyle(this.#hdlHolder, {display: 'none'});
+    this.#interfaceUpdate(true);
+  }
 
-    function moveOffset(offset: Point): void {
-      let ox = offset[0],
-        oy = offset[1];
+  // API methods {{{
 
-      if (0 > x1 + ox) {
-        ox -= ox + x1;
-      }
-      if (0 > y1 + oy) {
-        oy -= oy + y1;
-      }
+  cancel(): void {
+    this.#selection.done();
+  }
 
-      if (boundy < y2 + oy) {
-        oy += boundy - (y2 + oy);
-      }
-      if (boundx < x2 + ox) {
-        ox += boundx - (x2 + ox);
-      }
+  destroy(): void {
+    this.#div.remove();
+    setStyle(this.#origimg, {display: '', visibility: 'visible'});
+  }
 
-      x1 += ox;
-      x2 += ox;
-      y1 += oy;
-      y2 += oy;
-    }
+  disable(): void {
+    this.#options.disabled = true;
+    this.#selection.disableHandles();
+    this.#tracker.setCursor('default');
+  }
 
-    function getCorner(ord: Corner): Point {
-      const c = getFixed();
-      switch (ord) {
-        case 'ne':
-          return [c.x2, c.y];
-        case 'nw':
-          return [c.x, c.y];
-        case 'se':
-          return [c.x2, c.y2];
-        case 'sw':
-          return [c.x, c.y2];
-      }
-    }
+  enable(): void {
+    this.#options.disabled = false;
+    this.#interfaceUpdate();
+  }
 
-    function getFixed(): JcropCrop & {x2: number; y2: number} {
-      if (!options.aspectRatio) {
-        return getRect();
-      }
-      // This function could use some optimization I think...
-      const aspect = options.aspectRatio,
-        min_x = options.minSize[0] / xscale,
-        rh = y2 - y1,
-        rha = Math.abs(rh),
-        rw = x2 - x1,
-        rwa = Math.abs(rw),
-        real_ratio = rwa / rha;
-      let // Always reassigned before being read on every path that reads them (the aspect-locked
-        // branch below either recomputes h/w from scratch or never reads this initial value) - kept
-        // explicit rather than left `undefined` so TS's definite-assignment analysis doesn't need to
-        // prove that itself across the branching below.
-        // eslint-disable-next-line no-useless-assignment
-        h = 0,
-        max_x = options.maxSize[0] / xscale,
-        // eslint-disable-next-line no-useless-assignment
-        w = 0,
-        xx,
-        yy;
+  release(): void {
+    this.#selection.release();
+  }
 
-      if (max_x === 0) {
-        max_x = boundx * 10;
-      }
-      if (real_ratio < aspect) {
-        yy = y2;
-        w = rha * aspect;
-        xx = rw < 0 ? x1 - w : w + x1;
+  setOptions(opt: JcropOptions): void {
+    this.#mergeOptions(opt);
+    this.#interfaceUpdate();
+  }
 
-        if (xx < 0) {
-          xx = 0;
-          h = Math.abs((xx - x1) / aspect);
-          yy = rh < 0 ? y1 - h : h + y1;
-        } else if (xx > boundx) {
-          xx = boundx;
-          h = Math.abs((xx - x1) / aspect);
-          yy = rh < 0 ? y1 - h : h + y1;
-        }
-      } else {
-        xx = x2;
-        h = rwa / aspect;
-        yy = rh < 0 ? y1 - h : y1 + h;
-        if (yy < 0) {
-          yy = 0;
-          w = Math.abs((yy - y1) * aspect);
-          xx = rw < 0 ? x1 - w : w + x1;
-        } else if (yy > boundy) {
-          yy = boundy;
-          w = Math.abs(yy - y1) * aspect;
-          xx = rw < 0 ? x1 - w : w + x1;
-        }
-      }
+  setSelect(rect: number[]): void {
+    this.#setSelectRaw([
+      (rect[0] ?? 0) / this.#xscale,
+      (rect[1] ?? 0) / this.#yscale,
+      (rect[2] ?? 0) / this.#xscale,
+      (rect[3] ?? 0) / this.#yscale,
+    ]);
+    this.#options.onSelect.call(this, this.#unscale(this.#coords.getFixed()));
+    this.#selection.enableHandles();
+  }
 
-      // Magic %-)
-      if (xx > x1) {
-        // right side
-        if (xx - x1 < min_x) {
-          xx = x1 + min_x;
-        } else if (xx - x1 > max_x) {
-          xx = x1 + max_x;
-        }
-        if (yy > y1) {
-          yy = y1 + (xx - x1) / aspect;
-        } else {
-          yy = y1 - (xx - x1) / aspect;
-        }
-      } else if (xx < x1) {
-        // left side
-        if (x1 - xx < min_x) {
-          xx = x1 - min_x;
-        } else if (x1 - xx > max_x) {
-          xx = x1 - max_x;
-        }
-        if (yy > y1) {
-          yy = y1 + (x1 - xx) / aspect;
-        } else {
-          yy = y1 - (x1 - xx) / aspect;
-        }
-      }
+  get ui(): {holder: HTMLDivElement; selection: HTMLDivElement} {
+    return {holder: this.#div, selection: this.#sel};
+  }
 
-      if (xx < 0) {
-        x1 -= xx;
-        xx = 0;
-      } else if (xx > boundx) {
-        x1 -= xx - boundx;
-        xx = boundx;
-      }
-
-      if (yy < 0) {
-        y1 -= yy;
-        yy = 0;
-      } else if (yy > boundy) {
-        y1 -= yy - boundy;
-        yy = boundy;
-      }
-
-      return makeObj(flipCoords(x1, y1, xx, yy));
-    }
-
-    function rebound(p: Point): Point {
-      let px0 = p[0],
-        py0 = p[1];
-      if (px0 < 0) px0 = 0;
-      if (py0 < 0) py0 = 0;
-
-      if (px0 > boundx) px0 = boundx;
-      if (py0 > boundy) py0 = boundy;
-
-      return [Math.round(px0), Math.round(py0)];
-    }
-
-    function flipCoords(x1: number, y1: number, x2: number, y2: number): [number, number, number, number] {
-      let xa = x1,
-        xb = x2,
-        ya = y1,
-        yb = y2;
-      if (x2 < x1) {
-        xa = x2;
-        xb = x1;
-      }
-      if (y2 < y1) {
-        ya = y2;
-        yb = y1;
-      }
-      return [xa, ya, xb, yb];
-    }
-
-    function getRect(): JcropCrop & {x2: number; y2: number} {
-      let delta;
-      const xsize = x2 - x1,
-        ysize = y2 - y1;
-
-      if (xlimit && Math.abs(xsize) > xlimit) {
-        x2 = xsize > 0 ? x1 + xlimit : x1 - xlimit;
-      }
-      if (ylimit && Math.abs(ysize) > ylimit) {
-        y2 = ysize > 0 ? y1 + ylimit : y1 - ylimit;
-      }
-
-      if (ymin / yscale && Math.abs(ysize) < ymin / yscale) {
-        y2 = ysize > 0 ? y1 + ymin / yscale : y1 - ymin / yscale;
-      }
-      if (xmin / xscale && Math.abs(xsize) < xmin / xscale) {
-        x2 = xsize > 0 ? x1 + xmin / xscale : x1 - xmin / xscale;
-      }
-
-      if (x1 < 0) {
-        x2 -= x1;
-        x1 -= x1;
-      }
-      if (y1 < 0) {
-        y2 -= y1;
-        y1 -= y1;
-      }
-      if (x2 < 0) {
-        x1 -= x2;
-        x2 -= x2;
-      }
-      if (y2 < 0) {
-        y1 -= y2;
-        y2 -= y2;
-      }
-      if (x2 > boundx) {
-        delta = x2 - boundx;
-        x1 -= delta;
-        x2 -= delta;
-      }
-      if (y2 > boundy) {
-        delta = y2 - boundy;
-        y1 -= delta;
-        y2 -= delta;
-      }
-      if (x1 > boundx) {
-        delta = x1 - boundy;
-        y2 -= delta;
-        y1 -= delta;
-      }
-      if (y1 > boundy) {
-        delta = y1 - boundy;
-        y2 -= delta;
-        y1 -= delta;
-      }
-
-      return makeObj(flipCoords(x1, y1, x2, y2));
-    }
-
-    function makeObj(a: [number, number, number, number]): JcropCrop & {x2: number; y2: number} {
-      return {
-        h: a[3] - a[1],
-        w: a[2] - a[0],
-        x: a[0],
-        x2: a[2],
-        y: a[1],
-        y2: a[3],
-      };
-    }
-
-    return {
-      getCorner: getCorner,
-      getFixed: getFixed,
-      moveOffset: moveOffset,
-      setCurrent: setCurrent,
-      setPressed: setPressed,
-    };
-  })();
-
-  let btndown: boolean | undefined;
-
-  let docOffset: Point;
+  // }}}
 
   // Internal Methods {{{
-  function px(n: number): string {
-    return Math.round(n) + 'px';
-  }
-  function cssClass(cl: string): string {
-    return 'jcrop-' + cl;
-  }
-  function getPos(el: HTMLElement): Point {
+  readonly #getPos = (el: HTMLElement): Point => {
     const rect = el.getBoundingClientRect();
-    return [rect.left + win.scrollX, rect.top + win.scrollY];
-  }
+    return [rect.left + this.win.scrollX, rect.top + this.win.scrollY];
+  };
 
-  function mouseAbs(e: JcropMouseEvent): Point {
-    return [(e.pageX ?? 0) - docOffset[0], (e.pageY ?? 0) - docOffset[1]];
-  }
+  readonly #mouseAbs = (e: JcropMouseEvent): Point => {
+    return [(e.pageX ?? 0) - this.#docOffset[0], (e.pageY ?? 0) - this.#docOffset[1]];
+  };
 
-  function setOptions(opt: JcropOptions): void {
-    options = {...options, ...opt};
+  #mergeOptions(opt: JcropOptions): void {
+    this.#options = {...this.#options, ...opt};
 
-    if (typeof options.onSelect !== 'function') {
-      options.onSelect = function () {};
+    if (typeof this.#options.onSelect !== 'function') {
+      this.#options.onSelect = function () {};
     }
   }
 
-  function startDragMode(mode: DragMode, pos: Point, touch?: boolean): boolean {
-    docOffset = getPos(img);
-    Tracker.setCursor(mode === 'move' ? mode : mode + '-resize');
+  readonly #startDragMode = (mode: DragMode, pos: Point, touch?: boolean): void => {
+    this.#docOffset = this.#getPos(this.#img);
+    this.#tracker.setCursor(mode === 'move' ? mode : mode + '-resize');
 
     if (mode === 'move') {
-      return Tracker.activateHandlers(createMover(pos), doneSelect, touch);
+      this.#tracker.activateHandlers(this.#createMover(pos), this.#doneSelect, touch);
+      return;
     }
 
-    const fc = Coords.getFixed();
-    const opp = oppLockCorner(mode);
-    const opc = Coords.getCorner(oppLockCorner(opp));
+    const fc = this.#coords.getFixed();
+    const opp = this.#oppLockCorner(mode);
+    const opc = this.#coords.getCorner(this.#oppLockCorner(opp));
 
-    Coords.setPressed(Coords.getCorner(opp));
-    Coords.setCurrent(opc);
+    this.#coords.setPressed(this.#coords.getCorner(opp));
+    this.#coords.setCurrent(opc);
 
-    return Tracker.activateHandlers(dragmodeHandler(mode, fc), doneSelect, touch);
-  }
+    this.#tracker.activateHandlers(this.#dragmodeHandler(mode, fc), this.#doneSelect, touch);
+  };
 
-  function dragmodeHandler(mode: Ordinal, f: JcropCrop & {x2: number; y2: number}): PositionCallback {
-    return function (pos: Point) {
-      if (!options.aspectRatio) {
+  #dragmodeHandler(mode: Ordinal, f: JcropCrop & {x2: number; y2: number}): PositionCallback {
+    return (pos: Point): void => {
+      if (!this.#options.aspectRatio) {
         switch (mode) {
           case 'e':
             pos[1] = f.y2;
@@ -937,23 +1158,23 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions, doc: Document, win: Win
             break;
         }
       }
-      Coords.setCurrent(pos);
-      Selection.update();
+      this.#coords.setCurrent(pos);
+      this.#selection.update();
     };
   }
 
-  function createMover(pos: Point): PositionCallback {
+  #createMover(pos: Point): PositionCallback {
     let lloc = pos;
 
-    return function (pos: Point) {
-      Coords.moveOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
+    return (pos: Point): void => {
+      this.#coords.moveOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
       lloc = pos;
 
-      Selection.update();
+      this.#selection.update();
     };
   }
 
-  function oppLockCorner(ord: Ordinal): Corner {
+  #oppLockCorner(ord: Ordinal): Corner {
     switch (ord) {
       case 'e':
         return 'nw';
@@ -974,24 +1195,23 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions, doc: Document, win: Win
     }
   }
 
-  function createDragger(ord: DragMode) {
-    return function (e: JcropMouseEvent): void {
-      if (options.disabled) {
+  readonly #createDragger = (ord: DragMode): ((e: JcropMouseEvent) => void) => {
+    return (e: JcropMouseEvent): void => {
+      if (this.#options.disabled) {
         return;
       }
 
       // Fix position of crop area when dragged the very first time.
       // Necessary when crop image is in a hidden element when page is loaded.
-      docOffset = getPos(img);
+      this.#docOffset = this.#getPos(this.#img);
 
-      btndown = true;
-      startDragMode(ord, mouseAbs(e));
+      this.#startDragMode(ord, this.#mouseAbs(e));
       e.stopPropagation();
       e.preventDefault();
     };
-  }
+  };
 
-  function presize(el: HTMLElement, w: number, h: number): void {
+  #presize(el: HTMLElement, w: number, h: number): void {
     let nh = el.offsetHeight,
       nw = el.offsetWidth;
     if (nw > w && w > 0) {
@@ -1002,167 +1222,107 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions, doc: Document, win: Win
       nh = h;
       nw = (h / el.offsetHeight) * el.offsetWidth;
     }
-    xscale = el.offsetWidth / nw;
-    yscale = el.offsetHeight / nh;
+    this.#xscale = el.offsetWidth / nw;
+    this.#yscale = el.offsetHeight / nh;
     setStyle(el, {height: px(nh), width: px(nw)});
   }
 
-  function unscale(c: JcropCrop & {x2: number; y2: number}): JcropCrop {
+  #unscale(c: JcropCrop & {x2: number; y2: number}): JcropCrop {
     return {
-      h: c.h * yscale,
-      w: c.w * xscale,
-      x: c.x * xscale,
-      y: c.y * yscale,
+      h: c.h * this.#yscale,
+      w: c.w * this.#xscale,
+      x: c.x * this.#xscale,
+      y: c.y * this.#yscale,
     };
   }
 
-  function doneSelect(): void {
-    const c = Coords.getFixed();
-    const minSelect = options.minSelect;
+  readonly #doneSelect = (): void => {
+    const c = this.#coords.getFixed();
+    const minSelect = this.#options.minSelect;
     if (c.w > minSelect[0] && c.h > minSelect[1]) {
-      Selection.enableHandles();
-      Selection.done();
+      this.#selection.enableHandles();
+      this.#selection.done();
     } else {
-      Selection.release();
+      this.#selection.release();
     }
-    Tracker.setCursor('crosshair');
-  }
+    this.#tracker.setCursor('crosshair');
+  };
 
-  function newSelection(e: JcropMouseEvent): void {
-    if (options.disabled) {
+  readonly #newSelection = (e: JcropMouseEvent): void => {
+    if (this.#options.disabled) {
       return;
     }
-    btndown = true;
-    docOffset = getPos(img);
-    Selection.disableHandles();
-    Tracker.setCursor('crosshair');
-    const pos = mouseAbs(e);
-    Coords.setPressed(pos);
-    Selection.update();
-    Tracker.activateHandlers(selectDrag, doneSelect, e.type.startsWith('touch'));
+    this.#docOffset = this.#getPos(this.#img);
+    this.#selection.disableHandles();
+    this.#tracker.setCursor('crosshair');
+    const pos = this.#mouseAbs(e);
+    this.#coords.setPressed(pos);
+    this.#selection.update();
+    this.#tracker.activateHandlers(this.#selectDrag, this.#doneSelect, e.type.startsWith('touch'));
 
     e.stopPropagation();
     e.preventDefault();
-  }
+  };
 
-  function selectDrag(pos: Point): void {
-    Coords.setCurrent(pos);
-    Selection.update();
-  }
+  readonly #selectDrag = (pos: Point): void => {
+    this.#coords.setCurrent(pos);
+    this.#selection.update();
+  };
 
-  function newTracker(): HTMLDivElement {
-    const el = doc.createElement('div');
+  #newTracker(): HTMLDivElement {
+    const el = this.doc.createElement('div');
     el.classList.add(cssClass('tracker'));
     return el;
   }
 
-  img2 = doc.createElement('img');
-  (img2 as HTMLImageElement).src = img.getAttribute('src') ?? '';
-  setStyle(img2, imgStyle);
-  setStyle(img2, {display: '', height: px(boundy), width: px(boundx)});
-  imgHolder.append(img2);
-
-  /* }}} */
-  // Set more variables {{{
-  let bgcolor = 'black';
-  const bgopacity = options.bgOpacity;
-  let xlimit: number, xmin: number, ylimit: number, ymin: number;
-
-  docOffset = getPos(img);
-  // }}}
-  // }}}
-  // Internal Modules {{
-
-  // }}}
-  // API methods {{{
-
-  function setSelect(rect: number[]): void {
-    setSelectRaw([(rect[0] ?? 0) / xscale, (rect[1] ?? 0) / yscale, (rect[2] ?? 0) / xscale, (rect[3] ?? 0) / yscale]);
-    options.onSelect.call(api, unscale(Coords.getFixed()));
-    Selection.enableHandles();
-  }
-
-  function setSelectRaw(l: [number, number, number, number]): void {
-    Coords.setPressed([l[0], l[1]]);
-    Coords.setCurrent([l[2], l[3]]);
-    Selection.update();
-  }
-
-  function setOptionsNew(opt: JcropOptions): void {
-    setOptions(opt);
-    interfaceUpdate();
-  }
-
-  function disableCrop(): void {
-    options.disabled = true;
-    Selection.disableHandles();
-    Tracker.setCursor('default');
-  }
-
-  function enableCrop(): void {
-    options.disabled = false;
-    interfaceUpdate();
-  }
-
-  function cancelCrop(): void {
-    Selection.done();
-  }
-
-  function destroy(): void {
-    div.remove();
-    setStyle(origimg, {display: '', visibility: 'visible'});
+  #setSelectRaw(l: [number, number, number, number]): void {
+    this.#coords.setPressed([l[0], l[1]]);
+    this.#coords.setCurrent([l[2], l[3]]);
+    this.#selection.update();
   }
 
   // This method tweaks the interface based on options object. Called when options are changed and
-  // at end of initialization.
-  function interfaceUpdate(alt?: boolean): void {
+  // at end of construction.
+  #interfaceUpdate(alt?: boolean): void {
     if (alt) {
-      Selection.enableOnly();
+      this.#selection.enableOnly();
     } else {
-      Selection.enableHandles();
+      this.#selection.enableHandles();
     }
 
-    Tracker.setCursor('crosshair');
+    this.#tracker.setCursor('crosshair');
 
-    if (Object.hasOwn(options, 'trueSize') && options.trueSize) {
-      xscale = options.trueSize[0] / boundx;
-      yscale = options.trueSize[1] / boundy;
+    if (Object.hasOwn(this.#options, 'trueSize') && this.#options.trueSize) {
+      this.#xscale = this.#options.trueSize[0] / this.#boundx;
+      this.#yscale = this.#options.trueSize[1] / this.#boundy;
     }
 
-    if (Object.hasOwn(options, 'setSelect') && options.setSelect) {
-      setSelect(options.setSelect);
-      Selection.done();
-      delete options.setSelect;
+    if (Object.hasOwn(this.#options, 'setSelect') && this.#options.setSelect) {
+      this.setSelect(this.#options.setSelect);
+      this.#selection.done();
+      delete this.#options.setSelect;
     }
 
-    if ('black' !== bgcolor) {
-      setStyle(div, {backgroundColor: 'black'});
-      bgcolor = 'black';
+    if ('black' !== this.#bgcolor) {
+      setStyle(this.#div, {backgroundColor: 'black'});
+      this.#bgcolor = 'black';
     }
 
-    xlimit = options.maxSize[0];
-    ylimit = options.maxSize[1];
-    xmin = options.minSize[0];
-    ymin = options.minSize[1];
+    this.#coords.setLimits(
+      this.#options.maxSize[0],
+      this.#options.maxSize[1],
+      this.#options.minSize[0],
+      this.#options.minSize[1],
+    );
 
-    if (Object.hasOwn(options, 'outerImage') && options.outerImage) {
-      img.setAttribute('src', options.outerImage);
-      delete options.outerImage;
+    if (Object.hasOwn(this.#options, 'outerImage') && this.#options.outerImage) {
+      this.#img.setAttribute('src', this.#options.outerImage);
+      delete this.#options.outerImage;
     }
 
-    Selection.refresh();
+    this.#selection.refresh();
   }
-
-  if (Touch.support) {
-    trk.addEventListener('touchstart', (e: JcropMouseEvent) => {
-      Touch.newSelection(e);
-    });
-  }
-
-  setStyle(hdlHolder, {display: 'none'});
-  interfaceUpdate(true);
-
-  return api;
+  // }}}
 }
 
 export default Jcrop;
