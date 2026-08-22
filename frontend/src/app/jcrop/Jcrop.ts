@@ -40,30 +40,22 @@ export interface JcropCrop {
   y: number;
 }
 
+// The only options JcropComponent (the sole consumer) ever passes at construction. Everything else
+// the upstream plugin supported (bgOpacity/borderOpacity/boundary/createBorders/createDragbars/
+// createHandles/disabled/handleOpacity/minSelect/touchSupport) is still implemented - it just
+// always runs with its DefaultedOptions default now, since nothing here can override it any more.
+// addClass/aspectRatio/handleSize/maxSize/outerImage were dropped entirely (not just defaulted):
+// each gated a whole branch behind a falsy sentinel (null/0/[0,0]) that, once unoverridable, could
+// never turn truthy again, so the branch itself was dead code, not just fixed-at-its-default.
 export interface JcropOptions {
-  addClass?: null | string;
-  aspectRatio?: number;
-  bgOpacity?: number;
-  borderOpacity?: number;
-  boundary?: number;
   boxHeight?: number;
   boxWidth?: number;
-  createBorders?: Ordinal[];
-  createDragbars?: Ordinal[];
-  createHandles?: Ordinal[];
-  disabled?: boolean;
-  handleOpacity?: number;
-  handleSize?: null | number;
   // Accepted for API compatibility with the upstream plugin, but dead in this vendored copy - no
   // keyboard-nudge support was ported over, so this option is read nowhere below.
   keySupport?: boolean;
-  maxSize?: number[];
-  minSelect?: number[];
   minSize?: number[];
   onSelect?: (crop: JcropCrop) => void;
-  outerImage?: string;
   setSelect?: number[];
-  touchSupport?: boolean | null;
   trueSize?: number[];
 }
 
@@ -83,12 +75,9 @@ export interface JcropInstance {
 }
 
 // The subset of options `defaults` always supplies a value for - everything else on JcropOptions
-// (disabled/keySupport/outerImage/setSelect/trueSize) is genuinely optional at runtime: read only
-// behind an `options.hasOwnProperty(...)` check, or (for `disabled`) only ever assigned, never
-// relied on being present.
+// (keySupport/setSelect/trueSize) is genuinely optional at runtime, read only behind an
+// `options.hasOwnProperty(...)` check (or, for keySupport, nowhere at all).
 interface DefaultedOptions {
-  addClass: null | string;
-  aspectRatio: number;
   bgOpacity: number;
   borderOpacity: number;
   boundary: number;
@@ -97,9 +86,8 @@ interface DefaultedOptions {
   createBorders: Ordinal[];
   createDragbars: Ordinal[];
   createHandles: Ordinal[];
+  disabled: boolean;
   handleOpacity: number;
-  handleSize: null | number;
-  maxSize: number[];
   minSelect: number[];
   minSize: number[];
   onSelect: (crop: JcropCrop) => void;
@@ -131,8 +119,6 @@ type Corner = 'ne' | 'nw' | 'se' | 'sw';
 // Global Defaults {{{
 const defaults: DefaultedOptions = {
   // Styling Options
-  addClass: null,
-  aspectRatio: 0,
   bgOpacity: 0.6,
   borderOpacity: 0.4,
   boundary: 2,
@@ -143,9 +129,8 @@ const defaults: DefaultedOptions = {
   createDragbars: ['n', 's', 'e', 'w'],
   createHandles: ['n', 's', 'e', 'w', 'nw', 'ne', 'se', 'sw'],
 
+  disabled: false,
   handleOpacity: 0.5,
-  handleSize: null,
-  maxSize: [0, 0],
 
   minSelect: [0, 0],
   minSize: [0, 0],
@@ -264,34 +249,29 @@ class Tracker {
 }
 
 // Owns the selection rectangle's coordinate math: the pressed/current corner state (x1/y1/x2/y2)
-// and everything derived from it (aspect-ratio locking, min/max size clamping, bounding to the
-// image). `boundx`/`boundy` never change after construction, so they're plain constructor values;
-// `aspectRatio`/`minSize`/`maxSize` (part of the outer Jcrop options, which get wholesale-reassigned
-// on setOptions()) and `xscale`/`yscale` (recomputed by presize()/interfaceUpdate() outside this
-// class) do change, so those are read live through the two getters instead of copied in once.
-// xlimit/xmin/ylimit/ymin, by contrast, are written from outside (interfaceUpdate()) but read only
-// here, so they're owned outright as private state with a setter.
+// and everything derived from it (min-size clamping, bounding to the image). `boundx`/`boundy`
+// never change after construction, so they're plain constructor values; `minSize` (part of the
+// outer Jcrop options, which get wholesale-reassigned on setOptions()) and `xscale`/`yscale`
+// (recomputed by presize()/interfaceUpdate() outside this class) do change, so those are read live
+// through the two getters instead of copied in once. xmin/ymin, by contrast, are written from
+// outside (interfaceUpdate()) but read only here, so they're owned outright as private state with a
+// setter.
 class Coords {
   #x1 = 0;
   #x2 = 0;
   #y1 = 0;
   #y2 = 0;
 
-  #xlimit = 0;
   #xmin = 0;
-  #ylimit = 0;
   #ymin = 0;
 
   constructor(
     private readonly boundx: number,
     private readonly boundy: number,
-    private readonly getOptions: () => InternalOptions,
     private readonly getScale: () => {xscale: number; yscale: number},
   ) {}
 
-  setLimits(xlimit: number, ylimit: number, xmin: number, ymin: number): void {
-    this.#xlimit = xlimit;
-    this.#ylimit = ylimit;
+  setLimits(xmin: number, ymin: number): void {
     this.#xmin = xmin;
     this.#ymin = ymin;
   }
@@ -346,110 +326,6 @@ class Coords {
     }
   }
 
-  getFixed(): JcropCrop & {x2: number; y2: number} {
-    const options = this.getOptions();
-    if (!options.aspectRatio) {
-      return this.#getRect();
-    }
-    const {xscale} = this.getScale();
-    // This function could use some optimization I think...
-    const aspect = options.aspectRatio,
-      min_x = options.minSize[0] / xscale,
-      rh = this.#y2 - this.#y1,
-      rha = Math.abs(rh),
-      rw = this.#x2 - this.#x1,
-      rwa = Math.abs(rw),
-      real_ratio = rwa / rha;
-    let // Always reassigned before being read on every path that reads them (the aspect-locked
-      // branch below either recomputes h/w from scratch or never reads this initial value) - kept
-      // explicit rather than left `undefined` so TS's definite-assignment analysis doesn't need to
-      // prove that itself across the branching below.
-      // eslint-disable-next-line no-useless-assignment
-      h = 0,
-      max_x = options.maxSize[0] / xscale,
-      // eslint-disable-next-line no-useless-assignment
-      w = 0,
-      xx,
-      yy;
-
-    if (max_x === 0) {
-      max_x = this.boundx * 10;
-    }
-    if (real_ratio < aspect) {
-      yy = this.#y2;
-      w = rha * aspect;
-      xx = rw < 0 ? this.#x1 - w : w + this.#x1;
-
-      if (xx < 0) {
-        xx = 0;
-        h = Math.abs((xx - this.#x1) / aspect);
-        yy = rh < 0 ? this.#y1 - h : h + this.#y1;
-      } else if (xx > this.boundx) {
-        xx = this.boundx;
-        h = Math.abs((xx - this.#x1) / aspect);
-        yy = rh < 0 ? this.#y1 - h : h + this.#y1;
-      }
-    } else {
-      xx = this.#x2;
-      h = rwa / aspect;
-      yy = rh < 0 ? this.#y1 - h : this.#y1 + h;
-      if (yy < 0) {
-        yy = 0;
-        w = Math.abs((yy - this.#y1) * aspect);
-        xx = rw < 0 ? this.#x1 - w : w + this.#x1;
-      } else if (yy > this.boundy) {
-        yy = this.boundy;
-        w = Math.abs(yy - this.#y1) * aspect;
-        xx = rw < 0 ? this.#x1 - w : w + this.#x1;
-      }
-    }
-
-    // Magic %-)
-    if (xx > this.#x1) {
-      // right side
-      if (xx - this.#x1 < min_x) {
-        xx = this.#x1 + min_x;
-      } else if (xx - this.#x1 > max_x) {
-        xx = this.#x1 + max_x;
-      }
-      if (yy > this.#y1) {
-        yy = this.#y1 + (xx - this.#x1) / aspect;
-      } else {
-        yy = this.#y1 - (xx - this.#x1) / aspect;
-      }
-    } else if (xx < this.#x1) {
-      // left side
-      if (this.#x1 - xx < min_x) {
-        xx = this.#x1 - min_x;
-      } else if (this.#x1 - xx > max_x) {
-        xx = this.#x1 - max_x;
-      }
-      if (yy > this.#y1) {
-        yy = this.#y1 + (this.#x1 - xx) / aspect;
-      } else {
-        yy = this.#y1 - (this.#x1 - xx) / aspect;
-      }
-    }
-
-    if (xx < 0) {
-      this.#x1 -= xx;
-      xx = 0;
-    } else if (xx > this.boundx) {
-      this.#x1 -= xx - this.boundx;
-      xx = this.boundx;
-    }
-
-    if (yy < 0) {
-      this.#y1 -= yy;
-      yy = 0;
-    } else if (yy > this.boundy) {
-      this.#y1 -= yy - this.boundy;
-      yy = this.boundy;
-    }
-
-    return this.#makeObj(this.#flipCoords(this.#x1, this.#y1, xx, yy));
-  }
-
   #rebound(p: Point): Point {
     let px0 = p[0],
       py0 = p[1];
@@ -478,18 +354,11 @@ class Coords {
     return [xa, ya, xb, yb];
   }
 
-  #getRect(): JcropCrop & {x2: number; y2: number} {
+  getFixed(): JcropCrop & {x2: number; y2: number} {
     let delta;
     const xsize = this.#x2 - this.#x1,
       ysize = this.#y2 - this.#y1;
     const {xscale, yscale} = this.getScale();
-
-    if (this.#xlimit && Math.abs(xsize) > this.#xlimit) {
-      this.#x2 = xsize > 0 ? this.#x1 + this.#xlimit : this.#x1 - this.#xlimit;
-    }
-    if (this.#ylimit && Math.abs(ysize) > this.#ylimit) {
-      this.#y2 = ysize > 0 ? this.#y1 + this.#ylimit : this.#y1 - this.#ylimit;
-    }
 
     if (this.#ymin / yscale && Math.abs(ysize) < this.#ymin / yscale) {
       this.#y2 = ysize > 0 ? this.#y1 + this.#ymin / yscale : this.#y1 - this.#ymin / yscale;
@@ -672,11 +541,6 @@ class Selection {
     const div = this.#dragDiv(ord, this.#hdep++);
     setStyle(div, {opacity: String(this.getOptions().handleOpacity)});
     div.classList.add(cssClass('handle'));
-    const hs = this.getOptions().handleSize;
-
-    if (hs) {
-      setStyle(div, {height: px(hs), width: px(hs)});
-    }
 
     return div;
   }
@@ -922,10 +786,6 @@ export class Jcrop implements JcropInstance {
     origimg.after(div);
     div.append(img);
 
-    if (this.#options.addClass) {
-      div.classList.add(this.#options.addClass);
-    }
-
     const bound = this.#options.boundary;
     const trk = this.#newTracker();
     setStyle(trk, {
@@ -946,12 +806,7 @@ export class Jcrop implements JcropInstance {
     sel.append(this.#imgHolder, this.#hdlHolder);
 
     // Coords Module {{{
-    this.#coords = new Coords(
-      this.#boundx,
-      this.#boundy,
-      () => this.#options,
-      () => ({xscale: this.#xscale, yscale: this.#yscale}),
-    );
+    this.#coords = new Coords(this.#boundx, this.#boundy, () => ({xscale: this.#xscale, yscale: this.#yscale}));
     // }}}
 
     // Touch Module {{{
@@ -1127,36 +982,19 @@ export class Jcrop implements JcropInstance {
 
   #dragmodeHandler(mode: Ordinal, f: JcropCrop & {x2: number; y2: number}): PositionCallback {
     return (pos: Point): void => {
-      if (!this.#options.aspectRatio) {
-        switch (mode) {
-          case 'e':
-            pos[1] = f.y2;
-            break;
-          case 'n':
-            pos[0] = f.x2;
-            break;
-          case 's':
-            pos[0] = f.x2;
-            break;
-          case 'w':
-            pos[1] = f.y2;
-            break;
-        }
-      } else {
-        switch (mode) {
-          case 'e':
-            pos[1] = f.y + 1;
-            break;
-          case 'n':
-            pos[0] = f.x + 1;
-            break;
-          case 's':
-            pos[0] = f.x + 1;
-            break;
-          case 'w':
-            pos[1] = f.y + 1;
-            break;
-        }
+      switch (mode) {
+        case 'e':
+          pos[1] = f.y2;
+          break;
+        case 'n':
+          pos[0] = f.x2;
+          break;
+        case 's':
+          pos[0] = f.x2;
+          break;
+        case 'w':
+          pos[1] = f.y2;
+          break;
       }
       this.#coords.setCurrent(pos);
       this.#selection.update();
@@ -1308,17 +1146,7 @@ export class Jcrop implements JcropInstance {
       this.#bgcolor = 'black';
     }
 
-    this.#coords.setLimits(
-      this.#options.maxSize[0],
-      this.#options.maxSize[1],
-      this.#options.minSize[0],
-      this.#options.minSize[1],
-    );
-
-    if (Object.hasOwn(this.#options, 'outerImage') && this.#options.outerImage) {
-      this.#img.setAttribute('src', this.#options.outerImage);
-      delete this.#options.outerImage;
-    }
+    this.#coords.setLimits(this.#options.minSize[0], this.#options.minSize[1]);
 
     this.#selection.refresh();
   }
