@@ -168,6 +168,30 @@ export default defineConfig([
     ...rxjsX.configs.recommended,
     files: ['**/*.ts'],
   },
+  {
+    // jquery.Jcrop.ts is a vendored third-party plugin (github.com/tapmodo/Jcrop), kept close to
+    // upstream so it stays diffable against future updates rather than restructured to this
+    // codebase's own conventions. It also only ever runs client-side (every consumer sits behind a
+    // RenderMode.Client route), so the SSR-safety reasoning behind no-restricted-globals doesn't
+    // apply to its direct `document`/`navigator` use. Placed after every other block that targets
+    // '**/*.ts' (depend, sonarjs, rxjs-x) so these overrides actually win instead of being
+    // reasserted by a later same-glob block.
+    files: ['src/app/jcrop/**/*.ts'],
+    rules: {
+      // The plugin is inherently jQuery - that's the dependency being vendored, not a choice this
+      // file makes on its own.
+      'depend/ban-dependencies': 'off',
+      'no-restricted-globals': 'off',
+      // Upstream Jcrop idiom: every DOM event handler ends with `return false;` (stop
+      // propagation/prevent default via jQuery's shorthand), which reads as "always returns the
+      // same value" to sonarjs. Kept as-is to stay diffable against upstream.
+      'sonarjs/no-invariant-returns': 'off',
+      'sonarjs/cognitive-complexity': 'off',
+      // Several call sites intentionally pass a no-op (`function () {}`) as a default/placeholder
+      // handler, matching the upstream plugin.
+      '@typescript-eslint/no-empty-function': 'off',
+    },
+  },
   eslintPluginPrettierRecommended,
   {
     ignores: ['src/grpc/**/*', 'src/rest/**/*'],

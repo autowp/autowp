@@ -33,8 +33,99 @@ import $ from 'jquery';
 
 import {hasTouchSupport} from './touch';
 
+export interface JcropCrop {
+  h: number;
+  w: number;
+  x: number;
+  y: number;
+}
+
+export interface JcropOptions {
+  addClass?: null | string;
+  aspectRatio?: number;
+  bgOpacity?: number;
+  borderOpacity?: number;
+  boundary?: number;
+  boxHeight?: number;
+  boxWidth?: number;
+  createBorders?: string[];
+  createDragbars?: string[];
+  createHandles?: string[];
+  disabled?: boolean;
+  handleOpacity?: number;
+  handleSize?: null | number;
+  // Accepted for API compatibility with the upstream plugin, but dead in this vendored copy - no
+  // keyboard-nudge support was ported over, so this option is read nowhere below.
+  keySupport?: boolean;
+  maxSize?: number[];
+  minSelect?: number[];
+  minSize?: number[];
+  onSelect?: (crop: JcropCrop) => void;
+  outerImage?: string;
+  setSelect?: number[];
+  touchSupport?: boolean | null;
+  trueSize?: number[];
+}
+
+export interface JcropInstance {
+  cancel: () => void;
+  destroy: () => void;
+  disable: () => void;
+  enable: () => void;
+  focus: null;
+  release: () => void;
+  setOptions: (opt: JcropOptions) => void;
+  setSelect: (rect: number[]) => void;
+  ui: {
+    holder: JQuery;
+    selection: JQuery;
+  };
+}
+
+// The subset of options `defaults` always supplies a value for - everything else on JcropOptions
+// (disabled/keySupport/outerImage/setSelect/trueSize) is genuinely optional at runtime: read only
+// behind an `options.hasOwnProperty(...)` check, or (for `disabled`) only ever assigned, never
+// relied on being present.
+interface DefaultedOptions {
+  addClass: null | string;
+  aspectRatio: number;
+  bgOpacity: number;
+  borderOpacity: number;
+  boundary: number;
+  boxHeight: number;
+  boxWidth: number;
+  createBorders: string[];
+  createDragbars: string[];
+  createHandles: string[];
+  handleOpacity: number;
+  handleSize: null | number;
+  maxSize: number[];
+  minSelect: number[];
+  minSize: number[];
+  onSelect: (crop: JcropCrop) => void;
+  touchSupport: boolean | null;
+}
+
+type InternalOptions = DefaultedOptions & JcropOptions;
+
+type Point = [number, number];
+
+// jQuery types a plain `.on(eventName, handler)` registration's handler as `JQuery.TriggeredEvent`
+// regardless of eventName - the more specific per-event interfaces (MouseEventBase,
+// TouchEventBase, ...) only come from its typed event-map overloads, which a runtime-built
+// eventName string like 'mousedown'/'touchstart.jcrop' doesn't hit. `originalEvent` isn't declared
+// on the base type, so touch handling reads it through this helper instead of widening the event
+// type everywhere.
+type JcropMouseEvent = JQuery.TriggeredEvent;
+
+function originalTouchEvent(e: JcropMouseEvent): TouchEvent {
+  return (e as unknown as {originalEvent: TouchEvent}).originalEvent;
+}
+
+type PositionCallback = (pos: Point) => void;
+
 // Global Defaults {{{
-const defaults = {
+const defaults: DefaultedOptions = {
   // Styling Options
   addClass: null,
   aspectRatio: 0,
@@ -60,16 +151,15 @@ const defaults = {
   touchSupport: null,
 };
 
-function Jcrop(obj, opt) {
-  let $img;
-  let xscale;
-  let yscale;
+function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
+  let xscale: number;
+  let yscale: number;
 
-  let options = $.extend({}, defaults);
+  let options: InternalOptions = $.extend({}, defaults);
   const _ua = navigator.userAgent.toLowerCase(),
-    is_msie = /msie/.test(_ua);
+    is_msie = _ua.includes('msie');
 
-  let $hdl_holder = $('<div />').width('100%').height('100%').css('zIndex', 320),
+  const $hdl_holder = $('<div />').width('100%').height('100%').css('zIndex', 320),
     $img_holder = $('<div />').width('100%').height('100%').css({
       overflow: 'hidden',
       position: 'absolute',
@@ -78,12 +168,6 @@ function Jcrop(obj, opt) {
 
   // Initialization {{{
   // Sanitize some options {{{
-  if (typeof obj !== 'object') {
-    obj = $(obj)[0];
-  }
-  if (typeof opt !== 'object') {
-    opt = {};
-  }
   // }}}
   setOptions(opt);
   // Initialize some jQuery objects {{{
@@ -101,7 +185,7 @@ function Jcrop(obj, opt) {
     visibility: 'visible',
   };
 
-  let $origimg = $(obj);
+  const $origimg = $(obj);
 
   if (obj.tagName !== 'IMG') {
     throw new Error('Only img is supported');
@@ -115,21 +199,21 @@ function Jcrop(obj, opt) {
   } else {
     // Obtain dimensions from temporary image in case the original is not loaded yet (e.g. IE 7.0).
     const tempImage = new Image();
-    tempImage.src = $origimg[0].src;
+    tempImage.src = $origimg.attr('src') ?? '';
     $origimg.width(tempImage.width);
     $origimg.height(tempImage.height);
   }
 
-  $img = $origimg.clone().removeAttr('id').css(img_css).show();
+  const $img: JQuery = $origimg.clone().removeAttr('id').css(img_css).show();
 
-  $img.width($origimg.width());
-  $img.height($origimg.height());
+  $img.width($origimg.width() ?? 0);
+  $img.height($origimg.height() ?? 0);
   $origimg.after($img).hide();
 
   presize($img, options.boxWidth, options.boxHeight);
 
-  let boundx = $img.width(),
-    boundy = $img.height(),
+  const boundx = $img.width() ?? 0,
+    boundy = $img.height() ?? 0,
     $div = $('<div />')
       .width(boundx)
       .height(boundy)
@@ -157,16 +241,16 @@ function Jcrop(obj, opt) {
     })
     .on('mousedown', newSelection);
 
-  let $img2 = $('<div />'),
-    $sel = $('<div />')
-      .css({
-        position: 'absolute',
-        zIndex: 600,
-      })
-      .insertBefore($img)
-      .append($img_holder, $hdl_holder);
+  let $img2 = $('<div />');
+  const $sel = $('<div />')
+    .css({
+      position: 'absolute',
+      zIndex: 600,
+    })
+    .insertBefore($img)
+    .append($img_holder, $hdl_holder);
 
-  function detectSupport() {
+  function detectSupport(): boolean {
     if (options.touchSupport === true || options.touchSupport === false) return options.touchSupport;
     else return hasTouchSupport();
   }
@@ -174,13 +258,14 @@ function Jcrop(obj, opt) {
   // Touch Module {{{
   const Touch = (function () {
     return {
-      cfilter: function (e) {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
+      cfilter: function (e: JcropMouseEvent): JcropMouseEvent {
+        const touch = originalTouchEvent(e).changedTouches[0];
+        e.pageX = touch.pageX;
+        e.pageY = touch.pageY;
         return e;
       },
-      createDragger: function (ord) {
-        return function (e) {
+      createDragger: function (ord: string) {
+        return function (e: JcropMouseEvent) {
           if (options.disabled) {
             return false;
           }
@@ -193,7 +278,7 @@ function Jcrop(obj, opt) {
         };
       },
       isSupported: hasTouchSupport,
-      newSelection: function (e) {
+      newSelection: function (e: JcropMouseEvent) {
         return newSelection(Touch.cfilter(e));
       },
       support: detectSupport(),
@@ -202,14 +287,14 @@ function Jcrop(obj, opt) {
 
   // Selection Module {{{
   const Selection = (function () {
-    let awake,
-      borders = {},
-      dragbar = {},
-      handle = {},
-      hdep = 370;
+    let awake: boolean | undefined;
+    const borders: Record<string, JQuery> = {};
+    const dragbar: Record<string, JQuery> = {};
+    const handle: Record<string, JQuery> = {};
+    let hdep = 370;
 
     // Private Methods
-    function insertBorder(type) {
+    function insertBorder(type: string): JQuery {
       const jq = $('<div />')
         .css({
           opacity: options.borderOpacity,
@@ -220,7 +305,7 @@ function Jcrop(obj, opt) {
       return jq;
     }
 
-    function dragDiv(ord, zi) {
+    function dragDiv(ord: string, zi: number): JQuery {
       const jq = $('<div />')
         .on('mousedown', createDragger(ord))
         .css({
@@ -238,7 +323,7 @@ function Jcrop(obj, opt) {
       return jq;
     }
 
-    function insertHandle(ord) {
+    function insertHandle(ord: string): JQuery {
       const div = dragDiv(ord, hdep++)
           .css({
             opacity: options.handleOpacity,
@@ -253,20 +338,20 @@ function Jcrop(obj, opt) {
       return div;
     }
 
-    function insertDragbar(ord) {
+    function insertDragbar(ord: string): JQuery {
       return dragDiv(ord, hdep++).addClass('jcrop-dragbar');
     }
 
-    function createDragbars(li) {
-      for (let i = 0; i < li.length; i++) {
-        dragbar[li[i]] = insertDragbar(li[i]);
+    function createDragbars(li: string[]): void {
+      for (const ord of li) {
+        dragbar[ord] = insertDragbar(ord);
       }
     }
 
-    function createBorders(li) {
-      let cl;
-      for (let i = 0; i < li.length; i++) {
-        switch (li[i]) {
+    function createBorders(li: string[]): void {
+      let cl = '';
+      for (const ord of li) {
+        switch (ord) {
           case 'e':
             cl = 'vline right';
             break;
@@ -280,17 +365,17 @@ function Jcrop(obj, opt) {
             cl = 'vline';
             break;
         }
-        borders[li[i]] = insertBorder(cl);
+        borders[ord] = insertBorder(cl);
       }
     }
 
-    function createHandles(li) {
-      for (let i = 0; i < li.length; i++) {
-        handle[li[i]] = insertHandle(li[i]);
+    function createHandles(li: string[]): void {
+      for (const ord of li) {
+        handle[ord] = insertHandle(ord);
       }
     }
 
-    function moveto(x, y) {
+    function moveto(x: number, y: number): void {
       $img2.css({
         left: px(-x),
         top: px(-y),
@@ -301,11 +386,11 @@ function Jcrop(obj, opt) {
       });
     }
 
-    function resize(w, h) {
+    function resize(w: number, h: number): void {
       $sel.width(Math.round(w)).height(Math.round(h));
     }
 
-    function refresh() {
+    function refresh(): void {
       const c = Coords.getFixed();
 
       Coords.setPressed([c.x, c.y]);
@@ -315,31 +400,31 @@ function Jcrop(obj, opt) {
     }
 
     // Internal Methods
-    function updateVisible(select) {
+    function updateVisible(select?: boolean): void {
       if (awake) {
-        return update(select);
+        update(select);
       }
     }
 
-    function update(select) {
+    function update(select?: boolean): void {
       const c = Coords.getFixed();
 
       resize(c.w, c.h);
       moveto(c.x, c.y);
 
-      awake || show();
+      if (!awake) show();
 
       if (select) {
         options.onSelect.call(api, unscale(c));
       }
     }
 
-    function setBgOpacity(opacity, force) {
+    function setBgOpacity(opacity: number, force?: boolean): void {
       if (!awake && !force) return;
       $img.css('opacity', opacity);
     }
 
-    function show() {
+    function show(): void {
       $sel.show();
 
       setBgOpacity(bgopacity, true);
@@ -347,7 +432,7 @@ function Jcrop(obj, opt) {
       awake = true;
     }
 
-    function release() {
+    function release(): void {
       disableHandles();
       $sel.hide();
 
@@ -356,25 +441,16 @@ function Jcrop(obj, opt) {
       awake = false;
     }
 
-    function enableHandles() {
+    function enableHandles(): boolean {
       $hdl_holder.show();
       return true;
     }
 
-    function disableHandles() {
+    function disableHandles(): void {
       $hdl_holder.hide();
     }
 
-    function animMode(v) {
-      if (v) {
-        disableHandles();
-      } else {
-        enableHandles();
-      }
-    }
-
-    function done() {
-      animMode(false);
+    function done(): void {
       refresh();
     }
 
@@ -411,19 +487,19 @@ function Jcrop(obj, opt) {
       enableHandles: enableHandles,
       enableOnly: function () {},
       isAwake: function () {
-        return awake;
+        return !!awake;
       },
       refresh: refresh,
       release: release,
       setBgOpacity: setBgOpacity,
-      setCursor: function (cursor) {
+      setCursor: function (cursor: string) {
         $track.css('cursor', cursor);
       },
       update: update,
     };
   })();
 
-  let api = {
+  const api: JcropInstance = {
     cancel: cancelCrop,
     destroy: destroy,
 
@@ -443,10 +519,10 @@ function Jcrop(obj, opt) {
 
   // Tracker Module {{{
   const Tracker = (function () {
-    let onDone = function () {},
-      onMove = function () {};
+    let onDone: PositionCallback = function () {},
+      onMove: PositionCallback = function () {};
 
-    function toFront(touch) {
+    function toFront(touch?: boolean): void {
       $trk.css({
         zIndex: 450,
       });
@@ -455,19 +531,19 @@ function Jcrop(obj, opt) {
       else $(document).on('mousemove.jcrop', trackMove).on('mouseup.jcrop', trackUp);
     }
 
-    function toBack() {
+    function toBack(): void {
       $trk.css({
         zIndex: 290,
       });
       $(document).off('.jcrop');
     }
 
-    function trackMove(e) {
+    function trackMove(e: JcropMouseEvent): boolean {
       onMove(mouseAbs(e));
       return false;
     }
 
-    function trackUp(e) {
+    function trackUp(e: JcropMouseEvent): boolean {
       e.preventDefault();
       e.stopPropagation();
 
@@ -488,7 +564,7 @@ function Jcrop(obj, opt) {
       return false;
     }
 
-    function activateHandlers(move, done, touch) {
+    function activateHandlers(move: PositionCallback, done: PositionCallback, touch?: boolean): boolean {
       btndown = true;
       onMove = move;
       onDone = done;
@@ -496,16 +572,16 @@ function Jcrop(obj, opt) {
       return false;
     }
 
-    function trackTouchMove(e) {
+    function trackTouchMove(e: JcropMouseEvent): boolean {
       onMove(mouseAbs(Touch.cfilter(e)));
       return false;
     }
 
-    function trackTouchEnd(e) {
+    function trackTouchEnd(e: JcropMouseEvent): boolean {
       return trackUp(Touch.cfilter(e));
     }
 
-    function setCursor(t) {
+    function setCursor(t: string): void {
       $trk.css('cursor', t);
     }
 
@@ -523,19 +599,19 @@ function Jcrop(obj, opt) {
       y1 = 0,
       y2 = 0;
 
-    function setPressed(pos) {
-      pos = rebound(pos);
-      x2 = x1 = pos[0];
-      y2 = y1 = pos[1];
+    function setPressed(pos: Point): void {
+      const rebounded = rebound(pos);
+      x2 = x1 = rebounded[0];
+      y2 = y1 = rebounded[1];
     }
 
-    function setCurrent(pos) {
-      pos = rebound(pos);
-      x2 = pos[0];
-      y2 = pos[1];
+    function setCurrent(pos: Point): void {
+      const rebounded = rebound(pos);
+      x2 = rebounded[0];
+      y2 = rebounded[1];
     }
 
-    function moveOffset(offset) {
+    function moveOffset(offset: Point): void {
       let ox = offset[0],
         oy = offset[1];
 
@@ -559,7 +635,7 @@ function Jcrop(obj, opt) {
       y2 += oy;
     }
 
-    function getCorner(ord) {
+    function getCorner(ord: string): Point {
       const c = getFixed();
       switch (ord) {
         case 'ne':
@@ -569,11 +645,12 @@ function Jcrop(obj, opt) {
         case 'se':
           return [c.x2, c.y2];
         case 'sw':
+        default:
           return [c.x, c.y2];
       }
     }
 
-    function getFixed() {
+    function getFixed(): JcropCrop & {x2: number; y2: number} {
       if (!options.aspectRatio) {
         return getRect();
       }
@@ -585,9 +662,15 @@ function Jcrop(obj, opt) {
         rw = x2 - x1,
         rwa = Math.abs(rw),
         real_ratio = rwa / rha;
-      let h,
+      let // Always reassigned before being read on every path that reads them (the aspect-locked
+        // branch below either recomputes h/w from scratch or never reads this initial value) - kept
+        // explicit rather than left `undefined` so TS's definite-assignment analysis doesn't need to
+        // prove that itself across the branching below.
+        // eslint-disable-next-line no-useless-assignment
+        h = 0,
         max_x = options.maxSize[0] / xscale,
-        w,
+        // eslint-disable-next-line no-useless-assignment
+        w = 0,
         xx,
         yy;
 
@@ -669,17 +752,19 @@ function Jcrop(obj, opt) {
       return makeObj(flipCoords(x1, y1, xx, yy));
     }
 
-    function rebound(p) {
-      if (p[0] < 0) p[0] = 0;
-      if (p[1] < 0) p[1] = 0;
+    function rebound(p: Point): Point {
+      let px0 = p[0],
+        py0 = p[1];
+      if (px0 < 0) px0 = 0;
+      if (py0 < 0) py0 = 0;
 
-      if (p[0] > boundx) p[0] = boundx;
-      if (p[1] > boundy) p[1] = boundy;
+      if (px0 > boundx) px0 = boundx;
+      if (py0 > boundy) py0 = boundy;
 
-      return [Math.round(p[0]), Math.round(p[1])];
+      return [Math.round(px0), Math.round(py0)];
     }
 
-    function flipCoords(x1, y1, x2, y2) {
+    function flipCoords(x1: number, y1: number, x2: number, y2: number): [number, number, number, number] {
       let xa = x1,
         xb = x2,
         ya = y1,
@@ -695,9 +780,9 @@ function Jcrop(obj, opt) {
       return [xa, ya, xb, yb];
     }
 
-    function getRect() {
-      let delta,
-        xsize = x2 - x1,
+    function getRect(): JcropCrop & {x2: number; y2: number} {
+      let delta;
+      const xsize = x2 - x1,
         ysize = y2 - y1;
 
       if (xlimit && Math.abs(xsize) > xlimit) {
@@ -754,7 +839,7 @@ function Jcrop(obj, opt) {
       return makeObj(flipCoords(x1, y1, x2, y2));
     }
 
-    function makeObj(a) {
+    function makeObj(a: [number, number, number, number]): JcropCrop & {x2: number; y2: number} {
       return {
         h: a[3] - a[1],
         w: a[2] - a[0],
@@ -774,28 +859,27 @@ function Jcrop(obj, opt) {
     };
   })();
 
-  let btndown;
+  let btndown: boolean | undefined;
 
-  let docOffset;
+  let docOffset: Point;
 
   // Internal Methods {{{
-  function px(n) {
+  function px(n: number): string {
     return Math.round(n) + 'px';
   }
-  function cssClass(cl) {
+  function cssClass(cl: string): string {
     return 'jcrop-' + cl;
   }
-  function getPos(obj) {
-    const pos = $(obj).offset();
-    return [pos.left, pos.top];
+  function getPos(obj: JQuery): Point {
+    const pos = obj.offset();
+    return [pos?.left ?? 0, pos?.top ?? 0];
   }
 
-  function mouseAbs(e) {
-    return [e.pageX - docOffset[0], e.pageY - docOffset[1]];
+  function mouseAbs(e: JcropMouseEvent): Point {
+    return [(e.pageX ?? 0) - docOffset[0], (e.pageY ?? 0) - docOffset[1]];
   }
 
-  function setOptions(opt) {
-    if (typeof opt !== 'object') opt = {};
+  function setOptions(opt: JcropOptions): void {
     options = $.extend(options, opt);
 
     if (typeof options.onSelect !== 'function') {
@@ -803,7 +887,7 @@ function Jcrop(obj, opt) {
     }
   }
 
-  function startDragMode(mode, pos, touch) {
+  function startDragMode(mode: string, pos: Point, touch?: boolean): boolean {
     docOffset = getPos($img);
     Tracker.setCursor(mode === 'move' ? mode : mode + '-resize');
 
@@ -818,11 +902,11 @@ function Jcrop(obj, opt) {
     Coords.setPressed(Coords.getCorner(opp));
     Coords.setCurrent(opc);
 
-    Tracker.activateHandlers(dragmodeHandler(mode, fc), doneSelect, touch);
+    return Tracker.activateHandlers(dragmodeHandler(mode, fc), doneSelect, touch);
   }
 
-  function dragmodeHandler(mode, f) {
-    return function (pos) {
+  function dragmodeHandler(mode: string, f: JcropCrop & {x2: number; y2: number}): PositionCallback {
+    return function (pos: Point) {
       if (!options.aspectRatio) {
         switch (mode) {
           case 'e':
@@ -859,10 +943,10 @@ function Jcrop(obj, opt) {
     };
   }
 
-  function createMover(pos) {
+  function createMover(pos: Point): PositionCallback {
     let lloc = pos;
 
-    return function (pos) {
+    return function (pos: Point) {
       Coords.moveOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
       lloc = pos;
 
@@ -870,7 +954,7 @@ function Jcrop(obj, opt) {
     };
   }
 
-  function oppLockCorner(ord) {
+  function oppLockCorner(ord: string): string {
     switch (ord) {
       case 'e':
         return 'nw';
@@ -887,12 +971,13 @@ function Jcrop(obj, opt) {
       case 'sw':
         return 'ne';
       case 'w':
+      default:
         return 'ne';
     }
   }
 
-  function createDragger(ord) {
-    return function (e) {
+  function createDragger(ord: string) {
+    return function (e: JcropMouseEvent) {
       if (options.disabled) {
         return false;
       }
@@ -909,36 +994,35 @@ function Jcrop(obj, opt) {
     };
   }
 
-  function presize($obj, w, h) {
-    let nh = $obj.height(),
-      nw = $obj.width();
+  function presize($obj: JQuery, w: number, h: number): void {
+    let nh = $obj.height() ?? 0,
+      nw = $obj.width() ?? 0;
     if (nw > w && w > 0) {
       nw = w;
-      nh = (w / $obj.width()) * $obj.height();
+      nh = (w / ($obj.width() ?? 1)) * ($obj.height() ?? 0);
     }
     if (nh > h && h > 0) {
       nh = h;
-      nw = (h / $obj.height()) * $obj.width();
+      nw = (h / ($obj.height() ?? 1)) * ($obj.width() ?? 0);
     }
-    xscale = $obj.width() / nw;
-    yscale = $obj.height() / nh;
+    xscale = ($obj.width() ?? 0) / nw;
+    yscale = ($obj.height() ?? 0) / nh;
     $obj.width(nw).height(nh);
   }
 
-  function unscale(c) {
+  function unscale(c: JcropCrop & {x2: number; y2: number}): JcropCrop {
     return {
       h: c.h * yscale,
       w: c.w * xscale,
       x: c.x * xscale,
-      x2: c.x2 * xscale,
       y: c.y * yscale,
-      y2: c.y2 * yscale,
     };
   }
 
-  function doneSelect() {
+  function doneSelect(): void {
     const c = Coords.getFixed();
-    if (c.w > options.minSelect[0] && c.h > options.minSelect[1]) {
+    const minSelect = options.minSelect;
+    if (c.w > minSelect[0] && c.h > minSelect[1]) {
       Selection.enableHandles();
       Selection.done();
     } else {
@@ -947,7 +1031,7 @@ function Jcrop(obj, opt) {
     Tracker.setCursor('crosshair');
   }
 
-  function newSelection(e) {
+  function newSelection(e: JcropMouseEvent): boolean {
     if (options.disabled) {
       return false;
     }
@@ -958,19 +1042,19 @@ function Jcrop(obj, opt) {
     const pos = mouseAbs(e);
     Coords.setPressed(pos);
     Selection.update();
-    Tracker.activateHandlers(selectDrag, doneSelect, e.type.substring(0, 5) === 'touch');
+    Tracker.activateHandlers(selectDrag, doneSelect, e.type.startsWith('touch'));
 
     e.stopPropagation();
     e.preventDefault();
     return false;
   }
 
-  function selectDrag(pos) {
+  function selectDrag(pos: Point): void {
     Coords.setCurrent(pos);
     Selection.update();
   }
 
-  function newTracker() {
+  function newTracker(): JQuery {
     const trk = $('<div></div>').addClass(cssClass('tracker'));
     if (is_msie) {
       trk.css({
@@ -981,17 +1065,18 @@ function Jcrop(obj, opt) {
     return trk;
   }
 
-  $img2 = $('<img />').attr('src', $img.attr('src')).css(img_css).width(boundx).height(boundy);
+  $img2 = $('<img />')
+    .attr('src', $img.attr('src') ?? '')
+    .css(img_css)
+    .width(boundx)
+    .height(boundy);
   $img_holder.append($img2);
 
   /* }}} */
   // Set more variables {{{
-  let bgcolor = 'black',
-    bgopacity = options.bgOpacity,
-    xlimit,
-    xmin,
-    ylimit,
-    ymin;
+  let bgcolor = 'black';
+  const bgopacity = options.bgOpacity;
+  let xlimit: number, xmin: number, ylimit: number, ymin: number;
 
   docOffset = getPos($img);
   // }}}
@@ -1001,50 +1086,48 @@ function Jcrop(obj, opt) {
   // }}}
   // API methods {{{
 
-  function setSelect(rect) {
-    setSelectRaw([rect[0] / xscale, rect[1] / yscale, rect[2] / xscale, rect[3] / yscale]);
+  function setSelect(rect: number[]): void {
+    setSelectRaw([(rect[0] ?? 0) / xscale, (rect[1] ?? 0) / yscale, (rect[2] ?? 0) / xscale, (rect[3] ?? 0) / yscale]);
     options.onSelect.call(api, unscale(Coords.getFixed()));
     Selection.enableHandles();
   }
 
-  function setSelectRaw(l) {
+  function setSelectRaw(l: [number, number, number, number]): void {
     Coords.setPressed([l[0], l[1]]);
     Coords.setCurrent([l[2], l[3]]);
     Selection.update();
   }
 
-  function setOptionsNew(opt) {
+  function setOptionsNew(opt: JcropOptions): void {
     setOptions(opt);
     interfaceUpdate();
   }
 
-  function disableCrop() {
+  function disableCrop(): void {
     options.disabled = true;
     Selection.disableHandles();
-    Selection.setCursor('default');
     Tracker.setCursor('default');
   }
 
-  function enableCrop() {
+  function enableCrop(): void {
     options.disabled = false;
     interfaceUpdate();
   }
 
-  function cancelCrop() {
+  function cancelCrop(): void {
     Selection.done();
-    Tracker.activateHandlers(null, null);
   }
 
-  function destroy() {
+  function destroy(): void {
     $div.remove();
     $origimg.show();
     $origimg.css('visibility', 'visible');
     $(obj).removeData('Jcrop');
   }
 
-  function interfaceUpdate(
-    alt, // This method tweaks the interface based on options object. // Called when options are changed and at end of initialization.
-  ) {
+  // This method tweaks the interface based on options object. Called when options are changed and
+  // at end of initialization.
+  function interfaceUpdate(alt?: boolean): void {
     if (alt) {
       Selection.enableOnly();
     } else {
@@ -1052,14 +1135,13 @@ function Jcrop(obj, opt) {
     }
 
     Tracker.setCursor('crosshair');
-    Selection.setCursor('move');
 
-    if (options.hasOwnProperty('trueSize')) {
+    if (Object.hasOwn(options, 'trueSize') && options.trueSize) {
       xscale = options.trueSize[0] / boundx;
       yscale = options.trueSize[1] / boundy;
     }
 
-    if (options.hasOwnProperty('setSelect')) {
+    if (Object.hasOwn(options, 'setSelect') && options.setSelect) {
       setSelect(options.setSelect);
       Selection.done();
       delete options.setSelect;
@@ -1070,17 +1152,12 @@ function Jcrop(obj, opt) {
       bgcolor = 'black';
     }
 
-    if (bgopacity !== options.bgOpacity) {
-      bgopacity = options.bgOpacity;
-      Selection.setBgOpacity(bgopacity);
-    }
+    xlimit = options.maxSize[0];
+    ylimit = options.maxSize[1];
+    xmin = options.minSize[0];
+    ymin = options.minSize[1];
 
-    xlimit = options.maxSize[0] || 0;
-    ylimit = options.maxSize[1] || 0;
-    xmin = options.minSize[0] || 0;
-    ymin = options.minSize[1] || 0;
-
-    if (options.hasOwnProperty('outerImage')) {
+    if (Object.hasOwn(options, 'outerImage') && options.outerImage) {
       $img.attr('src', options.outerImage);
       delete options.outerImage;
     }
@@ -1088,7 +1165,7 @@ function Jcrop(obj, opt) {
     Selection.refresh();
   }
 
-  if (Touch.support) $trk.on('touchstart.jcrop', Touch.newSelection);
+  if (Touch.support) $trk.on('touchstart.jcrop', (e: JcropMouseEvent) => Touch.newSelection(e));
 
   $hdl_holder.hide();
   interfaceUpdate(true);
