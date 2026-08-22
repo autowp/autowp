@@ -42,41 +42,49 @@ export interface JcropCrop {
 
 // The only options JcropComponent (the sole consumer) ever passes at construction. Everything else
 // the upstream plugin supported (bgOpacity/borderOpacity/boundary/createBorders/createDragbars/
-// createHandles/disabled/handleOpacity/minSelect/touchSupport) is still implemented - it just
-// always runs with its DefaultedOptions default now, since nothing here can override it any more.
-// addClass/aspectRatio/handleSize/maxSize/outerImage were dropped entirely (not just defaulted):
-// each gated a whole branch behind a falsy sentinel (null/0/[0,0]) that, once unoverridable, could
-// never turn truthy again, so the branch itself was dead code, not just fixed-at-its-default.
+// createHandles/handleOpacity/minSelect/touchSupport) is still implemented - it just always runs
+// with its DefaultedOptions default now, since nothing here can override it any more.
+// addClass/aspectRatio/disabled/handleSize/keySupport/maxSize/outerImage were dropped entirely
+// (not just defaulted): each was either dead on arrival (keySupport - no keyboard-nudge support was
+// ever ported into this vendored copy) or gated a whole branch behind a falsy sentinel
+// (null/0/[0,0]/false) that, once unoverridable, could never turn truthy again, so the branch
+// itself was dead code, not just fixed-at-its-default.
 export interface JcropOptions {
   boxHeight?: number;
   boxWidth?: number;
-  // Accepted for API compatibility with the upstream plugin, but dead in this vendored copy - no
-  // keyboard-nudge support was ported over, so this option is read nowhere below.
-  keySupport?: boolean;
   minSize?: number[];
   onSelect?: (crop: JcropCrop) => void;
   setSelect?: number[];
   trueSize?: number[];
 }
 
+// Only the two methods JcropComponent (the sole consumer) actually calls. The upstream plugin's
+// wider API - cancel/disable/enable/release/setOptions/ui/focus - was dropped rather than kept
+// unused: each either wrapped internal state nothing else could still reach once its wrapper was
+// gone (disable()/enable() and the `disabled` option, see below) or exposed something no caller
+// reads (cancel/release/setOptions/ui/focus).
 export interface JcropInstance {
-  cancel: () => void;
   destroy: () => void;
-  disable: () => void;
-  enable: () => void;
-  focus: null;
-  release: () => void;
-  setOptions: (opt: JcropOptions) => void;
   setSelect: (rect: number[]) => void;
-  ui: {
-    holder: HTMLDivElement;
-    selection: HTMLDivElement;
-  };
+}
+
+// The handful of container elements Jcrop needs that have a fixed identity for the lifetime of the
+// instance (unlike the handle/border/dragbar divs, created in variable-length loops from
+// createHandles/createBorders/createDragbars, or img2, which starts as a placeholder div and later
+// becomes a real <img>) - JcropComponent declares these statically in its own template and passes
+// them in, rather than Jcrop building them with document.createElement().
+export interface JcropElements {
+  hdlHolder: HTMLDivElement;
+  holder: HTMLDivElement;
+  imgHolder: HTMLDivElement;
+  sel: HTMLDivElement;
+  selectionTracker: HTMLDivElement;
+  tracker: HTMLDivElement;
 }
 
 // The subset of options `defaults` always supplies a value for - everything else on JcropOptions
-// (keySupport/setSelect/trueSize) is genuinely optional at runtime, read only behind an
-// `options.hasOwnProperty(...)` check (or, for keySupport, nowhere at all).
+// (setSelect/trueSize) is genuinely optional at runtime, read only behind an
+// `options.hasOwnProperty(...)` check.
 interface DefaultedOptions {
   bgOpacity: number;
   borderOpacity: number;
@@ -86,7 +94,6 @@ interface DefaultedOptions {
   createBorders: Ordinal[];
   createDragbars: Ordinal[];
   createHandles: Ordinal[];
-  disabled: boolean;
   handleOpacity: number;
   minSelect: number[];
   minSize: number[];
@@ -129,7 +136,6 @@ const defaults: DefaultedOptions = {
   createDragbars: ['n', 's', 'e', 'w'],
   createHandles: ['n', 's', 'e', 'w', 'nw', 'ne', 'se', 'sw'],
 
-  disabled: false,
   handleOpacity: 0.5,
 
   minSelect: [0, 0],
@@ -179,12 +185,11 @@ class Tracker {
     private readonly notifySelectionSettled: () => void,
   ) {}
 
-  activateHandlers(move: PositionCallback, done: PositionCallback, touch?: boolean): boolean {
+  activateHandlers(move: PositionCallback, done: PositionCallback, touch?: boolean): void {
     this.#btndown = true;
     this.#onMove = move;
     this.#onDone = done;
     this.#toFront(touch);
-    return false;
   }
 
   setCursor(t: string): void {
@@ -427,9 +432,6 @@ class Coords {
 // wrapped getters), since by the time Selection needs it, it already exists and never gets replaced.
 class Selection {
   #awake: boolean | undefined;
-  readonly #borders: Record<string, HTMLDivElement> = {};
-  readonly #dragbar: Record<string, HTMLDivElement> = {};
-  readonly #handle: Record<string, HTMLDivElement> = {};
   #hdep = 370;
 
   constructor(
@@ -453,15 +455,17 @@ class Selection {
   ) {
     const options = this.getOptions();
 
-    if (Array.isArray(options.createDragbars)) this.#createDragbars(options.createDragbars);
-    if (Array.isArray(options.createHandles)) this.#createHandles(options.createHandles);
-    if (Array.isArray(options.createBorders)) this.#createBorders(options.createBorders);
+    // createDragbars/createHandles/createBorders are DefaultedOptions fields (not part of the
+    // public JcropOptions surface any more), so they're always real arrays here - no
+    // Array.isArray() guard needed.
+    this.#createDragbars(options.createDragbars);
+    this.#createHandles(options.createHandles);
+    this.#createBorders(options.createBorders);
 
     track.addEventListener('mousedown', createDragger('move'));
     if (touchSupport) {
       track.addEventListener('touchstart', createTouchDragger('move'));
     }
-    imgHolder.append(track);
     this.disableHandles();
   }
 
@@ -473,12 +477,9 @@ class Selection {
     this.refresh();
   }
 
-  enableHandles(): boolean {
+  enableHandles(): void {
     setStyle(this.hdlHolder, {display: ''});
-    return true;
   }
-
-  enableOnly(): void {}
 
   isAwake(): boolean {
     return !!this.#awake;
@@ -515,12 +516,11 @@ class Selection {
     }
   }
 
-  #insertBorder(type: string): HTMLDivElement {
+  #insertBorder(type: string): void {
     const el = this.doc.createElement('div');
     setStyle(el, {opacity: String(this.getOptions().borderOpacity), position: 'absolute'});
     el.classList.add(cssClass(type));
     this.imgHolder.append(el);
-    return el;
   }
 
   #dragDiv(ord: Ordinal, zi: number): HTMLDivElement {
@@ -537,23 +537,20 @@ class Selection {
     return el;
   }
 
-  #insertHandle(ord: Ordinal): HTMLDivElement {
+  #insertHandle(ord: Ordinal): void {
     const div = this.#dragDiv(ord, this.#hdep++);
     setStyle(div, {opacity: String(this.getOptions().handleOpacity)});
     div.classList.add(cssClass('handle'));
-
-    return div;
   }
 
-  #insertDragbar(ord: Ordinal): HTMLDivElement {
+  #insertDragbar(ord: Ordinal): void {
     const el = this.#dragDiv(ord, this.#hdep++);
     el.classList.add('jcrop-dragbar');
-    return el;
   }
 
   #createDragbars(li: Ordinal[]): void {
     for (const ord of li) {
-      this.#dragbar[ord] = this.#insertDragbar(ord);
+      this.#insertDragbar(ord);
     }
   }
 
@@ -574,13 +571,13 @@ class Selection {
           cl = 'vline';
           break;
       }
-      this.#borders[ord] = this.#insertBorder(cl);
+      this.#insertBorder(cl);
     }
   }
 
   #createHandles(li: Ordinal[]): void {
     for (const ord of li) {
-      this.#handle[ord] = this.#insertHandle(ord);
+      this.#insertHandle(ord);
     }
   }
 
@@ -646,9 +643,6 @@ class Touch {
 
   createDragger(ord: DragMode): (e: JcropMouseEvent) => void {
     return (e: JcropMouseEvent): void => {
-      if (this.getOptions().disabled) {
-        return;
-      }
       this.setDocOffset(this.getPos(this.img));
       this.startDragMode(ord, this.mouseAbs(this.cfilter(e)), true);
       e.stopPropagation();
@@ -672,14 +666,11 @@ class Touch {
 // reference rather than called directly; an ordinary method read that way loses its `this` binding
 // the moment something else invokes it.
 export class Jcrop implements JcropInstance {
-  readonly focus: null = null;
-
   readonly #origimg: HTMLImageElement;
   readonly #img: HTMLImageElement;
   readonly #hdlHolder: HTMLDivElement;
   readonly #imgHolder: HTMLDivElement;
   readonly #div: HTMLDivElement;
-  readonly #sel: HTMLDivElement;
   readonly #boundx: number;
   readonly #boundy: number;
   readonly #coords: Coords;
@@ -701,27 +692,20 @@ export class Jcrop implements JcropInstance {
   #yscale!: number;
   #docOffset!: Point;
 
-  #bgcolor = 'black';
-
   constructor(
     obj: HTMLImageElement,
     opt: JcropOptions,
-    private readonly doc: Document,
+    elements: JcropElements,
+    doc: Document,
     private readonly win: Window,
   ) {
     this.#options = {...defaults};
 
-    this.#hdlHolder = doc.createElement('div');
-    setStyle(this.#hdlHolder, {height: '100%', width: '100%', zIndex: '320'});
-
-    this.#imgHolder = doc.createElement('div');
-    setStyle(this.#imgHolder, {
-      height: '100%',
-      overflow: 'hidden',
-      position: 'absolute',
-      width: '100%',
-      zIndex: '310',
-    });
+    // hdlHolder/imgHolder's styling (height/width/z-index, and imgHolder's overflow/position) never
+    // changes at runtime, so it's static CSS on their template elements (jcrop.component.html/.scss)
+    // instead of set here.
+    this.#hdlHolder = elements.hdlHolder;
+    this.#imgHolder = elements.imgHolder;
 
     // Initialization {{{
     this.#mergeOptions(opt);
@@ -774,24 +758,20 @@ export class Jcrop implements JcropInstance {
 
     this.#boundx = img.offsetWidth;
     this.#boundy = img.offsetHeight;
-    const div = doc.createElement('div');
+    // backgroundColor/position are static CSS on .jcrop-holder (jcrop.component.scss); only the
+    // image-dependent size is set here.
+    const div = elements.holder;
     this.#div = div;
-    setStyle(div, {
-      backgroundColor: 'black',
-      height: px(this.#boundy),
-      position: 'relative',
-      width: px(this.#boundx),
-    });
-    div.classList.add(cssClass('holder'));
-    origimg.after(div);
+    setStyle(div, {height: px(this.#boundy), width: px(this.#boundx)});
     div.append(img);
 
     const bound = this.#options.boundary;
-    const trk = this.#newTracker();
+    const trk = elements.tracker;
+    // position is static CSS on .jcrop-tracker; zIndex is left here even though 290 is also its
+    // resting value, because Tracker#toFront()/#toBack() toggle it between 290 and 450 at runtime.
     setStyle(trk, {
       height: px(this.#boundy + bound * 2),
       left: px(-bound),
-      position: 'absolute',
       top: px(-bound),
       width: px(this.#boundx + bound * 2),
       zIndex: '290',
@@ -799,11 +779,8 @@ export class Jcrop implements JcropInstance {
     trk.addEventListener('mousedown', this.#newSelection);
 
     this.#img2 = doc.createElement('div');
-    const sel = doc.createElement('div');
-    this.#sel = sel;
-    setStyle(sel, {position: 'absolute', zIndex: '600'});
-    img.before(sel);
-    sel.append(this.#imgHolder, this.#hdlHolder);
+    // position/zIndex are static CSS on the sel template element (jcrop.component.html).
+    const sel = elements.sel;
 
     // Coords Module {{{
     this.#coords = new Coords(this.#boundx, this.#boundy, () => ({xscale: this.#xscale, yscale: this.#yscale}));
@@ -841,8 +818,10 @@ export class Jcrop implements JcropInstance {
       if (target instanceof Element && target.classList.contains('jcrop-tracker')) e.stopPropagation();
     });
 
-    const selectionTrack = this.#newTracker();
-    setStyle(selectionTrack, {cursor: 'move', position: 'absolute', zIndex: '360'});
+    // cursor/position/zIndex never change at runtime for this element, so they're static CSS on its
+    // template element (jcrop.component.html), same as the class/height/width it shares with `trk`
+    // via .jcrop-tracker.
+    const selectionTrack = elements.selectionTracker;
 
     this.#selection = new Selection(
       doc,
@@ -875,7 +854,6 @@ export class Jcrop implements JcropInstance {
         }
       },
     );
-    img.before(trk);
 
     this.#img2 = doc.createElement('img');
     (this.#img2 as HTMLImageElement).src = img.getAttribute('src') ?? '';
@@ -892,38 +870,14 @@ export class Jcrop implements JcropInstance {
     }
 
     setStyle(this.#hdlHolder, {display: 'none'});
-    this.#interfaceUpdate(true);
+    this.#interfaceUpdate();
   }
 
   // API methods {{{
 
-  cancel(): void {
-    this.#selection.done();
-  }
-
   destroy(): void {
     this.#div.remove();
     setStyle(this.#origimg, {display: '', visibility: 'visible'});
-  }
-
-  disable(): void {
-    this.#options.disabled = true;
-    this.#selection.disableHandles();
-    this.#tracker.setCursor('default');
-  }
-
-  enable(): void {
-    this.#options.disabled = false;
-    this.#interfaceUpdate();
-  }
-
-  release(): void {
-    this.#selection.release();
-  }
-
-  setOptions(opt: JcropOptions): void {
-    this.#mergeOptions(opt);
-    this.#interfaceUpdate();
   }
 
   setSelect(rect: number[]): void {
@@ -935,10 +889,6 @@ export class Jcrop implements JcropInstance {
     ]);
     this.#options.onSelect.call(this, this.#unscale(this.#coords.getFixed()));
     this.#selection.enableHandles();
-  }
-
-  get ui(): {holder: HTMLDivElement; selection: HTMLDivElement} {
-    return {holder: this.#div, selection: this.#sel};
   }
 
   // }}}
@@ -1035,10 +985,6 @@ export class Jcrop implements JcropInstance {
 
   readonly #createDragger = (ord: DragMode): ((e: JcropMouseEvent) => void) => {
     return (e: JcropMouseEvent): void => {
-      if (this.#options.disabled) {
-        return;
-      }
-
       // Fix position of crop area when dragged the very first time.
       // Necessary when crop image is in a hidden element when page is loaded.
       this.#docOffset = this.#getPos(this.#img);
@@ -1087,9 +1033,6 @@ export class Jcrop implements JcropInstance {
   };
 
   readonly #newSelection = (e: JcropMouseEvent): void => {
-    if (this.#options.disabled) {
-      return;
-    }
     this.#docOffset = this.#getPos(this.#img);
     this.#selection.disableHandles();
     this.#tracker.setCursor('crosshair');
@@ -1107,27 +1050,15 @@ export class Jcrop implements JcropInstance {
     this.#selection.update();
   };
 
-  #newTracker(): HTMLDivElement {
-    const el = this.doc.createElement('div');
-    el.classList.add(cssClass('tracker'));
-    return el;
-  }
-
   #setSelectRaw(l: [number, number, number, number]): void {
     this.#coords.setPressed([l[0], l[1]]);
     this.#coords.setCurrent([l[2], l[3]]);
     this.#selection.update();
   }
 
-  // This method tweaks the interface based on options object. Called when options are changed and
-  // at end of construction.
-  #interfaceUpdate(alt?: boolean): void {
-    if (alt) {
-      this.#selection.enableOnly();
-    } else {
-      this.#selection.enableHandles();
-    }
-
+  // This method tweaks the interface based on options object. Called once, at end of construction
+  // (the only other caller - setOptions() - was dropped as unused; see JcropInstance above).
+  #interfaceUpdate(): void {
     this.#tracker.setCursor('crosshair');
 
     if (Object.hasOwn(this.#options, 'trueSize') && this.#options.trueSize) {
@@ -1139,11 +1070,6 @@ export class Jcrop implements JcropInstance {
       this.setSelect(this.#options.setSelect);
       this.#selection.done();
       delete this.#options.setSelect;
-    }
-
-    if ('black' !== this.#bgcolor) {
-      setStyle(this.#div, {backgroundColor: 'black'});
-      this.#bgcolor = 'black';
     }
 
     this.#coords.setLimits(this.#options.minSize[0], this.#options.minSize[1]);

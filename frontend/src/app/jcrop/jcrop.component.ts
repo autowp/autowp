@@ -1,10 +1,19 @@
 import type {OnDestroy} from '@angular/core';
 
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, ElementRef, inject, input, output, ViewEncapsulation} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  output,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {browserWindow} from '@utils/browser-window';
 
-import type {JcropCrop, JcropInstance} from './Jcrop';
+import type {JcropCrop, JcropElements, JcropInstance} from './Jcrop';
 
 import Jcrop from './Jcrop';
 
@@ -33,6 +42,13 @@ export class JcropComponent implements OnDestroy {
   readonly minSize = input.required<[number, number]>();
 
   readonly cropChange = output<JcropCrop>();
+
+  private readonly holderRef = viewChild.required<ElementRef<HTMLDivElement>>('holder');
+  private readonly selRef = viewChild.required<ElementRef<HTMLDivElement>>('sel');
+  private readonly imgHolderRef = viewChild.required<ElementRef<HTMLDivElement>>('imgHolder');
+  private readonly hdlHolderRef = viewChild.required<ElementRef<HTMLDivElement>>('hdlHolder');
+  private readonly trackerRef = viewChild.required<ElementRef<HTMLDivElement>>('tracker');
+  private readonly selectionTrackerRef = viewChild.required<ElementRef<HTMLDivElement>>('selectionTracker');
 
   #jcrop: JcropInstance | null = null;
 
@@ -92,7 +108,6 @@ export class JcropComponent implements OnDestroy {
       {
         boxHeight: height,
         boxWidth: width,
-        keySupport: false,
         minSize: this.minSize(),
         onSelect: (crop: JcropCrop) => {
           // Coords already clamps against [0, boundx]/[0, boundy] in scaled space, but rounding
@@ -103,6 +118,14 @@ export class JcropComponent implements OnDestroy {
         setSelect: [initial.x, initial.y, initial.x + initial.w, initial.y + initial.h],
         trueSize: [pictureWidth, pictureHeight],
       },
+      {
+        hdlHolder: this.hdlHolderRef().nativeElement,
+        holder: this.holderRef().nativeElement,
+        imgHolder: this.imgHolderRef().nativeElement,
+        sel: this.selRef().nativeElement,
+        selectionTracker: this.selectionTrackerRef().nativeElement,
+        tracker: this.trackerRef().nativeElement,
+      } satisfies JcropElements,
       this.#document,
       win,
     );

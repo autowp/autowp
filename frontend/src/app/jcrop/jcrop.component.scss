@@ -12,7 +12,9 @@
   You can also style this element if you want to add a border, etc
 */
 .jcrop-holder {
+  background-color: black;
   direction: ltr;
+  position: relative;
   text-align: left;
 }
 
@@ -45,6 +47,7 @@
 /* Invisible click targets */
 .jcrop-tracker {
   height: 100%;
+  position: absolute;
   width: 100%;
 
   /* "turn off" link highlight */
