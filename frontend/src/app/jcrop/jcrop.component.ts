@@ -24,7 +24,6 @@ import type {
   Ordinal,
   Point,
   PositionCallback,
-  SelectionElements,
 } from './Jcrop';
 
 import {Coords, defaults, px, Selection, setStyle, Touch, Tracker} from './Jcrop';
@@ -59,24 +58,6 @@ export class JcropComponent implements OnDestroy {
   private readonly selRef = viewChild.required<ElementRef<HTMLDivElement>>('sel');
   private readonly imgHolderRef = viewChild.required<ElementRef<HTMLDivElement>>('imgHolder');
   private readonly trackerRef = viewChild.required<ElementRef<HTMLDivElement>>('tracker');
-
-  // The dragbar/handle divs Selection wires up drag listeners for (see SelectionElements in
-  // Jcrop.ts) - declared statically here instead of Selection building them with
-  // document.createElement(). The 4 border divs are declared the same way in the template (see
-  // #borderN et al. there), but nothing here needs a reference to them - unlike these, they're
-  // purely static markup Selection never touches.
-  private readonly dragbarNRef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarN');
-  private readonly dragbarSRef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarS');
-  private readonly dragbarERef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarE');
-  private readonly dragbarWRef = viewChild.required<ElementRef<HTMLDivElement>>('dragbarW');
-  private readonly handleNRef = viewChild.required<ElementRef<HTMLDivElement>>('handleN');
-  private readonly handleSRef = viewChild.required<ElementRef<HTMLDivElement>>('handleS');
-  private readonly handleERef = viewChild.required<ElementRef<HTMLDivElement>>('handleE');
-  private readonly handleWRef = viewChild.required<ElementRef<HTMLDivElement>>('handleW');
-  private readonly handleNwRef = viewChild.required<ElementRef<HTMLDivElement>>('handleNw');
-  private readonly handleNeRef = viewChild.required<ElementRef<HTMLDivElement>>('handleNe');
-  private readonly handleSeRef = viewChild.required<ElementRef<HTMLDivElement>>('handleSe');
-  private readonly handleSwRef = viewChild.required<ElementRef<HTMLDivElement>>('handleSw');
 
   // Whether the resize handles/dragbars are shown - driven by Selection#disableHandles()/
   // enableHandles() via the setHandlesVisible callback passed into it below, and read directly by
@@ -208,6 +189,19 @@ export class JcropComponent implements OnDestroy {
   protected onSelectionTrackerTouchStart(e: TouchEvent): void {
     if (!this.#initialized || !this.#touch.support) return;
     this.#touch.createDragger('move')(e);
+  }
+
+  // Bound on each of the 12 static handle/dragbar template elements (jcrop.component.html), each
+  // passing its own fixed ordinal - Selection itself no longer listens for DOM events at all, it
+  // just owns what happens once one is forwarded to it (see Selection#dragStart/touchDragStart).
+  protected onDragMouseDown(ord: Ordinal, e: MouseEvent): void {
+    if (!this.#initialized) return;
+    this.#selection.dragStart(ord, e);
+  }
+
+  protected onDragTouchStart(ord: Ordinal, e: TouchEvent): void {
+    if (!this.#initialized || !this.#touch.support) return;
+    this.#selection.touchDragStart(ord, e);
   }
 
   // The vendored plugin's own single closure-based factory function, ported first to a class and
@@ -344,10 +338,8 @@ export class JcropComponent implements OnDestroy {
       () => this.#img2,
       sel,
       this.#bgopacity,
-      this.#touch.support,
       (ord) => this.#createDragger(ord),
       (ord) => this.#touch.createDragger(ord),
-      () => this.#options,
       this.#coords,
       (c) => {
         this.#options.onSelect.call(this, this.#unscale(c));
@@ -355,24 +347,6 @@ export class JcropComponent implements OnDestroy {
       (visible) => {
         this.handlesVisible.set(visible);
       },
-      {
-        dragbars: {
-          e: this.dragbarERef().nativeElement,
-          n: this.dragbarNRef().nativeElement,
-          s: this.dragbarSRef().nativeElement,
-          w: this.dragbarWRef().nativeElement,
-        },
-        handles: {
-          e: this.handleERef().nativeElement,
-          n: this.handleNRef().nativeElement,
-          ne: this.handleNeRef().nativeElement,
-          nw: this.handleNwRef().nativeElement,
-          s: this.handleSRef().nativeElement,
-          se: this.handleSeRef().nativeElement,
-          sw: this.handleSwRef().nativeElement,
-          w: this.handleWRef().nativeElement,
-        },
-      } satisfies SelectionElements,
     );
 
     // Tracker Module {{{

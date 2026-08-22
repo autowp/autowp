@@ -9,10 +9,13 @@
   z-index while tracking) is still set from there, with one exception: #hdlHolder's visibility is
   driven by the handlesVisible signal instead, since - unlike the rest - it toggles for a reason
   Angular can already see (Selection#disableHandles()/enableHandles() during a drag), not from
-  runtime layout math. Likewise, mousedown/touchstart below are exactly what #init() (and, for
-  #selectionTracker, the Selection class in Jcrop.ts) used to attach imperatively with
-  addEventListener() - both elements are static and permanent for the life of this component, so
-  there's no need to attach/detach them by hand.
+  runtime layout math. Likewise, every mousedown/touchstart below is exactly what #init() and the
+  Selection class (Jcrop.ts) used to attach imperatively with addEventListener() - all of these
+  elements are static and permanent for the life of this component, so there's no need to
+  attach/detach anything by hand. #tracker/#selectionTracker call straight into the drag logic
+  (onTrackerMouseDown et al.); the handle/dragbar elements instead forward through
+  onDragMouseDown/onDragTouchStart, passing along the fixed ordinal each one already knows, since
+  Selection itself no longer listens for DOM events at all - see Selection#dragStart/touchDragStart.
 -->
 <div #holder class="jcrop-holder">
   <div #sel style="position: absolute; z-index: 600">
@@ -34,22 +37,94 @@
     </div>
     <div #hdlHolder style="height: 100%; width: 100%; z-index: 320" [style.display]="handlesVisible() ? '' : 'none'">
       <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline since
-           it's the one thing genuinely unique per element, not shareable via a class. Jcrop.ts
-           (#dragDiv) still wires up mousedown/touchstart on each - fixed in number and identity,
-           since createDragbars/createHandles are DefaultedOptions fields nothing can override any
-           more, but still real drag targets, unlike the borders above. -->
-      <div #dragbarN class="jcrop-dragbar ord-n" style="z-index: 370"></div>
-      <div #dragbarS class="jcrop-dragbar ord-s" style="z-index: 371"></div>
-      <div #dragbarE class="jcrop-dragbar ord-e" style="z-index: 372"></div>
-      <div #dragbarW class="jcrop-dragbar ord-w" style="z-index: 373"></div>
-      <div #handleN class="jcrop-handle ord-n" style="z-index: 374"></div>
-      <div #handleS class="jcrop-handle ord-s" style="z-index: 375"></div>
-      <div #handleE class="jcrop-handle ord-e" style="z-index: 376"></div>
-      <div #handleW class="jcrop-handle ord-w" style="z-index: 377"></div>
-      <div #handleNw class="jcrop-handle ord-nw" style="z-index: 378"></div>
-      <div #handleNe class="jcrop-handle ord-ne" style="z-index: 379"></div>
-      <div #handleSe class="jcrop-handle ord-se" style="z-index: 380"></div>
-      <div #handleSw class="jcrop-handle ord-sw" style="z-index: 381"></div>
+           it's the one thing genuinely unique per element, not shareable via a class. Each still
+           forwards mousedown/touchstart into Selection (via onDragMouseDown/onDragTouchStart, passing
+           its own fixed ordinal) - fixed in number and identity now, but still real drag targets,
+           unlike the borders above. -->
+      <div
+        #dragbarN
+        class="jcrop-dragbar ord-n"
+        style="z-index: 370"
+        (mousedown)="onDragMouseDown('n', $event)"
+        (touchstart)="onDragTouchStart('n', $event)"
+      ></div>
+      <div
+        #dragbarS
+        class="jcrop-dragbar ord-s"
+        style="z-index: 371"
+        (mousedown)="onDragMouseDown('s', $event)"
+        (touchstart)="onDragTouchStart('s', $event)"
+      ></div>
+      <div
+        #dragbarE
+        class="jcrop-dragbar ord-e"
+        style="z-index: 372"
+        (mousedown)="onDragMouseDown('e', $event)"
+        (touchstart)="onDragTouchStart('e', $event)"
+      ></div>
+      <div
+        #dragbarW
+        class="jcrop-dragbar ord-w"
+        style="z-index: 373"
+        (mousedown)="onDragMouseDown('w', $event)"
+        (touchstart)="onDragTouchStart('w', $event)"
+      ></div>
+      <div
+        #handleN
+        class="jcrop-handle ord-n"
+        style="z-index: 374"
+        (mousedown)="onDragMouseDown('n', $event)"
+        (touchstart)="onDragTouchStart('n', $event)"
+      ></div>
+      <div
+        #handleS
+        class="jcrop-handle ord-s"
+        style="z-index: 375"
+        (mousedown)="onDragMouseDown('s', $event)"
+        (touchstart)="onDragTouchStart('s', $event)"
+      ></div>
+      <div
+        #handleE
+        class="jcrop-handle ord-e"
+        style="z-index: 376"
+        (mousedown)="onDragMouseDown('e', $event)"
+        (touchstart)="onDragTouchStart('e', $event)"
+      ></div>
+      <div
+        #handleW
+        class="jcrop-handle ord-w"
+        style="z-index: 377"
+        (mousedown)="onDragMouseDown('w', $event)"
+        (touchstart)="onDragTouchStart('w', $event)"
+      ></div>
+      <div
+        #handleNw
+        class="jcrop-handle ord-nw"
+        style="z-index: 378"
+        (mousedown)="onDragMouseDown('nw', $event)"
+        (touchstart)="onDragTouchStart('nw', $event)"
+      ></div>
+      <div
+        #handleNe
+        class="jcrop-handle ord-ne"
+        style="z-index: 379"
+        (mousedown)="onDragMouseDown('ne', $event)"
+        (touchstart)="onDragTouchStart('ne', $event)"
+      ></div>
+      <div
+        #handleSe
+        class="jcrop-handle ord-se"
+        style="z-index: 380"
+        (mousedown)="onDragMouseDown('se', $event)"
+        (touchstart)="onDragTouchStart('se', $event)"
+      ></div>
+      <div
+        #handleSw
+        class="jcrop-handle ord-sw"
+        style="z-index: 381"
+        (mousedown)="onDragMouseDown('sw', $event)"
+        (touchstart)="onDragTouchStart('sw', $event)"
+      ></div>
     </div>
   </div>
   <div

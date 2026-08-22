@@ -48,16 +48,19 @@ export interface JcropCrop {
 }
 
 // The only options JcropComponent (the sole consumer) ever passes at construction. Everything else
-// the upstream plugin supported (bgOpacity/boundary/createDragbars/createHandles/minSelect/
-// touchSupport) is still implemented - it just always runs with its DefaultedOptions default now,
-// since nothing here can override it any more.
-// addClass/aspectRatio/borderOpacity/createBorders/disabled/handleOpacity/handleSize/keySupport/
-// maxSize/outerImage were dropped entirely (not just defaulted): each was either dead on arrival
-// (keySupport - no keyboard-nudge support was ever ported into this vendored copy), gated a whole
-// branch behind a falsy sentinel (null/0/[0,0]/false) that, once unoverridable, could never turn
-// truthy again, or - once its DefaultedOptions default became the only value it could ever hold -
-// ended up read only by code that's now static markup instead (border/handle opacity, which class
-// classes get, which per-side divs even exist to begin with; see jcrop.component.html/.scss).
+// the upstream plugin supported (bgOpacity/boundary/minSelect/touchSupport) is still implemented -
+// it just always runs with its DefaultedOptions default now, since nothing here can override it
+// any more.
+// addClass/aspectRatio/borderOpacity/createBorders/createDragbars/createHandles/disabled/
+// handleOpacity/handleSize/keySupport/maxSize/outerImage were dropped entirely (not just
+// defaulted): each was either dead on arrival (keySupport - no keyboard-nudge support was ever
+// ported into this vendored copy), gated a whole branch behind a falsy sentinel (null/0/[0,0]/
+// false) that, once unoverridable, could never turn truthy again, or - once its DefaultedOptions
+// default became the only value it could ever hold - ended up read only by code that's now static
+// markup instead (border/handle opacity and classes, which per-side/per-corner divs even exist to
+// begin with, and - for createDragbars/createHandles specifically - which of them get their
+// mousedown/touchstart bound directly in the template now instead of via a runtime loop; see
+// jcrop.component.html/.scss).
 export interface JcropOptions {
   boxHeight?: number;
   boxWidth?: number;
@@ -75,8 +78,6 @@ interface DefaultedOptions {
   boundary: number;
   boxHeight: number;
   boxWidth: number;
-  createDragbars: Side[];
-  createHandles: Ordinal[];
   minSelect: number[];
   minSize: number[];
   onSelect: (crop: JcropCrop) => void;
@@ -101,12 +102,6 @@ export type PositionCallback = (pos: Point) => void;
 export type Ordinal = 'e' | 'n' | 'ne' | 'nw' | 's' | 'se' | 'sw' | 'w';
 export type DragMode = 'move' | Ordinal;
 
-// The 4 non-diagonal Ordinals - what createDragbars actually ever contains (dragbars, like borders,
-// only ever run along an edge, never sit at a corner - border div identity/class is static markup
-// now, not derived from a Side-typed list at all any more, but SelectionElements.dragbars is still
-// keyed by this).
-export type Side = 'e' | 'n' | 's' | 'w';
-
 // oppLockCorner only ever maps onto a diagonal - the corner opposite the dragged edge/corner, which
 // getCorner then reads off Coords - so both are typed to this narrower union rather than Ordinal.
 export type Corner = 'ne' | 'nw' | 'se' | 'sw';
@@ -119,8 +114,6 @@ export const defaults: DefaultedOptions = {
 
   boxHeight: 0,
   boxWidth: 0,
-  createDragbars: ['n', 's', 'e', 'w'],
-  createHandles: ['n', 's', 'e', 'w', 'nw', 'ne', 'se', 'sw'],
 
   minSelect: [0, 0],
   minSize: [0, 0],
@@ -404,26 +397,16 @@ export class Coords {
   }
 }
 
-// The 4 dragbar + 8 handle divs Selection still wires up drag listeners for - fixed in number and
-// identity for the lifetime of a JcropComponent instance (createDragbars/createHandles are
-// DefaultedOptions fields nothing can override any more), so JcropComponent declares them
-// statically in its own template rather than Selection building them with document.createElement().
-// The 4 border divs aren't here: Selection doesn't touch them at all any more, since nothing about
-// them (styling, class, or behavior) is dynamic - see jcrop.component.html/.scss.
-export interface SelectionElements {
-  dragbars: Record<Side, HTMLDivElement>;
-  handles: Record<Ordinal, HTMLDivElement>;
-}
-
 // Owns the visible selection box: its resize handles, dragbars, borders, and the crop-preview image
-// clipped to it. The "move" tracker overlay for dragging an existing selection is a sibling concern,
-// not owned here - JcropComponent binds mousedown/touchstart on it directly in its own template,
-// calling back into the same createDragger/createTouchDragger this class uses for its own handles.
-// Kept independent of Touch by taking its two touch-specific bits (whether it's supported, and how
-// to build a touch-drag handler) as plain values/functions rather than the Touch object itself -
-// same decoupling as Tracker. `coords` is taken as the real collaborator object it is (not
-// individually wrapped getters), since by the time Selection needs it, it already exists and never
-// gets replaced.
+// clipped to it. Doesn't listen for DOM events itself any more - JcropComponent binds
+// mousedown/touchstart on the static handle/dragbar/tracker elements directly in its own template
+// (same for borders, which need no interaction at all) and forwards them into dragStart()/
+// touchDragStart() below, the same way it already does for the "move" tracker overlay via
+// createDragger/createTouchDragger directly. Kept independent of Touch by taking its
+// touch-specific bit (how to build a touch-drag handler) as a plain function rather than the Touch
+// object itself - same decoupling as Tracker. `coords` is taken as the real collaborator object it
+// is (not individually wrapped getters), since by the time Selection needs it, it already exists
+// and never gets replaced.
 export class Selection {
   #awake: boolean | undefined;
 
@@ -435,27 +418,26 @@ export class Selection {
     private readonly getImg2: () => HTMLElement,
     private readonly sel: HTMLDivElement,
     private readonly bgopacity: number,
-    private readonly touchSupport: boolean,
     private readonly createDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
     private readonly createTouchDragger: (ord: DragMode) => (e: JcropMouseEvent) => void,
-    private readonly getOptions: () => InternalOptions,
     private readonly coords: Coords,
     private readonly notifySelect: (crop: JcropCrop & {x2: number; y2: number}) => void,
     // Handle/dragbar visibility is a JcropComponent signal ([style.display] on the #hdlHolder
     // template element), not a style this class sets directly any more.
     private readonly setHandlesVisible: (visible: boolean) => void,
-    private readonly elements: SelectionElements,
   ) {
-    const options = this.getOptions();
-
-    // createDragbars/createHandles are DefaultedOptions fields (not part of the public JcropOptions
-    // surface any more), so they're always real arrays here - no Array.isArray() guard needed.
-    // Borders have no equivalent call any more - their styling/class is entirely static now (see
-    // jcrop.component.html/.scss), so nothing here needs to touch them.
-    this.#createDragbars(options.createDragbars);
-    this.#createHandles(options.createHandles);
-
     this.disableHandles();
+  }
+
+  // Forwarded from the mousedown/touchstart bindings on each handle/dragbar's static template
+  // element (jcrop.component.html) - JcropComponent doesn't run the drag logic itself, just routes
+  // the DOM event here with the ordinal the template already knows at each binding site.
+  dragStart(ord: Ordinal, e: JcropMouseEvent): void {
+    this.createDragger(ord)(e);
+  }
+
+  touchDragStart(ord: Ordinal, e: JcropMouseEvent): void {
+    this.createTouchDragger(ord)(e);
   }
 
   disableHandles(): void {
@@ -502,30 +484,6 @@ export class Selection {
 
     if (select) {
       this.notifySelect(c);
-    }
-  }
-
-  // el is one of the static per-side/per-corner divs JcropComponent declares in its own template
-  // (see SelectionElements) - cursor/position/z-index/class are static there too now (borderOpacity/
-  // handleOpacity as well, for borders/handles respectively), so this only wires up the drag
-  // listeners, it doesn't create, place, or style anything.
-  #dragDiv(ord: Ordinal, el: HTMLDivElement): void {
-    el.addEventListener('mousedown', this.createDragger(ord));
-
-    if (this.touchSupport) {
-      el.addEventListener('touchstart', this.createTouchDragger(ord));
-    }
-  }
-
-  #createDragbars(li: Side[]): void {
-    for (const ord of li) {
-      this.#dragDiv(ord, this.elements.dragbars[ord]);
-    }
-  }
-
-  #createHandles(li: Ordinal[]): void {
-    for (const ord of li) {
-      this.#dragDiv(ord, this.elements.handles[ord]);
     }
   }
 
