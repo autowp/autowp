@@ -29,7 +29,9 @@
  * }}}
  */
 
-import {hasTouchSupport} from './touch';
+function hasTouchSupport(win: Window): boolean {
+  return 'ontouchstart' in win || win.navigator.maxTouchPoints > 0;
+}
 
 export interface JcropCrop {
   h: number;
@@ -161,16 +163,20 @@ function setStyle(el: HTMLElement, styles: Partial<CSSStyleDeclaration>): void {
   Object.assign(el.style, styles);
 }
 
-function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
+// doc/win are threaded through explicitly rather than read off the global `document`/`window` -
+// this file is a plain factory function, not an Angular class, so it can't inject() them itself.
+// The one caller that can (JcropComponent) gets them the Angular way (DOCUMENT token,
+// browserWindow()) and passes them in.
+function Jcrop(obj: HTMLImageElement, opt: JcropOptions, doc: Document, win: Window): JcropInstance {
   let xscale: number;
   let yscale: number;
 
   let options: InternalOptions = {...defaults};
 
-  const hdlHolder = document.createElement('div');
+  const hdlHolder = doc.createElement('div');
   setStyle(hdlHolder, {height: '100%', width: '100%', zIndex: '320'});
 
-  const imgHolder = document.createElement('div');
+  const imgHolder = doc.createElement('div');
   setStyle(imgHolder, {height: '100%', overflow: 'hidden', position: 'absolute', width: '100%', zIndex: '310'});
 
   // Initialization {{{
@@ -222,7 +228,7 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
 
   const boundx = img.offsetWidth,
     boundy = img.offsetHeight,
-    div = document.createElement('div');
+    div = doc.createElement('div');
   setStyle(div, {backgroundColor: 'black', height: px(boundy), position: 'relative', width: px(boundx)});
   div.classList.add(cssClass('holder'));
   origimg.after(div);
@@ -244,15 +250,15 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
   });
   trk.addEventListener('mousedown', newSelection);
 
-  let img2: HTMLElement = document.createElement('div');
-  const sel = document.createElement('div');
+  let img2: HTMLElement = doc.createElement('div');
+  const sel = doc.createElement('div');
   setStyle(sel, {position: 'absolute', zIndex: '600'});
   img.before(sel);
   sel.append(imgHolder, hdlHolder);
 
   function detectSupport(): boolean {
     if (options.touchSupport === true || options.touchSupport === false) return options.touchSupport;
-    else return hasTouchSupport();
+    else return hasTouchSupport(win);
   }
 
   // Touch Module {{{
@@ -265,21 +271,20 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
         return e;
       },
       createDragger: function (ord: DragMode) {
-        return function (e: JcropMouseEvent) {
+        return function (e: JcropMouseEvent): void {
           if (options.disabled) {
-            return false;
+            return;
           }
           docOffset = getPos(img);
           btndown = true;
           startDragMode(ord, mouseAbs(Touch.cfilter(e)), true);
           e.stopPropagation();
           e.preventDefault();
-          return false;
         };
       },
       isSupported: hasTouchSupport,
-      newSelection: function (e: JcropMouseEvent) {
-        return newSelection(Touch.cfilter(e));
+      newSelection: function (e: JcropMouseEvent): void {
+        newSelection(Touch.cfilter(e));
       },
       support: detectSupport(),
     };
@@ -295,7 +300,7 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
 
     // Private Methods
     function insertBorder(type: string): HTMLDivElement {
-      const el = document.createElement('div');
+      const el = doc.createElement('div');
       setStyle(el, {opacity: String(options.borderOpacity), position: 'absolute'});
       el.classList.add(cssClass(type));
       imgHolder.append(el);
@@ -303,7 +308,7 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
     }
 
     function dragDiv(ord: Ordinal, zi: number): HTMLDivElement {
-      const el = document.createElement('div');
+      const el = doc.createElement('div');
       el.addEventListener('mousedown', createDragger(ord));
       setStyle(el, {cursor: ord + '-resize', position: 'absolute', zIndex: String(zi)});
       el.classList.add('ord-' + ord);
@@ -456,7 +461,7 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
     // jQuery's .hasClass() had the equivalent guard (elem.nodeType === 1) built in, silently
     // no-opping for a Document node rather than throwing; preserved as dead-but-safe rather than
     // "fixed" to e.target, since that would be a behavior change from the original.
-    document.addEventListener('touchstart', function (e) {
+    doc.addEventListener('touchstart', function (e) {
       const target = e.currentTarget;
       if (target instanceof Element && target.classList.contains('jcrop-tracker')) e.stopPropagation();
     });
@@ -517,20 +522,20 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
       setStyle(trk, {zIndex: '450'});
 
       if (touch) {
-        document.addEventListener('touchmove', trackTouchMove);
-        document.addEventListener('touchend', trackTouchEnd);
+        doc.addEventListener('touchmove', trackTouchMove);
+        doc.addEventListener('touchend', trackTouchEnd);
       } else {
-        document.addEventListener('mousemove', trackMove);
-        document.addEventListener('mouseup', trackUp);
+        doc.addEventListener('mousemove', trackMove);
+        doc.addEventListener('mouseup', trackUp);
       }
     }
 
     function toBack(): void {
       setStyle(trk, {zIndex: '290'});
-      document.removeEventListener('mousemove', trackMove);
-      document.removeEventListener('mouseup', trackUp);
-      document.removeEventListener('touchmove', trackTouchMove);
-      document.removeEventListener('touchend', trackTouchEnd);
+      doc.removeEventListener('mousemove', trackMove);
+      doc.removeEventListener('mouseup', trackUp);
+      doc.removeEventListener('touchmove', trackTouchMove);
+      doc.removeEventListener('touchend', trackTouchEnd);
     }
 
     function trackMove(e: JcropMouseEvent): boolean {
@@ -866,7 +871,7 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
   }
   function getPos(el: HTMLElement): Point {
     const rect = el.getBoundingClientRect();
-    return [rect.left + window.scrollX, rect.top + window.scrollY];
+    return [rect.left + win.scrollX, rect.top + win.scrollY];
   }
 
   function mouseAbs(e: JcropMouseEvent): Point {
@@ -970,9 +975,9 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
   }
 
   function createDragger(ord: DragMode) {
-    return function (e: JcropMouseEvent) {
+    return function (e: JcropMouseEvent): void {
       if (options.disabled) {
-        return false;
+        return;
       }
 
       // Fix position of crop area when dragged the very first time.
@@ -983,7 +988,6 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
       startDragMode(ord, mouseAbs(e));
       e.stopPropagation();
       e.preventDefault();
-      return false;
     };
   }
 
@@ -1024,9 +1028,9 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
     Tracker.setCursor('crosshair');
   }
 
-  function newSelection(e: JcropMouseEvent): boolean {
+  function newSelection(e: JcropMouseEvent): void {
     if (options.disabled) {
-      return false;
+      return;
     }
     btndown = true;
     docOffset = getPos(img);
@@ -1039,7 +1043,6 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
 
     e.stopPropagation();
     e.preventDefault();
-    return false;
   }
 
   function selectDrag(pos: Point): void {
@@ -1048,12 +1051,12 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
   }
 
   function newTracker(): HTMLDivElement {
-    const el = document.createElement('div');
+    const el = doc.createElement('div');
     el.classList.add(cssClass('tracker'));
     return el;
   }
 
-  img2 = document.createElement('img');
+  img2 = doc.createElement('img');
   (img2 as HTMLImageElement).src = img.getAttribute('src') ?? '';
   setStyle(img2, imgStyle);
   setStyle(img2, {display: '', height: px(boundy), width: px(boundx)});
@@ -1150,7 +1153,11 @@ function Jcrop(obj: HTMLImageElement, opt: JcropOptions): JcropInstance {
     Selection.refresh();
   }
 
-  if (Touch.support) trk.addEventListener('touchstart', (e: JcropMouseEvent) => Touch.newSelection(e));
+  if (Touch.support) {
+    trk.addEventListener('touchstart', (e: JcropMouseEvent) => {
+      Touch.newSelection(e);
+    });
+  }
 
   setStyle(hdlHolder, {display: 'none'});
   interfaceUpdate(true);

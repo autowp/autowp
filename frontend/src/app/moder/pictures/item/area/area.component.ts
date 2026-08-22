@@ -2,7 +2,7 @@ import type {OnDestroy, OnInit} from '@angular/core';
 import type {Picture} from '@grpc/spec.pb';
 import type {Subscription} from 'rxjs';
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, viewChild} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   PictureFields,
@@ -16,17 +16,17 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
-import {browserWindow} from '@utils/browser-window';
-import {BehaviorSubject, catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
-import type {JcropCrop as Crop, JcropInstance} from '../../../../jcrop/Jcrop.js';
+import type {JcropCrop} from '../../../../jcrop/Jcrop.js';
 
-import Jcrop from '../../../../jcrop/Jcrop.js';
+import {cropSummary} from '../../../../jcrop/crop-summary.js';
+import {JcropComponent} from '../../../../jcrop/jcrop.component.js';
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
   selector: 'app-moder-pictures-item-area',
-  imports: [RouterLink],
+  imports: [RouterLink, JcropComponent],
   templateUrl: './area.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -37,7 +37,6 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
   readonly #cdr = inject(ChangeDetectorRef);
-  readonly #window = browserWindow();
 
   #id = '';
   #itemID = '';
@@ -45,16 +44,15 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
   #sub?: Subscription;
   protected aspect = '';
   protected resolution = '';
-  #jcrop: JcropInstance | null = null;
-  #currentCrop: Crop = {
+  #currentCrop: JcropCrop = {
     h: 0,
     w: 0,
     x: 0,
     y: 0,
   };
-  readonly #minSize = [50, 50];
+  protected readonly minSize: [number, number] = [50, 50];
   protected picture: null | Picture = null;
-  protected readonly img$ = new BehaviorSubject<HTMLImageElement | null>(null);
+  protected readonly jcrop = viewChild(JcropComponent);
 
   ngOnInit(): void {
     this.#pageEnv.set({
@@ -105,7 +103,6 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
             }),
           ),
         ),
-        switchMap((data) => this.img$.pipe(map((img) => ({img, pictureItem: data})))),
       )
       .subscribe({
         error: () => {
@@ -113,62 +110,28 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
             skipLocationChange: true,
           });
         },
-        next: (data) => {
-          if (data.img && this.picture) {
-            const body = data.img.parentElement;
-            if (!body) {
-              this.#cdr.markForCheck();
-              return;
-            }
-
-            this.#jcrop = null;
-            if (data.pictureItem.cropHeight > 0 && data.pictureItem.cropWidth > 0) {
-              this.#currentCrop = {
-                h: data.pictureItem.cropHeight,
-                w: data.pictureItem.cropWidth,
-                x: data.pictureItem.cropLeft,
-                y: data.pictureItem.cropTop,
-              };
-            } else {
-              this.#currentCrop = {
-                h: this.picture.height,
-                w: this.picture.width,
-                x: 0,
-                y: 0,
-              };
-            }
-
-            const styles = this.#window?.getComputedStyle(body, null);
-            const bWidth =
-              body.clientWidth - parseFloat(styles?.paddingLeft ?? '0') - parseFloat(styles?.paddingRight ?? '0') || 1;
-
-            const scale = this.picture.width / bWidth;
-            const width = this.picture.width / scale;
-            const height = this.picture.height / scale;
-
-            data.img.style.width = width + 'px';
-            data.img.style.height = height + 'px';
-
-            this.#jcrop = Jcrop(data.img, {
-              boxHeight: height,
-              boxWidth: width,
-              keySupport: false,
-              minSize: this.#minSize,
-              onSelect: (c: Crop) => {
-                this.#currentCrop = c;
-                this.updateSelectionText();
-              },
-              setSelect: [
-                this.#currentCrop.x,
-                this.#currentCrop.y,
-                this.#currentCrop.x + this.#currentCrop.w,
-                this.#currentCrop.y + this.#currentCrop.h,
-              ],
-              trueSize: [this.picture.width, this.picture.height],
-            });
-
-            this.#cdr.markForCheck();
+        next: (pictureItem) => {
+          if (!this.picture) {
+            return;
           }
+
+          if (pictureItem.cropHeight > 0 && pictureItem.cropWidth > 0) {
+            this.#currentCrop = {
+              h: pictureItem.cropHeight,
+              w: pictureItem.cropWidth,
+              x: pictureItem.cropLeft,
+              y: pictureItem.cropTop,
+            };
+          } else {
+            this.#currentCrop = {
+              h: this.picture.height,
+              w: this.picture.width,
+              x: 0,
+              y: 0,
+            };
+          }
+
+          this.#cdr.markForCheck();
         },
       });
   }
@@ -180,20 +143,19 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
   }
 
   protected selectAll() {
-    if (this.picture && this.#jcrop) {
-      this.#jcrop.setSelect([0, 0, this.picture.width, this.picture.height]);
-    }
+    this.jcrop()?.selectAll();
   }
 
-  private updateSelectionText() {
-    const text = Math.round(this.#currentCrop.w) + '×' + Math.round(this.#currentCrop.h);
-    const pw = 4;
-    const ph = (pw * this.#currentCrop.h) / this.#currentCrop.w;
-    const phRound = Math.round(ph * 10) / 10;
-
-    this.aspect = pw + ':' + phRound;
-    this.resolution = text;
+  protected onCropChange(crop: JcropCrop): void {
+    this.#currentCrop = crop;
+    const summary = cropSummary(crop);
+    this.aspect = summary.aspect;
+    this.resolution = summary.resolution;
     this.#cdr.markForCheck();
+  }
+
+  protected get initialCrop(): JcropCrop {
+    return this.#currentCrop;
   }
 
   protected saveCrop() {
@@ -224,12 +186,6 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
             void this.#router.navigate(['/moder/pictures', this.picture.id]);
           }
         });
-    }
-  }
-
-  protected onLoad(e: Event) {
-    if (e.target && e.target instanceof HTMLImageElement) {
-      this.img$.next(e.target);
     }
   }
 }

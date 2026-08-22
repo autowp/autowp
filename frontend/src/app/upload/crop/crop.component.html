@@ -5,13 +5,20 @@
 <div class="modal-body">
   @if (picture$ | async; as picture) {
     @if (picture && picture.imageGalleryFull) {
-      <img alt="" [src]="picture.imageGalleryFull.src" (load)="onLoad($event)" />
+      <app-jcrop
+        [src]="picture.imageGalleryFull.src"
+        [pictureWidth]="picture.width"
+        [pictureHeight]="picture.height"
+        [initialCrop]="initialCropFor(picture)"
+        [minSize]="minSize"
+        (cropChange)="onCropChange($event)"
+      />
     }
   }
 </div>
 <div class="modal-footer">
   @if (picture$ | async; as picture) {
-    <button type="button" class="btn btn-secondary float-start select-all" (click)="selectAll(picture)">
+    <button type="button" class="btn btn-secondary float-start select-all" (click)="selectAll()">
       <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
       <span i18n>Select all</span>
     </button>

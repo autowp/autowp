@@ -6,8 +6,6 @@
   on a parent element, place any fixes here or in a like selector
 
   You can also style this element if you want to add a border, etc
-  A better method for styling can be seen below with .jcrop-light
-  (Add a class to the holder and style elements for that extended class)
 */
 .jcrop-holder {
   direction: ltr;
@@ -150,44 +148,6 @@
 
   &.ord-w {
     margin-left: -4px;
-  }
-}
-
-/* The "jcrop-light" class/extension */
-.jcrop-light {
-  .jcrop-vline,
-  .jcrop-hline {
-    background: #fff;
-    opacity: 0.7 !important;
-  }
-
-  .jcrop-handle {
-    border-radius: 3px;
-    background-color: #000;
-    border-color: #fff;
-  }
-}
-
-/* The "jcrop-dark" class/extension */
-.jcrop-dark {
-  .jcrop-vline,
-  .jcrop-hline {
-    background: #000;
-    opacity: 0.7 !important;
-  }
-
-  .jcrop-handle {
-    border-radius: 3px;
-    background-color: #fff;
-    border-color: #000;
-  }
-}
-
-/* Simple macro to turn off the antlines */
-.solid-line {
-  .jcrop-vline,
-  .jcrop-hline {
-    background: #fff;
   }
 }
 

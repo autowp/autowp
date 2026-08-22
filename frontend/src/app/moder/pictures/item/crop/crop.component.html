@@ -21,11 +21,20 @@
   <h1 i18n>Cropper</h1>
 </div>
 
-@if (picture) {
+@if (picture; as picture) {
   <div>
-    <div class="crop-area mb-3">
-      <img alt="" [src]="picture.image?.src" (load)="onLoad($event)" />
-    </div>
+    @if (picture.image; as image) {
+      <div class="crop-area mb-3">
+        <app-jcrop
+          [src]="image.src"
+          [pictureWidth]="picture.width"
+          [pictureHeight]="picture.height"
+          [initialCrop]="initialCropFor(picture)"
+          [minSize]="minSize"
+          (cropChange)="onCropChange($event)"
+        />
+      </div>
+    }
     <div style="margin-bottom: 100px">
       <span i18n>{{ resolution }} (aspect is about {{ aspect }})</span>
       <button type="button" class="btn btn-secondary" i18n (click)="selectAll()">Select all</button>

@@ -1,144 +1,66 @@
-import type {OnDestroy, OnInit} from '@angular/core';
 import type {Picture} from '@grpc/spec.pb';
-import type {Subscription} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output, viewChild} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Image} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {browserWindow} from '@utils/browser-window';
-import {BehaviorSubject, combineLatest} from 'rxjs';
 
-import type {JcropCrop, JcropInstance} from '../../jcrop/Jcrop';
+import type {JcropCrop} from '../../jcrop/Jcrop';
 
-import Jcrop from '../../jcrop/Jcrop';
+import {cropSummary} from '../../jcrop/crop-summary';
+import {JcropComponent} from '../../jcrop/jcrop.component';
 
 @Component({
   selector: 'app-upload-crop',
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, JcropComponent],
   templateUrl: './crop.component.html',
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UploadCropComponent implements OnDestroy, OnInit {
+export class UploadCropComponent {
   protected readonly activeModal = inject(NgbActiveModal);
   readonly #cdr = inject(ChangeDetectorRef);
-  readonly #window = browserWindow();
 
   readonly changed = output();
 
   readonly picture = input.required<Picture>();
   readonly picture$ = toObservable(this.picture);
 
-  readonly #minSize = [400, 300];
+  protected readonly minSize: [number, number] = [400, 300];
+  protected readonly jcrop = viewChild(JcropComponent);
 
-  #jcrop: JcropInstance | null = null;
   protected aspect = '';
   protected resolution = '';
-  protected readonly img$ = new BehaviorSubject<HTMLImageElement | null>(null);
   private currentCrop: JcropCrop = {
     h: 0,
     w: 0,
     x: 0,
     y: 0,
   };
-  #sub?: Subscription;
 
-  ngOnInit(): void {
-    this.#sub = combineLatest([this.img$, this.picture$]).subscribe(([img, picture]) => {
-      if (img) {
-        const body = img.parentElement;
-
-        if (!body) {
-          return;
-        }
-
-        this.#jcrop = null;
-        if (picture.image?.cropWidth && picture.image.cropHeight) {
-          this.currentCrop = {
-            h: picture.image.cropHeight,
-            w: picture.image.cropWidth,
-            x: picture.image.cropLeft,
-            y: picture.image.cropTop,
-          };
-        } else {
-          this.currentCrop = {
-            h: picture.height,
-            w: picture.width,
-            x: 0,
-            y: 0,
-          };
-        }
-
-        const styles = this.#window?.getComputedStyle(body, null);
-        const bWidth =
-          body.clientWidth - parseFloat(styles?.paddingLeft ?? '0') - parseFloat(styles?.paddingRight ?? '0') || 1;
-
-        const scale = picture.width / bWidth;
-        const width = picture.width / scale;
-        const height = picture.height / scale;
-
-        img.style.width = `${width}px`;
-        img.style.height = `${height}px`;
-
-        this.#jcrop = Jcrop(img, {
-          boxHeight: height,
-          boxWidth: width,
-          keySupport: false,
-          minSize: this.#minSize,
-          onSelect: (c: JcropCrop) => {
-            this.currentCrop = c;
-            if (this.currentCrop.y < 0) {
-              this.currentCrop.y = 0;
-            }
-            if (this.currentCrop.x < 0) {
-              this.currentCrop.x = 0;
-            }
-            this.updateSelectionText();
-          },
-          setSelect: [
-            this.currentCrop.x,
-            this.currentCrop.y,
-            this.currentCrop.x + this.currentCrop.w,
-            this.currentCrop.y + this.currentCrop.h,
-          ],
-          trueSize: [picture.width, picture.height],
-        });
-
-        this.#cdr.markForCheck();
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.#sub) {
-      this.#sub.unsubscribe();
+  protected initialCropFor(picture: Picture): JcropCrop {
+    if (picture.image?.cropWidth && picture.image.cropHeight) {
+      return {
+        h: picture.image.cropHeight,
+        w: picture.image.cropWidth,
+        x: picture.image.cropLeft,
+        y: picture.image.cropTop,
+      };
     }
+
+    return {h: picture.height, w: picture.width, x: 0, y: 0};
   }
 
-  protected selectAll(picture: Picture) {
-    if (this.#jcrop) {
-      this.#jcrop.setSelect([0, 0, picture.width, picture.height]);
-    }
-  }
-
-  private updateSelectionText() {
-    const text = `${Math.round(this.currentCrop.w)}×${Math.round(this.currentCrop.h)}`;
-    const pw = 4;
-    const ph = (pw * this.currentCrop.h) / this.currentCrop.w;
-    const phRound = Math.round(ph * 10) / 10;
-
-    this.aspect = `${pw}:${phRound}`;
-    this.resolution = text;
-
+  protected onCropChange(crop: JcropCrop): void {
+    this.currentCrop = crop;
+    const summary = cropSummary(crop);
+    this.aspect = summary.aspect;
+    this.resolution = summary.resolution;
     this.#cdr.markForCheck();
   }
 
-  protected onLoad(e: Event) {
-    if (e.target && e.target instanceof HTMLImageElement) {
-      this.img$.next(e.target);
-    }
+  protected selectAll(): void {
+    this.jcrop()?.selectAll();
   }
 
   protected onSave(picture: Picture) {
