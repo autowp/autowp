@@ -61,15 +61,11 @@ Belarusian site translation: [be-translator](placeholder:be-translator)
 
 Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-translator)
 
-The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other "clever words".
+The site runs on [Go](https://go.dev/), [Angular](https://angular.dev/), [Twitter bootstrap](https://getbootstrap.com/), as well as many other "clever words".
 
 The site's source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
 [github](placeholder:github)
-
-[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
-[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
-[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
 
 ### Support the project
 

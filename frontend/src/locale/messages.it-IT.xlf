@@ -14798,7 +14798,7 @@ Tutti i valori inseriti qui vengono visualizzati sul sito, nelle specifiche, son
         </context-group>
         <target state="translated">partecipazione a competizioni</target>
       </trans-unit>
-      <trans-unit id="5651897684225294592" datatype="html">
+      <trans-unit id="5678902802693351106" datatype="html">
         <source>### People
 
 Our project owes its existence to the people who come here and contribute their time and knowledge.
@@ -14840,15 +14840,11 @@ Belarusian site translation: [be-translator](placeholder:be-translator)
 
 Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-translator)
 
-The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other &quot;clever words&quot;.
+The site runs on [Go](https://go.dev/), [Angular](https://angular.dev/), [Twitter bootstrap](https://getbootstrap.com/), as well as many other &quot;clever words&quot;.
 
 The site&apos;s source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
 [github](placeholder:github)
-
-[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
-[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
-[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
 
 ### Support the project
 
@@ -14856,7 +14852,7 @@ You can support our project by [finances](/donate) or [moral](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/about/about.component.ts</context>
-          <context context-type="linenumber">23,77</context>
+          <context context-type="linenumber">23,73</context>
         </context-group>
         <target state="translated">### Persone
 
@@ -14899,15 +14895,11 @@ Traduzione del sito in bielorusso: [be-translator](placeholder:be-translator)
 
 Traduzione del sito in portoghese brasiliano: [pt-br-translator](placeholder:pt-br-translator)
 
-Il sito funziona con [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), oltre a molte altre "parole difficili".
+Il sito funziona con [Go](https://go.dev/), [Angular](https://angular.dev/), [Twitter bootstrap](https://getbootstrap.com/), oltre a molte altre "parole difficili".
 
 Il codice sorgente del sito è aperto, in modo che chiunque lo desideri abbia la possibilità di influenzare la natura e la qualità del progetto.
 
 [github](placeholder:github)
-
-[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
-[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
-[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
 
 ### Sostieni il progetto
 
