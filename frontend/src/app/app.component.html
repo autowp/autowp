@@ -233,17 +233,21 @@
           </p>
         </div>
         <div class="col-md-6">
-          <remark
-            class="card card-body copyrights"
-            markdown="Please note that all material on this server autowp.ru, added visitors.
+          @defer {
+            <remark
+              class="card card-body copyrights"
+              markdown="Please note that all material on this server autowp.ru, added visitors.
 
 The site administration does not have information on the legality of the publication of these materials.
 
 All images are posted for educational purposes.
 
 [Report copyright violation](mailto:autowp@yandex.ru)"
-            i18n-markdown
-          />
+              i18n-markdown
+            />
+          } @placeholder {
+            <div class="card card-body copyrights"></div>
+          }
         </div>
       </div>
       <p class="language-picker">

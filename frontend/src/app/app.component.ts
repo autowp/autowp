@@ -24,7 +24,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {browserWindow} from '@utils/browser-window';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
-import {RemarkModule} from 'ngx-remark';
+import {RemarkComponent} from 'ngx-remark';
 import {map, shareReplay} from 'rxjs';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
@@ -46,7 +46,7 @@ import {UsersOnlineComponent} from './users/online/online.component';
     NgbTooltip,
     ContainerComponent,
     AsyncPipe,
-    RemarkModule,
+    RemarkComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
