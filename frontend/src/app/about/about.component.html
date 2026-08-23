@@ -12,8 +12,76 @@
 
 @if (aboutResource.error() || usersResource.error(); as error) {
   <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
-} @else if (html(); as html) {
-  <div class="card card-body mb-3" [innerHTML]="html"></div>
+} @else if (ready(); as ready) {
+  <div class="card card-body mb-3">
+    <remark [markdown]="aboutText">
+      <ng-template let-node remarkTemplate="link">
+        @if (node.url.startsWith('placeholder:')) {
+          @switch (node.url.slice('placeholder:'.length)) {
+            @case ('users') {
+              @for (id of ready.about.contributors; track id) {
+                @if (ready.users.get(id); as user) {
+                  <app-user [user]="user" />
+                }
+              }
+            }
+            @case ('developer') {
+              @if (ready.users.get(ready.about.developer); as user) {
+                <app-user [user]="user" />
+              }
+            }
+            @case ('fr-translator') {
+              @if (ready.users.get(ready.about.frTranslator); as user) {
+                <app-user [user]="user" />
+              }
+            }
+            @case ('zh-translator') {
+              @if (ready.users.get(ready.about.zhTranslator); as user) {
+                <app-user [user]="user" />
+              }
+            }
+            @case ('be-translator') {
+              @if (ready.users.get(ready.about.beTranslator); as user) {
+                <app-user [user]="user" />
+              }
+            }
+            @case ('pt-br-translator') {
+              @if (ready.users.get(ready.about.ptBrTranslator); as user) {
+                <app-user [user]="user" />
+              }
+            }
+            @case ('github') {
+              <i class="bi bi-github" aria-hidden="true"></i>
+              <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>
+            }
+            @case ('total-pictures') {
+              {{ ready.about.totalPictures | number }}
+            }
+            @case ('total-vehicles') {
+              {{ ready.about.totalItems }}
+            }
+            @case ('total-size') {
+              {{ ready.about.picturesSize * 1024 * 1024 | bytes: 1 }}
+            }
+            @case ('total-users') {
+              {{ ready.about.totalUsers }}
+            }
+            @case ('total-comments') {
+              {{ ready.about.totalComments }}
+            }
+            @default {
+              <!-- Unreachable: every placeholder: link in aboutText (about.component.ts) matches
+                   one of the cases above. -->
+            }
+          }
+        } @else {
+          <!-- <remark>'s own default link template, replicated here since overriding one node type
+               replaces it entirely. -->
+          <a [href]="node.url" [title]="node.title ?? ''" [remarkNode]="node"></a>
+        }
+      </ng-template>
+    </remark>
+  </div>
 } @else {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }

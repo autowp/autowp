@@ -1,32 +1,25 @@
 import type {OnInit} from '@angular/core';
-import type {User} from '@grpc/spec.pb';
 
-import {DecimalPipe, DOCUMENT} from '@angular/common';
+import {DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {Router, RouterLink} from '@angular/router';
+import {RouterLink} from '@angular/router';
 import {StatisticsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {UserService} from '@services/user';
 import {errorMessage} from 'app/grpc';
-import escapeStringRegexp from 'escape-string-regexp';
-import {marked} from 'marked';
-import {BytesPipe} from 'ngx-pipes';
+import {NgMathPipesModule} from 'ngx-pipes';
+import {RemarkComponent, RemarkNodeComponent, RemarkTemplateDirective} from 'ngx-remark';
 
 import * as versionJson from '../../version.json';
+import {UserComponent} from '../user/user/user.component';
 
-function replaceAll(str: string, find: string, replace: string): string {
-  return str.replace(new RegExp(escapeStringRegexp(find), 'g'), replace);
-}
-
-function replacePairs(str: string, pairs: Record<string, string>): string {
-  for (const key in pairs) {
-    str = replaceAll(str, key, pairs[key]);
-  }
-  return str;
-}
-
+// Placeholders below are markdown links with a `placeholder:` URL, e.g. [users](placeholder:users) -
+// real markdown remark-parse already produces a distinct 'link' AST node for, no custom plugin
+// needed. The *remarkTemplate="'link'" block in the template (about.component.html) checks for that
+// prefix and renders the matching dynamic content, falling through to a plain <a> (same as
+// <remark>'s own default link template) for every other link below.
 const aboutText = $localize`### People
 
 Our project owes its existence to the people who come here and contribute their time and knowledge.
@@ -35,7 +28,7 @@ Some add materials, others help find errors in what's already there. Some specia
 
 There are many of us, and we're all different, and that's wonderful. Here are just a few of us:
 
-%users%
+[users](placeholder:users)
 
 #### "Color coding of pants"
 
@@ -53,26 +46,26 @@ If you have questions about advertising, link exchange or promoting your product
 
 As it happens, we like to indulge our vanity with big numbers, and to show them off to everyone. Some of them, for your attention:
 
-* the site has more than %total-pictures% images, %total-vehicles% cars, amounting to roughly %total-size% of data
-* about %total-users% users are registered, who have left more than %total-comments% comments
+* the site has more than [total-pictures](placeholder:total-pictures) images, [total-vehicles](placeholder:total-vehicles) cars, amounting to roughly [total-size](placeholder:total-size) of data
+* about [total-users](placeholder:total-users) users are registered, who have left more than [total-comments](placeholder:total-comments) comments
 
 ### Development
 
-The project is developed and maintained mainly by %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+The project is developed and maintained mainly by [developer](placeholder:developer) ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
-French site translation: %fr-translator%
+French site translation: [fr-translator](placeholder:fr-translator)
 
-Chinese site translation: %zh-translator%
+Chinese site translation: [zh-translator](placeholder:zh-translator)
 
-Belarusian site translation: %be-translator%
+Belarusian site translation: [be-translator](placeholder:be-translator)
 
-Brazilian portuguese site translation: %pt-br-translator%
+Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-translator)
 
 The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other "clever words".
 
 The site's source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
@@ -85,21 +78,25 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
 
 @Component({
   selector: 'app-about',
-  imports: [RouterLink],
+  imports: [
+    DecimalPipe,
+    NgMathPipesModule,
+    RemarkComponent,
+    RemarkNodeComponent,
+    RemarkTemplateDirective,
+    RouterLink,
+    UserComponent,
+  ],
   templateUrl: './about.component.html',
-  providers: [BytesPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent implements OnInit {
   readonly #userService = inject(UserService);
-  readonly #router = inject(Router);
-  readonly #decimalPipe = inject(DecimalPipe);
-  readonly #bytesPipe = inject(BytesPipe);
   readonly #pageEnv = inject(PageEnvService);
   readonly #statisticsClient = inject(StatisticsClient);
-  readonly #document = inject(DOCUMENT);
 
   protected readonly version = versionJson;
+  protected readonly aboutText = aboutText;
 
   protected readonly aboutResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
@@ -136,36 +133,12 @@ export class AboutComponent implements OnInit {
     },
   });
 
-  protected readonly html = computed(() => {
+  // Gates the template on both resources being ready before rendering any of the markdown below,
+  // since it reads both aboutData()/usersResource.value() while rendering placeholder nodes.
+  protected readonly ready = computed(() => {
     const about = this.aboutResource.value();
     const users = this.usersResource.value();
-    if (!about || !users) {
-      return null;
-    }
-
-    const contributorsHtml: string[] = [];
-    for (const id of about.contributors) {
-      contributorsHtml.push(this.userHtml(users.get(id)));
-    }
-
-    const html = marked.parse(aboutText, {async: false});
-
-    return replacePairs(html, {
-      '%be-translator%': this.userHtml(users.get(about.beTranslator)),
-      '%developer%': this.userHtml(users.get(about.developer)),
-      '%fr-translator%': this.userHtml(users.get(about.frTranslator)),
-      '%github%':
-        '<i class="bi bi-github" aria-hidden="true"></i> ' +
-        '<a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
-      '%pt-br-translator%': this.userHtml(users.get(about.ptBrTranslator)),
-      '%total-comments%': about.totalComments.toString(),
-      '%total-pictures%': this.#decimalPipe.transform(about.totalPictures) ?? '',
-      '%total-size%': this.#bytesPipe.transform(about.picturesSize * 1024 * 1024, 1).toString(),
-      '%total-users%': about.totalUsers.toString(),
-      '%total-vehicles%': about.totalItems.toString(),
-      '%users%': contributorsHtml.join(' '),
-      '%zh-translator%': this.userHtml(users.get(about.zhTranslator)),
-    });
+    return about && users ? {about, users} : undefined;
   });
 
   ngOnInit(): void {
@@ -173,30 +146,4 @@ export class AboutComponent implements OnInit {
   }
 
   protected readonly errorMessage = errorMessage;
-
-  private userHtml(user: null | undefined | User): string {
-    if (!user) {
-      return '';
-    }
-    const span = this.#document.createElement('span');
-    const classes = ['user'];
-    if (user.deleted) {
-      classes.push('muted');
-    }
-    if (user.longAway) {
-      classes.push('long-away');
-    }
-    if (user.green) {
-      classes.push('green-man');
-    }
-    span.setAttribute('class', classes.join(' '));
-    const a = this.#document.createElement('a');
-    a.setAttribute(
-      'href',
-      this.#router.createUrlTree(['/users', user.identity ? user.identity : 'user' + user.id]).toString(),
-    );
-    a.innerText = user.name;
-
-    return '<i class="bi bi-person-fill" aria-hidden="true"></i> ' + span.appendChild(a).outerHTML;
-  }
 }

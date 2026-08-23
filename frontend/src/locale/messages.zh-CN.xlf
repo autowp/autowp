@@ -14788,7 +14788,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <target state="translated">参加比赛</target>
       </trans-unit>
-      <trans-unit id="5633021448686863176" datatype="html">
+      <trans-unit id="5651897684225294592" datatype="html">
         <source>### People
 
 Our project owes its existence to the people who come here and contribute their time and knowledge.
@@ -14797,7 +14797,7 @@ Some add materials, others help find errors in what&apos;s already there. Some s
 
 There are many of us, and we&apos;re all different, and that&apos;s wonderful. Here are just a few of us:
 
-%users%
+[users](placeholder:users)
 
 #### &quot;Color coding of pants&quot;
 
@@ -14815,26 +14815,26 @@ If you have questions about advertising, link exchange or promoting your product
 
 As it happens, we like to indulge our vanity with big numbers, and to show them off to everyone. Some of them, for your attention:
 
-* the site has more than %total-pictures% images, %total-vehicles% cars, amounting to roughly %total-size% of data
-* about %total-users% users are registered, who have left more than %total-comments% comments
+* the site has more than [total-pictures](placeholder:total-pictures) images, [total-vehicles](placeholder:total-vehicles) cars, amounting to roughly [total-size](placeholder:total-size) of data
+* about [total-users](placeholder:total-users) users are registered, who have left more than [total-comments](placeholder:total-comments) comments
 
 ### Development
 
-The project is developed and maintained mainly by %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+The project is developed and maintained mainly by [developer](placeholder:developer) ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
-French site translation: %fr-translator%
+French site translation: [fr-translator](placeholder:fr-translator)
 
-Chinese site translation: %zh-translator%
+Chinese site translation: [zh-translator](placeholder:zh-translator)
 
-Belarusian site translation: %be-translator%
+Belarusian site translation: [be-translator](placeholder:be-translator)
 
-Brazilian portuguese site translation: %pt-br-translator%
+Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-translator)
 
 The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other &quot;clever words&quot;.
 
 The site&apos;s source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
@@ -14846,7 +14846,7 @@ You can support our project by [finances](/donate) or [moral](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/about/about.component.ts</context>
-          <context context-type="linenumber">27,81</context>
+          <context context-type="linenumber">23,77</context>
         </context-group>
         <target state="translated">### 人物
 
@@ -14856,7 +14856,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
 
 我们人数众多，各不相同，这正是美好之处。以下仅是我们中的一部分：
 
-%users%
+[users](placeholder:users)
 
 #### "裤子的颜色区分"
 
@@ -14874,26 +14874,26 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
 
 我们喜欢用大数字来满足自己的虚荣心，并向所有人展示这些数字。请看其中一些：
 
-* 网站上有超过 %total-pictures% 张图片，%total-vehicles% 辆汽车，数据量约为 %total-size%
-* 已注册约 %total-users% 名用户，发表了超过 %total-comments% 条评论
+* 网站上有超过 [total-pictures](placeholder:total-pictures) 张图片，[total-vehicles](placeholder:total-vehicles) 辆汽车，数据量约为 [total-size](placeholder:total-size)
+* 已注册约 [total-users](placeholder:total-users) 名用户，发表了超过 [total-comments](placeholder:total-comments) 条评论
 
 ### 开发
 
-该项目主要由 %developer% 开发和维护（[贡献者](https://github.com/autowp/autowp/graphs/contributors)）
+该项目主要由 [developer](placeholder:developer) 开发和维护（[贡献者](https://github.com/autowp/autowp/graphs/contributors)）
 
-网站法语翻译：%fr-translator%
+网站法语翻译：[fr-translator](placeholder:fr-translator)
 
-网站中文翻译：%zh-translator%
+网站中文翻译：[zh-translator](placeholder:zh-translator)
 
-网站白俄罗斯语翻译：%be-translator%
+网站白俄罗斯语翻译：[be-translator](placeholder:be-translator)
 
-网站巴西葡萄牙语翻译：%pt-br-translator%
+网站巴西葡萄牙语翻译：[pt-br-translator](placeholder:pt-br-translator)
 
 本网站基于 [Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/) 以及许多其他"高深名词"构建。
 
 网站的源代码是开放的，以便任何有意愿的人都有机会影响项目的性质和质量。
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)

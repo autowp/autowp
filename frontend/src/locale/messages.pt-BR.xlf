@@ -14795,7 +14795,7 @@ Todos os valores inseridos aqui são exibidos no site, nas especificações, sã
         </context-group>
         <target state="translated">participação em competições</target>
       </trans-unit>
-      <trans-unit id="5633021448686863176" datatype="html">
+      <trans-unit id="5651897684225294592" datatype="html">
         <source>### People
 
 Our project owes its existence to the people who come here and contribute their time and knowledge.
@@ -14804,7 +14804,7 @@ Some add materials, others help find errors in what&apos;s already there. Some s
 
 There are many of us, and we&apos;re all different, and that&apos;s wonderful. Here are just a few of us:
 
-%users%
+[users](placeholder:users)
 
 #### &quot;Color coding of pants&quot;
 
@@ -14822,26 +14822,26 @@ If you have questions about advertising, link exchange or promoting your product
 
 As it happens, we like to indulge our vanity with big numbers, and to show them off to everyone. Some of them, for your attention:
 
-* the site has more than %total-pictures% images, %total-vehicles% cars, amounting to roughly %total-size% of data
-* about %total-users% users are registered, who have left more than %total-comments% comments
+* the site has more than [total-pictures](placeholder:total-pictures) images, [total-vehicles](placeholder:total-vehicles) cars, amounting to roughly [total-size](placeholder:total-size) of data
+* about [total-users](placeholder:total-users) users are registered, who have left more than [total-comments](placeholder:total-comments) comments
 
 ### Development
 
-The project is developed and maintained mainly by %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+The project is developed and maintained mainly by [developer](placeholder:developer) ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
-French site translation: %fr-translator%
+French site translation: [fr-translator](placeholder:fr-translator)
 
-Chinese site translation: %zh-translator%
+Chinese site translation: [zh-translator](placeholder:zh-translator)
 
-Belarusian site translation: %be-translator%
+Belarusian site translation: [be-translator](placeholder:be-translator)
 
-Brazilian portuguese site translation: %pt-br-translator%
+Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-translator)
 
 The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other &quot;clever words&quot;.
 
 The site&apos;s source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
@@ -14853,7 +14853,7 @@ You can support our project by [finances](/donate) or [moral](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/about/about.component.ts</context>
-          <context context-type="linenumber">27,81</context>
+          <context context-type="linenumber">23,77</context>
         </context-group>
         <target state="translated">### Pessoas
 
@@ -14863,7 +14863,7 @@ Alguns adicionam materiais, outros ajudam a encontrar erros no que já existe. A
 
 Somos muitos e diferentes, e isso é maravilhoso. Aqui estão apenas alguns de nós:
 
-%users%
+[users](placeholder:users)
 
 #### "Diferenciação de cores das calças"
 
@@ -14881,26 +14881,26 @@ Se você tiver dúvidas sobre publicidade, troca de links ou promoção do seu p
 
 Aconteceu que gostamos de alimentar nossa vaidade com grandes números, e de mostrá-los a todos. Alguns deles, para sua atenção:
 
-* o site tem mais de %total-pictures% imagens, %total-vehicles% carros, totalizando cerca de %total-size% de dados
-* cerca de %total-users% usuários estão registrados, tendo deixado mais de %total-comments% comentários
+* o site tem mais de [total-pictures](placeholder:total-pictures) imagens, [total-vehicles](placeholder:total-vehicles) carros, totalizando cerca de [total-size](placeholder:total-size) de dados
+* cerca de [total-users](placeholder:total-users) usuários estão registrados, tendo deixado mais de [total-comments](placeholder:total-comments) comentários
 
 ### Desenvolvimento
 
-O projeto é desenvolvido e mantido principalmente por %developer% ([colaboradores](https://github.com/autowp/autowp/graphs/contributors))
+O projeto é desenvolvido e mantido principalmente por [developer](placeholder:developer) ([colaboradores](https://github.com/autowp/autowp/graphs/contributors))
 
-Tradução do site para o francês: %fr-translator%
+Tradução do site para o francês: [fr-translator](placeholder:fr-translator)
 
-Tradução do site para o chinês: %zh-translator%
+Tradução do site para o chinês: [zh-translator](placeholder:zh-translator)
 
-Tradução do site para o bielorrusso: %be-translator%
+Tradução do site para o bielorrusso: [be-translator](placeholder:be-translator)
 
-Tradução do site para o português brasileiro: %pt-br-translator%
+Tradução do site para o português brasileiro: [pt-br-translator](placeholder:pt-br-translator)
 
 O site funciona com [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), além de muitas outras "palavras inteligentes".
 
 O código-fonte do site é aberto, para que qualquer pessoa interessada tenha a oportunidade de influenciar a natureza e a qualidade do projeto.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)

@@ -14793,7 +14793,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <target state="translated">участь у змаганнях</target>
       </trans-unit>
-      <trans-unit id="5633021448686863176" datatype="html">
+      <trans-unit id="5651897684225294592" datatype="html">
         <source>### People
 
 Our project owes its existence to the people who come here and contribute their time and knowledge.
@@ -14802,7 +14802,7 @@ Some add materials, others help find errors in what&apos;s already there. Some s
 
 There are many of us, and we&apos;re all different, and that&apos;s wonderful. Here are just a few of us:
 
-%users%
+[users](placeholder:users)
 
 #### &quot;Color coding of pants&quot;
 
@@ -14820,26 +14820,26 @@ If you have questions about advertising, link exchange or promoting your product
 
 As it happens, we like to indulge our vanity with big numbers, and to show them off to everyone. Some of them, for your attention:
 
-* the site has more than %total-pictures% images, %total-vehicles% cars, amounting to roughly %total-size% of data
-* about %total-users% users are registered, who have left more than %total-comments% comments
+* the site has more than [total-pictures](placeholder:total-pictures) images, [total-vehicles](placeholder:total-vehicles) cars, amounting to roughly [total-size](placeholder:total-size) of data
+* about [total-users](placeholder:total-users) users are registered, who have left more than [total-comments](placeholder:total-comments) comments
 
 ### Development
 
-The project is developed and maintained mainly by %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+The project is developed and maintained mainly by [developer](placeholder:developer) ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
-French site translation: %fr-translator%
+French site translation: [fr-translator](placeholder:fr-translator)
 
-Chinese site translation: %zh-translator%
+Chinese site translation: [zh-translator](placeholder:zh-translator)
 
-Belarusian site translation: %be-translator%
+Belarusian site translation: [be-translator](placeholder:be-translator)
 
-Brazilian portuguese site translation: %pt-br-translator%
+Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-translator)
 
 The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other &quot;clever words&quot;.
 
 The site&apos;s source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
@@ -14851,7 +14851,7 @@ You can support our project by [finances](/donate) or [moral](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/about/about.component.ts</context>
-          <context context-type="linenumber">27,81</context>
+          <context context-type="linenumber">23,77</context>
         </context-group>
         <target state="translated">### Люди
 
@@ -14861,7 +14861,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
 
 Нас багато, і ми різні, і це чудово. Ось лише деякі з нас:
 
-%users%
+[users](placeholder:users)
 
 #### "Кольорова диференціація штанів"
 
@@ -14879,26 +14879,26 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
 
 Так склалося, що ми любимо тішити свою марнославність великими цифрами, а також усім їх показувати. Вашій увазі деякі з них:
 
-* на сайті понад %total-pictures% зображень, %total-vehicles% автомобілів, що становить близько %total-size% даних
-* зареєстровано близько %total-users% користувачів, які залишили понад %total-comments% повідомлень
+* на сайті понад [total-pictures](placeholder:total-pictures) зображень, [total-vehicles](placeholder:total-vehicles) автомобілів, що становить близько [total-size](placeholder:total-size) даних
+* зареєстровано близько [total-users](placeholder:total-users) користувачів, які залишили понад [total-comments](placeholder:total-comments) повідомлень
 
 ### Розробка
 
-Розробка та підтримка проєкту ведеться переважно силами %developer% ([учасників](https://github.com/autowp/autowp/graphs/contributors))
+Розробка та підтримка проєкту ведеться переважно силами [developer](placeholder:developer) ([учасників](https://github.com/autowp/autowp/graphs/contributors))
 
-Переклад сайту французькою: %fr-translator%
+Переклад сайту французькою: [fr-translator](placeholder:fr-translator)
 
-Переклад сайту китайською: %zh-translator%
+Переклад сайту китайською: [zh-translator](placeholder:zh-translator)
 
-Переклад сайту білоруською: %be-translator%
+Переклад сайту білоруською: [be-translator](placeholder:be-translator)
 
-Переклад сайту бразильською португальською: %pt-br-translator%
+Переклад сайту бразильською португальською: [pt-br-translator](placeholder:pt-br-translator)
 
 Сайт працює на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а також багатьох інших "розумних словах".
 
 Вихідний код сайту є відкритим, щоб кожен охочий мав можливість впливати на суть і якість проєкту.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)

@@ -14796,7 +14796,7 @@ Toutes les valeurs saisies ici sont affichées sur le site, dans les caractéris
         </context-group>
         <target state="translated">participation à des compétitions</target>
       </trans-unit>
-      <trans-unit id="5633021448686863176" datatype="html">
+      <trans-unit id="5651897684225294592" datatype="html">
         <source>### People
 
 Our project owes its existence to the people who come here and contribute their time and knowledge.
@@ -14805,7 +14805,7 @@ Some add materials, others help find errors in what&apos;s already there. Some s
 
 There are many of us, and we&apos;re all different, and that&apos;s wonderful. Here are just a few of us:
 
-%users%
+[users](placeholder:users)
 
 #### &quot;Color coding of pants&quot;
 
@@ -14823,26 +14823,26 @@ If you have questions about advertising, link exchange or promoting your product
 
 As it happens, we like to indulge our vanity with big numbers, and to show them off to everyone. Some of them, for your attention:
 
-* the site has more than %total-pictures% images, %total-vehicles% cars, amounting to roughly %total-size% of data
-* about %total-users% users are registered, who have left more than %total-comments% comments
+* the site has more than [total-pictures](placeholder:total-pictures) images, [total-vehicles](placeholder:total-vehicles) cars, amounting to roughly [total-size](placeholder:total-size) of data
+* about [total-users](placeholder:total-users) users are registered, who have left more than [total-comments](placeholder:total-comments) comments
 
 ### Development
 
-The project is developed and maintained mainly by %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+The project is developed and maintained mainly by [developer](placeholder:developer) ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
-French site translation: %fr-translator%
+French site translation: [fr-translator](placeholder:fr-translator)
 
-Chinese site translation: %zh-translator%
+Chinese site translation: [zh-translator](placeholder:zh-translator)
 
-Belarusian site translation: %be-translator%
+Belarusian site translation: [be-translator](placeholder:be-translator)
 
-Brazilian portuguese site translation: %pt-br-translator%
+Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-translator)
 
 The site runs on [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), as well as many other &quot;clever words&quot;.
 
 The site&apos;s source code is open, so that anyone willing has the opportunity to influence the nature and quality of the project.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
@@ -14854,7 +14854,7 @@ You can support our project by [finances](/donate) or [moral](/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/about/about.component.ts</context>
-          <context context-type="linenumber">27,81</context>
+          <context context-type="linenumber">23,77</context>
         </context-group>
         <target state="translated">### Personnes
 
@@ -14864,7 +14864,7 @@ Certains ajoutent des documents, d'autres aident à trouver des erreurs dans ceu
 
 Nous sommes nombreux et différents, et c'est merveilleux. Voici juste quelques-uns d'entre nous :
 
-%users%
+[users](placeholder:users)
 
 #### « Différenciation colorée des pantalons »
 
@@ -14882,26 +14882,26 @@ Si vous avez des questions sur la publicité, l'échange de liens ou la promotio
 
 Il se trouve que nous aimons flatter notre vanité avec de grands chiffres, et les montrer à tout le monde. En voici quelques-uns, à votre attention :
 
-* le site compte plus de %total-pictures% images, %total-vehicles% voitures, ce qui représente environ %total-size% de données
-* environ %total-users% utilisateurs sont enregistrés, ayant laissé plus de %total-comments% commentaires
+* le site compte plus de [total-pictures](placeholder:total-pictures) images, [total-vehicles](placeholder:total-vehicles) voitures, ce qui représente environ [total-size](placeholder:total-size) de données
+* environ [total-users](placeholder:total-users) utilisateurs sont enregistrés, ayant laissé plus de [total-comments](placeholder:total-comments) commentaires
 
 ### Développement
 
-Le projet est développé et maintenu principalement par %developer% ([contributeurs](https://github.com/autowp/autowp/graphs/contributors))
+Le projet est développé et maintenu principalement par [developer](placeholder:developer) ([contributeurs](https://github.com/autowp/autowp/graphs/contributors))
 
-Traduction du site en français : %fr-translator%
+Traduction du site en français : [fr-translator](placeholder:fr-translator)
 
-Traduction du site en chinois : %zh-translator%
+Traduction du site en chinois : [zh-translator](placeholder:zh-translator)
 
-Traduction du site en biélorusse : %be-translator%
+Traduction du site en biélorusse : [be-translator](placeholder:be-translator)
 
-Traduction du site en portugais brésilien : %pt-br-translator%
+Traduction du site en portugais brésilien : [pt-br-translator](placeholder:pt-br-translator)
 
 Le site fonctionne avec [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), ainsi que beaucoup d'autres « mots savants ».
 
 Le code source du site est ouvert, afin que quiconque le souhaite ait la possibilité d'influencer la nature et la qualité du projet.
 
-%github%
+[github](placeholder:github)
 
 [![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
