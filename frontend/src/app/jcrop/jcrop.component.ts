@@ -89,7 +89,7 @@ export function cropSummary(crop: JcropCrop): CropSummary {
   };
 }
 
-// The shape #getCoordsFixed() (below) returns: a JcropCrop (x/y/w/h) plus the bottom-right corner
+// The shape #coordsFixed (below) returns: a JcropCrop (x/y/w/h) plus the bottom-right corner
 // (x2/y2) that x/y/w/h were themselves flipCoords()'d/makeObj()'d from - kept alongside x/y/w/h
 // rather than dropped, since #getCoordsCorner() and #dragmodeHandler() below both still need direct
 // corner coordinates, not just the box they bound.
@@ -196,7 +196,7 @@ function flipCoords(x1: number, y1: number, x2: number, y2: number): [number, nu
   return [xa, ya, xb, yb];
 }
 
-// Builds the JcropCrop (plus x2/y2) shape #getCoordsFixed() (below, on the class) returns, from the
+// Builds the JcropCrop (plus x2/y2) shape #coordsFixed (below, on the class) returns, from the
 // already-normalized [x1, y1, x2, y2] tuple flipCoords produces. A plain function for the same
 // reason flipCoords above is.
 function makeObj(a: [number, number, number, number]): FixedCrop {
@@ -322,12 +322,14 @@ export class JcropComponent {
   // minSize input and what the picture looked sized as - once every read of those six just mirrored
   // minSize()/displayWidth()/displayHeight()/#xscale()/#yscale() verbatim, with nothing left that a
   // snapshot protected against a live read didn't already, keeping a separate copy was pure
-  // indirection, so #rebound()/#getCoordsFixed()/#moveCoordsOffset() below read those directly now
-  // instead.
-  #x1 = 0;
-  #x2 = 0;
-  #y1 = 0;
-  #y2 = 0;
+  // indirection, so #rebound()/#coordsFixed/#moveCoordsOffset() below read those directly now
+  // instead. Signals (rather than plain fields) so #coordsFixed below - and, off of that, the
+  // selection/preview position/size signals - can be computed() derivations instead of values
+  // #selectionUpdate() has to remember to .set() on every drag frame.
+  readonly #x1 = signal(0);
+  readonly #x2 = signal(0);
+  readonly #y1 = signal(0);
+  readonly #y2 = signal(0);
 
   readonly src = input.required<string>();
   readonly pictureWidth = input.required<number>();
@@ -358,7 +360,7 @@ export class JcropComponent {
     // then merged directly onto this component: everything that used to be a local variable closed
     // over by every nested function is now a private field. Coords, the standalone module it built as
     // an IIFE (see Jcrop.ts), was the last of the plugin's modules to move here too (as the
-    // x1/y1/x2/y2/etc. fields and #setCoordsLimits()/#getCoordsFixed()/etc. methods above/below): once
+    // x1/y1/x2/y2/etc. fields and #setCoordsLimits()/#coordsFixed/etc. above/below): once
     // it needed its own bounds/scale driven directly by this component's own signals rather than being
     // handed pre-computed numbers once at construction, keeping it a separate class only added a layer
     // of indirection between the two - eventually enough so that boundx/boundy/xscale/yscale/xmin/ymin
@@ -408,7 +410,7 @@ export class JcropComponent {
         // (used to build it) is already a plain local variable above, in this same effect() run.
         this.#setSelect([initial.x, initial.y, initial.x + initial.w, initial.y + initial.h]);
         // minSize's own former role (setLimits(), applied once *after* this so the initial selection
-        // got clamped to it too on a second pass) is redundant now - #getCoordsFixed() reads minSize()
+        // got clamped to it too on a second pass) is redundant now - #coordsFixed reads minSize()
         // live, so #setSelect() above already clamped the initial selection to it. This
         // #selectionRefresh() call still matters for a different reason: #setCoordsPressed()/
         // #setCoordsCurrent() (which it calls) round through #rebound(), re-normalizing x1/y1/x2/y2 to
@@ -444,16 +446,18 @@ export class JcropComponent {
   // signal.
   protected readonly trackerOffset = -BOUNDARY;
 
-  // #img2's own left/top - driven by #selectionUpdate() below, on every drag frame.
-  protected readonly img2Left = signal(0);
-  protected readonly img2Top = signal(0);
+  // #img2's own left/top - pure derivations of #coordsFixed (below), the negated top-left corner so
+  // the full-size preview image shifts under the (clipping) selection box by exactly the selection's
+  // own offset.
+  protected readonly img2Left = computed(() => -this.#coordsFixed().x);
+  protected readonly img2Top = computed(() => -this.#coordsFixed().y);
 
-  // #sel's own left/top/height/width - driven by #selectionUpdate() below, on every drag frame, the
-  // same way img2Left/img2Top are.
-  protected readonly selLeft = signal(0);
-  protected readonly selTop = signal(0);
-  protected readonly selHeight = signal(0);
-  protected readonly selWidth = signal(0);
+  // #sel's own left/top/height/width - pure derivations of #coordsFixed (below) too, the same way
+  // img2Left/img2Top are.
+  protected readonly selLeft = computed(() => this.#coordsFixed().x);
+  protected readonly selTop = computed(() => this.#coordsFixed().y);
+  protected readonly selHeight = computed(() => Math.round(this.#coordsFixed().h));
+  protected readonly selWidth = computed(() => Math.round(this.#coordsFixed().w));
 
   // #sel's own display - whether the selection box (and everything clipped/nested inside it: borders,
   // handles, the #img2 crop-preview) is shown at all. Driven by #doneSelect()/#selectionUpdate()
@@ -586,42 +590,44 @@ export class JcropComponent {
 
   #setCoordsPressed(pos: Point): void {
     const rebounded = this.#rebound(pos);
-    this.#x2 = this.#x1 = rebounded[0];
-    this.#y2 = this.#y1 = rebounded[1];
+    this.#x1.set(rebounded[0]);
+    this.#x2.set(rebounded[0]);
+    this.#y1.set(rebounded[1]);
+    this.#y2.set(rebounded[1]);
   }
 
   #setCoordsCurrent(pos: Point): void {
     const rebounded = this.#rebound(pos);
-    this.#x2 = rebounded[0];
-    this.#y2 = rebounded[1];
+    this.#x2.set(rebounded[0]);
+    this.#y2.set(rebounded[1]);
   }
 
   #moveCoordsOffset(offset: Point): void {
     let ox = offset[0],
       oy = offset[1];
 
-    if (0 > this.#x1 + ox) {
-      ox -= ox + this.#x1;
+    if (0 > this.#x1() + ox) {
+      ox -= ox + this.#x1();
     }
-    if (0 > this.#y1 + oy) {
-      oy -= oy + this.#y1;
-    }
-
-    if (this.displayHeight() < this.#y2 + oy) {
-      oy += this.displayHeight() - (this.#y2 + oy);
-    }
-    if (this.displayWidth() < this.#x2 + ox) {
-      ox += this.displayWidth() - (this.#x2 + ox);
+    if (0 > this.#y1() + oy) {
+      oy -= oy + this.#y1();
     }
 
-    this.#x1 += ox;
-    this.#x2 += ox;
-    this.#y1 += oy;
-    this.#y2 += oy;
+    if (this.displayHeight() < this.#y2() + oy) {
+      oy += this.displayHeight() - (this.#y2() + oy);
+    }
+    if (this.displayWidth() < this.#x2() + ox) {
+      ox += this.displayWidth() - (this.#x2() + ox);
+    }
+
+    this.#x1.update((v) => v + ox);
+    this.#x2.update((v) => v + ox);
+    this.#y1.update((v) => v + oy);
+    this.#y2.update((v) => v + oy);
   }
 
   #getCoordsCorner(ord: Corner): Point {
-    const c = this.#getCoordsFixed();
+    const c = this.#coordsFixed();
     switch (ord) {
       case 'ne':
         return [c.x2, c.y];
@@ -646,66 +652,77 @@ export class JcropComponent {
     return [Math.round(px0), Math.round(py0)];
   }
 
-  #getCoordsFixed(): FixedCrop {
+  // A pure derivation of #x1/#y1/#x2/#y2 (plus minSize/#xscale/#yscale/displayWidth/displayHeight) -
+  // clamps a local working copy of the corners (never the #x1/etc. signals themselves: writing them
+  // from inside a computed() would both be disallowed and pointless, since re-clamping already-clamped
+  // input reproduces the same output) to the min-size and in-bounds constraints, then normalizes
+  // corners via flipCoords/makeObj. Callers that want the clamp to actually stick persist it back
+  // themselves via #setCoordsPressed()/#setCoordsCurrent() (e.g. #selectionRefresh() below) - nothing
+  // here does that implicitly any more.
+  readonly #coordsFixed = computed<FixedCrop>(() => {
+    let x1 = this.#x1(),
+      x2 = this.#x2(),
+      y1 = this.#y1(),
+      y2 = this.#y2();
     let delta;
-    const xsize = this.#x2 - this.#x1,
-      ysize = this.#y2 - this.#y1;
+    const xsize = x2 - x1,
+      ysize = y2 - y1;
     const xscale = this.#xscale(),
       yscale = this.#yscale();
     const [xmin, ymin] = this.minSize();
 
     if (ymin / yscale && Math.abs(ysize) < ymin / yscale) {
-      this.#y2 = ysize > 0 ? this.#y1 + ymin / yscale : this.#y1 - ymin / yscale;
+      y2 = ysize > 0 ? y1 + ymin / yscale : y1 - ymin / yscale;
     }
     if (xmin / xscale && Math.abs(xsize) < xmin / xscale) {
-      this.#x2 = xsize > 0 ? this.#x1 + xmin / xscale : this.#x1 - xmin / xscale;
+      x2 = xsize > 0 ? x1 + xmin / xscale : x1 - xmin / xscale;
     }
 
-    if (this.#x1 < 0) {
-      this.#x2 -= this.#x1;
-      this.#x1 -= this.#x1;
+    if (x1 < 0) {
+      x2 -= x1;
+      x1 -= x1;
     }
-    if (this.#y1 < 0) {
-      this.#y2 -= this.#y1;
-      this.#y1 -= this.#y1;
+    if (y1 < 0) {
+      y2 -= y1;
+      y1 -= y1;
     }
-    if (this.#x2 < 0) {
-      this.#x1 -= this.#x2;
-      this.#x2 -= this.#x2;
+    if (x2 < 0) {
+      x1 -= x2;
+      x2 -= x2;
     }
-    if (this.#y2 < 0) {
-      this.#y1 -= this.#y2;
-      this.#y2 -= this.#y2;
+    if (y2 < 0) {
+      y1 -= y2;
+      y2 -= y2;
     }
-    if (this.#x2 > this.displayWidth()) {
-      delta = this.#x2 - this.displayWidth();
-      this.#x1 -= delta;
-      this.#x2 -= delta;
+    if (x2 > this.displayWidth()) {
+      delta = x2 - this.displayWidth();
+      x1 -= delta;
+      x2 -= delta;
     }
-    if (this.#y2 > this.displayHeight()) {
-      delta = this.#y2 - this.displayHeight();
-      this.#y1 -= delta;
-      this.#y2 -= delta;
+    if (y2 > this.displayHeight()) {
+      delta = y2 - this.displayHeight();
+      y1 -= delta;
+      y2 -= delta;
     }
-    if (this.#x1 > this.displayWidth()) {
-      delta = this.#x1 - this.displayWidth();
-      this.#x2 -= delta;
-      this.#x1 -= delta;
+    if (x1 > this.displayWidth()) {
+      delta = x1 - this.displayWidth();
+      x2 -= delta;
+      x1 -= delta;
     }
-    if (this.#y1 > this.displayHeight()) {
-      delta = this.#y1 - this.displayHeight();
-      this.#y2 -= delta;
-      this.#y1 -= delta;
+    if (y1 > this.displayHeight()) {
+      delta = y1 - this.displayHeight();
+      y2 -= delta;
+      y1 -= delta;
     }
 
-    return makeObj(flipCoords(this.#x1, this.#y1, this.#x2, this.#y2));
-  }
+    return makeObj(flipCoords(x1, y1, x2, y2));
+  });
 
   #setSelect(rect: number[]): void {
     this.#setCoordsPressed([(rect[0] ?? 0) / this.#xscale(), (rect[1] ?? 0) / this.#yscale()]);
     this.#setCoordsCurrent([(rect[2] ?? 0) / this.#xscale(), (rect[3] ?? 0) / this.#yscale()]);
     this.#selectionUpdate();
-    this.#onSelect(this.#unscale(this.#getCoordsFixed()));
+    this.#onSelect(this.#unscale(this.#coordsFixed()));
     this.handlesVisible.set(true);
   }
 
@@ -734,7 +751,7 @@ export class JcropComponent {
       return;
     }
 
-    const fc = this.#getCoordsFixed();
+    const fc = this.#coordsFixed();
     const opp = oppLockCorner(mode);
     const opc = this.#getCoordsCorner(oppLockCorner(opp));
 
@@ -803,7 +820,7 @@ export class JcropComponent {
   }
 
   readonly #doneSelect = (): void => {
-    const c = this.#getCoordsFixed();
+    const c = this.#coordsFixed();
     // [0, 0] is the vendored plugin's minSelect option - never overridable via JcropOptions, so it's
     // a plain check now instead of routed through #options.
     if (c.w > 0 && c.h > 0) {
@@ -854,7 +871,7 @@ export class JcropComponent {
 
     this.#trackerOnDone(this.#mouseAbs(e));
     if (this.#selectionAwake) {
-      this.#onSelect(this.#unscale(this.#getCoordsFixed()));
+      this.#onSelect(this.#unscale(this.#coordsFixed()));
     }
 
     this.trackerZIndex.set(290);
@@ -866,7 +883,7 @@ export class JcropComponent {
   // collaborator it needed was already a closure over this component anyway, and it held no DOM
   // reference of its own any more either - see #selectionAwake above.
   #selectionRefresh(): void {
-    const c = this.#getCoordsFixed();
+    const c = this.#coordsFixed();
 
     this.#setCoordsPressed([c.x, c.y]);
     this.#setCoordsCurrent([c.x2, c.y2]);
@@ -878,16 +895,10 @@ export class JcropComponent {
 
   // `select` is never actually passed true at any of this component's own call sites - preserved
   // faithfully from the vendored Selection class rather than dropped as part of this inlining.
+  // selLeft/selTop/selHeight/selWidth/img2Left/img2Top no longer need setting here - they're
+  // computed() straight off #coordsFixed now (see their own field comments above) - so this is left
+  // with only the "wake up" bookkeeping (and the optional select emit) that isn't a pure derivation.
   #selectionUpdate(select?: boolean): void {
-    const c = this.#getCoordsFixed();
-
-    this.selWidth.set(Math.round(c.w));
-    this.selHeight.set(Math.round(c.h));
-    this.img2Left.set(-c.x);
-    this.img2Top.set(-c.y);
-    this.selLeft.set(c.x);
-    this.selTop.set(c.y);
-
     if (!this.#selectionAwake) {
       this.selVisible.set(true);
       this.#setSelBgOpacity(BG_OPACITY, true);
@@ -895,7 +906,7 @@ export class JcropComponent {
     }
 
     if (select) {
-      this.#onSelect(this.#unscale(c));
+      this.#onSelect(this.#unscale(this.#coordsFixed()));
     }
   }
 
