@@ -1,4 +1,6 @@
 import type {OnInit} from '@angular/core';
+import type {User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
 
 import {DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
@@ -11,6 +13,7 @@ import {UserService} from '@services/user';
 import {errorMessage} from 'app/grpc';
 import {NgMathPipesModule} from 'ngx-pipes';
 import {RemarkComponent, RemarkNodeComponent, RemarkTemplateDirective} from 'ngx-remark';
+import {map} from 'rxjs';
 
 import * as versionJson from '../../version.json';
 import {UserComponent} from '../user/user/user.component';
@@ -112,7 +115,10 @@ export class AboutComponent implements OnInit {
     // Angular skips stream() entirely while params() returns undefined, so about is always
     // defined once stream() actually runs.
     params: () => this.aboutData(),
-    stream: ({params: about}) => {
+    // A plain object rather than a Map: TransferState round-trips resource values through
+    // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+    // enumerable properties, no toJSON), losing all entries.
+    stream: ({params: about}): Observable<Record<string, User>> => {
       // Fetched into a fresh array rather than pushing onto about.contributors directly - that
       // would mutate the resource's own value and leak the developer/translators into the
       // contributors list below, which already shows them separately.
@@ -125,7 +131,7 @@ export class AboutComponent implements OnInit {
         about.ptBrTranslator,
       ];
 
-      return this.#userService.getUserMap$(ids);
+      return this.#userService.getUserMap$(ids).pipe(map((userMap) => Object.fromEntries(userMap)));
     },
   });
 

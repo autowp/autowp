@@ -20,33 +20,33 @@
           @switch (node.url.slice('placeholder:'.length)) {
             @case ('users') {
               @for (id of ready.about.contributors; track id) {
-                @if (ready.users.get(id); as user) {
+                @if (ready.users[id]; as user) {
                   <app-user [user]="user" />
                 }
               }
             }
             @case ('developer') {
-              @if (ready.users.get(ready.about.developer); as user) {
+              @if (ready.users[ready.about.developer]; as user) {
                 <app-user [user]="user" />
               }
             }
             @case ('fr-translator') {
-              @if (ready.users.get(ready.about.frTranslator); as user) {
+              @if (ready.users[ready.about.frTranslator]; as user) {
                 <app-user [user]="user" />
               }
             }
             @case ('zh-translator') {
-              @if (ready.users.get(ready.about.zhTranslator); as user) {
+              @if (ready.users[ready.about.zhTranslator]; as user) {
                 <app-user [user]="user" />
               }
             }
             @case ('be-translator') {
-              @if (ready.users.get(ready.about.beTranslator); as user) {
+              @if (ready.users[ready.about.beTranslator]; as user) {
                 <app-user [user]="user" />
               }
             }
             @case ('pt-br-translator') {
-              @if (ready.users.get(ready.about.ptBrTranslator); as user) {
+              @if (ready.users[ready.about.ptBrTranslator]; as user) {
                 <app-user [user]="user" />
               }
             }
