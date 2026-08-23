@@ -168,21 +168,6 @@ export default defineConfig([
     ...rxjsX.configs.recommended,
     files: ['**/*.ts'],
   },
-  {
-    // Jcrop.ts is an image-cropping plugin (originally from github.com/tapmodo/Jcrop). Placed after
-    // every other block that targets '**/*.ts' (depend, sonarjs, rxjs-x) so these overrides
-    // actually win instead of being reasserted by a later same-glob block.
-    files: ['src/app/jcrop/**/*.ts'],
-    rules: {
-      // The coordinate/aspect-ratio math (getFixed/getRect in particular) is inherently branchy -
-      // splitting it up to satisfy a complexity budget would risk the geometry itself, which isn't
-      // worth it without a live browser test of drag/resize to check against.
-      'sonarjs/cognitive-complexity': 'off',
-      // Several call sites intentionally pass a no-op (`function () {}`) as a default/placeholder
-      // handler.
-      '@typescript-eslint/no-empty-function': 'off',
-    },
-  },
   eslintPluginPrettierRecommended,
   {
     ignores: ['src/grpc/**/*', 'src/rest/**/*'],
