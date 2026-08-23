@@ -10,7 +10,7 @@
   exactly what that effect() used to set imperatively for properties that never change at runtime -
   anything that does from runtime
   state is driven by a signal instead: .jcrop-handles-holder's visibility (set directly by this
-  component's own #setSelect()/#doneSelect()/#newSelection()) via handlesVisible; #sel's own display
+  component's own #setSelect()/onDocumentEnd()/onTrackerStart()) via handlesVisible; #sel's own display
   via selectionAwake directly (not a true #private field, unlike most of this component's own internal
   state, precisely so the template can read it here); #workingImg's opacity (that same release/show
   dimming the image while a selection is awake) via imgOpacity; #workingImg's, #holder's, #tracker's,
@@ -25,9 +25,11 @@
   below is exactly what that same effect() and what used to be a separate Selection class (Jcrop.ts)
   used to attach imperatively with addEventListener() - all of these elements are static and permanent for
   the life of this component, so there's no need to attach/detach anything by hand.
-  #tracker/#selectionTracker call straight into the drag logic (onTrackerMouseDown et al.); the
-  handle/dragbar elements instead forward through onDragMouseDown/onDragTouchStart, passing along the
-  fixed ordinal each one already knows straight into #createDragger() (jcrop.component.ts).
+  #tracker/#selectionTracker call straight into the drag logic (onTrackerStart et al. - each bound on
+  both (mousedown) and (touchstart), merged from what used to be separate onXxxMouseDown()/
+  onXxxTouchStart() methods in jcrop.component.ts); the handle/dragbar elements instead forward
+  through onDragStart, passing along the fixed ordinal each one already knows straight into
+  #startDragMode() (jcrop.component.ts).
 -->
 <div class="jcrop-holder" [style.height.px]="displayHeight()" [style.width.px]="displayWidth()">
   <div
@@ -41,15 +43,15 @@
     <div class="jcrop-img-holder">
       <!-- Fully static: opacity/position come from .jcrop-vline/.jcrop-hline (jcrop.component.scss),
            and nothing touches these at all any more (contrast the dragbars/handles below, which still
-           get mousedown/touchstart wired up to onDragMouseDown/onDragTouchStart below). -->
+           get mousedown/touchstart wired up to onDragStart below). -->
       <div class="jcrop-hline"></div>
       <div class="jcrop-hline bottom"></div>
       <div class="jcrop-vline right"></div>
       <div class="jcrop-vline"></div>
       <div
         class="jcrop-tracker jcrop-selection-tracker"
-        (mousedown)="onSelectionTrackerMouseDown($event)"
-        (touchstart)="onSelectionTrackerTouchStart($event)"
+        (mousedown)="onSelectionTrackerStart($event)"
+        (touchstart)="onSelectionTrackerStart($event)"
       ></div>
       <img
         alt=""
@@ -65,23 +67,22 @@
       <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline (via
            dragbars/handles, jcrop.component.ts) since it's the one thing genuinely unique per
            element, not shareable via a class. Each still forwards mousedown/touchstart into
-           #createDragger() (jcrop.component.ts) via onDragMouseDown/onDragTouchStart, passing its
-           own fixed ordinal - fixed in number and identity now, but still real drag targets,
-           unlike the borders above. -->
+           #startDragMode() (jcrop.component.ts) via onDragStart, passing its own fixed ordinal -
+           fixed in number and identity now, but still real drag targets, unlike the borders above. -->
       @for (dragbar of dragbars; track dragbar.ord) {
         <div
           class="jcrop-dragbar ord-{{ dragbar.ord }}"
           [style.z-index]="dragbar.zIndex"
-          (mousedown)="onDragMouseDown(dragbar.ord, $event)"
-          (touchstart)="onDragTouchStart(dragbar.ord, $event)"
+          (mousedown)="onDragStart(dragbar.ord, $event)"
+          (touchstart)="onDragStart(dragbar.ord, $event)"
         ></div>
       }
       @for (handle of handles; track handle.ord) {
         <div
           class="jcrop-handle ord-{{ handle.ord }}"
           [style.z-index]="handle.zIndex"
-          (mousedown)="onDragMouseDown(handle.ord, $event)"
-          (touchstart)="onDragTouchStart(handle.ord, $event)"
+          (mousedown)="onDragStart(handle.ord, $event)"
+          (touchstart)="onDragStart(handle.ord, $event)"
         ></div>
       }
     </div>
@@ -94,8 +95,8 @@
     [style.width.px]="trackerWidth()"
     [style.left.px]="trackerOffset"
     [style.top.px]="trackerOffset"
-    (mousedown)="onTrackerMouseDown($event)"
-    (touchstart)="onTrackerTouchStart($event)"
+    (mousedown)="onTrackerStart($event)"
+    (touchstart)="onTrackerStart($event)"
   ></div>
   <img
     #workingImg
