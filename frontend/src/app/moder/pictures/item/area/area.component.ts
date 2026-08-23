@@ -18,10 +18,9 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
-import type {JcropCrop} from '../../../../jcrop/Jcrop.js';
+import type {JcropCrop} from '../../../../jcrop/jcrop.component.js';
 
-import {cropSummary} from '../../../../jcrop/crop-summary.js';
-import {JcropComponent} from '../../../../jcrop/jcrop.component.js';
+import {cropSummary, JcropComponent} from '../../../../jcrop/jcrop.component.js';
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({

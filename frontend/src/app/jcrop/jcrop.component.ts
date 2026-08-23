@@ -1,3 +1,52 @@
+/**
+ * jquery.Jcrop.js v0.9.12
+ * jQuery Image Cropping Plugin - released under MIT License
+ * Author: Kelly Hallman <khallman@gmail.com>
+ * http://github.com/tapmodo/Jcrop
+ * Copyright (c) 2008-2013 Tapmodo Interactive LLC {{{
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * }}}
+ *
+ * Every piece of the vendored plugin this monorepo actually uses - the orchestrating factory
+ * function, the document-level drag-tracking/touch/selection-box state (what used to be separate
+ * Tracker, Touch, and Selection classes), and Coords, the one collaborator that ever owned a
+ * distinct piece of state of its own - lives directly on JcropComponent below. There's only ever one
+ * consumer, so keeping any of it as a separate class/module (what used to be Jcrop.ts, a few doc
+ * comments below still reference it by that name for history) was pure indirection; Coords held out
+ * the longest only because it genuinely owned state the others didn't, but once it needed its own
+ * bounds/scale driven directly by JcropComponent's own signals rather than being handed pre-computed
+ * numbers once at construction, keeping it separate just added a layer of indirection between the
+ * two, so it moved too - see the "vendored plugin's own single closure-based factory function"
+ * comment below for the full history. JcropCrop and CropSummary/cropSummary() moved here last, once
+ * Jcrop.ts and crop-summary.ts had nothing left in them but those - they're still real shared
+ * API, not just internal implementation detail, since they're also imported directly by the three
+ * pages that embed JcropComponent for cropping (upload/crop, moder/pictures/item/crop,
+ * moder/pictures/item/area): JcropCrop to type the crop rect they read back out via (cropChange) and
+ * pass back in via [initialCrop], cropSummary() for their own aspect/resolution readout next to the
+ * crop UI.
+ */
+
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,12 +57,43 @@ import {
   input,
   output,
   signal,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import {browserWindow} from '@utils/browser-window';
 
-import type {JcropCrop} from './Jcrop';
+export interface JcropCrop {
+  h: number;
+  w: number;
+  x: number;
+  y: number;
+}
+
+export interface CropSummary {
+  aspect: string;
+  resolution: string;
+}
+
+// The "N:M" aspect-ratio approximation shown next to every cropper, normalized to a width of 4
+// (e.g. "4:3", "4:2.3") - not used by JcropComponent itself, only by the three pages that embed it
+// (upload/crop, moder/pictures/item/crop, moder/pictures/item/area) for their own aspect/resolution
+// readout next to the crop UI, same as JcropCrop above.
+export function cropSummary(crop: JcropCrop): CropSummary {
+  const pw = 4;
+  const ph = Math.round(((pw * crop.h) / crop.w) * 10) / 10;
+
+  return {
+    aspect: `${pw}:${ph}`,
+    resolution: `${Math.round(crop.w)}×${Math.round(crop.h)}`,
+  };
+}
+
+// The shape #getCoordsFixed() (below) returns: a JcropCrop (x/y/w/h) plus the bottom-right corner
+// (x2/y2) that x/y/w/h were themselves flipCoords()'d/makeObj()'d from - kept alongside x/y/w/h
+// rather than dropped, since #getCoordsCorner() and #dragmodeHandler() below both still need direct
+// corner coordinates, not just the box they bound.
+type FixedCrop = JcropCrop & {x2: number; y2: number};
 
 // Every option the vendored plugin's own options object supported
 // (addClass/aspectRatio/bgOpacity/borderOpacity/boundary/boxHeight/boxWidth/createBorders/
@@ -31,7 +111,8 @@ import type {JcropCrop} from './Jcrop';
 // never genuinely variable to begin with so it's a fixed value at its one use site now
 // (bgOpacity/boundary/minSelect/setSelect/trueSize - #selectionUpdate()'s bgopacity, the
 // trackerHeight/trackerWidth computed()s' BOUNDARY margin, #doneSelect()'s minSelect check,
-// onLoad()'s own #setSelect() call, and the #xscale/#yscale computed()s respectively), or
+// the constructor's own init effect()'s own #setSelect() call, and the #xscale/#yscale computed()s
+// respectively), or
 // (boxHeight/boxWidth/minSize, the three that do vary per crop) is read straight from the
 // displayWidth/displayHeight computed()s/the minSize input directly now instead of routed through a
 // shared #options object - every value it ever held was derivable from a component input (or, for
@@ -118,7 +199,7 @@ function flipCoords(x1: number, y1: number, x2: number, y2: number): [number, nu
 // Builds the JcropCrop (plus x2/y2) shape #getCoordsFixed() (below, on the class) returns, from the
 // already-normalized [x1, y1, x2, y2] tuple flipCoords produces. A plain function for the same
 // reason flipCoords above is.
-function makeObj(a: [number, number, number, number]): JcropCrop & {x2: number; y2: number} {
+function makeObj(a: [number, number, number, number]): FixedCrop {
   return {
     h: a[3] - a[1],
     w: a[2] - a[0],
@@ -160,8 +241,9 @@ const BG_OPACITY = 0.6;
   encapsulation: ViewEncapsulation.None,
   // Nothing here calls document.addEventListener()/removeEventListener() itself to track an active
   // drag - Angular has no equivalent to attaching/detaching a document-level listener conditionally,
-  // so these are permanently bound (from the moment this component is created, well before onLoad()
-  // ever runs) and just forward every event unconditionally; the mouse/touch move/up/end on*()
+  // so these are permanently bound (from the moment this component is created, well before the
+  // constructor's own init effect() ever runs) and just forward every event unconditionally; the
+  // mouse/touch move/up/end on*()
   // methods below are what actually gate on whether a drag is in progress
   // (#trackerBtndown/#trackerIstouch). onDocumentTouchStart is the exception - it's unconditional by
   // design, same as it was as a plain document.addEventListener() call (see its own comment).
@@ -177,18 +259,17 @@ export class JcropComponent {
   readonly #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly #window = browserWindow();
   // Whether this device supports touch - what used to be a separate Touch class's own `support`
-  // field (see Jcrop.ts): computed once here rather than in onLoad(), since (now that
-  // #options.touchSupport, the one-time "explicit override" option, is gone) it needs nothing from
-  // onLoad()/#options any more, just #window above.
+  // field (see Jcrop.ts): computed once here rather than in the constructor's own init effect()
+  // below, since (now that #options.touchSupport, the one-time "explicit override" option, is gone)
+  // it needs nothing from that effect()/#options any more, just #window above.
   readonly #touchSupport: boolean;
 
   // The <img> box size (rounded to whole CSS pixels - the template binds #workingImg's own
-  // height/width straight to these, and onLoad() below uses them as what used to be its own
-  // boundx/boundy fields holding a copy of the same numbers) that fits pictureWidth/pictureHeight
-  // inside the real page container (#elementRef's parentElement) at its current width, preserving
-  // aspect ratio. Doesn't need #workingImg to have finished loading, since it only ever reads
-  // pictureWidth/pictureHeight (component inputs) and the container's own layout, never anything off
-  // the image itself - so computed()s rather than something only onLoad() could populate, recomputed
+  // height/width straight to these) that fits pictureWidth/pictureHeight inside the real page
+  // container (#elementRef's parentElement) at its current width, preserving aspect ratio. Doesn't
+  // need #workingImg to have finished loading, since it only ever reads pictureWidth/pictureHeight
+  // (component inputs) and the container's own layout, never anything off the image itself - so
+  // computed()s rather than something only an onLoad()-style event handler could populate, recomputed
   // whenever pictureWidth/pictureHeight change (the container read itself isn't reactive - nothing
   // here tracks live container resizes - but doesn't need to be: it happens fresh on every
   // recomputation anyway). displayWidth/displayHeight are thin per-axis views onto #display so call
@@ -229,37 +310,24 @@ export class JcropComponent {
   // on-screen size, to compute the scale factor between the two) used to be a JcropOptions field
   // routed through #options - it never needed to be, since pictureWidth/pictureHeight are already
   // available directly, same as displayWidth/displayHeight, so this is a pure derivation of the two,
-  // not runtime state onLoad() has to populate.
+  // not runtime state some event handler has to populate.
   readonly #xscale = computed(() => this.pictureWidth() / this.displayWidth());
   readonly #yscale = computed(() => this.pictureHeight() / this.displayHeight());
 
-  // The selection rectangle's own pressed/current corner state (x1/y1/x2/y2) and everything derived
-  // from it (min-size clamping, bounding to the image) - what used to be a separate Coords class's
-  // own state (Jcrop.ts), folded in directly since nothing outside this component ever constructed
-  // more than one instance, same reasoning as Tracker/Touch/Selection before it (see the "vendored
-  // plugin's own single closure-based factory function" comment below). boundx/boundy/#coordXscale/
-  // #coordYscale are a frozen snapshot of what the picture currently looks sized as - kept fresh by
-  // #setCoordsBounds() (called by the constructor effect() below whenever displayWidth/displayHeight/
-  // #xscale/#yscale change, independent of onLoad()/the image finishing loading) rather than read
-  // live on every access, so an in-progress drag's own selection rect survives a bounds update
-  // undisturbed; #coordXscale/#coordYscale are named apart from the #xscale/#yscale computed()s
-  // above for exactly that reason - a snapshot, not the same live value. xmin/ymin are the current
-  // minSize input in unscaled pixels, written from onLoad() (via #setCoordsLimits()) but read only by
-  // #getCoordsFixed() below - all ten fields start at 0 (1 for the two scales, to avoid a division by
-  // zero) since real values aren't available this early: required inputs like pictureWidth (which
-  // displayWidth/etc. read, transitively) aren't set yet during field initialization - the
-  // constructor effect() applies the real bounds/scale moments later, well before #initialized (set
-  // at the end of onLoad()) lets anything actually read them back.
+  // The selection rectangle's own pressed/current corner state (x1/y1/x2/y2) - what used to be a
+  // separate Coords class's own state (Jcrop.ts), folded in directly since nothing outside this
+  // component ever constructed more than one instance, same reasoning as Tracker/Touch/Selection
+  // before it (see the "vendored plugin's own single closure-based factory function" comment below).
+  // Coords used to also keep its own xmin/ymin/boundx/boundy/xscale/yscale, a frozen copy of the
+  // minSize input and what the picture looked sized as - once every read of those six just mirrored
+  // minSize()/displayWidth()/displayHeight()/#xscale()/#yscale() verbatim, with nothing left that a
+  // snapshot protected against a live read didn't already, keeping a separate copy was pure
+  // indirection, so #rebound()/#getCoordsFixed()/#moveCoordsOffset() below read those directly now
+  // instead.
   #x1 = 0;
   #x2 = 0;
   #y1 = 0;
   #y2 = 0;
-  #xmin = 0;
-  #ymin = 0;
-  #boundx = 0;
-  #boundy = 0;
-  #coordXscale = 1;
-  #coordYscale = 1;
 
   readonly src = input.required<string>();
   readonly pictureWidth = input.required<number>();
@@ -286,14 +354,68 @@ export class JcropComponent {
       ? 'ontouchstart' in this.#window || this.#window.navigator.maxTouchPoints > 0
       : false;
 
-    // Keeps boundx/boundy/#coordXscale/#coordYscale fresh whenever displayWidth/displayHeight/
-    // #xscale/#yscale change, independent of onLoad()/the image finishing loading - same reasoning as
-    // the #display comment above, just one step further downstream. #setCoordsBounds() rather than
-    // also resetting x1/y1/x2/y2/xmin/ymin (what onLoad() itself used to do here, rebuilding a whole
-    // new Coords) so an in-progress drag's selection rect and #setCoordsLimits() minimum survive the
-    // update.
+    // The vendored plugin's own single closure-based factory function, ported first to a class and
+    // then merged directly onto this component: everything that used to be a local variable closed
+    // over by every nested function is now a private field. Coords, the standalone module it built as
+    // an IIFE (see Jcrop.ts), was the last of the plugin's modules to move here too (as the
+    // x1/y1/x2/y2/etc. fields and #setCoordsLimits()/#getCoordsFixed()/etc. methods above/below): once
+    // it needed its own bounds/scale driven directly by this component's own signals rather than being
+    // handed pre-computed numbers once at construction, keeping it a separate class only added a layer
+    // of indirection between the two - eventually enough so that boundx/boundy/xscale/yscale/xmin/ymin
+    // themselves moved out entirely, being nothing more than pictureWidth/pictureHeight/displayWidth/
+    // displayHeight/minSize read live (see the x1/y1/x2/y2 field comment above). Tracker, Touch, and
+    // Selection - the plugin's other three modules - never had a distinct piece of DOM/state of their
+    // own (once Selection stopped holding #sel/#img2 DOM references directly - see #selectionAwake
+    // above), just fields/methods closing over this component's own collaborators, so all three were
+    // folded in directly instead of classes in Jcrop.ts: Tracker as
+    // #trackerBtndown/#trackerIstouch/#trackerOnMove/#trackerOnDone and the
+    // #activateTrackerHandlers()/#finishTrackerDrag() methods below, Touch as #touchSupport and the
+    // #createDragger() method below (touchCfilter() moved out as a plain function above - see there),
+    // Selection as #selectionAwake and the #selectionRefresh()/#selectionUpdate()/#setSelBgOpacity()
+    // methods below (#doneSelect()/#selectionUpdate() themselves absorbed what used to be Selection's
+    // own release()/#show()). #init() itself (what used to build/wire all of the above) was folded in
+    // as this effect() - what used to be onLoad(), bound to #workingImg's own (load) event, until that
+    // stopped being necessary either: everything left in it only ever needed pictureWidth/
+    // pictureHeight/initialCrop/minSize (component inputs), never anything the real <img> element
+    // provided, once the sizing work above stopped needing it. Reacts only to pictureWidth/
+    // pictureHeight (a new picture, not just a new initialCrop/minSize value for the current one, is
+    // what should reset the selection) - everything else is read via untracked() so it doesn't also
+    // become a trigger: initialCrop especially, since (for a host page that feeds this component's own
+    // cropChange output straight back in as [initialCrop], e.g. moder/pictures/item/area) treating it
+    // as a trigger would re-fire this on every drag frame instead of only on a genuine picture change.
+    //
+    // #doneSelect/#selectDrag below are field arrows rather than ordinary methods because each is
+    // handed to #activateTrackerHandlers() by bare reference (stored as #trackerOnDone/#trackerOnMove
+    // and invoked later, not called directly where passed) - an ordinary method read that way loses its
+    // `this` binding the moment something else invokes it. A few other methods
+    // (#getPos/#mouseAbs/#startDragMode/#createDragger) are field arrows too, left over from when
+    // Selection/Touch needed them the same way - nothing still requires that of them, but nothing's
+    // broken by it either.
     effect(() => {
-      this.#setCoordsBounds(this.displayWidth(), this.displayHeight(), this.#xscale(), this.#yscale());
+      const pictureWidth = this.pictureWidth();
+      const pictureHeight = this.pictureHeight();
+
+      untracked(() => {
+        const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
+
+        this.#docOffset = this.#getPos();
+        this.#initialized = true;
+        this.trackerCursor.set('crosshair');
+
+        // setSelect's own role (the initial selection rect to apply once per picture) used to be a
+        // JcropOptions field routed through #options, deleted after being consumed so it wouldn't
+        // reapply - it never needed any of that, since this runs unconditionally anyway and `initial`
+        // (used to build it) is already a plain local variable above, in this same effect() run.
+        this.#setSelect([initial.x, initial.y, initial.x + initial.w, initial.y + initial.h]);
+        // minSize's own former role (setLimits(), applied once *after* this so the initial selection
+        // got clamped to it too on a second pass) is redundant now - #getCoordsFixed() reads minSize()
+        // live, so #setSelect() above already clamped the initial selection to it. This
+        // #selectionRefresh() call still matters for a different reason: #setCoordsPressed()/
+        // #setCoordsCurrent() (which it calls) round through #rebound(), re-normalizing x1/y1/x2/y2 to
+        // whole pixels in case the min-size clamp above left them fractional - #setSelect() itself
+        // never does that rounding pass.
+        this.#selectionRefresh();
+      });
     });
   }
 
@@ -303,9 +425,9 @@ export class JcropComponent {
   protected readonly handlesVisible = signal(false);
 
   // The #tracker template element's cursor - set directly via style manipulation in the vendored
-  // original; onLoad() (the first thing to set it, right after #initialized) always sets 'crosshair'
-  // first, so that's the signal's initial value too, matching what the element would otherwise
-  // briefly render before onLoad() has ever run.
+  // original; the constructor's own init effect() (the first thing it does, right after #initialized)
+  // always sets 'crosshair' first, so that's the signal's initial value too, matching what the
+  // element would otherwise briefly render before that effect() has ever run.
   protected readonly trackerCursor = signal('crosshair');
 
   // The #tracker template element's z-index - toggled between 290 (resting) and 450 (while a drag
@@ -322,16 +444,6 @@ export class JcropComponent {
   // signal.
   protected readonly trackerOffset = -BOUNDARY;
 
-  // The #holder template element's height/width - exactly displayWidth/displayHeight (unlike
-  // trackerHeight/trackerWidth above, no BOUNDARY margin added), so computed() straight off them.
-  protected readonly holderHeight = computed(() => this.displayHeight());
-  protected readonly holderWidth = computed(() => this.displayWidth());
-
-  // #img2's height/width - the crop-preview <img> clipped inside #imgHolder (jcrop.component.html),
-  // always the same size as #holder above, hence the same computed().
-  protected readonly img2Height = computed(() => this.displayHeight());
-  protected readonly img2Width = computed(() => this.displayWidth());
-
   // #img2's own left/top - driven by #selectionUpdate() below, on every drag frame.
   protected readonly img2Left = signal(0);
   protected readonly img2Top = signal(0);
@@ -346,7 +458,7 @@ export class JcropComponent {
   // #sel's own display - whether the selection box (and everything clipped/nested inside it: borders,
   // handles, the #img2 crop-preview) is shown at all. Driven by #doneSelect()/#selectionUpdate()
   // below, false until the first selection - matching handlesVisible's own initial value - since #sel
-  // would otherwise flash unstyled before onLoad() has run.
+  // would otherwise flash unstyled before the constructor's own init effect() has run.
   protected readonly selVisible = signal(false);
 
   // #workingImg's opacity - dimmed while a selection is awake (#selectionUpdate()'s bgopacity),
@@ -359,11 +471,11 @@ export class JcropComponent {
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
   // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). Unlike the
   // x1/y1/x2/y2/etc. fields above (kept fresh by signals for this component's whole lifetime),
-  // everything below is genuinely onLoad()-only: set once by onLoad(), when the template's own <img>
-  // fires its load event - never in this component's own constructor, so TS's definite-assignment
+  // everything below is set once by the constructor's own init effect() - deferred to that effect()
+  // callback rather than assigned directly in the constructor body, so TS's definite-assignment
   // analysis can't see it; #initialized guards selectAll() (the only externally-triggered entry
   // point) against running before that has happened - everything else here only ever runs from
-  // inside onLoad() itself.
+  // inside that effect() itself.
   #initialized = false;
   // Whether the selection box is awake (visible/tracked) - what used to be a separate Selection
   // class's own `#awake` field (see Jcrop.ts): true from the first #selectionUpdate() call after
@@ -393,77 +505,6 @@ export class JcropComponent {
     this.#setSelect([0, 0, this.pictureWidth(), this.pictureHeight()]);
   }
 
-  // The vendored plugin's own single closure-based factory function, ported first to a class and
-  // then merged directly onto this component: everything that used to be a local variable closed
-  // over by every nested function is now a private field. Coords, the standalone module it built as
-  // an IIFE (see Jcrop.ts), was the last of the plugin's modules to move here too (as the
-  // x1/y1/x2/y2/etc. fields and #setCoordsBounds()/#setCoordsLimits()/etc. methods above/below): once
-  // it needed its own bounds/scale driven directly by this component's own signals rather than being
-  // handed pre-computed numbers once at construction, keeping it a separate class only added a layer
-  // of indirection between the two. Tracker, Touch, and Selection - the plugin's other three modules -
-  // never had a distinct piece of DOM/state of their own (once Selection stopped holding #sel/#img2
-  // DOM references directly - see #selectionAwake above), just fields/methods closing over this
-  // component's own collaborators, so all three were folded in directly instead of classes in
-  // Jcrop.ts: Tracker as
-  // #trackerBtndown/#trackerIstouch/#trackerOnMove/#trackerOnDone and the
-  // #activateTrackerHandlers()/#finishTrackerDrag() methods below, Touch as #touchSupport and the
-  // #createDragger() method below (touchCfilter() moved out as a plain function above - see there),
-  // Selection as #selectionAwake and the
-  // #selectionRefresh()/#selectionUpdate()/#setSelBgOpacity() methods below (#doneSelect()/
-  // #selectionUpdate() themselves absorbed what used to be Selection's own release()/#show()).
-  // #init() itself (what used to build/wire all of the above) was folded in here too - onLoad() was
-  // its only caller.
-  //
-  // #doneSelect/#selectDrag below are field arrows rather than ordinary methods because each is
-  // handed to #activateTrackerHandlers() by bare reference (stored as #trackerOnDone/#trackerOnMove
-  // and invoked later, not called directly where passed) - an ordinary method read that way loses its
-  // `this` binding the moment something else invokes it. A few other methods
-  // (#getPos/#mouseAbs/#startDragMode/#createDragger) are field arrows too, left over from when
-  // Selection/Touch needed them the same way - nothing still requires that of them, but nothing's
-  // broken by it either.
-  protected onLoad(): void {
-    const pictureWidth = this.pictureWidth();
-    const pictureHeight = this.pictureHeight();
-
-    const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
-
-    // #workingImg is a static template <img> now (jcrop.component.html), not a runtime clone of a
-    // separate, hidden <img> - its (load) below is what used to be that other element's, and its
-    // static styling (position/border/margin/padding/top/left/visibility, plus its height/width -
-    // bound straight to displayWidth/displayHeight) is a plain template attribute instead of set
-    // here. #holder's/#tracker's/#img2's own sizes don't need anything from onLoad() either, being
-    // computed() straight off displayWidth/displayHeight themselves too (see holderHeight/
-    // holderWidth, trackerHeight/trackerWidth/trackerOffset, and img2Height/img2Width above) - so
-    // everything below reads displayWidth()/displayHeight() directly instead of measuring the DOM
-    // element back or keeping its own boundx/boundy copy of the same numbers. boundx/boundy/
-    // #coordXscale/#coordYscale are likewise already kept fresh by the constructor effect() above -
-    // onLoad() only ever needs to (re)establish the selection itself for whatever picture just
-    // loaded, via #setCoordsLimits()/#setSelect() below.
-
-    // Matches what used to be Selection's own constructor (Jcrop.ts) resetting handle visibility on
-    // construction - handlesVisible already starts false, but onLoad() (unlike a constructor) can run
-    // more than once per component instance, so this still matters if a previous run left it true.
-    this.handlesVisible.set(false);
-
-    this.#docOffset = this.#getPos();
-
-    this.#initialized = true;
-
-    this.trackerCursor.set('crosshair');
-
-    // setSelect's own role (the initial selection rect to apply once, on load) used to be a
-    // JcropOptions field routed through #options, deleted after being consumed so it wouldn't reapply
-    // - it never needed any of that, since this runs unconditionally anyway and `initial` (used to
-    // build it) is already a plain local variable above, in this same onLoad() call.
-    this.#setSelect([initial.x, initial.y, initial.x + initial.w, initial.y + initial.h]);
-    this.#selectionRefresh();
-
-    const minSize = this.minSize();
-    this.#setCoordsLimits(minSize[0], minSize[1]);
-
-    this.#selectionRefresh();
-  }
-
   // Called wherever the vendored plugin used to call its configurable onSelect option - this is the
   // sole consumer JcropComponent ever passed for it, so it's a real method now instead of a callback
   // routed through #options (which never actually varied at runtime).
@@ -477,7 +518,8 @@ export class JcropComponent {
   // Bound directly on the #tracker/#selectionTracker template elements (jcrop.component.html)
   // instead of Jcrop wiring them up itself with addEventListener() - both are static, permanent
   // elements, so there's no need for imperative attach/detach. Each still needs the #initialized
-  // guard: the template binds these unconditionally, from before onLoad() has ever run.
+  // guard: the template binds these unconditionally, from before the constructor's own init effect()
+  // has ever run.
   protected onTrackerMouseDown(e: MouseEvent): void {
     if (!this.#initialized) return;
     this.#newSelection(e);
@@ -542,22 +584,6 @@ export class JcropComponent {
     if (target instanceof Element && target.classList.contains('jcrop-tracker')) e.stopPropagation();
   }
 
-  // What used to be a separate Coords class's own methods (Jcrop.ts), folded in directly for the
-  // same reason Tracker/Touch/Selection were (see the "vendored plugin's own single closure-based
-  // factory function" comment above) - operating on the x1/y1/x2/y2/xmin/ymin/boundx/boundy/
-  // #coordXscale/#coordYscale fields declared with the rest of this component's own state above.
-  #setCoordsLimits(xmin: number, ymin: number): void {
-    this.#xmin = xmin;
-    this.#ymin = ymin;
-  }
-
-  #setCoordsBounds(boundx: number, boundy: number, xscale: number, yscale: number): void {
-    this.#boundx = boundx;
-    this.#boundy = boundy;
-    this.#coordXscale = xscale;
-    this.#coordYscale = yscale;
-  }
-
   #setCoordsPressed(pos: Point): void {
     const rebounded = this.#rebound(pos);
     this.#x2 = this.#x1 = rebounded[0];
@@ -581,11 +607,11 @@ export class JcropComponent {
       oy -= oy + this.#y1;
     }
 
-    if (this.#boundy < this.#y2 + oy) {
-      oy += this.#boundy - (this.#y2 + oy);
+    if (this.displayHeight() < this.#y2 + oy) {
+      oy += this.displayHeight() - (this.#y2 + oy);
     }
-    if (this.#boundx < this.#x2 + ox) {
-      ox += this.#boundx - (this.#x2 + ox);
+    if (this.displayWidth() < this.#x2 + ox) {
+      ox += this.displayWidth() - (this.#x2 + ox);
     }
 
     this.#x1 += ox;
@@ -614,24 +640,25 @@ export class JcropComponent {
     if (px0 < 0) px0 = 0;
     if (py0 < 0) py0 = 0;
 
-    if (px0 > this.#boundx) px0 = this.#boundx;
-    if (py0 > this.#boundy) py0 = this.#boundy;
+    if (px0 > this.displayWidth()) px0 = this.displayWidth();
+    if (py0 > this.displayHeight()) py0 = this.displayHeight();
 
     return [Math.round(px0), Math.round(py0)];
   }
 
-  #getCoordsFixed(): JcropCrop & {x2: number; y2: number} {
+  #getCoordsFixed(): FixedCrop {
     let delta;
     const xsize = this.#x2 - this.#x1,
       ysize = this.#y2 - this.#y1;
-    const xscale = this.#coordXscale,
-      yscale = this.#coordYscale;
+    const xscale = this.#xscale(),
+      yscale = this.#yscale();
+    const [xmin, ymin] = this.minSize();
 
-    if (this.#ymin / yscale && Math.abs(ysize) < this.#ymin / yscale) {
-      this.#y2 = ysize > 0 ? this.#y1 + this.#ymin / yscale : this.#y1 - this.#ymin / yscale;
+    if (ymin / yscale && Math.abs(ysize) < ymin / yscale) {
+      this.#y2 = ysize > 0 ? this.#y1 + ymin / yscale : this.#y1 - ymin / yscale;
     }
-    if (this.#xmin / xscale && Math.abs(xsize) < this.#xmin / xscale) {
-      this.#x2 = xsize > 0 ? this.#x1 + this.#xmin / xscale : this.#x1 - this.#xmin / xscale;
+    if (xmin / xscale && Math.abs(xsize) < xmin / xscale) {
+      this.#x2 = xsize > 0 ? this.#x1 + xmin / xscale : this.#x1 - xmin / xscale;
     }
 
     if (this.#x1 < 0) {
@@ -650,23 +677,23 @@ export class JcropComponent {
       this.#y1 -= this.#y2;
       this.#y2 -= this.#y2;
     }
-    if (this.#x2 > this.#boundx) {
-      delta = this.#x2 - this.#boundx;
+    if (this.#x2 > this.displayWidth()) {
+      delta = this.#x2 - this.displayWidth();
       this.#x1 -= delta;
       this.#x2 -= delta;
     }
-    if (this.#y2 > this.#boundy) {
-      delta = this.#y2 - this.#boundy;
+    if (this.#y2 > this.displayHeight()) {
+      delta = this.#y2 - this.displayHeight();
       this.#y1 -= delta;
       this.#y2 -= delta;
     }
-    if (this.#x1 > this.#boundx) {
-      delta = this.#x1 - this.#boundx;
+    if (this.#x1 > this.displayWidth()) {
+      delta = this.#x1 - this.displayWidth();
       this.#x2 -= delta;
       this.#x1 -= delta;
     }
-    if (this.#y1 > this.#boundy) {
-      delta = this.#y1 - this.#boundy;
+    if (this.#y1 > this.displayHeight()) {
+      delta = this.#y1 - this.displayHeight();
       this.#y2 -= delta;
       this.#y1 -= delta;
     }
@@ -685,8 +712,10 @@ export class JcropComponent {
   // Always reads #workingImg's own position - every caller only ever wants that, so it's read here
   // directly rather than threaded through as a parameter.
   readonly #getPos = (): Point => {
-    // Guarded the same defensive way onLoad() is - see there. [0, 0] is an arbitrary but harmless
-    // fallback for a branch that can't actually be reached (every caller only runs after onLoad()).
+    // This component's own template is never rendered server-side (every consumer sits behind a
+    // RenderMode.Client route), so #window is only ever null in a scenario where this can't actually
+    // be called in the first place. [0, 0] is an arbitrary but harmless fallback for that
+    // unreachable branch.
     if (!this.#window) return [0, 0];
     const rect = this.workingImgRef().nativeElement.getBoundingClientRect();
     return [rect.left + this.#window.scrollX, rect.top + this.#window.scrollY];
@@ -715,7 +744,7 @@ export class JcropComponent {
     this.#activateTrackerHandlers(this.#dragmodeHandler(mode, fc), this.#doneSelect, touch);
   };
 
-  #dragmodeHandler(mode: Ordinal, f: JcropCrop & {x2: number; y2: number}): PositionCallback {
+  #dragmodeHandler(mode: Ordinal, f: FixedCrop): PositionCallback {
     return (pos: Point): void => {
       switch (mode) {
         case 'e':
@@ -764,7 +793,7 @@ export class JcropComponent {
     };
   };
 
-  #unscale(c: JcropCrop & {x2: number; y2: number}): JcropCrop {
+  #unscale(c: FixedCrop): JcropCrop {
     return {
       h: c.h * this.#yscale(),
       w: c.w * this.#xscale(),

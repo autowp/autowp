@@ -6,10 +6,9 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {Image} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import type {JcropCrop} from '../../jcrop/Jcrop';
+import type {JcropCrop} from '../../jcrop/jcrop.component';
 
-import {cropSummary} from '../../jcrop/crop-summary';
-import {JcropComponent} from '../../jcrop/jcrop.component';
+import {cropSummary, JcropComponent} from '../../jcrop/jcrop.component';
 
 @Component({
   selector: 'app-upload-crop',
