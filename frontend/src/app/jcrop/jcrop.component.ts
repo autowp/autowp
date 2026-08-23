@@ -145,12 +145,6 @@ type Corner = 'ne' | 'nw' | 'se' | 'sw';
 // mousemove/touchmove event directly (onDocumentMove() below).
 type MoveCallback = (e: JcropMouseEvent) => void;
 
-// #trackerOnMove's (below, on the class) resting value - no drag is in progress, so there's nothing
-// to forward document mouse/touch events to. Module-level rather than reconstructed wherever it's
-// assigned, since it's stateless and shared by both "no drag active" cases (the field initializer and
-// onDocumentEnd's own reset, below).
-const NOOP: MoveCallback = () => {};
-
 // A handle/border/dragbar position, or the drag mode #dragMode (below, on the class) currently has
 // active while resizing/moving the selection - 'move' alongside the 8 ordinals rather than a
 // separate type, since #dragMode is exactly this union (or null, at rest).
@@ -411,10 +405,10 @@ export class JcropComponent {
     // as a trigger would re-fire this on every drag frame instead of only on a genuine picture change.
     //
     // No method here is a field arrow any more (nothing needs a bound `this` independent of where
-    // it's referenced) - #getPos/#mouseAbs/#startDragMode are all only ever invoked directly as
-    // this.#xxx(...), and the three MoveCallback-shaped handlers #trackerOnMove ends up
-    // holding are each an inline arrow function expression at their one call site (#startDragMode's
-    // own resize/move branches, onTrackerStart's own) instead: what used to be the separate
+    // it's referenced) - #mouseAbs is only ever invoked directly as this.#xxx(...), and the three
+    // MoveCallback-shaped handlers #trackerOnMove ends up holding are each an inline arrow function
+    // expression at their one call site (onSelectionTrackerStart's/onDragStart's own move/resize
+    // branches, onTrackerStart's own) instead: what used to be the separate
     // #dragmodeHandler()/#createMover()/#selectDrag members, each only ever referenced from the one
     // place that constructed/passed it.
     effect(() => {
@@ -424,7 +418,6 @@ export class JcropComponent {
       untracked(() => {
         const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
 
-        this.#docOffset = this.#getPos();
         this.#initialized = true;
 
         // setSelect's own role (the initial selection rect to apply once per picture) used to be a
@@ -449,9 +442,10 @@ export class JcropComponent {
   // template element's [style.display] binding instead of Jcrop imperatively setting that style itself.
   protected readonly handlesVisible = signal(false);
 
-  // Which drag gesture (if any) #startDragMode below currently has active - null at rest (also its
-  // initial value, matching what #tracker's cursor should show before the constructor's own init
-  // effect() has ever run), a DragMode while resizing/moving an existing selection. onTrackerStart's
+  // Which drag gesture (if any) onSelectionTrackerStart()/onDragStart() below currently has active -
+  // null at rest (also its initial value, matching what #tracker's cursor should show before the
+  // constructor's own init effect() has ever run), a DragMode while resizing/moving an existing
+  // selection. onTrackerStart's
   // own freehand "drag out a brand new box" gesture deliberately doesn't set this (see trackerCursor
   // below) - onDocumentEnd() (which ends every kind of drag) always resets it, and onTrackerStart()
   // resets it too, but only defensively, in case a still-active previous gesture (e.g. a touch drag
@@ -506,16 +500,15 @@ export class JcropComponent {
 
   // Everything below is Jcrop's own former per-instance state - it used to belong to a separately
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
-  // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). #initialized and
-  // #docOffset are genuinely one-shot: populated by the constructor's own init effect() below
-  // (deferred to that effect() callback rather than assigned directly in the constructor body, so
-  // TS's definite-assignment analysis can't see #docOffset's own assignment) - #initialized guards
-  // selectAll() (the only externally-triggered entry point) against running before that has happened.
-  // selectionAwake/#trackerBtndown/#trackerIstouch/#trackerOnMove, by contrast, start at a harmless
-  // resting default and are only ever touched by an actual user gesture (onTrackerStart()/
-  // #startDragMode()/onDocumentEnd() below) - the effect() itself never touches them;
-  // selectionAwake/#trackerBtndown are signals (unlike #initialized/#trackerIstouch/#trackerOnMove)
-  // since imgOpacity/trackerZIndex above are pure computed() derivations of them now.
+  // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). #initialized is
+  // genuinely one-shot: set true by the constructor's own init effect() below and never touched again
+  // - it guards selectAll() (the only externally-triggered entry point) against running before that
+  // has happened. selectionAwake/#trackerBtndown/#trackerIstouch/#trackerOnMove, by contrast, start at
+  // a harmless resting default (undefined, for #trackerOnMove - there's no drag to forward document
+  // mouse/touch events to yet) and are only ever touched by an actual user gesture (onTrackerStart()/
+  // onSelectionTrackerStart()/onDragStart()/onDocumentEnd() below) - the effect() itself never touches
+  // them; selectionAwake/#trackerBtndown are signals (unlike #initialized/#trackerIstouch/
+  // #trackerOnMove) since imgOpacity/trackerZIndex above are pure computed() derivations of them now.
   #initialized = false;
   // Whether the selection box is awake (visible/tracked) - what used to be a separate Selection
   // class's own `#awake` field (see Jcrop.ts): true from the first genuine selection after
@@ -527,8 +520,9 @@ export class JcropComponent {
   // Document-level drag-tracking state (what used to be a separate Tracker class - see Jcrop.ts):
   // whether a drag is currently active, whether it started from a touch, and the move callback the
   // caller currently has active (set at the start of one drag gesture each: onTrackerStart() for a
-  // fresh drag, #startDragMode() for resizing/moving an existing one - there's no equivalent
-  // #trackerOnDone any more, since every gesture ends the same way: see onDocumentEnd() below).
+  // fresh drag, onSelectionTrackerStart()/onDragStart() for resizing/moving an existing one - there's
+  // no equivalent #trackerOnDone any more, since every gesture ends the same way: see onDocumentEnd()
+  // below).
   // Unlike the vendored original, the on*() methods below are always
   // reachable (Angular has no equivalent to conditionally attaching/detaching a document listener)
   // and gate themselves on #trackerBtndown (and, to ignore a stray event of the wrong kind - e.g. a
@@ -536,8 +530,7 @@ export class JcropComponent {
   // relying on not being called at all while no drag is active.
   readonly #trackerBtndown = signal(false);
   #trackerIstouch = false;
-  #trackerOnMove: MoveCallback = NOOP;
-  #docOffset!: Point;
+  #trackerOnMove: MoveCallback | undefined;
 
   // Called by the host page's own "select all" button via viewChild() - the crop dialogs each keep
   // that button (and the aspect/resolution readout next to it) in their own template/layout rather
@@ -565,17 +558,22 @@ export class JcropComponent {
     this.cropChange.emit({h: c.h * yscale, w: c.w * xscale, x, y});
   }
 
+  // Shared by onTrackerStart()/onSelectionTrackerStart()/onDragStart() below, each bound unconditionally
+  // from before the constructor's own init effect() has ever run (#initialized guards against that),
+  // to both a (mousedown) and a (touchstart) binding (touch rejected on a device #touchSupport says
+  // can't generate one - a mouse event never needs that check at all).
+  #canStartGesture(touch: boolean): boolean {
+    return this.#initialized && (!touch || this.#touchSupport);
+  }
+
   // Bound directly on the #tracker/#selectionTracker template elements (jcrop.component.html)
   // instead of Jcrop wiring them up itself with addEventListener() - both are static, permanent
-  // elements, so there's no need for imperative attach/detach. Each still needs the #initialized
-  // guard: the template binds these unconditionally, from before the constructor's own init effect()
-  // has ever run. Bound on both (mousedown) and (touchstart), merged into one handler the same way
-  // onDocumentMove()/onDocumentEnd() above are.
+  // elements, so there's no need for imperative attach/detach. Bound on both (mousedown) and
+  // (touchstart), merged into one handler the same way onDocumentMove()/onDocumentEnd() above are.
   protected onTrackerStart(e: JcropMouseEvent): void {
     const touch = isTouchEvent(e);
-    if (!this.#initialized || (touch && !this.#touchSupport)) return;
+    if (!this.#canStartGesture(touch)) return;
 
-    this.#docOffset = this.#getPos();
     this.handlesVisible.set(false);
     this.#dragMode.set(null);
     const pos = this.#mouseAbs(e);
@@ -593,15 +591,11 @@ export class JcropComponent {
   }
 
   // Bound on both (mousedown) and (touchstart) (jcrop.component.html) - merged into one handler the
-  // same way onDocumentMove()/onDocumentEnd() above are, since both differed only in event type and
-  // whether #touchSupport needed checking (never for a mouse event, always for a touch one).
+  // same way onDocumentMove()/onDocumentEnd() above are.
   protected onSelectionTrackerStart(e: JcropMouseEvent): void {
     const touch = isTouchEvent(e);
-    if (!this.#initialized || (touch && !this.#touchSupport)) return;
+    if (!this.#canStartGesture(touch)) return;
 
-    // Fix position of crop area when dragged the very first time.
-    // Necessary when crop image is in a hidden element when page is loaded.
-    this.#docOffset = this.#getPos();
     this.#dragMode.set('move');
 
     let lloc = this.#mouseAbs(e);
@@ -609,7 +603,16 @@ export class JcropComponent {
     this.#trackerIstouch = touch;
     this.#trackerOnMove = (e: JcropMouseEvent): void => {
       const pos = this.#mouseAbs(e);
-      this.#moveCoordsOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
+      // Clamps the move so the selection stays in bounds: an axis's own coordinate pair can shift by
+      // at most -x1()/-y1() before its low edge would go negative, or displayWidth()-x2()/
+      // displayHeight()-y2() before its high edge would overshoot - the same two-sided clamp()
+      // #rebound() does for a single point, applied here to how far the whole selection may move.
+      const ox = clamp(pos[0] - lloc[0], -this.#x1(), this.displayWidth() - this.#x2());
+      const oy = clamp(pos[1] - lloc[1], -this.#y1(), this.displayHeight() - this.#y2());
+      this.#x1.update((v) => v + ox);
+      this.#x2.update((v) => v + ox);
+      this.#y1.update((v) => v + oy);
+      this.#y2.update((v) => v + oy);
       lloc = pos;
 
       this.selectionAwake.set(true);
@@ -624,11 +627,8 @@ export class JcropComponent {
   // #getCoordsCorner below - merged into one handler the same way onSelectionTrackerStart() above is.
   protected onDragStart(ord: Ordinal, e: JcropMouseEvent): void {
     const touch = isTouchEvent(e);
-    if (!this.#initialized || (touch && !this.#touchSupport)) return;
+    if (!this.#canStartGesture(touch)) return;
 
-    // Fix position of crop area when dragged the very first time.
-    // Necessary when crop image is in a hidden element when page is loaded.
-    this.#docOffset = this.#getPos();
     this.#dragMode.set(ord);
 
     const fc = this.#coordsFixed();
@@ -666,7 +666,7 @@ export class JcropComponent {
   // wrong kind - e.g. a touch brushing the screen mid mouse-drag on a hybrid device).
   protected onDocumentMove(e: JcropMouseEvent): void {
     if (!this.#initialized || !this.#trackerBtndown() || isTouchEvent(e) !== this.#trackerIstouch) return;
-    this.#trackerOnMove(e);
+    this.#trackerOnMove?.(e);
   }
 
   // Bound on both (document:mouseup) and (document:touchend), the same way onDocumentMove() above is.
@@ -695,7 +695,7 @@ export class JcropComponent {
     }
     this.#dragMode.set(null);
 
-    this.#trackerOnMove = NOOP;
+    this.#trackerOnMove = undefined;
   }
 
   // This is a hack for iOS5 to support drag/move touch functionality. Note that e.currentTarget is
@@ -724,32 +724,11 @@ export class JcropComponent {
     this.#y2.set(rebounded[1]);
   }
 
-  // Clamps offset so the moved selection stays in bounds: an axis's own coordinate pair can shift by
-  // at most -x1()/-y1() before its low edge would go negative, or displayWidth()-x2()/
-  // displayHeight()-y2() before its high edge would overshoot - the same two-sided clamp() #rebound()
-  // above does for a single point, applied here to how far the whole selection is allowed to move.
-  #moveCoordsOffset(offset: Point): void {
-    const ox = clamp(offset[0], -this.#x1(), this.displayWidth() - this.#x2());
-    const oy = clamp(offset[1], -this.#y1(), this.displayHeight() - this.#y2());
-
-    this.#x1.update((v) => v + ox);
-    this.#x2.update((v) => v + ox);
-    this.#y1.update((v) => v + oy);
-    this.#y2.update((v) => v + oy);
-  }
-
+  // The four cases below (ne/nw/se/sw) are really one rule, not four: east picks x2 over x, south
+  // picks y2 over y - a switch would just spell that same rule out longhand per corner.
   #getCoordsCorner(ord: Corner): Point {
     const c = this.#coordsFixed();
-    switch (ord) {
-      case 'ne':
-        return [c.x2, c.y];
-      case 'nw':
-        return [c.x, c.y];
-      case 'se':
-        return [c.x2, c.y2];
-      case 'sw':
-        return [c.x, c.y2];
-    }
+    return [ord.includes('e') ? c.x2 : c.x, ord.includes('s') ? c.y2 : c.y];
   }
 
   #rebound(p: Point): Point {
@@ -806,24 +785,29 @@ export class JcropComponent {
     this.handlesVisible.set(true);
   }
 
-  // Always reads #workingImg's own position - every caller only ever wants that, so it's read here
-  // directly rather than threaded through as a parameter.
-  #getPos(): Point {
-    // This component's own template is never rendered server-side (every consumer sits behind a
-    // RenderMode.Client route), so #window is only ever null in a scenario where this can't actually
-    // be called in the first place. [0, 0] is an arbitrary but harmless fallback for that
-    // unreachable branch.
-    if (!this.#window) return [0, 0];
-    const rect = this.workingImgRef().nativeElement.getBoundingClientRect();
-    return [rect.left + this.#window.scrollX, rect.top + this.#window.scrollY];
-  }
-
   // Reads pageX/pageY off e itself for a mouse event, or off its first changed touch for a touch one
   // (TouchEvent doesn't carry its own pageX/pageY) - what used to be a separate touchCfilter() step
-  // callers had to remember to run first, folded in here instead since this was its only caller.
+  // callers had to remember to run first, folded in here instead since this was its only caller. Reads
+  // #workingImg's own position fresh on every invocation, via what used to be a separate #getPos()
+  // helper (inlined here once this became its only caller), rather than a #docOffset field cached once
+  // per drag gesture (what this used to do, requiring every gesture-start handler to remember to
+  // refresh it) - getBoundingClientRect() is cheap enough to call per-event, and doing so fixes for
+  // free what that per-gesture refresh existed to work around: #workingImg's position going stale if
+  // it was hidden when the page first loaded.
   #mouseAbs(e: JcropMouseEvent): Point {
     const src = isTouchEvent(e) ? e.changedTouches[0] : e;
-    return [src.pageX - this.#docOffset[0], src.pageY - this.#docOffset[1]];
+
+    // This component's own template is never rendered server-side (every consumer sits behind a
+    // RenderMode.Client route), so #window is only ever null in a scenario where this can't actually
+    // be called in the first place - falling straight through to the un-offset page position is an
+    // arbitrary but harmless fallback for that unreachable branch.
+    if (!this.#window) return [src.pageX, src.pageY];
+
+    const rect = this.workingImgRef().nativeElement.getBoundingClientRect();
+    const offsetX = rect.left + this.#window.scrollX;
+    const offsetY = rect.top + this.#window.scrollY;
+
+    return [src.pageX - offsetX, src.pageY - offsetY];
   }
 
   // What used to be a separate Selection class (Jcrop.ts), folded in directly since every

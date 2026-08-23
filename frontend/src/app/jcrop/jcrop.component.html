@@ -28,8 +28,7 @@
   #tracker/#selectionTracker call straight into the drag logic (onTrackerStart et al. - each bound on
   both (mousedown) and (touchstart), merged from what used to be separate onXxxMouseDown()/
   onXxxTouchStart() methods in jcrop.component.ts); the handle/dragbar elements instead forward
-  through onDragStart, passing along the fixed ordinal each one already knows straight into
-  #startDragMode() (jcrop.component.ts).
+  through onDragStart, passing along the fixed ordinal each one already knows (jcrop.component.ts).
 -->
 <div class="jcrop-holder" [style.height.px]="displayHeight()" [style.width.px]="displayWidth()">
   <div
@@ -67,8 +66,8 @@
       <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline (via
            dragbars/handles, jcrop.component.ts) since it's the one thing genuinely unique per
            element, not shareable via a class. Each still forwards mousedown/touchstart into
-           #startDragMode() (jcrop.component.ts) via onDragStart, passing its own fixed ordinal -
-           fixed in number and identity now, but still real drag targets, unlike the borders above. -->
+           onDragStart (jcrop.component.ts), passing its own fixed ordinal - fixed in number and
+           identity now, but still real drag targets, unlike the borders above. -->
       @for (dragbar of dragbars; track dragbar.ord) {
         <div
           class="jcrop-dragbar ord-{{ dragbar.ord }}"
