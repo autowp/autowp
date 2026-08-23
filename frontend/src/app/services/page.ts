@@ -3,7 +3,7 @@ import type {Observer} from 'rxjs';
 import {Service} from '@angular/core';
 import {map, Observable} from 'rxjs';
 
-import * as pagesJson from './pages.json';
+import pagesJson from './pages.json';
 
 export interface Page {
   childs: Page[];
