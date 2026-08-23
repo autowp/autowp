@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   ElementRef,
   inject,
   input,
@@ -116,6 +117,14 @@ export class JcropComponent {
   // onLoad()/#options any more, just #window above.
   readonly #touchSupport: boolean;
 
+  // The <img> box size that fits pictureWidth/pictureHeight inside the real page container
+  // (#elementRef's parentElement) at its current width, preserving aspect ratio - computed by the
+  // constructor effect() below, which (unlike onLoad()) doesn't need the real <img> to have
+  // finished loading, since it only ever reads pictureWidth/pictureHeight (component inputs) and
+  // the container's own layout, never anything off the image itself.
+  #displayWidth = 0;
+  #displayHeight = 0;
+
   readonly src = input.required<string>();
   readonly pictureWidth = input.required<number>();
   readonly pictureHeight = input.required<number>();
@@ -141,6 +150,45 @@ export class JcropComponent {
     this.#touchSupport = this.#window
       ? 'ontouchstart' in this.#window || this.#window.navigator.maxTouchPoints > 0
       : false;
+
+    // Keeps #displayWidth/#displayHeight (and the real <img>'s own style, which - unlike
+    // #workingImg's below - nothing ever reads back synchronously, so a plain style write is fine
+    // here rather than a signal) in sync with pictureWidth/pictureHeight, independent of onLoad()/the
+    // real <img> element's own load event: those two inputs already carry the picture's true size, so
+    // this never needs to wait for the browser to have actually decoded the image, only for this
+    // component's own view (and its container) to exist. Re-runs on every pictureWidth/pictureHeight
+    // change, matching onLoad()'s own "can run more than once per component instance" behavior for
+    // when a host page reuses one JcropComponent across pictures.
+    effect(() => {
+      const win = this.#window;
+      if (!win) {
+        return;
+      }
+
+      // The real page container this component's content used to sit directly inside, before this
+      // component existed - reading its width (rather than this component's own host element, which
+      // isn't styled with any padding of its own) keeps the responsive-fit math identical to what it
+      // was when the three crop pages each duplicated it inline.
+      const container = this.#elementRef.nativeElement.parentElement;
+      if (!container) {
+        return;
+      }
+
+      const pictureWidth = this.pictureWidth();
+      const pictureHeight = this.pictureHeight();
+
+      const styles = win.getComputedStyle(container, null);
+      const containerWidth =
+        container.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight) || 1;
+
+      const scale = pictureWidth / containerWidth;
+      this.#displayWidth = pictureWidth / scale;
+      this.#displayHeight = pictureHeight / scale;
+
+      const img = this.origimgRef().nativeElement;
+      img.style.width = `${this.#displayWidth}px`;
+      img.style.height = `${this.#displayHeight}px`;
+    });
   }
 
   // Whether the resize handles/dragbars are shown - set directly by this component (#setSelect(),
@@ -277,54 +325,10 @@ export class JcropComponent {
   // Selection/Touch needed them the same way - nothing still requires that of them, but nothing's
   // broken by it either.
   protected onLoad(): void {
-    const img = this.origimgRef().nativeElement;
-
-    // Guaranteed by the time a real `load` event can fire: this component's own template is never
-    // rendered server-side (every consumer sits behind a RenderMode.Client route), so #window is
-    // only ever null in a scenario where onLoad() can't be called in the first place.
-    const win = this.#window;
-    if (!win) {
-      return;
-    }
-
-    // The real page container this component's content used to sit directly inside, before this
-    // component existed - reading its width (rather than this component's own host element, which
-    // isn't styled with any padding of its own) keeps the responsive-fit math identical to what it
-    // was when the three crop pages each duplicated it inline.
-    const container = this.#elementRef.nativeElement.parentElement;
-    if (!container) {
-      return;
-    }
-
     const pictureWidth = this.pictureWidth();
     const pictureHeight = this.pictureHeight();
 
-    const styles = win.getComputedStyle(container, null);
-    const containerWidth =
-      container.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight) || 1;
-
-    const scale = pictureWidth / containerWidth;
-    const width = pictureWidth / scale;
-    const height = pictureHeight / scale;
-
-    img.style.width = `${width}px`;
-    img.style.height = `${height}px`;
-
     const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
-
-    // Fix size of crop image.
-    // Necessary when crop image is within a hidden element when page is loaded.
-    if (img.width !== 0 && img.height !== 0) {
-      // Obtain dimensions from contained img element.
-      setStyle(img, {height: px(img.height), width: px(img.width)});
-    } else {
-      // width/height read 0 above because the source <img> sits inside a hidden (display:none)
-      // container at this point in every browser, not just old IE - load a detached copy to read
-      // its intrinsic dimensions instead.
-      const tempImage = new Image();
-      tempImage.src = img.getAttribute('src') ?? '';
-      setStyle(img, {height: px(tempImage.height), width: px(tempImage.width)});
-    }
 
     // #workingImg is a static template <img> now (jcrop.component.html), not a runtime clone of
     // origimg - its src is bound the same way origimg's own is ([src]="src()"), and its static
@@ -332,26 +336,32 @@ export class JcropComponent {
     // instead of set here. Its height/width, unlike #holder/#tracker below, stay a direct setStyle()
     // call rather than a signal - the presizing math below and the offsetWidth/offsetHeight reads
     // right after both need that size committed to the DOM synchronously, and a signal only takes
-    // effect on Angular's next change-detection pass (same reasoning as origimgVisible above).
+    // effect on Angular's next change-detection pass (same reasoning as origimgVisible above). Sized
+    // straight from #displayWidth/#displayHeight (kept in sync by the constructor effect() from
+    // pictureWidth/pictureHeight, always non-zero for a real picture) rather than reading origimg's
+    // own offsetHeight/offsetWidth: that read used to need a hidden-container fallback (a detached
+    // Image() reload) because origimg's rendered size could come back 0 when its container was
+    // display:none at load time - a problem that never applies to pictureWidth/pictureHeight, which
+    // don't depend on origimg being rendered at all.
     const workingImg = this.workingImgRef().nativeElement;
     this.#img = workingImg;
 
-    setStyle(workingImg, {height: px(img.offsetHeight), width: px(img.offsetWidth)});
+    setStyle(workingImg, {height: px(this.#displayHeight), width: px(this.#displayWidth)});
     this.origimgVisible.set(false);
 
-    // Shrinks #workingImg to fit inside the width/height box computed above (preserving aspect
+    // Shrinks #workingImg to fit inside the #displayWidth/#displayHeight box (preserving aspect
     // ratio) if it's currently bigger than that in either dimension, and derives #xscale/#yscale
     // (the ratio between #workingImg's real, unshrunk size and its on-screen presized size) from
     // however much shrinking that took.
     let presizedHeight = workingImg.offsetHeight,
       presizedWidth = workingImg.offsetWidth;
-    if (presizedWidth > width && width > 0) {
-      presizedWidth = width;
-      presizedHeight = (width / workingImg.offsetWidth) * workingImg.offsetHeight;
+    if (presizedWidth > this.#displayWidth && this.#displayWidth > 0) {
+      presizedWidth = this.#displayWidth;
+      presizedHeight = (this.#displayWidth / workingImg.offsetWidth) * workingImg.offsetHeight;
     }
-    if (presizedHeight > height && height > 0) {
-      presizedHeight = height;
-      presizedWidth = (height / workingImg.offsetHeight) * workingImg.offsetWidth;
+    if (presizedHeight > this.#displayHeight && this.#displayHeight > 0) {
+      presizedHeight = this.#displayHeight;
+      presizedWidth = (this.#displayHeight / workingImg.offsetHeight) * workingImg.offsetWidth;
     }
     this.#xscale = workingImg.offsetWidth / presizedWidth;
     this.#yscale = workingImg.offsetHeight / presizedHeight;
