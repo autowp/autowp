@@ -17,19 +17,13 @@ type Paginator struct {
 	CurrentPageNumber   int32
 	itemCount           int32
 	itemCountCalculated bool
-	PageRange           int32
 }
 
 type Pages struct {
 	PageCount        int32
 	ItemCountPerPage int32
-	First            int32
 	Current          int32
-	Last             int32
-	Previous         int32
-	Next             int32
 	TotalItemCount   int32
-	PagesInRange     []int32
 }
 
 func (s *Paginator) Count(ctx context.Context) (int32, error) {
@@ -65,58 +59,9 @@ func (s *Paginator) GetPages(ctx context.Context) (*Pages, error) {
 	pages := Pages{
 		PageCount:        pageCount,
 		ItemCountPerPage: s.ItemCountPerPage,
-		First:            1,
 		Current:          currentPageNumber,
-		Last:             pageCount,
-		Previous:         0,
-		Next:             0,
 		TotalItemCount:   totalItemCount,
 	}
-
-	// Previous and next
-	if currentPageNumber-1 > 0 {
-		previous := currentPageNumber - 1
-		pages.Previous = previous
-	}
-
-	if currentPageNumber+1 <= pageCount {
-		next := currentPageNumber + 1
-		pages.Next = next
-	}
-
-	// Pages in range
-	var pageRange int32 = 10
-	if s.PageRange > 0 {
-		pageRange = s.PageRange
-	}
-
-	pageNumber := currentPageNumber
-
-	if pageRange > pageCount {
-		pageRange = pageCount
-	}
-
-	delta := int32(math.Ceil(float64(pageRange) / 2.0))
-
-	lowerBound := pageCount - pageRange + 1
-	upperBound := pageCount
-
-	if pageNumber-delta <= pageCount-pageRange {
-		if pageNumber-delta < 0 {
-			delta = pageNumber
-		}
-
-		offset := pageNumber - delta
-		lowerBound = offset + 1
-		upperBound = offset + pageRange
-	}
-
-	pagesInRange, err := s.getPagesInRange(ctx, lowerBound, upperBound)
-	if err != nil {
-		return nil, err
-	}
-
-	pages.PagesInRange = pagesInRange
 
 	return &pages, nil
 }
@@ -212,32 +157,6 @@ func (s *Paginator) calculateCount(ctx context.Context) (int32, error) {
 
 func (s *Paginator) getCurrentPageNumber(ctx context.Context) (int32, error) {
 	return s.normalizePageNumber(ctx, s.CurrentPageNumber)
-}
-
-func (s *Paginator) getPagesInRange(
-	ctx context.Context,
-	lowerBound int32,
-	upperBound int32,
-) ([]int32, error) {
-	var err error
-
-	lowerBound, err = s.normalizePageNumber(ctx, lowerBound)
-	if err != nil {
-		return nil, err
-	}
-
-	upperBound, err = s.normalizePageNumber(ctx, upperBound)
-	if err != nil {
-		return nil, err
-	}
-
-	pages := make([]int32, upperBound-lowerBound+1)
-
-	for pageNumber := lowerBound; pageNumber <= upperBound; pageNumber++ {
-		pages[pageNumber-lowerBound] = pageNumber
-	}
-
-	return pages, nil
 }
 
 func (s *Paginator) normalizePageNumber(ctx context.Context, pageNumber int32) (int32, error) {

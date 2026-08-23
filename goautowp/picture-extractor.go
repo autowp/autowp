@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"math"
 	"strings"
 
 	"github.com/autowp/goautowp/comments"
@@ -845,7 +846,6 @@ func (s *PictureExtractor) buildPicturesPaginator(
 		}
 	}
 
-	paginator.PageRange = 15
 	paginator.CurrentPageNumber = pageNumber
 
 	pages, err := paginator.GetPages(ctx)
@@ -853,33 +853,51 @@ func (s *PictureExtractor) buildPicturesPaginator(
 		return nil, err
 	}
 
+	// Wider than a generic list paginator's page-link strip would be: this is the only paginator
+	// exposed as a strip of sibling *pictures* rather than page numbers, so a wider window reads
+	// better here.
+	const siblingPictureRange = 15
+
+	first, last := int32(1), pages.PageCount
+
+	var previous, next int32
+	if pages.Current-1 > 0 {
+		previous = pages.Current - 1
+	}
+
+	if pages.Current+1 <= pages.PageCount {
+		next = pages.Current + 1
+	}
+
 	picturesPages := PicturesPages{
 		PageCount:      pages.PageCount,
 		TotalItemCount: pages.TotalItemCount,
 	}
 
-	if pages.Previous > 0 {
-		picturesPages.Previous = paginatorPictures[pages.Previous-1].Identity
+	if previous > 0 {
+		picturesPages.Previous = paginatorPictures[previous-1].Identity
 	}
 
-	if pages.Next > 0 {
-		picturesPages.Next = paginatorPictures[pages.Next-1].Identity
+	if next > 0 {
+		picturesPages.Next = paginatorPictures[next-1].Identity
 	}
 
-	if pages.First > 0 {
-		picturesPages.First = paginatorPictures[pages.First-1].Identity
+	if first > 0 {
+		picturesPages.First = paginatorPictures[first-1].Identity
 	}
 
-	if pages.Last > 0 {
-		picturesPages.Last = paginatorPictures[pages.Last-1].Identity
+	if last > 0 {
+		picturesPages.Last = paginatorPictures[last-1].Identity
 	}
 
 	if pages.Current > 0 {
 		picturesPages.Current = paginatorPictures[pages.Current-1].Identity
 	}
 
-	pagesInRange := make([]*PicturesPagesPage, 0)
-	for _, i := range pages.PagesInRange {
+	siblingPageNumbers := pageNumbersInRange(pages.PageCount, pages.Current, siblingPictureRange)
+
+	pagesInRange := make([]*PicturesPagesPage, 0, len(siblingPageNumbers))
+	for _, i := range siblingPageNumbers {
 		pagesInRange = append(pagesInRange, &PicturesPagesPage{
 			Page:     i,
 			Identity: paginatorPictures[i-1].Identity,
@@ -889,6 +907,51 @@ func (s *PictureExtractor) buildPicturesPaginator(
 	picturesPages.PagesInRange = pagesInRange
 
 	return &picturesPages, nil
+}
+
+// pageNumbersInRange returns up to pageRange page numbers centered on current, clamped to
+// [1, pageCount] - the page-link window shown around the current sibling picture.
+func pageNumbersInRange(pageCount, current, pageRange int32) []int32 {
+	if pageRange > pageCount {
+		pageRange = pageCount
+	}
+
+	delta := int32(math.Ceil(float64(pageRange) / 2.0))
+
+	lowerBound := pageCount - pageRange + 1
+	upperBound := pageCount
+
+	if current-delta <= pageCount-pageRange {
+		if current-delta < 0 {
+			delta = current
+		}
+
+		offset := current - delta
+		lowerBound = offset + 1
+		upperBound = offset + pageRange
+	}
+
+	lowerBound = clampPageNumber(lowerBound, pageCount)
+	upperBound = clampPageNumber(upperBound, pageCount)
+
+	pageNumbers := make([]int32, upperBound-lowerBound+1)
+	for pageNumber := lowerBound; pageNumber <= upperBound; pageNumber++ {
+		pageNumbers[pageNumber-lowerBound] = pageNumber
+	}
+
+	return pageNumbers
+}
+
+func clampPageNumber(pageNumber, pageCount int32) int32 {
+	if pageNumber < 1 {
+		pageNumber = 1
+	}
+
+	if pageCount > 0 && pageNumber > pageCount {
+		pageNumber = pageCount
+	}
+
+	return pageNumber
 }
 
 func (s *PictureExtractor) preloadTopicsStat(
