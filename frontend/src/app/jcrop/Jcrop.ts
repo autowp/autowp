@@ -40,7 +40,9 @@
  * here is Coords, the one collaborator class that actually owns a distinct piece of state, plus the
  * few types (JcropCrop/Point/Corner) it and JcropComponent both need. Everything else that used to
  * live here - the other types (InternalOptions, JcropMouseEvent, PositionCallback, Ordinal,
- * DragMode), the setStyle()/px() DOM helpers, and the option default values (what used to be a
+ * DragMode) and the setStyle()/px() DOM helpers (both moved there with the rest, then were deleted
+ * entirely once nothing called them any more - sizing ended up computed()-driven and template-bound
+ * instead of imperative), and the option default values (what used to be a
  * `defaults` constant) - moved to JcropComponent itself once nothing here (Coords never did) needed
  * them any more either; it was always the only real consumer.
  */
@@ -60,12 +62,12 @@ export type Point = [number, number];
 export type Corner = 'ne' | 'nw' | 'se' | 'sw';
 
 // Owns the selection rectangle's coordinate math: the pressed/current corner state (x1/y1/x2/y2)
-// and everything derived from it (min-size clamping, bounding to the image). `boundx`/`boundy` never
-// change after construction, so they're plain constructor values. `#scale` does change (recomputed by
-// the presizing math/trueSize calculation in onLoad()): onLoad() (its only writer) pushes a new value
-// in via setScale() every time #xscale/#yscale change there, rather than this class pulling the
-// latest value through a callback. xmin/ymin are likewise written from outside (onLoad(), via
-// setLimits()) but read only here, so both pairs are owned outright as private state with a setter.
+// and everything derived from it (min-size clamping, bounding to the image). `boundx`/`boundy`/scale
+// never change after construction - onLoad() builds a brand new Coords (with the trueSize
+// xscale/yscale it already knows by then) on every run instead of mutating scale on an existing one,
+// so it's a plain constructor value like boundx/boundy. xmin/ymin are the exception: written from
+// outside (onLoad(), via setLimits()) but read only here, so that pair alone is owned as private
+// state with a setter.
 export class Coords {
   #x1 = 0;
   #x2 = 0;
@@ -75,24 +77,16 @@ export class Coords {
   #xmin = 0;
   #ymin = 0;
 
-  #scale: {xscale: number; yscale: number};
-
   constructor(
     private readonly boundx: number,
     private readonly boundy: number,
-    xscale: number,
-    yscale: number,
-  ) {
-    this.#scale = {xscale, yscale};
-  }
+    private readonly xscale: number,
+    private readonly yscale: number,
+  ) {}
 
   setLimits(xmin: number, ymin: number): void {
     this.#xmin = xmin;
     this.#ymin = ymin;
-  }
-
-  setScale(xscale: number, yscale: number): void {
-    this.#scale = {xscale, yscale};
   }
 
   setPressed(pos: Point): void {
@@ -177,7 +171,7 @@ export class Coords {
     let delta;
     const xsize = this.#x2 - this.#x1,
       ysize = this.#y2 - this.#y1;
-    const {xscale, yscale} = this.#scale;
+    const {xscale, yscale} = this;
 
     if (this.#ymin / yscale && Math.abs(ysize) < this.#ymin / yscale) {
       this.#y2 = ysize > 0 ? this.#y1 + this.#ymin / yscale : this.#y1 - this.#ymin / yscale;

@@ -7,23 +7,22 @@
   (its own (load) below is what used to be origimg's), and #img2 is just bound the same way
   #workingImg's own src is ([src]="src()"). Classes/inline styles below are exactly what onLoad() used
   to set imperatively for properties that never change at runtime - anything that does from runtime
-  layout math (size, position while dragging) is either still set imperatively (#workingImg's own
-  height/width - see the #displayWidth/#displayHeight comment in jcrop.component.ts for why) or driven
-  by a signal:
-  .jcrop-handles-holder's visibility (set directly by this component's own #setSelect()/#doneSelect()/
-  #newSelection()) via handlesVisible; #sel's own display (#doneSelect()/#selectionUpdate()) via
-  selVisible; #workingImg's opacity (that same release/show dimming the image while a selection is
-  awake) via imgOpacity; #holder's, #img2's, and #sel's height/width (#holder/#img2 computed in
-  onLoad() from the loaded image's size, #sel resized on every drag frame by #selectionUpdate()) via
-  holderHeight/holderWidth, img2Height/img2Width, and selHeight/selWidth; #img2's and #sel's own
-  left/top (#selectionUpdate(), on every drag frame) via img2Left/img2Top and selLeft/selTop; and
-  #tracker's cursor/z-index (the
-  component's own drag-mode changes) plus its height/width/left/top (that same one-time onLoad()
-  computation) via trackerCursor/trackerZIndex/trackerHeight/trackerWidth/trackerOffset. Likewise,
-  every mousedown/touchstart below is exactly what onLoad() and what used to be a separate Selection
-  class (Jcrop.ts) used to attach imperatively with addEventListener() - all of these elements are
-  static and permanent for the life of this component, so there's no need to attach/detach anything by
-  hand. #tracker/#selectionTracker call straight into the drag logic (onTrackerMouseDown et al.); the
+  state is driven by a signal instead: .jcrop-handles-holder's visibility (set directly by this
+  component's own #setSelect()/#doneSelect()/#newSelection()) via handlesVisible; #sel's own display
+  (#doneSelect()/#selectionUpdate()) via selVisible; #workingImg's opacity (that same release/show
+  dimming the image while a selection is awake) via imgOpacity; #workingImg's, #holder's, #tracker's,
+  and #img2's height/width (all computed() straight off pictureWidth/pictureHeight and the real page
+  container's own layout - see the displayWidth/displayHeight comment in jcrop.component.ts) via
+  displayWidth/displayHeight, holderHeight/holderWidth, trackerHeight/trackerWidth, and
+  img2Height/img2Width respectively; #sel's height/width (resized on every drag frame by
+  #selectionUpdate()) via selHeight/selWidth; #img2's and #sel's own left/top (#selectionUpdate(), on
+  every drag frame) via img2Left/img2Top and selLeft/selTop; and #tracker's cursor/z-index (the
+  component's own drag-mode changes, via trackerCursor/trackerZIndex). #tracker's own left/top are
+  the plain trackerOffset constant instead (jcrop.component.ts). Likewise, every mousedown/touchstart
+  below is exactly what onLoad() and what used to be a separate Selection class (Jcrop.ts) used to
+  attach imperatively with addEventListener() - all of these elements are static and permanent for
+  the life of this component, so there's no need to attach/detach anything by hand.
+  #tracker/#selectionTracker call straight into the drag logic (onTrackerMouseDown et al.); the
   handle/dragbar elements instead forward through onDragMouseDown/onDragTouchStart, passing along the
   fixed ordinal each one already knows straight into #createDragger() (jcrop.component.ts).
 -->
@@ -90,10 +89,19 @@
     [style.z-index]="trackerZIndex()"
     [style.height.px]="trackerHeight()"
     [style.width.px]="trackerWidth()"
-    [style.left.px]="trackerOffset()"
-    [style.top.px]="trackerOffset()"
+    [style.left.px]="trackerOffset"
+    [style.top.px]="trackerOffset"
     (mousedown)="onTrackerMouseDown($event)"
     (touchstart)="onTrackerTouchStart($event)"
   ></div>
-  <img #workingImg alt="" class="jcrop-working-image" [src]="src()" [style.opacity]="imgOpacity()" (load)="onLoad()" />
+  <img
+    #workingImg
+    alt=""
+    class="jcrop-working-image"
+    [src]="src()"
+    [style.opacity]="imgOpacity()"
+    [style.height.px]="displayHeight()"
+    [style.width.px]="displayWidth()"
+    (load)="onLoad()"
+  />
 </div>
