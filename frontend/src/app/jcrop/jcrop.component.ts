@@ -127,12 +127,18 @@ type JcropMouseEvent = (MouseEvent | TouchEvent) & {pageX?: number; pageY?: numb
 
 type Point = [number, number];
 
-// oppLockCorner (below) only ever maps onto a diagonal - the corner opposite the dragged
+// oppLockCorners (below) only ever maps onto a diagonal - the corner opposite the dragged
 // edge/corner, which #getCoordsCorner (on the class) then reads off - so both are typed to this
 // narrower union rather than the full Ordinal union below.
 type Corner = 'ne' | 'nw' | 'se' | 'sw';
 
 type PositionCallback = (pos: Point) => void;
+
+// #trackerOnDone/#trackerOnMove's (below, on the class) resting value - no drag is in progress, so
+// there's nothing to forward document mouse/touch events to. Module-level rather than reconstructed
+// wherever it's assigned, since it's stateless and shared by every "no drag active" case (the two
+// field initializers and #finishTrackerDrag's own reset, below).
+const NOOP: PositionCallback = () => {};
 
 // A handle/border/dragbar position, or the drag mode passed around while resizing/moving the
 // selection - 'move' alongside the 8 ordinals rather than a separate type, since #startDragMode's
@@ -154,27 +160,20 @@ function touchCfilter(e: JcropMouseEvent): JcropMouseEvent {
 
 // The corner diagonally opposite a dragged edge/corner - what a resize drag anchors on, so it grows
 // or shrinks from the edge/corner actually being dragged rather than the selection's center. A plain
-// function for the same reason touchCfilter above is.
-function oppLockCorner(ord: Ordinal): Corner {
-  switch (ord) {
-    case 'e':
-      return 'nw';
-    case 'n':
-      return 'sw';
-    case 'ne':
-      return 'sw';
-    case 'nw':
-      return 'se';
-    case 's':
-      return 'nw';
-    case 'se':
-      return 'nw';
-    case 'sw':
-      return 'ne';
-    case 'w':
-      return 'ne';
-  }
-}
+// lookup object (rather than a function) for the same reason touchCfilter above is a plain function -
+// it only ever maps its own argument, never touches this component's state - and a Record<Ordinal,
+// Corner> still forces every Ordinal to be covered (a missing key is a type error) the same way an
+// exhaustive switch would.
+const oppLockCorners: Record<Ordinal, Corner> = {
+  e: 'nw',
+  n: 'sw',
+  ne: 'sw',
+  nw: 'se',
+  s: 'nw',
+  se: 'nw',
+  sw: 'ne',
+  w: 'ne',
+};
 
 // Normalizes a selection rect's corners so x1/y1 is always the top-left and x2/y2 the bottom-right,
 // regardless of which corner was actually dragged (dragging the top-left corner past the bottom-right
@@ -496,8 +495,8 @@ export class JcropComponent {
   // drag is active.
   #trackerBtndown: boolean | undefined;
   #trackerIstouch: boolean | undefined;
-  #trackerOnDone: PositionCallback = function () {};
-  #trackerOnMove: PositionCallback = function () {};
+  #trackerOnDone: PositionCallback = NOOP;
+  #trackerOnMove: PositionCallback = NOOP;
   #docOffset!: Point;
 
   // Called by the host page's own "select all" button via viewChild() - the crop dialogs each keep
@@ -517,6 +516,14 @@ export class JcropComponent {
     // xscale/yscale in unscale() can still leave a hair of negative slop after a drag to the
     // top/left edge - guard against saving that.
     this.cropChange.emit({...crop, x: Math.max(0, crop.x), y: Math.max(0, crop.y)});
+  }
+
+  // #onSelect(#unscale(#coordsFixed())) - the "emit the current selection, in picture-pixel space" call
+  // every genuine selection change (a completed #setSelect(), the end of a resize/move drag, or a
+  // still-in-progress drag when #selectionUpdate() below is asked to emit) makes. Pulled out since
+  // that exact chain is repeated identically at all three call sites below.
+  #emitSelect(): void {
+    this.#onSelect(this.#unscale(this.#coordsFixed()));
   }
 
   // Bound directly on the #tracker/#selectionTracker template elements (jcrop.component.html)
@@ -722,7 +729,7 @@ export class JcropComponent {
     this.#setCoordsPressed([(rect[0] ?? 0) / this.#xscale(), (rect[1] ?? 0) / this.#yscale()]);
     this.#setCoordsCurrent([(rect[2] ?? 0) / this.#xscale(), (rect[3] ?? 0) / this.#yscale()]);
     this.#selectionUpdate();
-    this.#onSelect(this.#unscale(this.#coordsFixed()));
+    this.#emitSelect();
     this.handlesVisible.set(true);
   }
 
@@ -752,8 +759,8 @@ export class JcropComponent {
     }
 
     const fc = this.#coordsFixed();
-    const opp = oppLockCorner(mode);
-    const opc = this.#getCoordsCorner(oppLockCorner(opp));
+    const opp = oppLockCorners[mode];
+    const opc = this.#getCoordsCorner(oppLockCorners[opp]);
 
     this.#setCoordsPressed(this.#getCoordsCorner(opp));
     this.#setCoordsCurrent(opc);
@@ -765,16 +772,12 @@ export class JcropComponent {
     return (pos: Point): void => {
       switch (mode) {
         case 'e':
+        case 'w':
           pos[1] = f.y2;
           break;
         case 'n':
-          pos[0] = f.x2;
-          break;
         case 's':
           pos[0] = f.x2;
-          break;
-        case 'w':
-          pos[1] = f.y2;
           break;
       }
       this.#setCoordsCurrent(pos);
@@ -871,12 +874,12 @@ export class JcropComponent {
 
     this.#trackerOnDone(this.#mouseAbs(e));
     if (this.#selectionAwake) {
-      this.#onSelect(this.#unscale(this.#coordsFixed()));
+      this.#emitSelect();
     }
 
     this.trackerZIndex.set(290);
-    this.#trackerOnMove = function () {};
-    this.#trackerOnDone = function () {};
+    this.#trackerOnMove = NOOP;
+    this.#trackerOnDone = NOOP;
   }
 
   // What used to be a separate Selection class (Jcrop.ts), folded in directly since every
@@ -906,7 +909,7 @@ export class JcropComponent {
     }
 
     if (select) {
-      this.#onSelect(this.#unscale(this.#coordsFixed()));
+      this.#emitSelect();
     }
   }
 
