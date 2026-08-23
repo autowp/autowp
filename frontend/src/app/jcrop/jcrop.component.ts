@@ -109,7 +109,7 @@ type FixedCrop = JcropCrop & {x2: number; y2: number};
 // createDragbars/createHandles specifically - which of them get their mousedown/touchstart bound
 // directly in the template now instead of via a runtime loop; see jcrop.component.html/.scss), was
 // never genuinely variable to begin with so it's a fixed value at its one use site now
-// (bgOpacity/boundary/minSelect/setSelect/trueSize - #selectionUpdate()'s bgopacity, the
+// (bgOpacity/boundary/minSelect/setSelect/trueSize - the imgOpacity computed()'s bgopacity, the
 // trackerHeight/trackerWidth computed()s' BOUNDARY margin, #doneSelect()'s minSelect check,
 // the constructor's own init effect()'s own #setSelect() call, and the #xscale/#yscale computed()s
 // respectively), or
@@ -313,8 +313,8 @@ export class JcropComponent {
   // snapshot protected against a live read didn't already, keeping a separate copy was pure
   // indirection, so #rebound()/#coordsFixed/#moveCoordsOffset() below read those directly now
   // instead. Signals (rather than plain fields) so #coordsFixed below - and, off of that, the
-  // selection/preview position/size signals - can be computed() derivations instead of values
-  // #selectionUpdate() has to remember to .set() on every drag frame.
+  // selection/preview position/size signals - can be computed() derivations instead of values some
+  // method has to remember to .set() on every drag frame.
   readonly #x1 = signal(0);
   readonly #x2 = signal(0);
   readonly #y1 = signal(0);
@@ -356,15 +356,14 @@ export class JcropComponent {
     // themselves moved out entirely, being nothing more than pictureWidth/pictureHeight/displayWidth/
     // displayHeight/minSize read live (see the x1/y1/x2/y2 field comment above). Tracker, Touch, and
     // Selection - the plugin's other three modules - never had a distinct piece of DOM/state of their
-    // own (once Selection stopped holding #sel/#img2 DOM references directly - see #selectionAwake
+    // own (once Selection stopped holding #sel/#img2 DOM references directly - see selectionAwake
     // above), just fields/methods closing over this component's own collaborators, so all three were
     // folded in directly instead of classes in Jcrop.ts: Tracker as
     // #trackerBtndown/#trackerIstouch/#trackerOnMove and the
     // #activateTrackerHandlers()/#finishTrackerDrag() methods below, Touch as #touchSupport and the
-    // #createDragger() method below, Selection as #selectionAwake and the
-    // #selectionRefresh()/#selectionUpdate() methods below
-    // (#doneSelect()/#selectionUpdate() themselves absorbed what used to be Selection's own
-    // release()/#show()). #init() itself (what used to build/wire all of the above) was folded in
+    // #createDragger() method below, Selection as selectionAwake and the #selectionRefresh() method
+    // below (#doneSelect()/#selectionRefresh() themselves absorbed what used to be Selection's own
+    // release()/#show()/update()). #init() itself (what used to build/wire all of the above) was folded in
     // as this effect() - what used to be onLoad(), bound to #workingImg's own (load) event, until that
     // stopped being necessary either: everything left in it only ever needed pictureWidth/
     // pictureHeight/initialCrop/minSize (component inputs), never anything the real <img> element
@@ -464,17 +463,11 @@ export class JcropComponent {
   protected readonly selHeight = computed(() => Math.round(this.#coordsFixed().h));
   protected readonly selWidth = computed(() => Math.round(this.#coordsFixed().w));
 
-  // #sel's own display - whether the selection box (and everything clipped/nested inside it: borders,
-  // handles, the #img2 crop-preview) is shown at all - a pure derivation of #selectionAwake below,
-  // false until the first selection (matching handlesVisible's own initial value, since #sel would
-  // otherwise flash unstyled before the constructor's own init effect() has run).
-  protected readonly selVisible = computed(() => this.#selectionAwake());
-
   // #workingImg's opacity - dimmed to the vendored plugin's own bgOpacity option while a selection is
-  // awake, restored to fully opaque on release - another pure derivation of #selectionAwake below.
+  // awake, restored to fully opaque on release - a pure derivation of selectionAwake below.
   // #setSelBgOpacity(), which used to set this imperatively (with its own force/"already awake" guard
   // to avoid dimming before the first real selection), is gone, folded into this derivation.
-  protected readonly imgOpacity = computed(() => (this.#selectionAwake() ? BG_OPACITY : 1));
+  protected readonly imgOpacity = computed(() => (this.selectionAwake() ? BG_OPACITY : 1));
 
   // Everything below is Jcrop's own former per-instance state - it used to belong to a separately
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
@@ -483,17 +476,19 @@ export class JcropComponent {
   // (deferred to that effect() callback rather than assigned directly in the constructor body, so
   // TS's definite-assignment analysis can't see #docOffset's own assignment) - #initialized guards
   // selectAll() (the only externally-triggered entry point) against running before that has happened.
-  // #selectionAwake/#trackerBtndown/#trackerIstouch/#trackerOnMove, by contrast, start at a harmless
+  // selectionAwake/#trackerBtndown/#trackerIstouch/#trackerOnMove, by contrast, start at a harmless
   // resting default and are only ever touched by an actual user gesture (#newSelection()/
   // #startDragMode()/#activateTrackerHandlers()/#finishTrackerDrag() below) - the effect() itself never
-  // touches them; #selectionAwake/#trackerBtndown are signals (unlike #initialized/#trackerIstouch/
-  // #trackerOnMove) since selVisible/imgOpacity/trackerZIndex above are pure computed() derivations of
-  // them now.
+  // touches them; selectionAwake/#trackerBtndown are signals (unlike #initialized/#trackerIstouch/
+  // #trackerOnMove) since imgOpacity/trackerZIndex above are pure computed() derivations of them now.
   #initialized = false;
   // Whether the selection box is awake (visible/tracked) - what used to be a separate Selection
-  // class's own `#awake` field (see Jcrop.ts): true from the first #selectionUpdate() call after
-  // construction or a release, until #doneSelect() sets it back to false on release.
-  readonly #selectionAwake = signal(false);
+  // class's own `#awake` field (see Jcrop.ts): true from the first genuine selection after
+  // construction or a release, until #doneSelect() sets it back to false on release. Not a true
+  // #private field (unlike #trackerBtndown, its sibling below) since the template's own [style.display]
+  // binding on #sel (jcrop.component.html) reads it directly too, as "is there a selection to show" -
+  // the same boolean, no separate selVisible wrapper needed for that.
+  protected readonly selectionAwake = signal(false);
   // Document-level drag-tracking state (what used to be a separate Tracker class - see Jcrop.ts):
   // whether a drag is currently active, whether it started from a touch, and the move callback the
   // caller currently has active (set via #activateTrackerHandlers(), one call per drag gesture:
@@ -518,22 +513,17 @@ export class JcropComponent {
     this.#setSelect([0, 0, this.pictureWidth(), this.pictureHeight()]);
   }
 
-  // Called wherever the vendored plugin used to call its configurable onSelect option - this is the
-  // sole consumer JcropComponent ever passed for it, so it's a real method now instead of a callback
-  // routed through #options (which never actually varied at runtime).
-  #onSelect(crop: JcropCrop): void {
+  // Emits the current selection, in picture-pixel space (#unscale(#coordsFixed())) - what used to be
+  // the vendored plugin's own configurable onSelect option, called wherever this component (its sole
+  // consumer) needs to report a genuine selection change (a completed #setSelect(), or the end of a
+  // resize/move/new-selection drag, via #finishTrackerDrag() below). Pulled out since that exact chain
+  // is repeated identically at both call sites below.
+  #emitSelect(): void {
+    const crop = this.#unscale(this.#coordsFixed());
     // Coords already clamps against [0, boundx]/[0, boundy] in scaled space, but rounding through
     // xscale/yscale in unscale() can still leave a hair of negative slop after a drag to the
     // top/left edge - guard against saving that.
     this.cropChange.emit({...crop, x: Math.max(0, crop.x), y: Math.max(0, crop.y)});
-  }
-
-  // #onSelect(#unscale(#coordsFixed())) - the "emit the current selection, in picture-pixel space" call
-  // every genuine selection change (a completed #setSelect(), the end of a resize/move drag, or a
-  // still-in-progress drag when #selectionUpdate() below is asked to emit) makes. Pulled out since
-  // that exact chain is repeated identically at all three call sites below.
-  #emitSelect(): void {
-    this.#onSelect(this.#unscale(this.#coordsFixed()));
   }
 
   // Bound directly on the #tracker/#selectionTracker template elements (jcrop.component.html)
@@ -738,7 +728,7 @@ export class JcropComponent {
   #setSelect(rect: number[]): void {
     this.#setCoordsPressed([(rect[0] ?? 0) / this.#xscale(), (rect[1] ?? 0) / this.#yscale()]);
     this.#setCoordsCurrent([(rect[2] ?? 0) / this.#xscale(), (rect[3] ?? 0) / this.#yscale()]);
-    this.#selectionUpdate();
+    this.selectionAwake.set(true);
     this.#emitSelect();
     this.handlesVisible.set(true);
   }
@@ -774,7 +764,7 @@ export class JcropComponent {
         this.#moveCoordsOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
         lloc = pos;
 
-        this.#selectionUpdate();
+        this.selectionAwake.set(true);
       }, touch);
       return;
     }
@@ -799,7 +789,7 @@ export class JcropComponent {
           break;
       }
       this.#setCoordsCurrent(pos);
-      this.#selectionUpdate();
+      this.selectionAwake.set(true);
     }, touch);
   }
 
@@ -838,7 +828,7 @@ export class JcropComponent {
       this.#selectionRefresh();
     } else {
       this.handlesVisible.set(false);
-      this.#selectionAwake.set(false);
+      this.selectionAwake.set(false);
     }
     this.#dragMode.set(null);
   }
@@ -849,10 +839,10 @@ export class JcropComponent {
     this.#dragMode.set(null);
     const pos = this.#mouseAbs(e);
     this.#setCoordsPressed(pos);
-    this.#selectionUpdate();
+    this.selectionAwake.set(true);
     this.#activateTrackerHandlers((e: JcropMouseEvent): void => {
       this.#setCoordsCurrent(this.#mouseAbs(e));
-      this.#selectionUpdate();
+      this.selectionAwake.set(true);
     }, e.type.startsWith('touch'));
 
     e.stopPropagation();
@@ -877,7 +867,7 @@ export class JcropComponent {
     this.#trackerBtndown.set(false);
 
     this.#doneSelect();
-    if (this.#selectionAwake()) {
+    if (this.selectionAwake()) {
       this.#emitSelect();
     }
 
@@ -886,29 +876,14 @@ export class JcropComponent {
 
   // What used to be a separate Selection class (Jcrop.ts), folded in directly since every
   // collaborator it needed was already a closure over this component anyway, and it held no DOM
-  // reference of its own any more either - see #selectionAwake above.
+  // reference of its own any more either - see selectionAwake above. Used to also conditionally wake
+  // the selection up if it wasn't already, but that was always a no-op in practice - the vendored
+  // update() call it made only ever ran its own wake-up step while *not* already awake, the opposite
+  // of the condition this guarded it with.
   #selectionRefresh(): void {
     const c = this.#coordsFixed();
 
     this.#setCoordsPressed([c.x, c.y]);
     this.#setCoordsCurrent([c.x2, c.y2]);
-
-    if (this.#selectionAwake()) {
-      this.#selectionUpdate();
-    }
-  }
-
-  // `select` is never actually passed true at any of this component's own call sites - preserved
-  // faithfully from the vendored Selection class rather than dropped as part of this inlining.
-  // selLeft/selTop/selHeight/selWidth/img2Left/img2Top/selVisible/imgOpacity no longer need setting
-  // here - they're all computed() straight off #coordsFixed/#selectionAwake now (see their own field
-  // comments above) - so this is left with only the "wake up" (#selectionAwake itself) and the
-  // optional select emit, neither of which is a pure derivation.
-  #selectionUpdate(select?: boolean): void {
-    this.#selectionAwake.set(true);
-
-    if (select) {
-      this.#emitSelect();
-    }
   }
 }

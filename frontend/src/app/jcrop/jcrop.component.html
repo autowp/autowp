@@ -11,15 +11,15 @@
   anything that does from runtime
   state is driven by a signal instead: .jcrop-handles-holder's visibility (set directly by this
   component's own #setSelect()/#doneSelect()/#newSelection()) via handlesVisible; #sel's own display
-  (#doneSelect()/#selectionUpdate()) via selVisible; #workingImg's opacity (that same release/show
+  via selectionAwake directly (not a true #private field, unlike most of this component's own internal
+  state, precisely so the template can read it here); #workingImg's opacity (that same release/show
   dimming the image while a selection is awake) via imgOpacity; #workingImg's, #holder's, #tracker's,
   and #img2's height/width (all computed() straight off pictureWidth/pictureHeight and the real page
   container's own layout - see the displayWidth/displayHeight comment in jcrop.component.ts) via
   displayWidth/displayHeight directly (#holder's and #img2's are exactly displayWidth/displayHeight,
-  #tracker's adds the fixed BOUNDARY margin via trackerHeight/trackerWidth); #sel's height/width
-  (resized on every drag frame by
-  #selectionUpdate()) via selHeight/selWidth; #img2's and #sel's own left/top (#selectionUpdate(), on
-  every drag frame) via img2Left/img2Top and selLeft/selTop; and #tracker's cursor/z-index (the
+  #tracker's adds the fixed BOUNDARY margin via trackerHeight/trackerWidth); #sel's height/width via
+  selHeight/selWidth and #img2's/#sel's own left/top via img2Left/img2Top and selLeft/selTop (all four
+  pure derivations of the selection's own corner state); and #tracker's cursor/z-index (the
   component's own drag-mode changes, via trackerCursor/trackerZIndex). #tracker's own left/top are
   the plain trackerOffset constant instead (jcrop.component.ts). Likewise, every mousedown/touchstart
   below is exactly what that same effect() and what used to be a separate Selection class (Jcrop.ts)
@@ -32,7 +32,7 @@
 <div class="jcrop-holder" [style.height.px]="displayHeight()" [style.width.px]="displayWidth()">
   <div
     class="jcrop-sel"
-    [style.display]="selVisible() ? '' : 'none'"
+    [style.display]="selectionAwake() ? '' : 'none'"
     [style.left.px]="selLeft()"
     [style.top.px]="selTop()"
     [style.height.px]="selHeight()"
