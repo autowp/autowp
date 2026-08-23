@@ -510,10 +510,10 @@ export class JcropComponent {
   // Document-level drag-tracking state (what used to be a separate Tracker class - see Jcrop.ts):
   // whether a drag is currently active, and whether it started from a touch. Which of the three
   // possible gestures (a freehand new selection, a move, or a resize) is the active one isn't stored
-  // here - #dragStartOrd/#dragMode() below/above already say, so onDocumentMove() (below) reads those
-  // directly rather than a callback recorded at gesture-start time (see its own comment for the
-  // resulting three-way dispatch) - there's no equivalent #trackerOnDone either, since every gesture
-  // ends the same way: see onDocumentEnd() below.
+  // here - #dragMode() above already says, so onDocumentMove() (below) reads that directly rather than
+  // a callback recorded at gesture-start time (see its own comment for the resulting three-way
+  // dispatch) - there's no equivalent #trackerOnDone either, since every gesture ends the same way: see
+  // onDocumentEnd() below.
   // Unlike the vendored original, the on*() methods below are always
   // reachable (Angular has no equivalent to conditionally attaching/detaching a document listener)
   // and gate themselves on #trackerBtndown (and, to ignore a stray event of the wrong kind - e.g. a
@@ -525,24 +525,19 @@ export class JcropComponent {
   // for every onDocumentMove() event of that same gesture (see onDragStart()'s own comment for why:
   // the opposite corner it locks against must stay put for the gesture's whole duration, not re-track
   // #coordsFixed() as it changes frame to frame) - a component property instead of a variable captured
-  // by a closure so it reads the same way #trackerIstouch/#dragMode above do. `!` rather than
-  // `| undefined` (unlike #dragStartOrd below) since there's no harmless resting value for it to start
-  // at - only ever read from within the same onDragStart() gesture that assigns it first (via
-  // #dragStartOrd below, which does need a resting value: see its own comment).
+  // by a closure so it reads the same way #trackerIstouch/#dragMode above do. `!` since there's no
+  // harmless resting value for it to start at - only #resizeMove (below) ever reads either this or
+  // #dragStartOrd below, and only from within the same onDragStart() gesture that assigns them.
   #dragStartFc!: FixedCrop;
-  // The ordinal onDragStart() below is resizing from - alongside #dragStartFc above, a component
-  // property instead of a variable #resizeMove (below) closes over, since #resizeMove reads per-gesture
-  // state through `this` rather than a closure (it's a plain method - see its own comment). Doubles as
-  // onDocumentMove()'s own "is this a resize gesture" test (below), the same way #dragMode() doubling
-  // as "is this a freehand gesture" test there (once #trackerBtndown() is already known true) lets
-  // #newSelectionMove be called directly too, and #dragMode() being neither of those - the only
-  // possibility left once both are ruled out - lets #selectionMove be called directly for the
-  // remaining move gesture: onDocumentMove() dispatches to all three plain methods directly now, with
-  // no callback-holding field standing in for any of them any more. `undefined` at rest (unlike
-  // #dragStartFc above) precisely because it's read for that even when no resize is active -
-  // onDocumentEnd() below resets it back to undefined, so a later move/new-selection gesture's own
-  // onDocumentMove() calls don't misroute into #resizeMove() off a stale ordinal from a previous resize.
-  #dragStartOrd: Ordinal | undefined;
+  // The ordinal onDragStart() below is resizing from, alongside #dragStartFc above - both component
+  // properties instead of variables #resizeMove (below) closes over, since #resizeMove reads
+  // per-gesture state through `this` rather than a closure (it's a plain method - see its own
+  // comment). onDocumentMove() itself dispatches to #resizeMove/#newSelectionMove/#selectionMove
+  // (below) purely off #dragMode() above, so unlike that field this one is never read as a flag - only
+  // #resizeMove's own switch reads it, and only while #dragMode() itself already guarantees a resize is
+  // the active gesture, set by onDragStart() the same moment this field is (and never explicitly reset
+  // - same as #dragStartFc above, only ever read while that guarantee holds).
+  #dragStartOrd!: Ordinal;
   // The position onSelectionTrackerStart()/#selectionMove (both below) last saw the pointer at during
   // an active move gesture - alongside #dragStartFc/#dragStartOrd above, a component property instead
   // of the `lloc` local variable #selectionMove used to close over, now that #selectionMove is a plain
@@ -698,25 +693,25 @@ export class JcropComponent {
   // metadata above) - merged into one handler since both differed only in event type and which way
   // isTouchEvent(e) had to agree with #trackerIstouch to accept the event (reject a stray one of the
   // wrong kind - e.g. a touch brushing the screen mid mouse-drag on a hybrid device). Dispatches to
-  // whichever gesture #trackerBtndown() (just confirmed true) says is active: #dragStartOrd set means
-  // a resize (onDragStart() below), calling #resizeMove directly; #dragMode() null - the only other way
-  // it can be, once #trackerBtndown() is true - means onTrackerStart()'s own freehand gesture instead
-  // (see its own comment: #dragMode stays null throughout that one), calling #newSelectionMove
-  // directly; anything else can only be onSelectionTrackerStart()'s own move gesture (the one DragMode
-  // value - 'move' - neither of the above two checks rules out), calling #selectionMove directly too.
+  // whichever gesture #dragMode() (once #trackerBtndown() has just confirmed one is active) says is
+  // active: null means onTrackerStart()'s own freehand gesture (see its own comment: #dragMode stays
+  // null throughout that one), calling #newSelectionMove directly; 'move' means onSelectionTrackerStart's
+  // own gesture, calling #selectionMove; any Ordinal - the only possibility left - means a resize
+  // (onDragStart() below), calling #resizeMove.
   protected onDocumentMove(e: JcropMouseEvent): void {
     if (!this.#initialized || !this.#trackerBtndown() || isTouchEvent(e) !== this.#trackerIstouch) return;
 
-    if (this.#dragStartOrd !== undefined) {
-      this.#resizeMove(e);
-      return;
-    }
-    if (this.#dragMode() === null) {
+    const mode = this.#dragMode();
+    if (mode === null) {
       this.#newSelectionMove(e);
       return;
     }
+    if (mode === 'move') {
+      this.#selectionMove(e);
+      return;
+    }
 
-    this.#selectionMove(e);
+    this.#resizeMove(e);
   }
 
   // Bound on both (document:mouseup) and (document:touchend), the same way onDocumentMove() above is.
@@ -744,8 +739,6 @@ export class JcropComponent {
       this.selectionAwake.set(false);
     }
     this.#dragMode.set(null);
-
-    this.#dragStartOrd = undefined;
   }
 
   // This is a hack for iOS5 to support drag/move touch functionality. Note that e.currentTarget is
