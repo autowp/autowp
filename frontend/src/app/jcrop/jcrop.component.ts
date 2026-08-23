@@ -388,10 +388,11 @@ export class JcropComponent {
     // #doneSelect/#selectDrag below are field arrows rather than ordinary methods because each is
     // handed to #activateTrackerHandlers() by bare reference (stored as #trackerOnDone/#trackerOnMove
     // and invoked later, not called directly where passed) - an ordinary method read that way loses its
-    // `this` binding the moment something else invokes it. A few other methods
-    // (#getPos/#mouseAbs/#startDragMode/#createDragger) are field arrows too, left over from when
-    // Selection/Touch needed them the same way - nothing still requires that of them, but nothing's
-    // broken by it either.
+    // `this` binding the moment something else invokes it. Every other method that used to be a field
+    // arrow for the same historical reason (left over from when Selection/Touch needed it that way) is
+    // an ordinary method now - #getPos/#mouseAbs/#startDragMode/#createDragger are all only ever
+    // invoked directly as this.#xxx(...), never passed by bare reference, the same way
+    // #dragmodeHandler/#createMover below (which also each return a closure) already were.
     effect(() => {
       const pictureWidth = this.pictureWidth();
       const pictureHeight = this.pictureHeight();
@@ -754,7 +755,7 @@ export class JcropComponent {
 
   // Always reads #workingImg's own position - every caller only ever wants that, so it's read here
   // directly rather than threaded through as a parameter.
-  readonly #getPos = (): Point => {
+  #getPos(): Point {
     // This component's own template is never rendered server-side (every consumer sits behind a
     // RenderMode.Client route), so #window is only ever null in a scenario where this can't actually
     // be called in the first place. [0, 0] is an arbitrary but harmless fallback for that
@@ -762,13 +763,13 @@ export class JcropComponent {
     if (!this.#window) return [0, 0];
     const rect = this.workingImgRef().nativeElement.getBoundingClientRect();
     return [rect.left + this.#window.scrollX, rect.top + this.#window.scrollY];
-  };
+  }
 
-  readonly #mouseAbs = (e: JcropMouseEvent): Point => {
+  #mouseAbs(e: JcropMouseEvent): Point {
     return [(e.pageX ?? 0) - this.#docOffset[0], (e.pageY ?? 0) - this.#docOffset[1]];
-  };
+  }
 
-  readonly #startDragMode = (mode: DragMode, pos: Point, touch?: boolean): void => {
+  #startDragMode(mode: DragMode, pos: Point, touch?: boolean): void {
     this.#docOffset = this.#getPos();
     this.#dragMode.set(mode);
 
@@ -785,7 +786,7 @@ export class JcropComponent {
     this.#setCoordsCurrent(opc);
 
     this.#activateTrackerHandlers(this.#dragmodeHandler(mode, fc), this.#doneSelect, touch);
-  };
+  }
 
   #dragmodeHandler(mode: Ordinal, f: FixedCrop): PositionCallback {
     return (pos: Point): void => {
@@ -820,7 +821,7 @@ export class JcropComponent {
   // own touch equivalent, since the two differed only in running the event through touchCfilter()
   // first and passing touch=true through to #startDragMode (which activates the tracker handlers in
   // touch mode - see #trackerIstouch).
-  readonly #createDragger = (ord: DragMode, touch?: boolean): ((e: JcropMouseEvent) => void) => {
+  #createDragger(ord: DragMode, touch?: boolean): (e: JcropMouseEvent) => void {
     return (e: JcropMouseEvent): void => {
       // Fix position of crop area when dragged the very first time.
       // Necessary when crop image is in a hidden element when page is loaded.
@@ -830,7 +831,7 @@ export class JcropComponent {
       e.stopPropagation();
       e.preventDefault();
     };
-  };
+  }
 
   #unscale(c: FixedCrop): JcropCrop {
     return {
