@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   input,
@@ -12,9 +13,7 @@ import {
 } from '@angular/core';
 import {browserWindow} from '@utils/browser-window';
 
-import type {Corner, JcropCrop, Point} from './Jcrop';
-
-import {Coords} from './Jcrop';
+import type {JcropCrop} from './Jcrop';
 
 // Every option the vendored plugin's own options object supported
 // (addClass/aspectRatio/bgOpacity/borderOpacity/boundary/boxHeight/boxWidth/createBorders/
@@ -38,12 +37,19 @@ import {Coords} from './Jcrop';
 // shared #options object - every value it ever held was derivable from a component input (or, for
 // boxHeight/boxWidth, the page container's own layout) anyway, so the object was pure indirection.
 
-// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: #touchCfilter() below copies
+// A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: touchCfilter() below copies
 // the active touch's page coordinates onto the event itself so #mouseAbs() can read event.pageX/
 // pageY the same way regardless of whether the drag started from a mouse or touch listener -
 // TouchEvent doesn't carry its own pageX/pageY (only the individual Touch entries in its touch
 // lists do).
 type JcropMouseEvent = (MouseEvent | TouchEvent) & {pageX?: number; pageY?: number};
+
+type Point = [number, number];
+
+// oppLockCorner (below) only ever maps onto a diagonal - the corner opposite the dragged
+// edge/corner, which #getCoordsCorner (on the class) then reads off - so both are typed to this
+// narrower union rather than the full Ordinal union below.
+type Corner = 'ne' | 'nw' | 'se' | 'sw';
 
 type PositionCallback = (pos: Point) => void;
 
@@ -52,6 +58,76 @@ type PositionCallback = (pos: Point) => void;
 // mode parameter is exactly this union and every ordinal-only site narrows it via `mode !== 'move'`.
 type Ordinal = 'e' | 'n' | 'ne' | 'nw' | 's' | 'se' | 'sw' | 'w';
 type DragMode = 'move' | Ordinal;
+
+// Copies the active touch's page coordinates onto the event itself so #mouseAbs() (below, on the
+// class) can read event.pageX/pageY the same way regardless of whether the drag started from a
+// mouse or touch listener - see the JcropMouseEvent comment above. What used to be Touch's own
+// cfilter() (Jcrop.ts). A plain function rather than a class method since it only ever touches its
+// own parameter, never this component's own state.
+function touchCfilter(e: JcropMouseEvent): JcropMouseEvent {
+  const touch = (e as TouchEvent).changedTouches[0];
+  e.pageX = touch.pageX;
+  e.pageY = touch.pageY;
+  return e;
+}
+
+// The corner diagonally opposite a dragged edge/corner - what a resize drag anchors on, so it grows
+// or shrinks from the edge/corner actually being dragged rather than the selection's center. A plain
+// function for the same reason touchCfilter above is.
+function oppLockCorner(ord: Ordinal): Corner {
+  switch (ord) {
+    case 'e':
+      return 'nw';
+    case 'n':
+      return 'sw';
+    case 'ne':
+      return 'sw';
+    case 'nw':
+      return 'se';
+    case 's':
+      return 'nw';
+    case 'se':
+      return 'nw';
+    case 'sw':
+      return 'ne';
+    case 'w':
+      return 'ne';
+  }
+}
+
+// Normalizes a selection rect's corners so x1/y1 is always the top-left and x2/y2 the bottom-right,
+// regardless of which corner was actually dragged (dragging the top-left corner past the bottom-right
+// one, for instance, would otherwise leave x1 > x2). A plain function for the same reason
+// touchCfilter above is - it only operates on its own four parameters.
+function flipCoords(x1: number, y1: number, x2: number, y2: number): [number, number, number, number] {
+  let xa = x1,
+    xb = x2,
+    ya = y1,
+    yb = y2;
+  if (x2 < x1) {
+    xa = x2;
+    xb = x1;
+  }
+  if (y2 < y1) {
+    ya = y2;
+    yb = y1;
+  }
+  return [xa, ya, xb, yb];
+}
+
+// Builds the JcropCrop (plus x2/y2) shape #getCoordsFixed() (below, on the class) returns, from the
+// already-normalized [x1, y1, x2, y2] tuple flipCoords produces. A plain function for the same
+// reason flipCoords above is.
+function makeObj(a: [number, number, number, number]): JcropCrop & {x2: number; y2: number} {
+  return {
+    h: a[3] - a[1],
+    w: a[2] - a[0],
+    x: a[0],
+    x2: a[2],
+    y: a[1],
+    y2: a[3],
+  };
+}
 
 // The ordinals rendered as dragbars/handles (jcrop.component.html) and the z-index each one gets -
 // listed here as plain arrays, with z-index derived from array position plus a shared base, rather
@@ -157,6 +233,34 @@ export class JcropComponent {
   readonly #xscale = computed(() => this.pictureWidth() / this.displayWidth());
   readonly #yscale = computed(() => this.pictureHeight() / this.displayHeight());
 
+  // The selection rectangle's own pressed/current corner state (x1/y1/x2/y2) and everything derived
+  // from it (min-size clamping, bounding to the image) - what used to be a separate Coords class's
+  // own state (Jcrop.ts), folded in directly since nothing outside this component ever constructed
+  // more than one instance, same reasoning as Tracker/Touch/Selection before it (see the "vendored
+  // plugin's own single closure-based factory function" comment below). boundx/boundy/#coordXscale/
+  // #coordYscale are a frozen snapshot of what the picture currently looks sized as - kept fresh by
+  // #setCoordsBounds() (called by the constructor effect() below whenever displayWidth/displayHeight/
+  // #xscale/#yscale change, independent of onLoad()/the image finishing loading) rather than read
+  // live on every access, so an in-progress drag's own selection rect survives a bounds update
+  // undisturbed; #coordXscale/#coordYscale are named apart from the #xscale/#yscale computed()s
+  // above for exactly that reason - a snapshot, not the same live value. xmin/ymin are the current
+  // minSize input in unscaled pixels, written from onLoad() (via #setCoordsLimits()) but read only by
+  // #getCoordsFixed() below - all ten fields start at 0 (1 for the two scales, to avoid a division by
+  // zero) since real values aren't available this early: required inputs like pictureWidth (which
+  // displayWidth/etc. read, transitively) aren't set yet during field initialization - the
+  // constructor effect() applies the real bounds/scale moments later, well before #initialized (set
+  // at the end of onLoad()) lets anything actually read them back.
+  #x1 = 0;
+  #x2 = 0;
+  #y1 = 0;
+  #y2 = 0;
+  #xmin = 0;
+  #ymin = 0;
+  #boundx = 0;
+  #boundy = 0;
+  #coordXscale = 1;
+  #coordYscale = 1;
+
   readonly src = input.required<string>();
   readonly pictureWidth = input.required<number>();
   readonly pictureHeight = input.required<number>();
@@ -181,6 +285,16 @@ export class JcropComponent {
     this.#touchSupport = this.#window
       ? 'ontouchstart' in this.#window || this.#window.navigator.maxTouchPoints > 0
       : false;
+
+    // Keeps boundx/boundy/#coordXscale/#coordYscale fresh whenever displayWidth/displayHeight/
+    // #xscale/#yscale change, independent of onLoad()/the image finishing loading - same reasoning as
+    // the #display comment above, just one step further downstream. #setCoordsBounds() rather than
+    // also resetting x1/y1/x2/y2/xmin/ymin (what onLoad() itself used to do here, rebuilding a whole
+    // new Coords) so an in-progress drag's selection rect and #setCoordsLimits() minimum survive the
+    // update.
+    effect(() => {
+      this.#setCoordsBounds(this.displayWidth(), this.displayHeight(), this.#xscale(), this.#yscale());
+    });
   }
 
   // Whether the resize handles/dragbars are shown - set directly by this component (#setSelect(),
@@ -243,13 +357,14 @@ export class JcropComponent {
 
   // Everything below is Jcrop's own former per-instance state - it used to belong to a separately
   // constructed Jcrop object, but that was pure indirection given this component is its only ever
-  // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). All of it is set
-  // once by onLoad(), when the template's own <img> fires its load event - never in this component's
-  // own constructor, so TS's definite-assignment analysis can't see it; #initialized guards
-  // selectAll() (the only externally-triggered entry point) against running before that has happened
-  // - everything else here only ever runs from inside onLoad() itself.
+  // consumer, so it was folded in directly (see the file-level comment in Jcrop.ts). Unlike the
+  // x1/y1/x2/y2/etc. fields above (kept fresh by signals for this component's whole lifetime),
+  // everything below is genuinely onLoad()-only: set once by onLoad(), when the template's own <img>
+  // fires its load event - never in this component's own constructor, so TS's definite-assignment
+  // analysis can't see it; #initialized guards selectAll() (the only externally-triggered entry
+  // point) against running before that has happened - everything else here only ever runs from
+  // inside onLoad() itself.
   #initialized = false;
-  #coords!: Coords;
   // Whether the selection box is awake (visible/tracked) - what used to be a separate Selection
   // class's own `#awake` field (see Jcrop.ts): true from the first #selectionUpdate() call after
   // construction or a release, until #doneSelect() sets it back to false on release.
@@ -280,15 +395,20 @@ export class JcropComponent {
 
   // The vendored plugin's own single closure-based factory function, ported first to a class and
   // then merged directly onto this component: everything that used to be a local variable closed
-  // over by every nested function is now a private field, and the standalone Coords module it built
-  // as an IIFE (see Jcrop.ts) is a collaborator object constructed here. Tracker, Touch, and Selection
-  // - the plugin's other three modules - never had a distinct piece of DOM/state of their own (once
-  // Selection stopped holding #sel/#img2 DOM references directly - see #selectionAwake above), just
-  // fields/methods closing over this component's own collaborators, so all three are folded in
-  // directly instead of classes in Jcrop.ts: Tracker as
+  // over by every nested function is now a private field. Coords, the standalone module it built as
+  // an IIFE (see Jcrop.ts), was the last of the plugin's modules to move here too (as the
+  // x1/y1/x2/y2/etc. fields and #setCoordsBounds()/#setCoordsLimits()/etc. methods above/below): once
+  // it needed its own bounds/scale driven directly by this component's own signals rather than being
+  // handed pre-computed numbers once at construction, keeping it a separate class only added a layer
+  // of indirection between the two. Tracker, Touch, and Selection - the plugin's other three modules -
+  // never had a distinct piece of DOM/state of their own (once Selection stopped holding #sel/#img2
+  // DOM references directly - see #selectionAwake above), just fields/methods closing over this
+  // component's own collaborators, so all three were folded in directly instead of classes in
+  // Jcrop.ts: Tracker as
   // #trackerBtndown/#trackerIstouch/#trackerOnMove/#trackerOnDone and the
   // #activateTrackerHandlers()/#finishTrackerDrag() methods below, Touch as #touchSupport and the
-  // #createDragger()/#touchCfilter() methods below, Selection as #selectionAwake and the
+  // #createDragger() method below (touchCfilter() moved out as a plain function above - see there),
+  // Selection as #selectionAwake and the
   // #selectionRefresh()/#selectionUpdate()/#setSelBgOpacity() methods below (#doneSelect()/
   // #selectionUpdate() themselves absorbed what used to be Selection's own release()/#show()).
   // #init() itself (what used to build/wire all of the above) was folded in here too - onLoad() was
@@ -315,11 +435,10 @@ export class JcropComponent {
     // computed() straight off displayWidth/displayHeight themselves too (see holderHeight/
     // holderWidth, trackerHeight/trackerWidth/trackerOffset, and img2Height/img2Width above) - so
     // everything below reads displayWidth()/displayHeight() directly instead of measuring the DOM
-    // element back or keeping its own boundx/boundy copy of the same numbers.
-
-    // Coords Module {{{
-    this.#coords = new Coords(this.displayWidth(), this.displayHeight(), this.#xscale(), this.#yscale());
-    // }}}
+    // element back or keeping its own boundx/boundy copy of the same numbers. boundx/boundy/
+    // #coordXscale/#coordYscale are likewise already kept fresh by the constructor effect() above -
+    // onLoad() only ever needs to (re)establish the selection itself for whatever picture just
+    // loaded, via #setCoordsLimits()/#setSelect() below.
 
     // Matches what used to be Selection's own constructor (Jcrop.ts) resetting handle visibility on
     // construction - handlesVisible already starts false, but onLoad() (unlike a constructor) can run
@@ -340,7 +459,7 @@ export class JcropComponent {
     this.#selectionRefresh();
 
     const minSize = this.minSize();
-    this.#coords.setLimits(minSize[0], minSize[1]);
+    this.#setCoordsLimits(minSize[0], minSize[1]);
 
     this.#selectionRefresh();
   }
@@ -366,7 +485,7 @@ export class JcropComponent {
 
   protected onTrackerTouchStart(e: TouchEvent): void {
     if (!this.#initialized || !this.#touchSupport) return;
-    this.#newSelection(this.#touchCfilter(e));
+    this.#newSelection(touchCfilter(e));
   }
 
   protected onSelectionTrackerMouseDown(e: MouseEvent): void {
@@ -403,12 +522,12 @@ export class JcropComponent {
 
   protected onDocumentTouchMove(e: TouchEvent): void {
     if (!this.#initialized || !this.#trackerBtndown || !this.#trackerIstouch) return;
-    this.#trackerOnMove(this.#mouseAbs(this.#touchCfilter(e)));
+    this.#trackerOnMove(this.#mouseAbs(touchCfilter(e)));
   }
 
   protected onDocumentTouchEnd(e: TouchEvent): void {
     if (!this.#initialized || !this.#trackerBtndown || !this.#trackerIstouch) return;
-    this.#finishTrackerDrag(this.#touchCfilter(e));
+    this.#finishTrackerDrag(touchCfilter(e));
   }
 
   // This is a hack for iOS5 to support drag/move touch functionality. Note that e.currentTarget is
@@ -423,11 +542,143 @@ export class JcropComponent {
     if (target instanceof Element && target.classList.contains('jcrop-tracker')) e.stopPropagation();
   }
 
+  // What used to be a separate Coords class's own methods (Jcrop.ts), folded in directly for the
+  // same reason Tracker/Touch/Selection were (see the "vendored plugin's own single closure-based
+  // factory function" comment above) - operating on the x1/y1/x2/y2/xmin/ymin/boundx/boundy/
+  // #coordXscale/#coordYscale fields declared with the rest of this component's own state above.
+  #setCoordsLimits(xmin: number, ymin: number): void {
+    this.#xmin = xmin;
+    this.#ymin = ymin;
+  }
+
+  #setCoordsBounds(boundx: number, boundy: number, xscale: number, yscale: number): void {
+    this.#boundx = boundx;
+    this.#boundy = boundy;
+    this.#coordXscale = xscale;
+    this.#coordYscale = yscale;
+  }
+
+  #setCoordsPressed(pos: Point): void {
+    const rebounded = this.#rebound(pos);
+    this.#x2 = this.#x1 = rebounded[0];
+    this.#y2 = this.#y1 = rebounded[1];
+  }
+
+  #setCoordsCurrent(pos: Point): void {
+    const rebounded = this.#rebound(pos);
+    this.#x2 = rebounded[0];
+    this.#y2 = rebounded[1];
+  }
+
+  #moveCoordsOffset(offset: Point): void {
+    let ox = offset[0],
+      oy = offset[1];
+
+    if (0 > this.#x1 + ox) {
+      ox -= ox + this.#x1;
+    }
+    if (0 > this.#y1 + oy) {
+      oy -= oy + this.#y1;
+    }
+
+    if (this.#boundy < this.#y2 + oy) {
+      oy += this.#boundy - (this.#y2 + oy);
+    }
+    if (this.#boundx < this.#x2 + ox) {
+      ox += this.#boundx - (this.#x2 + ox);
+    }
+
+    this.#x1 += ox;
+    this.#x2 += ox;
+    this.#y1 += oy;
+    this.#y2 += oy;
+  }
+
+  #getCoordsCorner(ord: Corner): Point {
+    const c = this.#getCoordsFixed();
+    switch (ord) {
+      case 'ne':
+        return [c.x2, c.y];
+      case 'nw':
+        return [c.x, c.y];
+      case 'se':
+        return [c.x2, c.y2];
+      case 'sw':
+        return [c.x, c.y2];
+    }
+  }
+
+  #rebound(p: Point): Point {
+    let px0 = p[0],
+      py0 = p[1];
+    if (px0 < 0) px0 = 0;
+    if (py0 < 0) py0 = 0;
+
+    if (px0 > this.#boundx) px0 = this.#boundx;
+    if (py0 > this.#boundy) py0 = this.#boundy;
+
+    return [Math.round(px0), Math.round(py0)];
+  }
+
+  #getCoordsFixed(): JcropCrop & {x2: number; y2: number} {
+    let delta;
+    const xsize = this.#x2 - this.#x1,
+      ysize = this.#y2 - this.#y1;
+    const xscale = this.#coordXscale,
+      yscale = this.#coordYscale;
+
+    if (this.#ymin / yscale && Math.abs(ysize) < this.#ymin / yscale) {
+      this.#y2 = ysize > 0 ? this.#y1 + this.#ymin / yscale : this.#y1 - this.#ymin / yscale;
+    }
+    if (this.#xmin / xscale && Math.abs(xsize) < this.#xmin / xscale) {
+      this.#x2 = xsize > 0 ? this.#x1 + this.#xmin / xscale : this.#x1 - this.#xmin / xscale;
+    }
+
+    if (this.#x1 < 0) {
+      this.#x2 -= this.#x1;
+      this.#x1 -= this.#x1;
+    }
+    if (this.#y1 < 0) {
+      this.#y2 -= this.#y1;
+      this.#y1 -= this.#y1;
+    }
+    if (this.#x2 < 0) {
+      this.#x1 -= this.#x2;
+      this.#x2 -= this.#x2;
+    }
+    if (this.#y2 < 0) {
+      this.#y1 -= this.#y2;
+      this.#y2 -= this.#y2;
+    }
+    if (this.#x2 > this.#boundx) {
+      delta = this.#x2 - this.#boundx;
+      this.#x1 -= delta;
+      this.#x2 -= delta;
+    }
+    if (this.#y2 > this.#boundy) {
+      delta = this.#y2 - this.#boundy;
+      this.#y1 -= delta;
+      this.#y2 -= delta;
+    }
+    if (this.#x1 > this.#boundx) {
+      delta = this.#x1 - this.#boundx;
+      this.#x2 -= delta;
+      this.#x1 -= delta;
+    }
+    if (this.#y1 > this.#boundy) {
+      delta = this.#y1 - this.#boundy;
+      this.#y2 -= delta;
+      this.#y1 -= delta;
+    }
+
+    return makeObj(flipCoords(this.#x1, this.#y1, this.#x2, this.#y2));
+  }
+
   #setSelect(rect: number[]): void {
-    this.#coords.setPressed([(rect[0] ?? 0) / this.#xscale(), (rect[1] ?? 0) / this.#yscale()]);
-    this.#coords.setCurrent([(rect[2] ?? 0) / this.#xscale(), (rect[3] ?? 0) / this.#yscale()]);
+    this.#setCoordsPressed([(rect[0] ?? 0) / this.#xscale(), (rect[1] ?? 0) / this.#yscale()]);
+    this.#setCoordsCurrent([(rect[2] ?? 0) / this.#xscale(), (rect[3] ?? 0) / this.#yscale()]);
     this.#selectionUpdate();
-    this.#onSelect(this.#unscale(this.#coords.getFixed()));
+    this.#onSelect(this.#unscale(this.#getCoordsFixed()));
     this.handlesVisible.set(true);
   }
 
@@ -454,12 +705,12 @@ export class JcropComponent {
       return;
     }
 
-    const fc = this.#coords.getFixed();
-    const opp = this.#oppLockCorner(mode);
-    const opc = this.#coords.getCorner(this.#oppLockCorner(opp));
+    const fc = this.#getCoordsFixed();
+    const opp = oppLockCorner(mode);
+    const opc = this.#getCoordsCorner(oppLockCorner(opp));
 
-    this.#coords.setPressed(this.#coords.getCorner(opp));
-    this.#coords.setCurrent(opc);
+    this.#setCoordsPressed(this.#getCoordsCorner(opp));
+    this.#setCoordsCurrent(opc);
 
     this.#activateTrackerHandlers(this.#dragmodeHandler(mode, fc), this.#doneSelect, touch);
   };
@@ -480,7 +731,7 @@ export class JcropComponent {
           pos[1] = f.y2;
           break;
       }
-      this.#coords.setCurrent(pos);
+      this.#setCoordsCurrent(pos);
       this.#selectionUpdate();
     };
   }
@@ -489,37 +740,16 @@ export class JcropComponent {
     let lloc = pos;
 
     return (pos: Point): void => {
-      this.#coords.moveOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
+      this.#moveCoordsOffset([pos[0] - lloc[0], pos[1] - lloc[1]]);
       lloc = pos;
 
       this.#selectionUpdate();
     };
   }
 
-  #oppLockCorner(ord: Ordinal): Corner {
-    switch (ord) {
-      case 'e':
-        return 'nw';
-      case 'n':
-        return 'sw';
-      case 'ne':
-        return 'sw';
-      case 'nw':
-        return 'se';
-      case 's':
-        return 'nw';
-      case 'se':
-        return 'nw';
-      case 'sw':
-        return 'ne';
-      case 'w':
-        return 'ne';
-    }
-  }
-
   // What used to be Touch's own createDragger() (Jcrop.ts), folded in directly since every
   // collaborator it needed was already a closure over this component anyway - and merged with its
-  // own touch equivalent, since the two differed only in running the event through #touchCfilter()
+  // own touch equivalent, since the two differed only in running the event through touchCfilter()
   // first and passing touch=true through to #startDragMode (which activates the tracker handlers in
   // touch mode - see #trackerIstouch).
   readonly #createDragger = (ord: DragMode, touch?: boolean): ((e: JcropMouseEvent) => void) => {
@@ -528,21 +758,11 @@ export class JcropComponent {
       // Necessary when crop image is in a hidden element when page is loaded.
       this.#docOffset = this.#getPos();
 
-      this.#startDragMode(ord, this.#mouseAbs(touch ? this.#touchCfilter(e) : e), touch);
+      this.#startDragMode(ord, this.#mouseAbs(touch ? touchCfilter(e) : e), touch);
       e.stopPropagation();
       e.preventDefault();
     };
   };
-
-  // Copies the active touch's page coordinates onto the event itself so #mouseAbs() can read
-  // event.pageX/pageY the same way regardless of whether the drag started from a mouse or touch
-  // listener - see the JcropMouseEvent comment in Jcrop.ts. What used to be Touch's own cfilter().
-  #touchCfilter(e: JcropMouseEvent): JcropMouseEvent {
-    const touch = (e as TouchEvent).changedTouches[0];
-    e.pageX = touch.pageX;
-    e.pageY = touch.pageY;
-    return e;
-  }
 
   #unscale(c: JcropCrop & {x2: number; y2: number}): JcropCrop {
     return {
@@ -554,7 +774,7 @@ export class JcropComponent {
   }
 
   readonly #doneSelect = (): void => {
-    const c = this.#coords.getFixed();
+    const c = this.#getCoordsFixed();
     // [0, 0] is the vendored plugin's minSelect option - never overridable via JcropOptions, so it's
     // a plain check now instead of routed through #options.
     if (c.w > 0 && c.h > 0) {
@@ -574,7 +794,7 @@ export class JcropComponent {
     this.handlesVisible.set(false);
     this.trackerCursor.set('crosshair');
     const pos = this.#mouseAbs(e);
-    this.#coords.setPressed(pos);
+    this.#setCoordsPressed(pos);
     this.#selectionUpdate();
     this.#activateTrackerHandlers(this.#selectDrag, this.#doneSelect, e.type.startsWith('touch'));
 
@@ -583,7 +803,7 @@ export class JcropComponent {
   }
 
   readonly #selectDrag = (pos: Point): void => {
-    this.#coords.setCurrent(pos);
+    this.#setCoordsCurrent(pos);
     this.#selectionUpdate();
   };
 
@@ -605,7 +825,7 @@ export class JcropComponent {
 
     this.#trackerOnDone(this.#mouseAbs(e));
     if (this.#selectionAwake) {
-      this.#onSelect(this.#unscale(this.#coords.getFixed()));
+      this.#onSelect(this.#unscale(this.#getCoordsFixed()));
     }
 
     this.trackerZIndex.set(290);
@@ -617,10 +837,10 @@ export class JcropComponent {
   // collaborator it needed was already a closure over this component anyway, and it held no DOM
   // reference of its own any more either - see #selectionAwake above.
   #selectionRefresh(): void {
-    const c = this.#coords.getFixed();
+    const c = this.#getCoordsFixed();
 
-    this.#coords.setPressed([c.x, c.y]);
-    this.#coords.setCurrent([c.x2, c.y2]);
+    this.#setCoordsPressed([c.x, c.y]);
+    this.#setCoordsCurrent([c.x2, c.y2]);
 
     if (this.#selectionAwake) {
       this.#selectionUpdate();
@@ -630,7 +850,7 @@ export class JcropComponent {
   // `select` is never actually passed true at any of this component's own call sites - preserved
   // faithfully from the vendored Selection class rather than dropped as part of this inlining.
   #selectionUpdate(select?: boolean): void {
-    const c = this.#coords.getFixed();
+    const c = this.#getCoordsFixed();
 
     this.selWidth.set(Math.round(c.w));
     this.selHeight.set(Math.round(c.h));
