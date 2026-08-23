@@ -110,7 +110,7 @@ type FixedCrop = JcropCrop & {x2: number; y2: number};
 // directly in the template now instead of via a runtime loop; see jcrop.component.html/.scss), was
 // never genuinely variable to begin with so it's a fixed value at its one use site now
 // (bgOpacity/boundary/minSelect/setSelect/trueSize - the imgOpacity computed()'s bgopacity, the
-// trackerHeight/trackerWidth computed()s' BOUNDARY margin, #doneSelect()'s minSelect check,
+// trackerHeight/trackerWidth computed()s' BOUNDARY margin, #finishTrackerDrag()'s minSelect check,
 // the constructor's own init effect()'s own #setSelect() call, and the #xscale/#yscale computed()s
 // respectively), or
 // (boxHeight/boxWidth/minSize, the three that do vary per crop) is read straight from the
@@ -197,6 +197,30 @@ function makeObj(a: [number, number, number, number]): FixedCrop {
     y: a[1],
     y2: a[3],
   };
+}
+
+// Normalizes value into [min, max] - used by #rebound()/#moveCoordsOffset() (below, on the class),
+// each clamping a genuine two-sided range independent of any other coordinate (a point's own
+// position, or how far a move drag is allowed to shift the whole selection). #coordsFixed's own
+// bounds pass doesn't fit this shape: it shifts a *pair* of coordinates together to keep the
+// selection's own size intact (sliding both x1 and x2 by the same delta so x2 lands exactly on the
+// boundary, say), not clamping one coordinate to a range on its own the way this does - see
+// slideToBound() below for that one instead.
+function clamp(value: number, min: number, max: number): number {
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
+}
+
+// Shifts [a, b] by the same delta so probe (one of the two) lands exactly on bound - keeps b-a (the
+// selection's own size) intact, unlike clamp() above applied to a and b independently, which would
+// squash the pair instead of sliding it whole. #coordsFixed (below, on the class) calls this once per
+// boundary check on its own x1/y1/x2/y2 corners against 0/displayWidth()/displayHeight() - only after
+// already finding that probe violates bound, so delta is never 0 there (a harmless no-op even if it
+// were).
+function slideToBound(a: number, b: number, probe: number, bound: number): [number, number] {
+  const delta = probe - bound;
+  return [a - delta, b - delta];
 }
 
 // The ordinals rendered as dragbars/handles (jcrop.component.html) and the z-index each one gets -
@@ -362,8 +386,8 @@ export class JcropComponent {
     // #trackerBtndown/#trackerIstouch/#trackerOnMove and the
     // #activateTrackerHandlers()/#finishTrackerDrag() methods below, Touch as #touchSupport and the
     // #createDragger() method below, Selection as selectionAwake and the #selectionRefresh() method
-    // below (#doneSelect()/#selectionRefresh() themselves absorbed what used to be Selection's own
-    // release()/#show()/update()). #init() itself (what used to build/wire all of the above) was folded in
+    // below (#finishTrackerDrag()/#selectionRefresh() themselves absorbed what used to be Selection's
+    // own release()/#show()/update()). #init() itself (what used to build/wire all of the above) was folded in
     // as this effect() - what used to be onLoad(), bound to #workingImg's own (load) event, until that
     // stopped being necessary either: everything left in it only ever needed pictureWidth/
     // pictureHeight/initialCrop/minSize (component inputs), never anything the real <img> element
@@ -375,8 +399,8 @@ export class JcropComponent {
     // as a trigger would re-fire this on every drag frame instead of only on a genuine picture change.
     //
     // No method here is a field arrow any more (nothing needs a bound `this` independent of where
-    // it's referenced) - #getPos/#mouseAbs/#startDragMode/#createDragger/#doneSelect are all only ever
-    // invoked directly as this.#xxx(...), and the three MoveCallback-shaped handlers this component
+    // it's referenced) - #getPos/#mouseAbs/#startDragMode/#createDragger are all only ever invoked
+    // directly as this.#xxx(...), and the three MoveCallback-shaped handlers this component
     // ever hands #activateTrackerHandlers() below (what #trackerOnMove ends up holding) are each an
     // inline arrow function expression at their one call site (#startDragMode's own resize/move
     // branches, #newSelection's own) instead: what used to be the separate
@@ -410,18 +434,18 @@ export class JcropComponent {
   }
 
   // Whether the resize handles/dragbars are shown - set directly by this component (#setSelect(),
-  // #doneSelect(), #newSelection() below), and read directly by the .jcrop-handles-holder template
-  // element's [style.display] binding instead of Jcrop imperatively setting that style itself.
+  // #finishTrackerDrag(), #newSelection() below), and read directly by the .jcrop-handles-holder
+  // template element's [style.display] binding instead of Jcrop imperatively setting that style itself.
   protected readonly handlesVisible = signal(false);
 
   // Which drag gesture (if any) #startDragMode below currently has active - null at rest (also its
   // initial value, matching what #tracker's cursor should show before the constructor's own init
   // effect() has ever run), a DragMode while resizing/moving an existing selection. #newSelection's
   // own freehand "drag out a brand new box" gesture deliberately doesn't set this (see trackerCursor
-  // below) - #doneSelect() (which ends every kind of drag) always resets it, and #newSelection()
+  // below) - #finishTrackerDrag() (which ends every kind of drag) always resets it, and #newSelection()
   // resets it too, but only defensively, in case a still-active previous gesture (e.g. a touch drag
   // interrupted by the OS mid-way, with no touchcancel handler here to catch it) never reached
-  // #doneSelect().
+  // #finishTrackerDrag().
   readonly #dragMode = signal<DragMode | null>(null);
 
   // The #tracker template element's cursor - a pure derivation of #dragMode above: 'crosshair' at
@@ -484,7 +508,7 @@ export class JcropComponent {
   #initialized = false;
   // Whether the selection box is awake (visible/tracked) - what used to be a separate Selection
   // class's own `#awake` field (see Jcrop.ts): true from the first genuine selection after
-  // construction or a release, until #doneSelect() sets it back to false on release. Not a true
+  // construction or a release, until #finishTrackerDrag() sets it back to false on release. Not a true
   // #private field (unlike #trackerBtndown, its sibling below) since the template's own [style.display]
   // binding on #sel (jcrop.component.html) reads it directly too, as "is there a selection to show" -
   // the same boolean, no separate selVisible wrapper needed for that.
@@ -513,16 +537,19 @@ export class JcropComponent {
     this.#setSelect([0, 0, this.pictureWidth(), this.pictureHeight()]);
   }
 
-  // Emits the current selection, in picture-pixel space (#unscale(#coordsFixed())) - what used to be
-  // the vendored plugin's own configurable onSelect option, called wherever this component (its sole
-  // consumer) needs to report a genuine selection change (a completed #setSelect(), or the end of a
-  // resize/move/new-selection drag, via #finishTrackerDrag() below). Pulled out since that exact chain
-  // is repeated identically at both call sites below.
+  // Emits the current selection, in picture-pixel space - what used to be the vendored plugin's own
+  // configurable onSelect option, called wherever this component (its sole consumer) needs to report a
+  // genuine selection change (a completed #setSelect(), or the end of a resize/move/new-selection drag,
+  // via #finishTrackerDrag() below). Pulled out since that exact chain is repeated identically at both
+  // call sites below.
   #emitSelect(): void {
-    const crop = this.#unscale(this.#coordsFixed());
+    const c = this.#coordsFixed();
+    const xscale = this.#xscale();
+    const yscale = this.#yscale();
+    const crop = {h: c.h * yscale, w: c.w * xscale, x: c.x * xscale, y: c.y * yscale};
     // Coords already clamps against [0, boundx]/[0, boundy] in scaled space, but rounding through
-    // xscale/yscale in unscale() can still leave a hair of negative slop after a drag to the
-    // top/left edge - guard against saving that.
+    // xscale/yscale above can still leave a hair of negative slop after a drag to the top/left edge -
+    // guard against saving that.
     this.cropChange.emit({...crop, x: Math.max(0, crop.x), y: Math.max(0, crop.y)});
   }
 
@@ -609,23 +636,13 @@ export class JcropComponent {
     this.#y2.set(rebounded[1]);
   }
 
+  // Clamps offset so the moved selection stays in bounds: an axis's own coordinate pair can shift by
+  // at most -x1()/-y1() before its low edge would go negative, or displayWidth()-x2()/
+  // displayHeight()-y2() before its high edge would overshoot - the same two-sided clamp() #rebound()
+  // above does for a single point, applied here to how far the whole selection is allowed to move.
   #moveCoordsOffset(offset: Point): void {
-    let ox = offset[0],
-      oy = offset[1];
-
-    if (0 > this.#x1() + ox) {
-      ox -= ox + this.#x1();
-    }
-    if (0 > this.#y1() + oy) {
-      oy -= oy + this.#y1();
-    }
-
-    if (this.displayHeight() < this.#y2() + oy) {
-      oy += this.displayHeight() - (this.#y2() + oy);
-    }
-    if (this.displayWidth() < this.#x2() + ox) {
-      ox += this.displayWidth() - (this.#x2() + ox);
-    }
+    const ox = clamp(offset[0], -this.#x1(), this.displayWidth() - this.#x2());
+    const oy = clamp(offset[1], -this.#y1(), this.displayHeight() - this.#y2());
 
     this.#x1.update((v) => v + ox);
     this.#x2.update((v) => v + ox);
@@ -648,13 +665,8 @@ export class JcropComponent {
   }
 
   #rebound(p: Point): Point {
-    let px0 = p[0],
-      py0 = p[1];
-    if (px0 < 0) px0 = 0;
-    if (py0 < 0) py0 = 0;
-
-    if (px0 > this.displayWidth()) px0 = this.displayWidth();
-    if (py0 > this.displayHeight()) py0 = this.displayHeight();
+    const px0 = clamp(p[0], 0, this.displayWidth());
+    const py0 = clamp(p[1], 0, this.displayHeight());
 
     return [Math.round(px0), Math.round(py0)];
   }
@@ -671,12 +683,13 @@ export class JcropComponent {
       x2 = this.#x2(),
       y1 = this.#y1(),
       y2 = this.#y2();
-    let delta;
     const xsize = x2 - x1,
       ysize = y2 - y1;
     const xscale = this.#xscale(),
       yscale = this.#yscale();
     const [xmin, ymin] = this.minSize();
+    const displayWidth = this.displayWidth();
+    const displayHeight = this.displayHeight();
 
     if (ymin / yscale && Math.abs(ysize) < ymin / yscale) {
       y2 = ysize > 0 ? y1 + ymin / yscale : y1 - ymin / yscale;
@@ -685,42 +698,14 @@ export class JcropComponent {
       x2 = xsize > 0 ? x1 + xmin / xscale : x1 - xmin / xscale;
     }
 
-    if (x1 < 0) {
-      x2 -= x1;
-      x1 -= x1;
-    }
-    if (y1 < 0) {
-      y2 -= y1;
-      y1 -= y1;
-    }
-    if (x2 < 0) {
-      x1 -= x2;
-      x2 -= x2;
-    }
-    if (y2 < 0) {
-      y1 -= y2;
-      y2 -= y2;
-    }
-    if (x2 > this.displayWidth()) {
-      delta = x2 - this.displayWidth();
-      x1 -= delta;
-      x2 -= delta;
-    }
-    if (y2 > this.displayHeight()) {
-      delta = y2 - this.displayHeight();
-      y1 -= delta;
-      y2 -= delta;
-    }
-    if (x1 > this.displayWidth()) {
-      delta = x1 - this.displayWidth();
-      x2 -= delta;
-      x1 -= delta;
-    }
-    if (y1 > this.displayHeight()) {
-      delta = y1 - this.displayHeight();
-      y2 -= delta;
-      y1 -= delta;
-    }
+    if (x1 < 0) [x1, x2] = slideToBound(x1, x2, x1, 0);
+    if (y1 < 0) [y1, y2] = slideToBound(y1, y2, y1, 0);
+    if (x2 < 0) [x1, x2] = slideToBound(x1, x2, x2, 0);
+    if (y2 < 0) [y1, y2] = slideToBound(y1, y2, y2, 0);
+    if (x2 > displayWidth) [x1, x2] = slideToBound(x1, x2, x2, displayWidth);
+    if (y2 > displayHeight) [y1, y2] = slideToBound(y1, y2, y2, displayHeight);
+    if (x1 > displayWidth) [x1, x2] = slideToBound(x1, x2, x1, displayWidth);
+    if (y1 > displayHeight) [y1, y2] = slideToBound(y1, y2, y1, displayHeight);
 
     return makeObj(flipCoords(x1, y1, x2, y2));
   });
@@ -810,29 +795,6 @@ export class JcropComponent {
     };
   }
 
-  #unscale(c: FixedCrop): JcropCrop {
-    return {
-      h: c.h * this.#yscale(),
-      w: c.w * this.#xscale(),
-      x: c.x * this.#xscale(),
-      y: c.y * this.#yscale(),
-    };
-  }
-
-  #doneSelect(): void {
-    const c = this.#coordsFixed();
-    // [0, 0] is the vendored plugin's minSelect option - never overridable via JcropOptions, so it's
-    // a plain check now instead of routed through #options.
-    if (c.w > 0 && c.h > 0) {
-      this.handlesVisible.set(true);
-      this.#selectionRefresh();
-    } else {
-      this.handlesVisible.set(false);
-      this.selectionAwake.set(false);
-    }
-    this.#dragMode.set(null);
-  }
-
   #newSelection(e: JcropMouseEvent): void {
     this.#docOffset = this.#getPos();
     this.handlesVisible.set(false);
@@ -850,10 +812,11 @@ export class JcropComponent {
   }
 
   // What used to be Tracker's own activateHandlers()/#finish() (Jcrop.ts), folded in directly since
-  // every collaborator those needed was already a closure over this component anyway. `done` isn't a
-  // parameter (unlike `move`) since every call site below hands it the same #doneSelect - the move
-  // callback genuinely varies per gesture (a fresh drag, a resize, or moving the whole selection), but
-  // what happens once any of them ends never does.
+  // every collaborator those needed was already a closure over this component anyway. There's no
+  // `done` parameter (unlike `move`) since what happens once any gesture ends is the same regardless
+  // of which one it was - that's #finishTrackerDrag() below, unconditionally, not a callback this ever
+  // varies per gesture the way `move` genuinely does (a fresh drag, a resize, or moving the whole
+  // selection).
   #activateTrackerHandlers(move: MoveCallback, touch?: boolean): void {
     this.#trackerBtndown.set(true);
     this.#trackerIstouch = touch;
@@ -866,7 +829,18 @@ export class JcropComponent {
 
     this.#trackerBtndown.set(false);
 
-    this.#doneSelect();
+    const c = this.#coordsFixed();
+    // [0, 0] is the vendored plugin's minSelect option - never overridable via JcropOptions, so it's
+    // a plain check now instead of routed through #options.
+    if (c.w > 0 && c.h > 0) {
+      this.handlesVisible.set(true);
+      this.#selectionRefresh();
+    } else {
+      this.handlesVisible.set(false);
+      this.selectionAwake.set(false);
+    }
+    this.#dragMode.set(null);
+
     if (this.selectionAwake()) {
       this.#emitSelect();
     }
