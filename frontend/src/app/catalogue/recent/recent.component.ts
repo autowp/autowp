@@ -1,7 +1,7 @@
-import type {Item, Pages, Picture} from '@grpc/spec.pb';
+import type {Item, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, RESPONSE_INIT} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -9,6 +9,7 @@ import {
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
+  Pages,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -32,6 +33,32 @@ interface PictureRoute {
   route: null | string[];
 }
 
+const PICTURES_PER_PAGE = 12;
+
+// Only the most recent 120 pictures are worth paging through here - further back stops being
+// "recent" and is what the brand's full picture gallery is for.
+const MAX_PAGES = 120 / PICTURES_PER_PAGE;
+
+/** Clamps a paginator to MAX_PAGES, so the template never offers a page beyond that. */
+function capPaginator(paginator: Pages | undefined): Pages | undefined {
+  if (!paginator) {
+    return paginator;
+  }
+
+  return new Pages({
+    current: Math.min(paginator.current, MAX_PAGES),
+    first: paginator.first,
+    firstPageInRange: Math.min(paginator.firstPageInRange, MAX_PAGES),
+    last: Math.min(paginator.last, MAX_PAGES),
+    lastPageInRange: Math.min(paginator.lastPageInRange, MAX_PAGES),
+    next: paginator.next && paginator.next <= MAX_PAGES ? paginator.next : 0,
+    pageCount: Math.min(paginator.pageCount, MAX_PAGES),
+    pagesInRange: paginator.pagesInRange.filter((page) => page <= MAX_PAGES),
+    previous: paginator.previous,
+    totalItemCount: Math.min(paginator.totalItemCount, MAX_PAGES * PICTURES_PER_PAGE),
+  });
+}
+
 @Component({
   selector: 'app-catalogue-recent',
   imports: [RouterLink, PaginatorComponent, ThumbnailComponent],
@@ -46,6 +73,7 @@ export class CatalogueRecentComponent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #picturesClient = inject(PicturesClient);
+  readonly #response = inject(RESPONSE_INIT);
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,
@@ -112,6 +140,29 @@ export class CatalogueRecentComponent {
         title: $localize`Last pictures of ${this.brandResource.value().nameText}`,
       });
     });
+
+    // Beyond the last page (now capped to MAX_PAGES, see capPaginator()) there is nothing to
+    // paginate to, so a page number past it names no distinct resource - redirect callers straight
+    // to the one that does, rather than rendering an empty page for every number above it.
+    effect(() => {
+      const page = this.#page();
+      const last = this.picturesResource.value()?.paginator?.last;
+
+      if (last === undefined || !Number.isFinite(page) || page <= last) {
+        return;
+      }
+
+      if (this.#response) {
+        this.#response.status = 301;
+        this.#response.statusText = 'Moved Permanently';
+      }
+
+      void this.#router.navigate([], {
+        queryParams: {page: last},
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    });
   }
 
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
@@ -145,7 +196,7 @@ export class CatalogueRecentComponent {
               votes: true,
             }),
             language: this.#languageService.language,
-            limit: 12,
+            limit: PICTURES_PER_PAGE,
             options: new PictureListOptions({
               pictureItem: new PictureItemListOptions({
                 itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brand.id}),
@@ -164,7 +215,7 @@ export class CatalogueRecentComponent {
               route: this.#catalogue.picturePathToRoute(picture),
             }));
             return {
-              paginator: response.paginator,
+              paginator: capPaginator(response.paginator),
               pictures: chunkBy(pictures, 4),
             };
           }),
