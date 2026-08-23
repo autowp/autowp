@@ -5,7 +5,7 @@
         <span [innerHTML]="picture.nameHtml"></span>
         @if (pictureItemsData(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
-            @if (items[0].item?.design; as design) {
+            @if (items[0].item.design; as design) {
               <sup class="design-brand">
                 <ng-container i18n>designed by</ng-container>
                 <a [routerLink]="design.route">{{ design.name }}</a>
@@ -19,7 +19,7 @@
         <span [innerHTML]="picture.nameHtml"></span>
         @if (pictureItemsData(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
-            @if (items[0].item?.design; as design) {
+            @if (items[0].item.design; as design) {
               <sup class="design-brand">
                 <ng-container i18n>designed by</ng-container>
                 <a [routerLink]="design.route">{{ design.name }}</a>

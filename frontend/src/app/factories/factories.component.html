@@ -26,7 +26,7 @@
     }
   </div>
 
-  @if (factory.location?.latitude && factory.location?.longitude) {
+  @if (factory.location?.latitude && factory.location.longitude) {
     @defer {
       <app-factory-map [latitude]="factory.location.latitude" [longitude]="factory.location.longitude" />
     } @placeholder {

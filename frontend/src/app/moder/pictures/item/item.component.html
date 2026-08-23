@@ -481,7 +481,7 @@
           <h3 i18n>Edit and repair</h3>
           <div class="card card-body mb-4">
             <div>
-              @if (picture.rights?.normalize) {
+              @if (picture.rights.normalize) {
                 <button
                   type="button"
                   class="btn btn-warning"
@@ -492,7 +492,7 @@
                   <ng-container i18n>Normalize</ng-container>
                 </button>
               }
-              @if (picture.rights?.flop) {
+              @if (picture.rights.flop) {
                 <button
                   type="button"
                   class="btn btn-warning"
@@ -503,7 +503,7 @@
                   <ng-container i18n>Flop</ng-container>
                 </button>
               }
-              @if (picture.rights?.crop) {
+              @if (picture.rights.crop) {
                 <a
                   class="btn btn-secondary"
                   [routerLink]="['/moder/pictures', picture.id, 'crop']"

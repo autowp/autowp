@@ -3,7 +3,7 @@
     <div>
       @if ((response.items || []).length > 0) {
         @if (response.brand?.brandicon?.src) {
-          <img alt="" style="float: right; margin: 0 0 5px 5px" [src]="response.brand?.brandicon?.src" />
+          <img alt="" style="float: right; margin: 0 0 5px 5px" [src]="response.brand.brandicon.src" />
         }
         @for (item of response.items; track item.id) {
           <p [innerHTML]="item.nameHtml"></p>

@@ -21,7 +21,7 @@
       <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
     </p>
   }
-  @if (item.location?.latitude && item.location?.longitude) {
+  @if (item.location?.latitude && item.location.longitude) {
     @defer {
       <app-museum-map [latitude]="item.location.latitude" [longitude]="item.location.longitude" />
     } @placeholder {
