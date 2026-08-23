@@ -1,21 +1,15 @@
-<img
-  #origimg
-  alt=""
-  [src]="src()"
-  [style.display]="origimgVisible() ? '' : 'none'"
-  [style.visibility]="origimgVisible() ? 'visible' : ''"
-  (load)="onLoad()"
-/>
 <!--
   Jcrop's fixed-identity container elements - declared here, already nested the way onLoad()
   (jcrop.component.ts) expects them, so it doesn't have to build any of them with
   document.createElement() or reparent them into place itself. #workingImg and #img2 are the latest
-  to move here: they used to be a runtime clone of the real <img> above (origimg.cloneNode(true)) and
-  a runtime document.createElement('img') respectively, both now just bound the same way the real
-  <img>'s own src is ([src]="src()"). Classes/inline styles below are exactly what onLoad() used to set
-  imperatively for properties that never change at runtime - anything that does from runtime layout
-  math (size, position while dragging) is either still set imperatively (#workingImg's own
-  height/width - see the origimgVisible comment in jcrop.component.ts for why) or driven by a signal:
+  to move here: they used to be a runtime clone of a separate, hidden <img> (origimg.cloneNode(true))
+  and a runtime document.createElement('img') respectively - #workingImg is now that <img> itself
+  (its own (load) below is what used to be origimg's), and #img2 is just bound the same way
+  #workingImg's own src is ([src]="src()"). Classes/inline styles below are exactly what onLoad() used
+  to set imperatively for properties that never change at runtime - anything that does from runtime
+  layout math (size, position while dragging) is either still set imperatively (#workingImg's own
+  height/width - see the #displayWidth/#displayHeight comment in jcrop.component.ts for why) or driven
+  by a signal:
   .jcrop-handles-holder's visibility (set directly by this component's own #setSelect()/#doneSelect()/
   #newSelection()) via handlesVisible; #sel's own display (#doneSelect()/#selectionUpdate()) via
   selVisible; #workingImg's opacity (that same release/show dimming the image while a selection is
@@ -101,5 +95,5 @@
     (mousedown)="onTrackerMouseDown($event)"
     (touchstart)="onTrackerTouchStart($event)"
   ></div>
-  <img #workingImg alt="" class="jcrop-working-image" [src]="src()" [style.opacity]="imgOpacity()" />
+  <img #workingImg alt="" class="jcrop-working-image" [src]="src()" [style.opacity]="imgOpacity()" (load)="onLoad()" />
 </div>

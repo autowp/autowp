@@ -117,11 +117,14 @@ export class JcropComponent {
   // onLoad()/#options any more, just #window above.
   readonly #touchSupport: boolean;
 
-  // The <img> box size that fits pictureWidth/pictureHeight inside the real page container
+  // The #workingImg box size that fits pictureWidth/pictureHeight inside the real page container
   // (#elementRef's parentElement) at its current width, preserving aspect ratio - computed by the
-  // constructor effect() below, which (unlike onLoad()) doesn't need the real <img> to have
-  // finished loading, since it only ever reads pictureWidth/pictureHeight (component inputs) and
-  // the container's own layout, never anything off the image itself.
+  // constructor effect() below, which (unlike onLoad()) doesn't need #workingImg to have finished
+  // loading, since it only ever reads pictureWidth/pictureHeight (component inputs) and the
+  // container's own layout, never anything off the image itself. Applied to #workingImg's own style
+  // as soon as it's computed (rather than waiting for onLoad()) so the page never has to reflow
+  // around it finishing load, and there's nothing size-wise left for onLoad() to fix up if the
+  // image was already decoded (e.g. browser cache) by the time this runs.
   #displayWidth = 0;
   #displayHeight = 0;
 
@@ -133,7 +136,6 @@ export class JcropComponent {
 
   readonly cropChange = output<JcropCrop>();
 
-  private readonly origimgRef = viewChild.required<ElementRef<HTMLImageElement>>('origimg');
   private readonly workingImgRef = viewChild.required<ElementRef<HTMLImageElement>>('workingImg');
 
   // Rendered with @for (jcrop.component.html) instead of one static element per ordinal - z-index is
@@ -151,14 +153,13 @@ export class JcropComponent {
       ? 'ontouchstart' in this.#window || this.#window.navigator.maxTouchPoints > 0
       : false;
 
-    // Keeps #displayWidth/#displayHeight (and the real <img>'s own style, which - unlike
-    // #workingImg's below - nothing ever reads back synchronously, so a plain style write is fine
-    // here rather than a signal) in sync with pictureWidth/pictureHeight, independent of onLoad()/the
-    // real <img> element's own load event: those two inputs already carry the picture's true size, so
-    // this never needs to wait for the browser to have actually decoded the image, only for this
-    // component's own view (and its container) to exist. Re-runs on every pictureWidth/pictureHeight
-    // change, matching onLoad()'s own "can run more than once per component instance" behavior for
-    // when a host page reuses one JcropComponent across pictures.
+    // Keeps #displayWidth/#displayHeight and #workingImg's own style in sync with
+    // pictureWidth/pictureHeight, independent of onLoad()/#workingImg's own load event: those two
+    // inputs already carry the picture's true size, so this never needs to wait for the browser to
+    // have actually decoded the image, only for this component's own view (and its container) to
+    // exist. Re-runs on every pictureWidth/pictureHeight change, matching onLoad()'s own "can run
+    // more than once per component instance" behavior for when a host page reuses one JcropComponent
+    // across pictures.
     effect(() => {
       const win = this.#window;
       if (!win) {
@@ -185,7 +186,7 @@ export class JcropComponent {
       this.#displayWidth = pictureWidth / scale;
       this.#displayHeight = pictureHeight / scale;
 
-      const img = this.origimgRef().nativeElement;
+      const img = this.workingImgRef().nativeElement;
       img.style.width = `${this.#displayWidth}px`;
       img.style.height = `${this.#displayHeight}px`;
     });
@@ -221,9 +222,9 @@ export class JcropComponent {
   protected readonly holderWidth = signal(0);
 
   // #img2's height/width - the crop-preview <img> clipped inside #imgHolder (jcrop.component.html),
-  // always the same size as #holder above. Unlike #workingImg's height/width (see origimgVisible and
-  // onLoad() below), nothing reads this element's layout back synchronously after onLoad() sets it,
-  // so a signal is safe here.
+  // always the same size as #holder above. Unlike #workingImg's height/width (see the
+  // #displayWidth/#displayHeight comment and onLoad() below), nothing reads this element's layout
+  // back synchronously after onLoad() sets it, so a signal is safe here.
   protected readonly img2Height = signal(0);
   protected readonly img2Width = signal(0);
 
@@ -237,15 +238,6 @@ export class JcropComponent {
   protected readonly selTop = signal(0);
   protected readonly selHeight = signal(0);
   protected readonly selWidth = signal(0);
-
-  // The real <img> template element's display/visibility - true (its default) until onLoad() hides it
-  // once #workingImg (a second, static template <img> - see onLoad() below) is ready to show in its
-  // place. #workingImg's own height/width, by contrast, stay a direct setStyle() call in onLoad()
-  // rather than a signal: the presizing math and the offsetHeight/offsetWidth reads right after both
-  // need that size actually committed to the DOM synchronously - a signal only takes effect on
-  // Angular's next change-detection pass, which would leave #workingImg (and everything sized off
-  // it) built from the wrong dimensions.
-  protected readonly origimgVisible = signal(true);
 
   // #sel's own display - whether the selection box (and everything clipped/nested inside it: borders,
   // handles, the #img2 crop-preview) is shown at all. Driven by #doneSelect()/#selectionUpdate()
@@ -267,7 +259,6 @@ export class JcropComponent {
   // selectAll() (the only externally-triggered entry point) against running before that has happened
   // - everything else here only ever runs from inside onLoad() itself.
   #initialized = false;
-  #img!: HTMLImageElement;
   #boundx!: number;
   #boundy!: number;
   #coords!: Coords;
@@ -330,24 +321,15 @@ export class JcropComponent {
 
     const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
 
-    // #workingImg is a static template <img> now (jcrop.component.html), not a runtime clone of
-    // origimg - its src is bound the same way origimg's own is ([src]="src()"), and its static
-    // styling (position/border/margin/padding/top/left/visibility) is a plain template attribute
-    // instead of set here. Its height/width, unlike #holder/#tracker below, stay a direct setStyle()
-    // call rather than a signal - the presizing math below and the offsetWidth/offsetHeight reads
-    // right after both need that size committed to the DOM synchronously, and a signal only takes
-    // effect on Angular's next change-detection pass (same reasoning as origimgVisible above). Sized
-    // straight from #displayWidth/#displayHeight (kept in sync by the constructor effect() from
-    // pictureWidth/pictureHeight, always non-zero for a real picture) rather than reading origimg's
-    // own offsetHeight/offsetWidth: that read used to need a hidden-container fallback (a detached
-    // Image() reload) because origimg's rendered size could come back 0 when its container was
-    // display:none at load time - a problem that never applies to pictureWidth/pictureHeight, which
-    // don't depend on origimg being rendered at all.
+    // #workingImg is a static template <img> now (jcrop.component.html), not a runtime clone of a
+    // separate, hidden <img> - its (load) below is what used to be that other element's, and its
+    // static styling (position/border/margin/padding/top/left/visibility) is a plain template
+    // attribute instead of set here. Its height/width, unlike #holder/#tracker below, are never set
+    // here at all any more - the constructor effect() already committed #displayWidth/#displayHeight
+    // to its style before onLoad() could ever run (that's what onLoad() being bound to #workingImg's
+    // own (load) guarantees), so the offsetWidth/offsetHeight reads the presizing math below needs
+    // are already correct without this method touching its style itself.
     const workingImg = this.workingImgRef().nativeElement;
-    this.#img = workingImg;
-
-    setStyle(workingImg, {height: px(this.#displayHeight), width: px(this.#displayWidth)});
-    this.origimgVisible.set(false);
 
     // Shrinks #workingImg to fit inside the #displayWidth/#displayHeight box (preserving aspect
     // ratio) if it's currently bigger than that in either dimension, and derives #xscale/#yscale
@@ -401,7 +383,7 @@ export class JcropComponent {
     // more than once per component instance, so this still matters if a previous run left it true.
     this.handlesVisible.set(false);
 
-    this.#docOffset = this.#getPos(workingImg);
+    this.#docOffset = this.#getPos();
 
     this.#initialized = true;
 
@@ -516,11 +498,13 @@ export class JcropComponent {
     this.handlesVisible.set(true);
   }
 
-  readonly #getPos = (el: HTMLElement): Point => {
+  // Always reads #workingImg's own position - every caller only ever wants that, so it's read here
+  // directly rather than threaded through as a parameter.
+  readonly #getPos = (): Point => {
     // Guarded the same defensive way onLoad() is - see there. [0, 0] is an arbitrary but harmless
     // fallback for a branch that can't actually be reached (every caller only runs after onLoad()).
     if (!this.#window) return [0, 0];
-    const rect = el.getBoundingClientRect();
+    const rect = this.workingImgRef().nativeElement.getBoundingClientRect();
     return [rect.left + this.#window.scrollX, rect.top + this.#window.scrollY];
   };
 
@@ -529,7 +513,7 @@ export class JcropComponent {
   };
 
   readonly #startDragMode = (mode: DragMode, pos: Point, touch?: boolean): void => {
-    this.#docOffset = this.#getPos(this.#img);
+    this.#docOffset = this.#getPos();
     this.trackerCursor.set(mode === 'move' ? mode : mode + '-resize');
 
     if (mode === 'move') {
@@ -609,7 +593,7 @@ export class JcropComponent {
     return (e: JcropMouseEvent): void => {
       // Fix position of crop area when dragged the very first time.
       // Necessary when crop image is in a hidden element when page is loaded.
-      this.#docOffset = this.#getPos(this.#img);
+      this.#docOffset = this.#getPos();
 
       this.#startDragMode(ord, this.#mouseAbs(touch ? this.#touchCfilter(e) : e), touch);
       e.stopPropagation();
@@ -653,7 +637,7 @@ export class JcropComponent {
   };
 
   #newSelection(e: JcropMouseEvent): void {
-    this.#docOffset = this.#getPos(this.#img);
+    this.#docOffset = this.#getPos();
     this.handlesVisible.set(false);
     this.trackerCursor.set('crosshair');
     const pos = this.#mouseAbs(e);
