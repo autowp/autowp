@@ -2968,7 +2968,7 @@ func (s *Repository) RebuildItemOrderCache(ctx context.Context) error {
 			}
 		}
 
-		if pages.Last == int32(page) {
+		if pages.PageCount == int32(page) {
 			break
 		}
 	}

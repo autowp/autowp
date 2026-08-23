@@ -1371,16 +1371,9 @@ func (s *PicturesGRPCServer) GetPictures(
 	var paginator *Pages
 	if pages != nil {
 		paginator = &Pages{
-			PageCount:        pages.PageCount,
-			First:            pages.First,
-			Last:             pages.Last,
-			Current:          pages.Current,
-			FirstPageInRange: pages.FirstPageInRange,
-			LastPageInRange:  pages.LastPageInRange,
-			PagesInRange:     pages.PagesInRange,
-			TotalItemCount:   pages.TotalItemCount,
-			Next:             pages.Next,
-			Previous:         pages.Previous,
+			PageCount:      pages.PageCount,
+			Current:        pages.Current,
+			TotalItemCount: pages.TotalItemCount,
 		}
 	}
 
@@ -1439,16 +1432,9 @@ func (s *PicturesGRPCServer) GetPicturesPaginator(
 	}
 
 	return &Pages{
-		PageCount:        pages.PageCount,
-		First:            pages.First,
-		Last:             pages.Last,
-		Current:          pages.Current,
-		FirstPageInRange: pages.FirstPageInRange,
-		LastPageInRange:  pages.LastPageInRange,
-		PagesInRange:     pages.PagesInRange,
-		TotalItemCount:   pages.TotalItemCount,
-		Next:             pages.Next,
-		Previous:         pages.Previous,
+		PageCount:      pages.PageCount,
+		Current:        pages.Current,
+		TotalItemCount: pages.TotalItemCount,
 	}, nil
 }
 
@@ -1623,16 +1609,9 @@ func (s *PicturesGRPCServer) GetNewbox(ctx context.Context, in *NewboxRequest) (
 		NextDate:     util.DateToGrpcDate(nextDate),
 		NextCount:    nextCount,
 		Paginator: &Pages{
-			PageCount:        pages.PageCount,
-			First:            pages.First,
-			Last:             pages.Last,
-			Current:          pages.Current,
-			FirstPageInRange: pages.FirstPageInRange,
-			LastPageInRange:  pages.LastPageInRange,
-			PagesInRange:     pages.PagesInRange,
-			TotalItemCount:   pages.TotalItemCount,
-			Next:             pages.Next,
-			Previous:         pages.Previous,
+			PageCount:      pages.PageCount,
+			Current:        pages.Current,
+			TotalItemCount: pages.TotalItemCount,
 		},
 	}, nil
 }

@@ -47,14 +47,7 @@ function capPaginator(paginator: Pages | undefined): Pages | undefined {
 
   return new Pages({
     current: Math.min(paginator.current, MAX_PAGES),
-    first: paginator.first,
-    firstPageInRange: Math.min(paginator.firstPageInRange, MAX_PAGES),
-    last: Math.min(paginator.last, MAX_PAGES),
-    lastPageInRange: Math.min(paginator.lastPageInRange, MAX_PAGES),
-    next: paginator.next && paginator.next <= MAX_PAGES ? paginator.next : 0,
     pageCount: Math.min(paginator.pageCount, MAX_PAGES),
-    pagesInRange: paginator.pagesInRange.filter((page) => page <= MAX_PAGES),
-    previous: paginator.previous,
     totalItemCount: Math.min(paginator.totalItemCount, MAX_PAGES * PICTURES_PER_PAGE),
   });
 }
@@ -146,7 +139,7 @@ export class CatalogueRecentComponent {
     // to the one that does, rather than rendering an empty page for every number above it.
     effect(() => {
       const page = this.#page();
-      const last = this.picturesResource.value()?.paginator?.last;
+      const last = this.picturesResource.value()?.paginator?.pageCount;
 
       if (last === undefined || !Number.isFinite(page) || page <= last) {
         return;

@@ -96,16 +96,9 @@ func (s *ArticlesGRPCServer) GetList(
 	return &ArticlesResponse{
 		Items: articles,
 		Paginator: &Pages{
-			PageCount:        pages.PageCount,
-			First:            pages.First,
-			Last:             pages.Last,
-			Previous:         pages.Previous,
-			Next:             pages.Next,
-			Current:          pages.Current,
-			FirstPageInRange: pages.FirstPageInRange,
-			LastPageInRange:  pages.LastPageInRange,
-			PagesInRange:     pages.PagesInRange,
-			TotalItemCount:   pages.TotalItemCount,
+			PageCount:      pages.PageCount,
+			Current:        pages.Current,
+			TotalItemCount: pages.TotalItemCount,
 		},
 	}, nil
 }

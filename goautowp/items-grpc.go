@@ -519,16 +519,9 @@ func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*ItemList
 	var paginator *Pages
 	if pages != nil {
 		paginator = &Pages{
-			PageCount:        pages.PageCount,
-			First:            pages.First,
-			Last:             pages.Last,
-			Current:          pages.Current,
-			FirstPageInRange: pages.FirstPageInRange,
-			LastPageInRange:  pages.LastPageInRange,
-			PagesInRange:     pages.PagesInRange,
-			TotalItemCount:   pages.TotalItemCount,
-			Next:             pages.Next,
-			Previous:         pages.Previous,
+			PageCount:      pages.PageCount,
+			Current:        pages.Current,
+			TotalItemCount: pages.TotalItemCount,
 		}
 	}
 
@@ -2146,16 +2139,9 @@ func (s *ItemsGRPCServer) GetItemParents(
 	var paginator *Pages
 	if pages != nil {
 		paginator = &Pages{
-			PageCount:        pages.PageCount,
-			First:            pages.First,
-			Last:             pages.Last,
-			Current:          pages.Current,
-			FirstPageInRange: pages.FirstPageInRange,
-			LastPageInRange:  pages.LastPageInRange,
-			PagesInRange:     pages.PagesInRange,
-			TotalItemCount:   pages.TotalItemCount,
-			Next:             pages.Next,
-			Previous:         pages.Previous,
+			PageCount:      pages.PageCount,
+			Current:        pages.Current,
+			TotalItemCount: pages.TotalItemCount,
 		}
 	}
 

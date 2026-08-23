@@ -2251,15 +2251,8 @@ message MessagingGetMessagesResponse {
 
 message Pages {
   int32 pageCount = 1;
-  int32 first = 2;
   int32 current = 3;
-  int32 next = 5;
-  int32 previous = 6;
-  int32 firstPageInRange = 7;
-  int32 lastPageInRange = 8;
-  repeated int32 pagesInRange = 9;
   int32 totalItemCount = 10;
-  int32 last = 11;
 }
 
 message DonationsTransaction {

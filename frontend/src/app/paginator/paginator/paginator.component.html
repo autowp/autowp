@@ -1,45 +1,51 @@
 @if (data(); as data) {
-  @if (data.pageCount > 1) {
-    <div>
-      <p>
-        @if (data.previous) {
-          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.previous}"
-            >←<ng-container i18n>previous</ng-container></a
-          >
-        } @else {
-          <span>←<ng-container i18n>previous</ng-container></span>
-        }
-        @if (data.next) {
-          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.next}"
-            ><ng-container i18n>next</ng-container>→</a
-          >
-        } @else {
-          <span><ng-container i18n>next</ng-container>→</span>
-        }
-      </p>
-      <p>
-        @if (data.first < data.firstPageInRange) {
-          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.first}">{{ padd(data.first) }}</a>
-        }
-        @if (data.first < data.firstPageInRange - 1) {
-          <span>…</span>
-        }
-        @for (page of pagesInRange(); track page) {
-          <span>
-            @if (page !== data.current) {
-              <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: page}">{{ padd(page) }}</a>
-            } @else {
-              <strong style="font-size: 20px; margin: 0 3px">{{ padd(page) }}</strong>
-            }
-          </span>
-        }
-        @if (data.last > data.lastPageInRange + 1) {
-          <span>…</span>
-        }
-        @if (data.last > data.lastPageInRange) {
-          <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: data.last}">{{ padd(data.last) }}</a>
-        }
-      </p>
-    </div>
+  @if (window(); as window) {
+    @if (data.pageCount > 1) {
+      <div>
+        <p>
+          @if (window.previous) {
+            <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.previous}"
+              >←<ng-container i18n>previous</ng-container></a
+            >
+          } @else {
+            <span>←<ng-container i18n>previous</ng-container></span>
+          }
+          @if (window.next) {
+            <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.next}"
+              ><ng-container i18n>next</ng-container>→</a
+            >
+          } @else {
+            <span><ng-container i18n>next</ng-container>→</span>
+          }
+        </p>
+        <p>
+          @if (window.first < window.firstPageInRange) {
+            <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.first}">{{
+              padd(window.first)
+            }}</a>
+          }
+          @if (window.first < window.firstPageInRange - 1) {
+            <span>…</span>
+          }
+          @for (page of window.pages; track page) {
+            <span>
+              @if (page !== data.current) {
+                <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: page}">{{ padd(page) }}</a>
+              } @else {
+                <strong style="font-size: 20px; margin: 0 3px">{{ padd(page) }}</strong>
+              }
+            </span>
+          }
+          @if (window.last > window.lastPageInRange + 1) {
+            <span>…</span>
+          }
+          @if (window.last > window.lastPageInRange) {
+            <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.last}">{{
+              padd(window.last)
+            }}</a>
+          }
+        </p>
+      </div>
+    }
   }
 }

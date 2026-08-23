@@ -28,8 +28,6 @@ type Pages struct {
 	Last             int32
 	Previous         int32
 	Next             int32
-	FirstPageInRange int32
-	LastPageInRange  int32
 	TotalItemCount   int32
 	PagesInRange     []int32
 }
@@ -46,22 +44,6 @@ func (s *Paginator) Count(ctx context.Context) (int32, error) {
 	}
 
 	return s.pageCount, nil
-}
-
-func MinMax(array []int32) (int32, int32) {
-	maxValue, minValue := array[0], array[0]
-
-	for _, value := range array {
-		if maxValue < value {
-			maxValue = value
-		}
-
-		if minValue > value {
-			minValue = value
-		}
-	}
-
-	return minValue, maxValue
 }
 
 func (s *Paginator) GetPages(ctx context.Context) (*Pages, error) {
@@ -134,7 +116,6 @@ func (s *Paginator) GetPages(ctx context.Context) (*Pages, error) {
 		return nil, err
 	}
 
-	pages.FirstPageInRange, pages.LastPageInRange = MinMax(pagesInRange)
 	pages.PagesInRange = pagesInRange
 
 	return &pages, nil

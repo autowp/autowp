@@ -336,7 +336,7 @@ export class CatalogueVehiclesComponent {
         active:
           CatalogueVehiclesComponent.resolveTypeId(data.type) === ItemParentType.ITEM_TYPE_DEFAULT &&
           !!items?.paginator &&
-          items.paginator.current >= items.paginator.last,
+          items.paginator.current >= items.paginator.pageCount,
         item,
         routerLink,
       };
