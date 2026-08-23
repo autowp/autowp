@@ -65,146 +65,13 @@ spec:
               name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: app-port
-        - path: "/goautowp.Autowp/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Traffic/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Contacts/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Users/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Items/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Comments/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Map/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Messaging/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Statistics/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Pictures/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Donations/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Articles/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Forums/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Text/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Attrs/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Rating/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Log/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Mosts/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Votings/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
-        - path: "/goautowp.Achievements/"
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
-              port:
-                name: app-port
+        # Every grpc-web service path (/goautowp.Autowp/, /goautowp.Traffic/, ...) used to get its own
+        # near-identical rule here - all ~23 of them route to this same service/port, differing only in
+        # a substring within one path segment, which plain pathType: Prefix can't collapse (it matches
+        # whole path elements, not substrings). Collapsed into one regex rule in the backend-grpc-web
+        # Ingress below instead, kept as a separate resource since nginx.ingress.kubernetes.io/use-regex
+        # applies to every path in the Ingress it's set on, and the literal paths here shouldn't become
+        # regexes too.
         - path: "/ws/"
           pathType: Prefix
           backend:
@@ -238,6 +105,47 @@ spec:
               name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
               port:
                 name: assets-port
+  {{- end }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-grpc-web
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    # No cert-manager.io/cluster-issuer here - this Ingress covers the exact same hosts as backend
+    # above, which already provisions secretName tls for them; adding the annotation to both would make
+    # cert-manager issue and manage a second, redundant Certificate for the same hosts into the same
+    # Secret. nginx-ingress itself is fine reading a tls secretName that a different Ingress for the
+    # same host provisions.
+    #
+    # Scoped to this Ingress object only - the backend Ingress above keeps its literal paths as plain
+    # pathType: Prefix rules, since this annotation would turn every path in whichever Ingress it's set
+    # on into a regex.
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        {{- range .Values.hostnames }}
+        - {{ . }}
+        {{- end }}
+      secretName: tls
+  rules:
+  {{- range .Values.hostnames }}
+  - host: {{ . }}
+    http:
+      paths:
+        # Matches every grpc-web service path (/goautowp.Autowp/, /goautowp.Traffic/, ...) in one rule -
+        # see the backend Ingress's own comment for why this couldn't just be a pathType: Prefix rule.
+        - path: "/goautowp\\.[^/]+/"
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
+              port:
+                name: app-port
   {{- end }}
 
 ---
