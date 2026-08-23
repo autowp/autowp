@@ -16,7 +16,7 @@
   imperatively for properties that never change at runtime - anything that does from runtime layout
   math (size, position while dragging) is either still set imperatively (#workingImg's own
   height/width - see the origimgVisible comment in jcrop.component.ts for why) or driven by a signal:
-  #hdlHolder's visibility (set directly by this component's own #setSelect()/#doneSelect()/
+  .jcrop-handles-holder's visibility (set directly by this component's own #setSelect()/#doneSelect()/
   #newSelection()) via handlesVisible; #sel's own display (#doneSelect()/#selectionUpdate()) via
   selVisible; #workingImg's opacity (that same release/show dimming the image while a selection is
   awake) via imgOpacity; #holder's, #img2's, and #sel's height/width (#holder/#img2 computed in
@@ -31,8 +31,7 @@
   static and permanent for the life of this component, so there's no need to attach/detach anything by
   hand. #tracker/#selectionTracker call straight into the drag logic (onTrackerMouseDown et al.); the
   handle/dragbar elements instead forward through onDragMouseDown/onDragTouchStart, passing along the
-  fixed ordinal each one already knows straight into #createDragger()/#createTouchDragger()
-  (jcrop.component.ts).
+  fixed ordinal each one already knows straight into #createDragger() (jcrop.component.ts).
 -->
 <div class="jcrop-holder" [style.height.px]="holderHeight()" [style.width.px]="holderWidth()">
   <div
@@ -70,9 +69,9 @@
       <!-- cursor/opacity/position/class are static (jcrop.component.scss); z-index is inline (via
            dragbars/handles, jcrop.component.ts) since it's the one thing genuinely unique per
            element, not shareable via a class. Each still forwards mousedown/touchstart into
-           #createDragger()/#createTouchDragger() (jcrop.component.ts) via
-           onDragMouseDown/onDragTouchStart, passing its own fixed ordinal - fixed in number and
-           identity now, but still real drag targets, unlike the borders above. -->
+           #createDragger() (jcrop.component.ts) via onDragMouseDown/onDragTouchStart, passing its
+           own fixed ordinal - fixed in number and identity now, but still real drag targets,
+           unlike the borders above. -->
       @for (dragbar of dragbars; track dragbar.ord) {
         <div
           class="jcrop-dragbar ord-{{ dragbar.ord }}"

@@ -213,9 +213,9 @@ export class Coords {
       this.#y2 -= delta;
     }
     if (this.#x1 > this.boundx) {
-      delta = this.#x1 - this.boundy;
-      this.#y2 -= delta;
-      this.#y1 -= delta;
+      delta = this.#x1 - this.boundx;
+      this.#x2 -= delta;
+      this.#x1 -= delta;
     }
     if (this.#y1 > this.boundy) {
       delta = this.#y1 - this.boundy;

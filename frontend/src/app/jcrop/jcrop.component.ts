@@ -27,32 +27,26 @@ function px(n: number): string {
   return Math.round(n) + 'px';
 }
 
-// The subset of the vendored plugin's own options JcropComponent (the sole consumer) actually
-// varies per crop - boxHeight/boxWidth (the fitted display box size) and minSize (the minSize
-// input) - so, unlike the vendored plugin's original options object, all three are required rather
-// than optional: onLoad() always provides a fresh value for each, in its own #options field
-// initializer. Every other option the vendored plugin supported
-// (addClass/aspectRatio/bgOpacity/borderOpacity/boundary/createBorders/createDragbars/createHandles/
-// disabled/handleOpacity/handleSize/keySupport/maxSize/minSelect/outerImage/setSelect/touchSupport/
-// trueSize) was dropped entirely (not just defaulted): each was either dead on arrival (keySupport -
-// no keyboard-nudge support was ever ported into this vendored copy), gated a whole branch behind a
+// Every option the vendored plugin's own options object supported
+// (addClass/aspectRatio/bgOpacity/borderOpacity/boundary/boxHeight/boxWidth/createBorders/
+// createDragbars/createHandles/disabled/handleOpacity/handleSize/keySupport/maxSize/minSelect/
+// minSize/outerImage/setSelect/touchSupport/trueSize) is gone from JcropComponent as a distinct
+// "options" concept now: each is either dead code that was dropped entirely (keySupport - no
+// keyboard-nudge support was ever ported into this vendored copy), gated a whole branch behind a
 // falsy sentinel (null/0/[0,0]/false) that, once unoverridable, could never turn truthy again
-// (touchSupport's null - once it could never be true/false instead, JcropComponent's own constructor
-// always fell through to feature-detecting the window, so the override check itself was dead too),
-// once its fixed default became the only value it could ever hold, ended up read only by code that's
-// now static markup instead (border/handle opacity and classes, which per-side/per-corner divs even
-// exist to begin with, and - for createDragbars/createHandles specifically - which of them get their
-// mousedown/touchstart bound directly in the template now instead of via a runtime loop; see
-// jcrop.component.html/.scss), or - bgOpacity/boundary/minSelect/setSelect/trueSize - was never
-// genuinely variable to begin with, so JcropComponent just uses a fixed value or an already-in-scope
-// local variable directly now (#selectionUpdate()'s bgopacity, onLoad()'s tracker sizing,
-// #doneSelect()'s minSelect check, and onLoad()'s own #setSelect()/xscale/yscale calls respectively)
-// instead of routing any of them through #options at all.
-interface InternalOptions {
-  boxHeight: number;
-  boxWidth: number;
-  minSize: number[];
-}
+// (touchSupport's null - once it could never be true/false instead, JcropComponent's own
+// constructor always fell through to feature-detecting the window, so the override check itself
+// was dead too), ended up read only by code that's now static markup instead (border/handle
+// opacity and classes, which per-side/per-corner divs even exist to begin with, and - for
+// createDragbars/createHandles specifically - which of them get their mousedown/touchstart bound
+// directly in the template now instead of via a runtime loop; see jcrop.component.html/.scss), was
+// never genuinely variable to begin with so it's a fixed value at its one use site now
+// (bgOpacity/boundary/minSelect/setSelect/trueSize - #selectionUpdate()'s bgopacity, onLoad()'s
+// tracker sizing, #doneSelect()'s minSelect check, and onLoad()'s own #setSelect()/xscale/yscale
+// calls respectively), or (boxHeight/boxWidth/minSize, the three that do vary per crop) is read
+// straight from onLoad()'s own local variables/the minSize input directly now instead of routed
+// through a shared #options object - every read and the one place any of them was ever set all
+// lived inside that same method anyway, so the object was pure indirection.
 
 // A native MouseEvent/TouchEvent, widened with a writable pageX/pageY: #touchCfilter() below copies
 // the active touch's page coordinates onto the event itself so #mouseAbs() can read event.pageX/
@@ -68,6 +62,20 @@ type PositionCallback = (pos: Point) => void;
 // mode parameter is exactly this union and every ordinal-only site narrows it via `mode !== 'move'`.
 type Ordinal = 'e' | 'n' | 'ne' | 'nw' | 's' | 'se' | 'sw' | 'w';
 type DragMode = 'move' | Ordinal;
+
+// The ordinals rendered as dragbars/handles (jcrop.component.html) and the z-index each one gets -
+// listed here as plain arrays, with z-index derived from array position plus a shared base, rather
+// than hand-typed per ordinal, so the two ranges are provably non-overlapping by construction
+// instead of by careful counting.
+const dragbarOrdinals: Ordinal[] = ['n', 's', 'e', 'w'];
+const handleOrdinals: Ordinal[] = ['n', 's', 'e', 'w', 'nw', 'ne', 'se', 'sw'];
+const DRAGBAR_Z_BASE = 370;
+const HANDLE_Z_BASE = DRAGBAR_Z_BASE + dragbarOrdinals.length;
+
+// The vendored plugin's boundary and bgOpacity options - neither ever overridable via
+// JcropOptions, so both are plain constants now instead of routed through #options.
+const BOUNDARY = 2;
+const BG_OPACITY = 0.6;
 
 @Component({
   selector: 'app-jcrop',
@@ -120,26 +128,11 @@ export class JcropComponent {
   private readonly workingImgRef = viewChild.required<ElementRef<HTMLImageElement>>('workingImg');
 
   // Rendered with @for (jcrop.component.html) instead of one static element per ordinal - z-index is
-  // listed alongside each ordinal here (rather than computed from array position in the template)
-  // since it's the one thing genuinely unique per element, not shareable via a class or derivable
-  // from the ordinal itself.
-  protected readonly dragbars: {ord: Ordinal; zIndex: number}[] = [
-    {ord: 'n', zIndex: 370},
-    {ord: 's', zIndex: 371},
-    {ord: 'e', zIndex: 372},
-    {ord: 'w', zIndex: 373},
-  ];
-
-  protected readonly handles: {ord: Ordinal; zIndex: number}[] = [
-    {ord: 'n', zIndex: 374},
-    {ord: 's', zIndex: 375},
-    {ord: 'e', zIndex: 376},
-    {ord: 'w', zIndex: 377},
-    {ord: 'nw', zIndex: 378},
-    {ord: 'ne', zIndex: 379},
-    {ord: 'se', zIndex: 380},
-    {ord: 'sw', zIndex: 381},
-  ];
+  // derived from each ordinal's position in dragbarOrdinals/handleOrdinals above (plus a shared
+  // base) rather than hand-typed, since it's the one thing genuinely unique per element, not
+  // shareable via a class or derivable from the ordinal itself.
+  protected readonly dragbars = dragbarOrdinals.map((ord, i) => ({ord, zIndex: DRAGBAR_Z_BASE + i}));
+  protected readonly handles = handleOrdinals.map((ord, i) => ({ord, zIndex: HANDLE_Z_BASE + i}));
 
   constructor() {
     // Feature-detect the window (what used to be Touch's own constructor logic and the free
@@ -151,8 +144,8 @@ export class JcropComponent {
   }
 
   // Whether the resize handles/dragbars are shown - set directly by this component (#setSelect(),
-  // #doneSelect(), #newSelection() below), and read directly by the #hdlHolder template element's
-  // [style.display] binding instead of Jcrop imperatively setting that style itself.
+  // #doneSelect(), #newSelection() below), and read directly by the .jcrop-handles-holder template
+  // element's [style.display] binding instead of Jcrop imperatively setting that style itself.
   protected readonly handlesVisible = signal(false);
 
   // The #tracker template element's cursor - set directly via style manipulation in the vendored
@@ -247,15 +240,6 @@ export class JcropComponent {
   #trackerIstouch: boolean | undefined;
   #trackerOnDone: PositionCallback = function () {};
   #trackerOnMove: PositionCallback = function () {};
-  // Default option values (what used to be a `defaults` constant in Jcrop.ts) - onLoad() is the only
-  // consumer, so there's no reason for these to live anywhere else. A real field initializer rather
-  // than a static one: each instance gets its own fresh object this way, so onLoad() merging its own
-  // per-crop values into it can't mutate a value shared across every other JcropComponent instance.
-  #options: InternalOptions = {
-    boxHeight: 0,
-    boxWidth: 0,
-    minSize: [0, 0],
-  };
   #xscale!: number;
   #yscale!: number;
   #docOffset!: Point;
@@ -279,7 +263,7 @@ export class JcropComponent {
   // directly instead of classes in Jcrop.ts: Tracker as
   // #trackerBtndown/#trackerIstouch/#trackerOnMove/#trackerOnDone and the
   // #activateTrackerHandlers()/#finishTrackerDrag() methods below, Touch as #touchSupport and the
-  // #createTouchDragger()/#touchCfilter() methods below, Selection as #selectionAwake and the
+  // #createDragger()/#touchCfilter() methods below, Selection as #selectionAwake and the
   // #selectionRefresh()/#selectionUpdate()/#setSelBgOpacity() methods below (#doneSelect()/
   // #selectionUpdate() themselves absorbed what used to be Selection's own release()/#show()).
   // #init() itself (what used to build/wire all of the above) was folded in here too - onLoad() was
@@ -288,8 +272,8 @@ export class JcropComponent {
   // #doneSelect/#selectDrag below are field arrows rather than ordinary methods because each is
   // handed to #activateTrackerHandlers() by bare reference (stored as #trackerOnDone/#trackerOnMove
   // and invoked later, not called directly where passed) - an ordinary method read that way loses its
-  // `this` binding the moment something else invokes it. A few other methods (#getPos/#mouseAbs/
-  // #startDragMode/#createDragger/#createTouchDragger) are field arrows too, left over from when
+  // `this` binding the moment something else invokes it. A few other methods
+  // (#getPos/#mouseAbs/#startDragMode/#createDragger) are field arrows too, left over from when
   // Selection/Touch needed them the same way - nothing still requires that of them, but nothing's
   // broken by it either.
   protected onLoad(): void {
@@ -328,13 +312,6 @@ export class JcropComponent {
 
     const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
 
-    this.#options = {
-      ...this.#options,
-      boxHeight: height,
-      boxWidth: width,
-      minSize: this.minSize(),
-    };
-
     // Fix size of crop image.
     // Necessary when crop image is within a hidden element when page is loaded.
     if (img.width !== 0 && img.height !== 0) {
@@ -362,19 +339,19 @@ export class JcropComponent {
     setStyle(workingImg, {height: px(img.offsetHeight), width: px(img.offsetWidth)});
     this.origimgVisible.set(false);
 
-    // Shrinks #workingImg to fit inside the boxWidth/boxHeight box (preserving aspect ratio) if it's
-    // currently bigger than that in either dimension, and derives #xscale/#yscale (the ratio between
-    // #workingImg's real, unshrunk size and its on-screen presized size) from however much shrinking
-    // that took.
+    // Shrinks #workingImg to fit inside the width/height box computed above (preserving aspect
+    // ratio) if it's currently bigger than that in either dimension, and derives #xscale/#yscale
+    // (the ratio between #workingImg's real, unshrunk size and its on-screen presized size) from
+    // however much shrinking that took.
     let presizedHeight = workingImg.offsetHeight,
       presizedWidth = workingImg.offsetWidth;
-    if (presizedWidth > this.#options.boxWidth && this.#options.boxWidth > 0) {
-      presizedWidth = this.#options.boxWidth;
-      presizedHeight = (this.#options.boxWidth / workingImg.offsetWidth) * workingImg.offsetHeight;
+    if (presizedWidth > width && width > 0) {
+      presizedWidth = width;
+      presizedHeight = (width / workingImg.offsetWidth) * workingImg.offsetHeight;
     }
-    if (presizedHeight > this.#options.boxHeight && this.#options.boxHeight > 0) {
-      presizedHeight = this.#options.boxHeight;
-      presizedWidth = (this.#options.boxHeight / workingImg.offsetHeight) * workingImg.offsetWidth;
+    if (presizedHeight > height && height > 0) {
+      presizedHeight = height;
+      presizedWidth = (height / workingImg.offsetHeight) * workingImg.offsetWidth;
     }
     this.#xscale = workingImg.offsetWidth / presizedWidth;
     this.#yscale = workingImg.offsetHeight / presizedHeight;
@@ -387,14 +364,11 @@ export class JcropComponent {
     this.holderHeight.set(this.#boundy);
     this.holderWidth.set(this.#boundx);
 
-    // 2 is the vendored plugin's boundary option - never overridable via JcropOptions, so it's a
-    // plain constant now instead of routed through #options.
-    const bound = 2;
     // position is static CSS on .jcrop-tracker; height/width/left/top/z-index are all signals bound
     // in the template (trackerHeight/trackerWidth/trackerOffset/trackerZIndex) instead of setStyle().
-    this.trackerHeight.set(this.#boundy + bound * 2);
-    this.trackerWidth.set(this.#boundx + bound * 2);
-    this.trackerOffset.set(-bound);
+    this.trackerHeight.set(this.#boundy + BOUNDARY * 2);
+    this.trackerWidth.set(this.#boundx + BOUNDARY * 2);
+    this.trackerOffset.set(-BOUNDARY);
 
     // #img2's own src/static styling are template bindings, same as #workingImg above; its
     // height/width and left/top are all signals too (img2Height/img2Width/img2Left/img2Top) - unlike
@@ -440,7 +414,8 @@ export class JcropComponent {
     this.#setSelect([initial.x, initial.y, initial.x + initial.w, initial.y + initial.h]);
     this.#selectionRefresh();
 
-    this.#coords.setLimits(this.#options.minSize[0], this.#options.minSize[1]);
+    const minSize = this.minSize();
+    this.#coords.setLimits(minSize[0], minSize[1]);
 
     this.#selectionRefresh();
   }
@@ -476,11 +451,11 @@ export class JcropComponent {
 
   protected onSelectionTrackerTouchStart(e: TouchEvent): void {
     if (!this.#initialized || !this.#touchSupport) return;
-    this.#createTouchDragger('move')(e);
+    this.#createDragger('move', true)(e);
   }
 
   // Bound on each of the 12 static handle/dragbar template elements (jcrop.component.html), each
-  // passing its own fixed ordinal directly into #createDragger()/#createTouchDragger() below.
+  // passing its own fixed ordinal directly into #createDragger() below.
   protected onDragMouseDown(ord: Ordinal, e: MouseEvent): void {
     if (!this.#initialized) return;
     this.#createDragger(ord)(e);
@@ -488,7 +463,7 @@ export class JcropComponent {
 
   protected onDragTouchStart(ord: Ordinal, e: TouchEvent): void {
     if (!this.#initialized || !this.#touchSupport) return;
-    this.#createTouchDragger(ord)(e);
+    this.#createDragger(ord, true)(e);
   }
 
   protected onDocumentMouseMove(e: MouseEvent): void {
@@ -615,28 +590,18 @@ export class JcropComponent {
     }
   }
 
-  readonly #createDragger = (ord: DragMode): ((e: JcropMouseEvent) => void) => {
+  // What used to be Touch's own createDragger() (Jcrop.ts), folded in directly since every
+  // collaborator it needed was already a closure over this component anyway - and merged with its
+  // own touch equivalent, since the two differed only in running the event through #touchCfilter()
+  // first and passing touch=true through to #startDragMode (which activates the tracker handlers in
+  // touch mode - see #trackerIstouch).
+  readonly #createDragger = (ord: DragMode, touch?: boolean): ((e: JcropMouseEvent) => void) => {
     return (e: JcropMouseEvent): void => {
       // Fix position of crop area when dragged the very first time.
       // Necessary when crop image is in a hidden element when page is loaded.
       this.#docOffset = this.#getPos(this.#img);
 
-      this.#startDragMode(ord, this.#mouseAbs(e));
-      e.stopPropagation();
-      e.preventDefault();
-    };
-  };
-
-  // The touch equivalent of #createDragger above - what used to be Touch's own createDragger()
-  // (Jcrop.ts), folded in directly since every collaborator it needed was already a closure over
-  // this component anyway. Passes touch=true through to #startDragMode so it activates the tracker
-  // handlers in touch mode (see #trackerIstouch), and runs the event through #touchCfilter() first so
-  // mouseAbs() can read pageX/pageY the same way it does for a mouse event.
-  readonly #createTouchDragger = (ord: DragMode): ((e: JcropMouseEvent) => void) => {
-    return (e: JcropMouseEvent): void => {
-      this.#docOffset = this.#getPos(this.#img);
-
-      this.#startDragMode(ord, this.#mouseAbs(this.#touchCfilter(e)), true);
+      this.#startDragMode(ord, this.#mouseAbs(touch ? this.#touchCfilter(e) : e), touch);
       e.stopPropagation();
       e.preventDefault();
     };
@@ -749,9 +714,7 @@ export class JcropComponent {
 
     if (!this.#selectionAwake) {
       this.selVisible.set(true);
-      // 0.6 is the vendored plugin's bgOpacity option - never overridable via JcropOptions, so it's
-      // a plain constant now instead of routed through #options.
-      this.#setSelBgOpacity(0.6, true);
+      this.#setSelBgOpacity(BG_OPACITY, true);
       this.#selectionAwake = true;
     }
 
