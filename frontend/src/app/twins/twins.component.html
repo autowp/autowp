@@ -23,6 +23,8 @@
 
     @if (dataResource.error(); as error) {
       <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+    } @else if (dataResource.isLoading()) {
+      <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
     } @else if (data(); as data) {
       @for (group of data.groups; track group) {
         <div>
