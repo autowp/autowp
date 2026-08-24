@@ -136,11 +136,11 @@ spec:
               type: RuntimeDefault
           resources:
             limits:
-              memory: 5Gi
+              memory: 8Gi
               cpu: 4000m
             requests:
-              memory: 10M
-              cpu: 50m
+              memory: 1Gi
+              cpu: 500m
         - name: goautowp-serve
           image: {{ include "autowp.goautowp.image" . }}
           imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
@@ -168,11 +168,11 @@ spec:
               name: tmp
           resources:
             limits:
-              memory: 5Gi
+              memory: 8Gi
               cpu: 4000m
             requests:
-              memory: 10M
-              cpu: 50m
+              memory: 1Gi
+              cpu: 500m
           securityContext:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
