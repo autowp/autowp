@@ -143,15 +143,15 @@ export const serverRoutes: ServerRoute[] = [
   // Sorted last rather than under `b`, because `:brand` is not a prefix like the ones above: it
   // matches any single segment that isn't one of them.
   {path: ':brand', renderMode: RenderMode.Server},
-  {path: ':brand/cars/**', renderMode: RenderMode.Server},
-  {path: ':brand/concepts/**', renderMode: RenderMode.Server},
+  {path: ':brand/cars/**', renderMode: RenderMode.Client},
+  {path: ':brand/concepts/**', renderMode: RenderMode.Client},
   {path: ':brand/logotypes/**', renderMode: RenderMode.Server},
   {path: ':brand/mixed/**', renderMode: RenderMode.Server},
   // MostsContentsComponent, which this renders, is the same one behind the top-level mosts/**
   // route that has been server-rendered all along.
-  {path: ':brand/mosts/**', renderMode: RenderMode.Server},
+  {path: ':brand/mosts/**', renderMode: RenderMode.Client},
   {path: ':brand/other/**', renderMode: RenderMode.Server},
-  {path: ':brand/recent/**', renderMode: RenderMode.Server},
+  {path: ':brand/recent/**', renderMode: RenderMode.Client},
   {path: ':brand/**', renderMode: RenderMode.Client},
 
   // Only reachable by a route that was added without being listed above. Server rather than Client
