@@ -20,6 +20,7 @@ import {UserComponent} from '../../user/user/user.component';
   imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, DatePipe, TimeAgoPipe],
   templateUrl: './users.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerUsersComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

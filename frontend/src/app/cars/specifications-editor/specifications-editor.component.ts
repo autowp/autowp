@@ -30,6 +30,7 @@ import {CarsSpecificationsEditorSpecComponent} from './spec/spec.component';
   ],
   templateUrl: './specifications-editor.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CarsSpecificationsEditorComponent {
   readonly #router = inject(Router);

@@ -24,6 +24,7 @@ const CAPTCHA = 'captcha';
   imports: [RouterLink, FormsModule, ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, RemarkModule],
   templateUrl: './feedback.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class FeedbackComponent implements OnInit {
   readonly #autowpClient = inject(AutowpClient);

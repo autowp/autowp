@@ -31,6 +31,7 @@ import {map} from 'rxjs';
   imports: [RouterLink, FormsModule, AsyncPipe, InvalidParamsPipe, RemarkModule],
   templateUrl: './new-topic.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ForumsNewTopicComponent implements OnInit {
   readonly #router = inject(Router);

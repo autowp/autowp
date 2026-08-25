@@ -50,6 +50,7 @@ interface LanguageItem {
   imports: [RouterLink, FormsModule, InvalidParamsPipe, AsyncPipe, UpperCasePipe],
   templateUrl: './item-parent.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemParentComponent {
   readonly #contentLanguage = inject(ContentLanguageService);

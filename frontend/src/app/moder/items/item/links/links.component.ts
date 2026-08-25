@@ -19,6 +19,7 @@ import {ToastsService} from '../../../../toasts/toasts.service';
   imports: [FormsModule, AsyncPipe],
   templateUrl: './links.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemLinksComponent implements OnInit {
   readonly #auth = inject(AuthService);

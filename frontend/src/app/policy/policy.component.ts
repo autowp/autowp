@@ -9,6 +9,7 @@ import {PageEnvService} from '@services/page-env.service';
   imports: [RouterLink],
   templateUrl: './policy.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PolicyComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

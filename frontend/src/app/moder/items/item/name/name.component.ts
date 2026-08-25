@@ -31,6 +31,7 @@ import {MarkdownEditComponent} from '../../../../markdown-edit/markdown-edit/mar
   ],
   templateUrl: './name.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemNameComponent {
   readonly #contentLanguage = inject(ContentLanguageService);

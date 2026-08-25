@@ -35,6 +35,7 @@ interface ArticleListItem {
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ListComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

@@ -20,6 +20,7 @@ import {ForumsTopicListComponent} from './topic-list/topic-list.component';
   templateUrl: './forums.component.html',
   styles: 'app-forums {display:block}',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ForumsComponent {
   readonly #route = inject(ActivatedRoute);

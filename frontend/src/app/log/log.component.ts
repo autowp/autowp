@@ -40,6 +40,7 @@ interface LogEventView {
   imports: [RouterLink, UserComponent, NgbTooltip, PaginatorComponent, DatePipe, TimeAgoPipe],
   templateUrl: './log.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class LogComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
