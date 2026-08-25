@@ -134,8 +134,15 @@ export class CatalogueVehiclesComponent {
 
   // Only fetches once catalogueResource has resolved - while it's still loading or in an error
   // state, this stays idle.
+  //
+  // `id` folds in #isModer() as read once at construction - see the matching comment on
+  // CatalogueIndexComponent.brandResource for why: isModer is always false during SSR, and for an
+  // already-authenticated session it can already read true by the time this component constructs
+  // (Keycloak resolving before bootstrap completes), which would otherwise let hydration silently
+  // adopt the server's always-non-moderator TransferState snapshot (missing inboxPicturesCount) with
+  // no later isModer change left to trigger a refetch.
   protected readonly itemResource = rxResource({
-    id: `catalogue-vehicles-item-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
+    id: `catalogue-vehicles-item-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}`,
     params: () => {
       const data = this.catalogueData();
       return data ? {isModer: this.#isModer(), path: data.path} : undefined;
@@ -189,8 +196,9 @@ export class CatalogueVehiclesComponent {
   // Same reasoning as catalogueData above.
   protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
 
+  // `id` folds in #isModer() - same reasoning as itemResource above.
   protected readonly itemsResource = rxResource({
-    id: `catalogue-vehicles-items-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
+    id: `catalogue-vehicles-items-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}`,
     params: () => {
       const data = this.catalogueData();
       const item = this.itemData();

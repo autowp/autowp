@@ -69,24 +69,37 @@ export class CatalogueIndexComponent {
   // they don't race Angular's SSR whenStable() check the way a raw Observable stored on an object
   // and subscribed later by the template would (see the Articles list author-lookup fix for the
   // full explanation). `id` also seeds each resource as already-resolved from TransferState on
-  // hydration — notably useful here since isModer depends on client-side Keycloak
-  // initialization, which can take a real amount of time; without `id` the whole page would
-  // blank-and-reload on every hydration waiting for it, even though SSR already has the data.
+  // hydration, avoiding a loading-state blink.
   //
   // Every `id` below is suffixed with the catname read once at construction time (component
   // construction happens per brand, since a route-param-only change reuses the instance and
   // never re-reads `id`). A static id would let a *second* CatalogueIndexComponent instance -
   // created by navigating SSR /bmw -> away -> /toyota, all before Angular's whenStable() ever
-  // resolves (isActive stays true the whole time isModer's Keycloak init is pending) - match the
-  // TransferState entry BMW's SSR pass already wrote under the same static key, and seed itself
-  // with BMW's data instead of fetching Toyota's.
+  // resolves - match the TransferState entry BMW's SSR pass already wrote under the same static
+  // key, and seed itself with BMW's data instead of fetching Toyota's.
   //
   // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
   // than an imperative Router.navigate() inside the stream (which raced SSR's whenStable() the
   // same way the picture-page canonicalResource did) — see the constructor effect() below, which
   // is the single place that navigates or toasts off this resource's error()/value() signals.
+  //
+  // brandResource's `id` also folds in isModer() *as read once at construction*, which matters for
+  // one specific race: isModer starts as its toSignal initialValue (false) and flips once Keycloak
+  // resolves (app.config.ts's provideKeycloakInAppInitializer blocks bootstrap on it, browser-only -
+  // it's always false during SSR). For a session that's already authenticated, Keycloak can resolve
+  // *before* this component ever constructs, so isModer can already read true on that very first
+  // read. Hydration's TransferState lookup matches purely on the `id` string, with no check that the
+  // params which produced the cached value still match the current ones - so without isModer in
+  // `id`, that fast-resolving-moderator case would silently adopt the server's always-false snapshot
+  // (which never requested inboxPicturesCount/commentsAttentionsCount) and then never notice, since
+  // nothing about isModer changes *afterwards* to trigger a refetch. Folding isModer into `id` here
+  // makes that id deliberately mismatch the server's in that one case, so the resource falls through
+  // to a normal fresh fetch instead of getting stuck. The much more common case - isModer still false
+  // at construction, flipping true only after Keycloak actually finishes - isn't affected by this at
+  // all: `id` is read once and already matches the server's, so hydration proceeds as usual, and the
+  // later isModer change is picked up through the ordinary params()-changed reactive refetch instead.
   protected readonly brandResource = rxResource({
-    id: `catalogue-brand-${this.#catname() ?? ''}`,
+    id: `catalogue-brand-${this.#catname() ?? ''}${this.isModer() ? '-moder' : ''}`,
     params: () => ({catname: this.#catname(), isModer: this.isModer()}),
     stream: ({params: {catname, isModer}}): Observable<Item> => {
       if (!catname) {
@@ -102,6 +115,8 @@ export class CatalogueIndexComponent {
         nameOnly: true,
         nameText: true,
       });
+      // The backend rejects these two outright for a non-moderator caller
+      // (items-grpc.go requestsModeratorOnlyFields), so they can't be requested unconditionally.
       if (isModer) {
         fields.inboxPicturesCount = true;
         fields.commentsAttentionsCount = true;

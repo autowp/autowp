@@ -200,8 +200,14 @@ export class UsersUserComponent {
     },
   });
 
+  // `id` folds in #authenticated() as read once at construction - see the matching comment on
+  // CatalogueIndexComponent.brandResource for why: authenticated is always false during SSR, and
+  // for an already-authenticated session it can already read true by the time this component
+  // constructs (Keycloak resolving before bootstrap completes), which would otherwise let hydration
+  // silently adopt the server's always-signed-out TransferState snapshot (of(false)) with no later
+  // authenticated change left to trigger a refetch.
   protected readonly inContactsResource = rxResource({
-    id: `users-user-in-contacts-${this.#identity()}`,
+    id: `users-user-in-contacts-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const user = this.userData();
 
@@ -216,8 +222,9 @@ export class UsersUserComponent {
     },
   });
 
+  // `id` folds in #authenticated() - same reasoning as inContactsResource above.
   protected readonly disableCommentsNotificationsResource = rxResource({
-    id: `users-user-disable-comments-notifications-${this.#identity()}`,
+    id: `users-user-disable-comments-notifications-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const user = this.userData();
 
