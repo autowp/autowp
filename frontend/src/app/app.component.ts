@@ -22,10 +22,11 @@ import {LanguageService} from '@services/language';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {browserWindow} from '@utils/browser-window';
+import {isPrerendering} from '@utils/is-prerendering';
 import {Angulartics2GoogleAnalytics} from 'angulartics2';
 import Keycloak from 'keycloak-js';
 import {RemarkComponent} from 'ngx-remark';
-import {map, shareReplay} from 'rxjs';
+import {map, of, shareReplay} from 'rxjs';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {ContainerComponent} from './toasts/container/container.component';
@@ -66,6 +67,7 @@ export class AppComponent {
   readonly #document = inject(DOCUMENT);
   readonly #destroyRef = inject(DestroyRef);
   readonly #window = browserWindow();
+  readonly #isPrerendering = isPrerendering();
 
   protected readonly languages: Language[] = environment.languages;
   protected readonly authenticated$: Observable<boolean> = this.#auth.authenticated$;
@@ -76,8 +78,14 @@ export class AppComponent {
   protected readonly categoriesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: 'app-root-categories',
-    stream: () =>
-      this.#itemsClient.list(
+    stream: () => {
+      // Build-time prerendering has no backend to call (see isPrerendering()); skip straight to an
+      // empty categories dropdown instead of failing the build with a transport error.
+      if (this.#isPrerendering) {
+        return of(null);
+      }
+
+      return this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({
             descendantsCount: true,
@@ -94,7 +102,8 @@ export class AppComponent {
         // call only requests descendantsCount/nameText, which are never gated by caller identity
         // (goautowp/item-extractor.go). Skip auth so it stays cache-eligible for logged-in users.
         skipAuthMetadata(),
-      ),
+      );
+    },
   });
 
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
