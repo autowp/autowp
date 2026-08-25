@@ -24,6 +24,7 @@ import {PictureComponent} from './picture.component';
   imports: [RouterLink, CommentsComponent, PictureComponent],
   templateUrl: './picture-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PicturePageComponent {
   readonly #route = inject(ActivatedRoute);

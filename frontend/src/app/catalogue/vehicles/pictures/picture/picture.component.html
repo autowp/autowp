@@ -37,11 +37,11 @@
     />
 
     <div id="comments">
-      <!-- eslint-disable prettier/prettier -->
       @defer (on viewport) {
         <app-comments [typeID]="CommentsType.PICTURES_TYPE_ID" [itemID]="picture.id" [limit]="null" />
-      } @placeholder {<div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>}
-      <!-- eslint-enable prettier/prettier -->
+      } @placeholder {
+        <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+      }
     </div>
   } @else {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>

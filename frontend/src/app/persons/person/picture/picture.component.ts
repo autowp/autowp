@@ -26,6 +26,7 @@ import {PictureComponent} from '../../../picture/picture.component';
   imports: [CommentsComponent, PictureComponent],
   templateUrl: './picture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PersonsPersonPictureComponent {
   readonly #pageEnv = inject(PageEnvService);
