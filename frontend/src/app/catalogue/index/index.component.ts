@@ -1,4 +1,4 @@
-import type {Item, ItemLink, Picture} from '@grpc/spec.pb';
+import type {Item, ItemLink} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
@@ -17,7 +17,6 @@ import {
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
-  PicturePathRequest,
   PicturesRequest,
   PictureStatus,
 } from '@grpc/spec.pb';
@@ -30,20 +29,15 @@ import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
-import {chunk, chunkBy} from '../../chunk';
-import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
-import {CatalogueService} from '../catalogue-service';
-
-interface PictureRoute {
-  picture: Picture;
-  route: null | string[];
-}
+import {chunk} from '../../chunk';
+import {CatalogueIndexPicturesComponent} from './pictures/pictures.component';
 
 @Component({
   selector: 'app-catalogue-index',
-  imports: [RouterLink, ThumbnailComponent, RemarkModule],
+  imports: [RouterLink, RemarkModule, CatalogueIndexPicturesComponent],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueIndexComponent {
   readonly #pageEnv = inject(PageEnvService);
@@ -51,7 +45,6 @@ export class CatalogueIndexComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
   readonly #router = inject(Router);
-  readonly #catalogue = inject(CatalogueService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #picturesClient = inject(PicturesClient);
@@ -183,46 +176,6 @@ export class CatalogueIndexComponent {
   protected readonly brandData = computed(() =>
     this.brandResource.hasValue() ? this.brandResource.value() : undefined,
   );
-
-  protected readonly picturesResource = rxResource({
-    id: `catalogue-brand-pictures-${this.#catname() ?? ''}`,
-    params: () => this.brandData(),
-    stream: ({params: brand}) =>
-      this.#picturesClient
-        .getPictures(
-          new PicturesRequest({
-            fields: new PictureFields({
-              commentsCount: true,
-              moderVote: true,
-              nameHtml: true,
-              nameText: true,
-              path: new PicturePathRequest({parentId: brand.id}),
-              thumbMedium: true,
-              views: true,
-              votes: true,
-            }),
-            language: this.#languageService.language,
-            limit: 12,
-            options: new PictureListOptions({
-              pictureItem: new PictureItemListOptions({
-                itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brand.id}),
-              }),
-              status: PictureStatus.PICTURE_STATUS_ACCEPTED,
-            }),
-            order: PicturesRequest.Order.ORDER_LIKES,
-          }),
-        )
-        .pipe(
-          map((response) => {
-            const pictures: PictureRoute[] = (response.items ?? []).map((pic) => ({
-              picture: pic,
-              route: this.#catalogue.picturePathToRoute(pic),
-            }));
-
-            return chunkBy(pictures, 4);
-          }),
-        ),
-  });
 
   protected readonly linksResource = rxResource({
     id: `catalogue-brand-links-${this.#catname() ?? ''}`,

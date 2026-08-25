@@ -1,0 +1,20 @@
+@if (picturesResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+} @else if (picturesResource.value(); as pictures) {
+  @if (pictures.length) {
+    <section>
+      <h2 i18n>Popular images</h2>
+      @for (chunk of pictures; track chunk) {
+        <div class="row">
+          @for (item of chunk; track item) {
+            <div class="col-sm-3">
+              <app-thumbnail [picture]="item.picture" [route]="item.route || []" />
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+}

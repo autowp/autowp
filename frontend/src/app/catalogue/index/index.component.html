@@ -3,7 +3,6 @@
 } @else if (brandResource.value(); as brand) {
   <header class="mb-4">
     <div class="p-5 mb-4 rounded-3 brand-hero-unit clearfix">
-      <!-- [translate-attr-alt]="''"  sprintf($this->translate('catalogue/brand/logo-of-%s'), $this->brand['name']) 'format' => 'logo', -->
       @if (brand.logo120) {
         <img alt="" class="logo" loading="lazy" [src]="brand.logo120.src" />
       }
@@ -171,24 +170,9 @@
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 
-  @if (picturesResource.error(); as error) {
-    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
-  } @else if (picturesResource.value(); as pictures) {
-    @if (pictures.length) {
-      <section>
-        <h2 i18n>Popular images</h2>
-        @for (chunk of pictures; track chunk) {
-          <div class="row">
-            @for (item of chunk; track item) {
-              <div class="col-sm-3">
-                <app-thumbnail [picture]="item.picture" [route]="item.route || []" />
-              </div>
-            }
-          </div>
-        }
-      </section>
-    }
-  } @else {
+  @defer (on viewport) {
+    <app-catalogue-index-pictures [itemID]="brand.id" />
+  } @placeholder {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 
