@@ -15,13 +15,12 @@
     @if (isModer$ | async) {
       <a class="nav-link" [routerLink]="['/moder/items/item', item.id]">
         <i class="bi bi-gear-fill" aria-hidden="true"></i>
-        <ng-container i18n>edit</ng-container>
-        <span [innerHTML]="item.nameHtml"></span>
+        &ngsp;<ng-container i18n>edit</ng-container> &ngsp;<span [innerHTML]="item.nameHtml"></span>
       </a>
     }
     <a class="nav-link" routerLink="/cars/attrs-change-log" [queryParams]="{item_id: item.id}">
       <i class="bi bi-list" aria-hidden="true"></i>
-      <ng-container i18n>Log of values</ng-container>
+      &ngsp;<ng-container i18n>Log of values</ng-container>
     </a>
   </div>
 
@@ -47,7 +46,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
           [class.active]="tab === 'info'"
         >
           <span class="bi bi-info" aria-hidden="true"></span>
-          <ng-container i18n>Info</ng-container>
+          &ngsp;<ng-container i18n>Info</ng-container>
         </a>
       </li>
       @if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE) {
@@ -59,9 +58,9 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
             [class.active]="tab === 'engine'"
           >
             <span class="glyphicon glyphicon-align-left"></span>
-            <ng-container i18n>Engine</ng-container>
+            &ngsp;<ng-container i18n>Engine</ng-container>
             @if (item.engineItemId) {
-              <span class="badge rounded-pill text-bg-secondary">1</span>
+              &ngsp;<span class="badge rounded-pill text-bg-secondary">1</span>
             }
           </a>
         </li>
@@ -74,7 +73,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
           [class.active]="tab === 'spec'"
         >
           <span class="bi bi-car-front" aria-hidden="true"></span>
-          <ng-container i18n>Specifications</ng-container>
+          &ngsp;<ng-container i18n>Specifications</ng-container>
         </a>
       </li>
       @if (item) {
@@ -86,7 +85,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
             [class.active]="tab === 'result'"
           >
             <span class="bi bi-table" aria-hidden="true"></span>
-            <ng-container i18n>Result</ng-container>
+            &ngsp;<ng-container i18n>Result</ng-container>
           </a>
         </li>
         @if (isSpecsAdmin$ | async) {
@@ -98,7 +97,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
               [class.active]="tab === 'admin'"
             >
               <span class="bi bi-table" aria-hidden="true"></span>
-              <ng-container i18n>Admin</ng-container>
+              &ngsp;<ng-container i18n>Admin</ng-container>
             </a>
           </li>
         }

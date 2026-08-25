@@ -4,8 +4,10 @@
       <li class="nav-item">
         <a class="nav-link" [class.active]="active() === 'default'" [routerLink]="itemRouterLink()">
           <i class="bi bi-list" aria-hidden="true"></i>
-          <app-item-header [item]="{nameHTML: header().nameHTML || ''}" />
-          <span class="badge rounded-pill text-bg-secondary">{{ childsCounts.stock }}</span>
+          &ngsp;<app-item-header [item]="{nameHTML: header().nameHTML || ''}" /> &ngsp;<span
+            class="badge rounded-pill text-bg-secondary"
+            >{{ childsCounts.stock }}</span
+          >
         </a>
       </li>
     }
@@ -13,9 +15,10 @@
       <li class="nav-item">
         <a class="nav-link" [class.active]="active() === 'tuning'" [routerLink]="itemRouterLink().concat(['tuning'])">
           <i class="bi bi-list" aria-hidden="true"></i>
-          <ng-container i18n>Related</ng-container>
-          <app-item-header [item]="{nameHTML: header().nameHTML || ''}" />
-          <span class="badge rounded-pill text-bg-secondary">{{ childsCounts.tuning }}</span>
+          &ngsp;<ng-container i18n>Related</ng-container> &ngsp;<app-item-header
+            [item]="{nameHTML: header().nameHTML || ''}"
+          />
+          &ngsp;<span class="badge rounded-pill text-bg-secondary">{{ childsCounts.tuning }}</span>
         </a>
       </li>
     }
@@ -23,9 +26,10 @@
       <li class="nav-item">
         <a class="nav-link" [class.active]="active() === 'sport'" [routerLink]="itemRouterLink().concat(['sport'])">
           <i class="bi bi-list" aria-hidden="true"></i>
-          <app-item-header [item]="{nameHTML: header().nameHTML || ''}" />
-          <ng-container i18n>Sport</ng-container>
-          <span class="badge rounded-pill text-bg-secondary">{{ childsCounts.sport }}</span>
+          &ngsp;<app-item-header [item]="{nameHTML: header().nameHTML || ''}" /> &ngsp;<ng-container i18n
+            >Sport</ng-container
+          >
+          &ngsp;<span class="badge rounded-pill text-bg-secondary">{{ childsCounts.sport }}</span>
         </a>
       </li>
     }
@@ -34,9 +38,10 @@
     <li class="nav-item">
       <a class="nav-link" [class.active]="active() === 'pictures'" [routerLink]="itemRouterLink().concat(['pictures'])">
         <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
-        <ng-container i18n>All pictures of</ng-container>
-        <app-item-header [item]="{nameHTML: header().nameHTML || ''}" />
-        <span class="badge rounded-pill text-bg-secondary">{{ picturesCount() }}</span>
+        &ngsp;<ng-container i18n>All pictures of</ng-container> &ngsp;<app-item-header
+          [item]="{nameHTML: header().nameHTML || ''}"
+        />
+        &ngsp;<span class="badge rounded-pill text-bg-secondary">{{ picturesCount() }}</span>
       </a>
     </li>
   }

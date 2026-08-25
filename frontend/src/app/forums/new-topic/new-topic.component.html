@@ -73,7 +73,7 @@
                 [class.is-invalid]="invalidParams() && invalidParams()['moderator_attention']"
                 [(ngModel)]="form.moderator_attention"
               />
-              <ng-container i18n>It requires attention of moderators</ng-container>
+              &ngsp;<ng-container i18n>It requires attention of moderators</ng-container>
             </label>
           </div>
           @for (message of invalidParams() | invalidParams: 'moderator_attention'; track message) {
@@ -93,7 +93,7 @@
                 [class.is-invalid]="invalidParams() && invalidParams()['subscription']"
                 [(ngModel)]="form.subscription"
               />
-              <ng-container i18n>Subscribe to new messages</ng-container>
+              &ngsp;<ng-container i18n>Subscribe to new messages</ng-container>
             </label>
           </div>
           @for (message of invalidParams() | invalidParams: 'subscription'; track message) {

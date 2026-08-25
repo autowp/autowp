@@ -30,7 +30,7 @@
     <div>
       <a class="btn btn-primary mb-3" [routerLink]="['/forums/new-topic', data.theme.id]">
         <i class="bi bi-chat-fill" aria-hidden="true"></i>
-        <ng-container i18n>Create new topic</ng-container>
+        &ngsp;<ng-container i18n>Create new topic</ng-container>
       </a>
       @if (topicsResource.error(); as error) {
         <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>

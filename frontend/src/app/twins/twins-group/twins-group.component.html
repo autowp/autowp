@@ -28,15 +28,17 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="." routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
               <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
-              <ng-container i18n>group</ng-container>
+              &ngsp;<ng-container i18n>group</ng-container>
             </a>
           </li>
           @if (group.acceptedPicturesCount > 0) {
             <li class="nav-item">
               <a class="nav-link" routerLink="pictures" routerLinkActive="active">
                 <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
-                <ng-container i18n>all pictures</ng-container>
-                <span class="badge rounded-pill bg-secondary">{{ group.acceptedPicturesCount }}</span>
+                &ngsp;<ng-container i18n>all pictures</ng-container> &ngsp;<span
+                  class="badge rounded-pill bg-secondary"
+                  >{{ group.acceptedPicturesCount }}</span
+                >
               </a>
             </li>
           }
@@ -44,7 +46,7 @@
             <li class="nav-item">
               <a class="nav-link" routerLink="specifications" routerLinkActive="active">
                 <i class="bi bi-card-list" aria-hidden="true"></i>
-                <ng-container i18n>specifications</ng-container>
+                &ngsp;<ng-container i18n>specifications</ng-container>
               </a>
             </li>
           }

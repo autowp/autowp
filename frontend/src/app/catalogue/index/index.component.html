@@ -21,27 +21,27 @@
       <li class="nav-item">
         <a class="nav-link" [routerLink]="['/', brand.catname, 'cars']">
           <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
-          <ng-container i18n>Chronological</ng-container>
+          &ngsp;<ng-container i18n>Chronological</ng-container>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" [routerLink]="['/', brand.catname, 'recent']">
           <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
-          <ng-container i18n>New pictures</ng-container>
+          &ngsp;<ng-container i18n>New pictures</ng-container>
         </a>
       </li>
       @if (brand.descendantTwinsGroupsCount) {
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/twins', brand.catname]">
-            <i class="bi bi-circle-half" aria-hidden="true"></i> <ng-container i18n>Twins</ng-container>
-            <span class="badge rounded-pill text-bg-secondary">{{ brand.descendantTwinsGroupsCount }}</span>
+            <i class="bi bi-circle-half" aria-hidden="true"></i>&ngsp;<ng-container i18n>Twins</ng-container>
+            &ngsp;<span class="badge rounded-pill text-bg-secondary">{{ brand.descendantTwinsGroupsCount }}</span>
           </a>
         </li>
       }
       @if (brand.mostsActive) {
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/', brand.catname, 'mosts']">
-            <i class="bi bi-sort-down" aria-hidden="true"></i> <ng-container i18n>Mostly</ng-container>
+            <i class="bi bi-sort-down" aria-hidden="true"></i>&ngsp;<ng-container i18n>Mostly</ng-container>
           </a>
         </li>
       }
@@ -49,8 +49,10 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/moder/pictures" [queryParams]="{status: 'inbox', item_id: brand.id}">
             <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
-            <ng-container i18n>Brand inbox</ng-container>
-            <span class="badge rounded-pill text-bg-secondary">{{ brand.inboxPicturesCount }}</span>
+            &ngsp;<ng-container i18n>Brand inbox</ng-container> &ngsp;<span
+              class="badge rounded-pill text-bg-secondary"
+              >{{ brand.inboxPicturesCount }}</span
+            >
           </a>
         </li>
       }
@@ -62,8 +64,9 @@
             [queryParams]="{moderator_attention: '1', pictures_of_item_id: brand.id}"
           >
             <i class="bi bi-chat-fill" aria-hidden="true"></i>
-            <ng-container i18n>comments</ng-container>
-            <span class="badge rounded-pill text-bg-secondary">{{ brand.commentsAttentionsCount }}</span>
+            &ngsp;<ng-container i18n>comments</ng-container> &ngsp;<span class="badge rounded-pill text-bg-secondary">{{
+              brand.commentsAttentionsCount
+            }}</span>
           </a>
         </li>
       }
@@ -71,7 +74,7 @@
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/moder/items/item', brand.id]">
             <i class="bi bi-gear-fill" aria-hidden="true"></i>
-            <ng-container i18n>edit</ng-container>
+            &ngsp;<ng-container i18n>edit</ng-container>
           </a>
         </li>
         <li class="nav-item">
@@ -81,7 +84,7 @@
             [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE, parent_id: brand.id}"
           >
             <i class="bi bi-plus" aria-hidden="true"></i>
-            <ng-container i18n>add vehicle</ng-container>
+            &ngsp;<ng-container i18n>add vehicle</ng-container>
           </a>
         </li>
         <li class="nav-item">
@@ -91,7 +94,7 @@
             [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE, parent_id: brand.id}"
           >
             <i class="bi bi-plus" aria-hidden="true"></i>
-            <ng-container i18n>add engine</ng-container>
+            &ngsp;<ng-container i18n>add engine</ng-container>
           </a>
         </li>
       }
