@@ -3483,6 +3483,14 @@ Algunos de ellos descubiertos por otros visitantes pueden encontrarse [here](/ac
         </context-group>
         <target state="translated">Cronológico</target>
       </trans-unit>
+      <trans-unit id="1924584399128307298" datatype="html">
+        <source>Pictures from the last year</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
+          <context context-type="linenumber">32,35</context>
+        </context-group>
+        <target state="translated">Fotos del último año</target>
+      </trans-unit>
       <trans-unit id="4832648236620985717" datatype="html">
         <source>New pictures</source>
         <context-group purpose="location">

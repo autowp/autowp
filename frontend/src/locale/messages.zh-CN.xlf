@@ -3485,6 +3485,14 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
         </context-group>
         <target state="translated">按车型年代</target>
       </trans-unit>
+      <trans-unit id="1924584399128307298" datatype="html">
+        <source>Pictures from the last year</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
+          <context context-type="linenumber">32,35</context>
+        </context-group>
+        <target state="translated">最近一年的照片</target>
+      </trans-unit>
       <trans-unit id="4832648236620985717" datatype="html">
         <source>New pictures</source>
         <context-group purpose="location">

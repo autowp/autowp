@@ -24,12 +24,22 @@
           &ngsp;<ng-container i18n>Chronological</ng-container>
         </a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/', brand.catname, 'recent']">
-          <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
-          &ngsp;<ng-container i18n>New pictures</ng-container>
-        </a>
-      </li>
+      @if (recentPicturesCountResource.value(); as recentPicturesCount) {
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            i18n-ngbTooltip
+            ngbTooltip="Pictures from the last year"
+            [routerLink]="['/', brand.catname, 'recent']"
+          >
+            <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+            &ngsp;<ng-container i18n>New pictures</ng-container> &ngsp;<span
+              class="badge rounded-pill text-bg-secondary"
+              >{{ recentPicturesCount }}</span
+            >
+          </a>
+        </li>
+      }
       @if (brand.descendantTwinsGroupsCount) {
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/twins', brand.catname]">

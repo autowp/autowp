@@ -21,6 +21,7 @@ import {
   PictureStatus,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -32,9 +33,12 @@ import {catchError, forkJoin, map, of, switchMap} from 'rxjs';
 import {chunk} from '../../chunk';
 import {CatalogueIndexPicturesComponent} from './pictures/pictures.component';
 
+// Keep in sync with ACCEPTED_IN_DAYS in ../recent/recent.component.ts.
+const RECENT_PICTURES_ACCEPTED_IN_DAYS = 365;
+
 @Component({
   selector: 'app-catalogue-index',
-  imports: [RouterLink, RemarkModule, CatalogueIndexPicturesComponent],
+  imports: [RouterLink, RemarkModule, CatalogueIndexPicturesComponent, NgbTooltip],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   preserveWhitespaces: false,
@@ -176,6 +180,32 @@ export class CatalogueIndexComponent {
   protected readonly brandData = computed(() =>
     this.brandResource.hasValue() ? this.brandResource.value() : undefined,
   );
+
+  // "New pictures" nav link only makes sense while such pictures (accepted within the last year)
+  // actually exist - otherwise it's a dead end to an empty recent.component.ts page. The count also
+  // feeds the link's badge, so this fetches the paginator's totalItemCount rather than just a
+  // boolean presence check.
+  protected readonly recentPicturesCountResource = rxResource({
+    id: `catalogue-brand-recent-pictures-count-${this.#catname() ?? ''}`,
+    params: () => this.brandData(),
+    stream: ({params: brand}) =>
+      this.#picturesClient
+        .getPictures(
+          new PicturesRequest({
+            language: this.#languageService.language,
+            limit: 1,
+            options: new PictureListOptions({
+              acceptedInDays: RECENT_PICTURES_ACCEPTED_IN_DAYS,
+              pictureItem: new PictureItemListOptions({
+                itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brand.id}),
+              }),
+              status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+            }),
+            paginator: true,
+          }),
+        )
+        .pipe(map((response) => response.paginator?.totalItemCount ?? 0)),
+  });
 
   protected readonly linksResource = rxResource({
     id: `catalogue-brand-links-${this.#catname() ?? ''}`,

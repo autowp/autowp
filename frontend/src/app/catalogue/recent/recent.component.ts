@@ -1,4 +1,4 @@
-import type {Item, Picture} from '@grpc/spec.pb';
+import type {Item, Pages, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject, RESPONSE_INIT} from '@angular/core';
@@ -9,7 +9,6 @@ import {
   ItemListOptions,
   ItemParentCacheListOptions,
   ItemsRequest,
-  Pages,
   PictureFields,
   PictureItemListOptions,
   PictureListOptions,
@@ -35,22 +34,9 @@ interface PictureRoute {
 
 const PICTURES_PER_PAGE = 12;
 
-// Only the most recent 120 pictures are worth paging through here - further back stops being
-// "recent" and is what the brand's full picture gallery is for.
-const MAX_PAGES = 120 / PICTURES_PER_PAGE;
-
-/** Clamps a paginator to MAX_PAGES, so the template never offers a page beyond that. */
-function capPaginator(paginator: Pages | undefined): Pages | undefined {
-  if (!paginator) {
-    return paginator;
-  }
-
-  return new Pages({
-    current: Math.min(paginator.current, MAX_PAGES),
-    pageCount: Math.min(paginator.pageCount, MAX_PAGES),
-    totalItemCount: Math.min(paginator.totalItemCount, MAX_PAGES * PICTURES_PER_PAGE),
-  });
-}
+// "Recent" here means accepted within the last year - further back stops being "recent" and is
+// what the brand's full picture gallery is for.
+const ACCEPTED_IN_DAYS = 365;
 
 @Component({
   selector: 'app-catalogue-recent',
@@ -134,9 +120,9 @@ export class CatalogueRecentComponent {
       });
     });
 
-    // Beyond the last page (now capped to MAX_PAGES, see capPaginator()) there is nothing to
-    // paginate to, so a page number past it names no distinct resource - redirect callers straight
-    // to the one that does, rather than rendering an empty page for every number above it.
+    // Beyond the last page there is nothing to paginate to, so a page number past it names no
+    // distinct resource - redirect callers straight to the one that does, rather than rendering an
+    // empty page for every number above it.
     effect(() => {
       const page = this.#page();
       const last = this.picturesResource.value()?.paginator?.pageCount;
@@ -191,6 +177,7 @@ export class CatalogueRecentComponent {
             language: this.#languageService.language,
             limit: PICTURES_PER_PAGE,
             options: new PictureListOptions({
+              acceptedInDays: ACCEPTED_IN_DAYS,
               pictureItem: new PictureItemListOptions({
                 itemParentCacheAncestor: new ItemParentCacheListOptions({parentId: brand.id}),
               }),
@@ -208,7 +195,7 @@ export class CatalogueRecentComponent {
               route: this.#catalogue.picturePathToRoute(picture),
             }));
             return {
-              paginator: capPaginator(response.paginator),
+              paginator: response.paginator,
               pictures: chunkBy(pictures, 4),
             };
           }),
