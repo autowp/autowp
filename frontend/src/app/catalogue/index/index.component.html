@@ -196,27 +196,27 @@
       <section>
         <h2 i18n>Links</h2>
         @if (links.official.length > 0) {
+          <!-- prettier-ignore -->
           <p>
-            <strong i18n>Official websites</strong><br />
-            @for (link of links.official; track link.id) {
+            <strong i18n>Official websites</strong><br />@for (link of links.official; track link.id) {
               <a [href]="link.url">{{ link.name ? link.name : link.url }}</a
               ><br />
             }
           </p>
         }
         @if (links.club.length > 0) {
+          <!-- prettier-ignore -->
           <p>
-            <strong i18n>Car clubs</strong><br />
-            @for (link of links.club; track link.id) {
+            <strong i18n>Car clubs</strong><br />@for (link of links.club; track link.id) {
               <a [href]="link.url">{{ link.name ? link.name : link.url }}</a
               ><br />
             }
           </p>
         }
         @if (links.other.length > 0) {
+          <!-- prettier-ignore -->
           <p>
-            <strong i18n>Other</strong><br />
-            @for (link of links.other; track link.id) {
+            <strong i18n>Other</strong><br />@for (link of links.other; track link.id) {
               <a [href]="link.url">{{ link.name ? link.name : link.url }}</a
               ><br />
             }

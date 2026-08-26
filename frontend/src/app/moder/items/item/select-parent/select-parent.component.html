@@ -23,6 +23,7 @@
 
 @if (itemID$ | async; as itemID) {
   @if (tab$ | async; as tab) {
+    <!-- prettier-ignore -->
     <div class="nav nav-pills" style="margin-bottom: 10px">
       @if (showCatalogueTab$ | async) {
         <a
@@ -34,8 +35,7 @@
           <i class="bi bi-list" aria-hidden="true"></i>
           &ngsp;<ng-container i18n>Catalogue</ng-container>
         </a>
-      }
-      @if (showBrandsTab$ | async) {
+      }@if (showBrandsTab$ | async) {
         <a
           class="nav-link"
           [class.active]="tab === 'brands'"
@@ -45,8 +45,7 @@
           <i class="bi bi-list" aria-hidden="true"></i>
           &ngsp;<ng-container i18n>Brands</ng-container>
         </a>
-      }
-      <a
+      }<a
         class="nav-link"
         [class.active]="tab === 'categories'"
         [routerLink]="['/moder/items/item', itemID, 'select-parent']"
@@ -54,8 +53,8 @@
       >
         <i class="bi bi-tag-fill" aria-hidden="true"></i>
         &ngsp;<ng-container i18n>Categories</ng-container>
-      </a>
-      @if (showTwinsTab$ | async) {
+      </a
+      >@if (showTwinsTab$ | async) {
         <a
           class="nav-link"
           [class.active]="tab === 'twins'"
@@ -65,8 +64,7 @@
           <i class="bi bi-circle-half" aria-hidden="true"></i>
           &ngsp;<ng-container i18n>Twins</ng-container>
         </a>
-      }
-      @if (showFactoriesTab$ | async) {
+      }@if (showFactoriesTab$ | async) {
         <a
           class="nav-link"
           [class.active]="tab === 'factories'"

@@ -51,6 +51,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
       </li>
       @if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE) {
         <li class="nav-item">
+          <!-- prettier-ignore -->
           <a
             routerLink="/cars/specifications-editor"
             class="nav-link"
@@ -58,8 +59,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
             [class.active]="tab === 'engine'"
           >
             <span class="glyphicon glyphicon-align-left"></span>
-            &ngsp;<ng-container i18n>Engine</ng-container>
-            @if (item.engineItemId) {
+            &ngsp;<ng-container i18n>Engine</ng-container>@if (item.engineItemId) {
               &ngsp;<span class="badge rounded-pill text-bg-secondary">1</span>
             }
           </a>
