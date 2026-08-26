@@ -20,6 +20,7 @@ import {GalleryComponent} from '../../../gallery/gallery.component';
   imports: [GalleryComponent],
   templateUrl: './gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueMixedGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);

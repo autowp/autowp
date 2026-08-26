@@ -9,6 +9,7 @@ import {RemarkModule} from 'ngx-remark';
   imports: [RemarkModule],
   templateUrl: './deleted.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class AccountDeletedComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

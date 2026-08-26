@@ -15,6 +15,7 @@ import {browserWindow} from '@utils/browser-window';
   host: {
     '(window:resize)': 'onResize()',
   },
+  preserveWhitespaces: false,
 })
 export class AreaComponent implements AfterViewInit {
   readonly #window = browserWindow();

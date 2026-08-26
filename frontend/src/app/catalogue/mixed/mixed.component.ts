@@ -31,6 +31,7 @@ import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component'
   imports: [RouterLink, PaginatorComponent, ThumbnailComponent],
   templateUrl: './mixed.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueMixedComponent {
   readonly #pageEnv = inject(PageEnvService);

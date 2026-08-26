@@ -10,6 +10,7 @@ import {RemarkModule} from 'ngx-remark';
   imports: [RouterLink, RemarkModule],
   templateUrl: './success.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class DonateSuccessComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

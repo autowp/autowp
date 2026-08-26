@@ -27,6 +27,7 @@ import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component'
   imports: [RouterLink, PaginatorComponent, DatePipe, ThumbnailComponent],
   templateUrl: './item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class NewItemComponent {
   readonly #route = inject(ActivatedRoute);

@@ -15,6 +15,7 @@ import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-ite
   imports: [ModerItemsItemSelectParentTreeItemComponent, AsyncPipe],
   templateUrl: './tree.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemSelectParentTreeComponent {
   readonly #itemsClient = inject(ItemsClient);

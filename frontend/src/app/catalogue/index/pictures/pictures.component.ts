@@ -30,6 +30,7 @@ interface PictureRoute {
   imports: [ThumbnailComponent],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueIndexPicturesComponent {
   readonly #picturesClient = inject(PicturesClient);

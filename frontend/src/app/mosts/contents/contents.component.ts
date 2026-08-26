@@ -51,6 +51,7 @@ function vehicleTypesToList(vehicleTypes: MostsVehicleType[]): MostsVehicleTypeT
   templateUrl: './contents.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class MostsContentsComponent implements OnInit {
   readonly #mostsService = inject(MostsService);

@@ -31,6 +31,7 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
   imports: [RouterLink, PaginatorComponent, CatalogueListItemComponent],
   templateUrl: './concepts.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueConceptsComponent {
   readonly #pageEnv = inject(PageEnvService);

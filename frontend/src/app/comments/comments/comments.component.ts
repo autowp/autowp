@@ -28,6 +28,7 @@ import {CommentsListComponent} from '../list/list.component';
   imports: [CommentsListComponent, PaginatorComponent, CommentsFormComponent, RemarkModule],
   templateUrl: './comments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CommentsComponent implements OnInit {
   readonly #router = inject(Router);

@@ -14,6 +14,7 @@ import {map} from 'rxjs';
   imports: [GalleryComponent],
   templateUrl: './gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PersonsPersonGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);

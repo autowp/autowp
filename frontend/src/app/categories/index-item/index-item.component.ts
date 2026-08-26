@@ -21,6 +21,7 @@ import {LanguageService} from '@services/language';
   templateUrl: './index-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {class: 'card mb-4'},
+  preserveWhitespaces: false,
 })
 export class CategoriesIndexItemComponent implements OnInit {
   readonly #picturesClient = inject(PicturesClient);

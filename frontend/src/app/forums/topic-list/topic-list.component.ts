@@ -11,6 +11,7 @@ import {ForumsTopicListItemComponent} from './topic-list-item/topic-list-item.co
   imports: [ForumsTopicListItemComponent],
   templateUrl: './topic-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ForumsTopicListComponent {
   readonly #auth = inject(AuthService);

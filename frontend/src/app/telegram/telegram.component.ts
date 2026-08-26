@@ -10,6 +10,7 @@ import {RemarkModule} from 'ngx-remark';
   imports: [RouterLink, RemarkModule],
   templateUrl: './telegram.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class TelegramComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

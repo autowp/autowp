@@ -107,6 +107,7 @@ export class AttrFormControl<TValue> extends FormControl {
   templateUrl: './spec.component.html',
   styleUrl: './spec.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CarsSpecificationsEditorSpecComponent {
   readonly #attrsService = inject(APIAttrsService);

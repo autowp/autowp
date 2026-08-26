@@ -13,6 +13,7 @@ import {MostsContentsComponent} from './contents/contents.component';
   imports: [RouterLink, MostsContentsComponent],
   templateUrl: './mosts.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class MostsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

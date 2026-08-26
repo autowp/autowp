@@ -14,6 +14,7 @@ import {GalleryComponent} from './gallery.component';
   imports: [GalleryComponent],
   templateUrl: './gallery-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class GalleryPageComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

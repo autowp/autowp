@@ -20,6 +20,7 @@ import {PictureModerVoteModalComponent} from './modal/modal.component';
   imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserComponent],
   templateUrl: './picture-moder-vote.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PictureModerVoteComponent implements OnInit {
   readonly #moderVoteService = inject(PictureModerVoteService);

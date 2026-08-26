@@ -42,6 +42,7 @@ const rulesMarkdown = $localize`:@@rules:
   imports: [RouterLink, RemarkModule],
   templateUrl: './rules.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class RulesComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

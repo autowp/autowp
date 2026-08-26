@@ -9,6 +9,7 @@ import {ItemParentType} from '@grpc/spec.pb';
   imports: [RouterLink],
   templateUrl: './tree.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemTreeComponent {
   readonly item = input.required<TreeItem>();

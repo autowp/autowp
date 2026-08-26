@@ -9,6 +9,7 @@ import {icon, latLng, marker, tileLayer} from 'leaflet';
   imports: [LeafletModule],
   templateUrl: './museum-map.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class MuseumMapComponent {
   readonly latitude = input.required<number>();

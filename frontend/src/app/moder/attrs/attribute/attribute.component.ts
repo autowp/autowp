@@ -17,6 +17,7 @@ import {APIAttrsService} from '../../../api/attrs/attrs.service';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './attribute.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerAttrsAttributeComponent {
   readonly #attrsService = inject(APIAttrsService);

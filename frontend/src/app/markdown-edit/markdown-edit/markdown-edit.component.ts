@@ -22,6 +22,7 @@ import {RemarkModule} from 'ngx-remark';
   ],
   templateUrl: './markdown-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class MarkdownEditComponent implements AfterViewInit {
   readonly text = input.required<string>();

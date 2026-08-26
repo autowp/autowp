@@ -13,6 +13,7 @@ import {LanguageService} from '@services/language';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './sidebar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class TwinsSidebarComponent {
   readonly #itemsClient = inject(ItemsClient);

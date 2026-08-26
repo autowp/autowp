@@ -21,6 +21,7 @@ interface Order {
   imports: [RouterLink, PaginatorComponent],
   templateUrl: './comments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class UsersUserCommentsComponent {
   readonly #userService = inject(UserService);

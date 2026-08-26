@@ -14,6 +14,7 @@ import {map, of, switchMap} from 'rxjs';
   imports: [RouterLink, MostsContentsComponent],
   templateUrl: './mosts.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueMostsComponent {
   readonly #route = inject(ActivatedRoute);

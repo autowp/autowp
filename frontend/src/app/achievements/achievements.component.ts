@@ -39,6 +39,7 @@ function buildGroups(codes: string[]): AchievementGroup[] {
   imports: [AsyncPipe],
   templateUrl: './achievements.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class AchievementsComponent {
   readonly #achievementsClient = inject(AchievementsClient);

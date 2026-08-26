@@ -27,6 +27,7 @@ interface Period {
   templateUrl: './pulse.component.html',
   providers: [provideCharts(withDefaultRegisterables())],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PulseComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

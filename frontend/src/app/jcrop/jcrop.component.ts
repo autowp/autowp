@@ -192,6 +192,7 @@ const BG_OPACITY = 0.6;
     '(document:touchmove)': 'onDocumentMove($event)',
     '(document:touchstart)': 'onDocumentTouchStart($event)',
   },
+  preserveWhitespaces: false,
 })
 export class JcropComponent {
   readonly #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

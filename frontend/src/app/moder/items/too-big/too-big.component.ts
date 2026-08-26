@@ -16,6 +16,7 @@ import {map} from 'rxjs';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './too-big.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsTooBigComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

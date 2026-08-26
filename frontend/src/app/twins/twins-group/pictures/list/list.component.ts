@@ -26,6 +26,7 @@ import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.comp
   imports: [PaginatorComponent, ThumbnailComponent],
   templateUrl: './list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class TwinsGroupPicturesListComponent {
   readonly #route = inject(ActivatedRoute);

@@ -21,6 +21,7 @@ import {ToastsService} from '../../toasts/toasts.service';
   imports: [PaginatorComponent, AsyncPipe, ThumbnailComponent],
   templateUrl: './inbox-pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class AccountInboxPicturesComponent implements OnInit {
   readonly #auth = inject(AuthService);

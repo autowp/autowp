@@ -19,6 +19,7 @@ import {ModerAttrsZoneAttributeListComponent} from './attribute-list/attribute-l
   imports: [RouterLink, ModerAttrsZoneAttributeListComponent, AsyncPipe],
   templateUrl: './zone.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerAttrsZoneComponent {
   readonly #attrsService = inject(APIAttrsService);

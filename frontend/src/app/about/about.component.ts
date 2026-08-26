@@ -88,6 +88,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
   ],
   templateUrl: './about.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class AboutComponent implements OnInit {
   readonly #userService = inject(UserService);

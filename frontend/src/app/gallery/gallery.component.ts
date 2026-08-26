@@ -150,6 +150,7 @@ function galleryPageNumberByIndex(index: number): number {
     '(document:keydown.arrowright)': 'onRightKeydownHandler()',
     '(document:keydown.arrowleft)': 'onLeftKeydownHandler()',
   },
+  preserveWhitespaces: false,
 })
 export class GalleryComponent implements OnInit {
   readonly #router = inject(Router);

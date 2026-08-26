@@ -10,6 +10,7 @@ import {RemarkModule} from 'ngx-remark';
   imports: [RouterLink, RemarkModule],
   templateUrl: './sent.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class FeedbackSentComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

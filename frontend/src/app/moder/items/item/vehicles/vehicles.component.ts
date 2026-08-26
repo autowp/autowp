@@ -15,6 +15,7 @@ import {EMPTY, map, switchMap} from 'rxjs';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './vehicles.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemVehiclesComponent {
   readonly #itemsClient = inject(ItemsClient);

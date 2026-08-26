@@ -14,6 +14,7 @@ import {errorMessage} from 'app/grpc';
   imports: [RouterLink],
   templateUrl: './perspectives.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerPerspectivesComponent implements OnInit {
   readonly #picturesClient = inject(PicturesClient);

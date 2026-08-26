@@ -25,6 +25,7 @@ import {MESSAGES_PER_PAGE} from '../forums.module';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './move-message.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ForumsMoveMessageComponent implements OnInit {
   readonly #commentsClient = inject(CommentsClient);

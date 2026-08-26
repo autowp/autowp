@@ -43,6 +43,7 @@ const ACCEPTED_IN_DAYS = 365;
   imports: [RouterLink, PaginatorComponent, ThumbnailComponent],
   templateUrl: './recent.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueRecentComponent {
   readonly #pageEnv = inject(PageEnvService);

@@ -14,6 +14,7 @@ import {map, switchMap} from 'rxjs';
   imports: [AsyncPipe],
   templateUrl: './result.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CarsSpecificationsEditorResultComponent {
   readonly #attrsClient = inject(AttrsClient);

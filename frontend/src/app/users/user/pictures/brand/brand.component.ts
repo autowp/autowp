@@ -28,6 +28,7 @@ import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.comp
   imports: [RouterLink, PaginatorComponent, ThumbnailComponent],
   templateUrl: './brand.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class UsersUserPicturesBrandComponent {
   readonly #userService = inject(UserService);

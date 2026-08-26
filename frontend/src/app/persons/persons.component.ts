@@ -33,6 +33,7 @@ import {PaginatorComponent} from '../paginator/paginator/paginator.component';
   imports: [RouterLink, PaginatorComponent, CatalogueListItemComponent],
   templateUrl: './persons.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PersonsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

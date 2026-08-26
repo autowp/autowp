@@ -9,6 +9,7 @@ import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
   imports: [RouterLink],
   templateUrl: './attribute-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerAttrsAttributeListComponent {
   readonly attributes = input.required<AttrAttributeTreeItem[]>();
