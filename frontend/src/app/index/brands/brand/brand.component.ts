@@ -3,18 +3,16 @@ import type {TopBrandsListItem} from '@grpc/spec.pb';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {RouterLink} from '@angular/router';
 import {NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
+import {NameCountComponent} from '@utils/name-count/name-count.component';
 import {switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-index-brands-brand',
-  imports: [RouterLink, NgbPopover, AsyncPipe],
+  imports: [AsyncPipe, NameCountComponent],
   templateUrl: './brand.component.html',
-  styleUrl: './brand.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexBrandsBrandComponent {
@@ -34,4 +32,8 @@ export class IndexBrandsBrandComponent {
       ),
     ),
   );
+
+  protected popoverTitle(name: string): string {
+    return $localize`New ${name} vehicles`;
+  }
 }

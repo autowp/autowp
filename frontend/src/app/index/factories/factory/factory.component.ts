@@ -3,18 +3,16 @@ import type {TopFactoriesListItem} from '@grpc/spec.pb';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {RouterLink} from '@angular/router';
 import {NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
+import {NameCountComponent} from '@utils/name-count/name-count.component';
 import {switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-index-factories-factory',
-  imports: [RouterLink, NgbPopover, AsyncPipe],
+  imports: [AsyncPipe, NameCountComponent],
   templateUrl: './factory.component.html',
-  styleUrl: './factory.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexFactoriesFactoryComponent {

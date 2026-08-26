@@ -1,11 +1,11 @@
-:host > span {
+:host {
   white-space: nowrap;
-
-  .count span {
-    cursor: help;
-  }
 }
 
 a {
   white-space: nowrap;
+}
+
+.count .has-popover {
+  cursor: help;
 }

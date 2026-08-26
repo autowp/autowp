@@ -5092,6 +5092,14 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, one {<x id="INTERPOLATION"/> выява} few {<x id="INTERPOLATION"/> выяў} many {<x id="INTERPOLATION"/> выяў} other {<x id="INTERPOLATION"/> выяў}}</target>
       </trans-unit>
+      <trans-unit id="1436264795679294438" datatype="html">
+        <source>New <x id="PH" equiv-text="name"/> vehicles</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/index/brands/brand/brand.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <target state="needs-translation">New <x id="PH" equiv-text="name"/> vehicles</target>
+      </trans-unit>
       <trans-unit id="7126464771610287155" datatype="html">
         <source>all</source>
         <context-group purpose="location">

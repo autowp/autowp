@@ -1,0 +1,12 @@
+<a [routerLink]="routerLink()">{{ name() }}</a>
+<!-- prettier-ignore -->
+<span class="count"
+  >({{ count() }}@if (newCount() > 0) {<span
+      triggers="mouseenter:mouseleave"
+      container="body"
+      [class.has-popover]="!!popover()"
+      [ngbPopover]="popover()"
+      [popoverTitle]="popoverTitle()"
+      >+{{ newCount() }}</span
+    >})</span
+>

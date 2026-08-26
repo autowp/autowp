@@ -5095,6 +5095,14 @@ Si vous n'êtes pas encore inscrit sur le site, vous [pouvez le faire](/signup) 
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, one {<x id="INTERPOLATION"/> image} other {<x id="INTERPOLATION"/> images}}</target>
       </trans-unit>
+      <trans-unit id="1436264795679294438" datatype="html">
+        <source>New <x id="PH" equiv-text="name"/> vehicles</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/index/brands/brand/brand.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <target state="translated">Nouveaux véhicules <x id="PH" equiv-text="name"/></target>
+      </trans-unit>
       <trans-unit id="7126464771610287155" datatype="html">
         <source>all</source>
         <context-group purpose="location">

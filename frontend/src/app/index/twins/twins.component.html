@@ -4,12 +4,12 @@
 @if (items$ | async; as items) {
   <p>
     @for (brand of items.items; track brand.id) {
-      <a [routerLink]="['/twins', brand.catname]">{{ brand.name }}</a
-      >&#xa0;<!-- prettier-ignore --><span class="count"
-        >({{ brand.count - brand.newCount }}@if (brand.newCount > 0) {<span
-            >+{{ brand.newCount }}</span
-          >})</span
-      >
+      <app-name-count
+        [routerLink]="['/twins', brand.catname]"
+        [name]="brand.name"
+        [count]="brand.count - brand.newCount"
+        [newCount]="brand.newCount"
+      />
     }
     @if (items.count > (items.items?.length || 0)) {
       <ng-container i18n>… and</ng-container>

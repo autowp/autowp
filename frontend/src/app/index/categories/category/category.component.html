@@ -16,16 +16,11 @@
   }
 </ng-template>
 @if (category$ | async; as category) {
-  <span>
-    <a [routerLink]="['/category', category.catname]">{{ category.name }}</a>
-    <!-- prettier-ignore -->
-    <span class="count"
-      >({{ category.count - category.newCount }}@if (category.newCount > 0) {<span
-          triggers="mouseenter:mouseleave"
-          container="body"
-          [ngbPopover]="popover"
-          >+{{ category.newCount }}</span
-        >})</span
-    >
-  </span>
+  <app-name-count
+    [routerLink]="['/category', category.catname]"
+    [name]="category.name"
+    [count]="category.count - category.newCount"
+    [newCount]="category.newCount"
+    [popover]="popover"
+  />
 }
