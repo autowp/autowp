@@ -30,7 +30,7 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/mosts" routerLinkActive="active" i18n>Mostly</a>
           </li>
-          <li class="nav-item" ngbDropdown>
+          <li class="nav-item" ngbDropdown (openChange)="onCategoriesDropdownOpenChange($event)">
             <button
               type="button"
               class="btn btn-link nav-link"
@@ -47,19 +47,23 @@
               <ng-container i18n>Categories</ng-container>
               <b class="caret" aria-hidden="true"></b>
             </button>
-            @if (categoriesData(); as categories) {
-              <div ngbDropdownMenu>
+            <div ngbDropdownMenu>
+              @if (categoriesData(); as categories) {
                 @for (category of categories.items; track category.id) {
                   <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/category', category.catname]">
-                    {{ category.nameText }}&#xa0;
-                    <span class="count">
-                      ({{ category.descendantsCount }})
-                      <!--<span *ngIf="category.new_cars_count > 0">+{{category.new_cars_count}}</span> -->
-                    </span>
+                    {{ category.nameText }}&#xa0;<span class="count">({{ category.descendantsCount }})</span>
                   </a>
                 }
-              </div>
-            }
+              } @else if (categoriesResource.isLoading()) {
+                <div class="placeholder-glow">
+                  @for (item of categoriesPlaceholders; track item) {
+                    <span class="dropdown-item disabled">
+                      <span class="placeholder" [style.width]="item.width + 'rem'"></span>
+                    </span>
+                  }
+                </div>
+              }
+            </div>
           </li>
           <li class="nav-item d-md-none d-lg-block">
             <a class="nav-link" routerLink="/map" routerLinkActive="active" i18n>Map</a>

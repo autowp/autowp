@@ -75,9 +75,20 @@ export class AppComponent {
     .getNew$()
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
   protected readonly searchHostname: string;
+  // Deterministic (not truly random) so the skeleton's widths match between the SSR pass and
+  // client hydration - see IndexBrandsComponent.placeholderItems for the same reasoning.
+  protected readonly categoriesPlaceholders = Array.from({length: 8}, (_, i) => ({width: 4 + (i % 5)}));
+
+  // Stays false until the dropdown is opened for the first time - the categories list is only
+  // ever needed once a visitor actually opens this menu, so fetching it unconditionally on every
+  // page load (this component is the app shell) would be wasted work on the common path where
+  // nobody opens it at all.
+  protected readonly categoriesRequested = signal(false);
+
   protected readonly categoriesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: 'app-root-categories',
+    params: () => (this.categoriesRequested() ? true : undefined),
     stream: () => {
       // Build-time prerendering has no backend to call (see isPrerendering()); skip straight to an
       // empty categories dropdown instead of failing the build with a transport error.
@@ -174,5 +185,11 @@ export class AppComponent {
     });
 
     return false;
+  }
+
+  protected onCategoriesDropdownOpenChange(open: boolean): void {
+    if (open) {
+      this.categoriesRequested.set(true);
+    }
   }
 }
