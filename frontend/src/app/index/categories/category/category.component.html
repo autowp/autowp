@@ -18,12 +18,14 @@
 @if (category$ | async; as category) {
   <span>
     <a [routerLink]="['/category', category.catname]">{{ category.name }}</a>
+    <!-- prettier-ignore -->
     <span class="count"
-      >({{ category.count - category.newCount }}
-      @if (category.newCount > 0) {
-        <span triggers="mouseenter:mouseleave" container="body" [ngbPopover]="popover">+{{ category.newCount }}</span>
-      }
-      )</span
+      >({{ category.count - category.newCount }}@if (category.newCount > 0) {<span
+          triggers="mouseenter:mouseleave"
+          container="body"
+          [ngbPopover]="popover"
+          >+{{ category.newCount }}</span
+        >})</span
     >
   </span>
 }

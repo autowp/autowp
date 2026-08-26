@@ -18,12 +18,14 @@
 @if (factory$ | async; as factory) {
   <span>
     <a [routerLink]="['/factories', factory.id]">{{ factory.name }}</a>
+    <!-- prettier-ignore -->
     <span class="count"
-      >({{ factory.count - factory.newCount }}
-      @if (factory.newCount > 0) {
-        <span triggers="mouseenter:mouseleave" container="body" [ngbPopover]="popover">+{{ factory.newCount }}</span>
-      }
-      )</span
+      >({{ factory.count - factory.newCount }}@if (factory.newCount > 0) {<span
+          triggers="mouseenter:mouseleave"
+          container="body"
+          [ngbPopover]="popover"
+          >+{{ factory.newCount }}</span
+        >})</span
     >
   </span>
 }

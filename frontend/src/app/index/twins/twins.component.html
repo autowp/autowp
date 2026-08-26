@@ -5,12 +5,10 @@
   <p>
     @for (brand of items.items; track brand.id) {
       <a [routerLink]="['/twins', brand.catname]">{{ brand.name }}</a
-      >&#xa0;<span class="count"
-        >({{ brand.count - brand.newCount }}
-        @if (brand.newCount > 0) {
-          <span>+{{ brand.newCount }}</span>
-        }
-        )</span
+      >&#xa0;<!-- prettier-ignore --><span class="count"
+        >({{ brand.count - brand.newCount }}@if (brand.newCount > 0) {<span
+            >+{{ brand.newCount }}</span
+          >})</span
       >
     }
     @if (items.count > (items.items?.length || 0)) {

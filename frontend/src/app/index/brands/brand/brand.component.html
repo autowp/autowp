@@ -20,9 +20,7 @@
     <a [routerLink]="brand.catname">{{ brand.name }}</a>
     <!-- prettier-ignore -->
     <span class="count"
-      >({{ brand.itemsCount - brand.newItemsCount }}
-      @if (brand.newItemsCount > 0) {
-        <span
+      >({{ brand.itemsCount - brand.newItemsCount }}@if (brand.newItemsCount > 0) {<span
           triggers="mouseenter:mouseleave"
           container="body"
           popoverTitle="New {{ brand.name }} vehicles"
