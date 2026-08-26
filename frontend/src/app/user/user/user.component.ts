@@ -8,6 +8,7 @@ import {RouterLink} from '@angular/router';
   imports: [RouterLink],
   templateUrl: './user.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class UserComponent {
   readonly user = input.required<User>();
