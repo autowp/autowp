@@ -14683,19 +14683,13 @@ Transmission is not considered</source>
         </context-group>
         <target state="translated">Кто проголосовал?</target>
       </trans-unit>
-      <trans-unit id="1929970493428392749" datatype="html">
-        <source>
-      Voting during <x id="INTERPOLATION" equiv-text="{{ voting.beginDate.toDate() | date: &apos;mediumDate&apos; }}"/> to
-      <x id="INTERPOLATION_1" equiv-text="{{ voting.endDate.toDate() | date: &apos;mediumDate&apos; }}"/>
-    </source>
+      <trans-unit id="6985102042691668567" datatype="html">
+        <source> Voting during <x id="INTERPOLATION" equiv-text="{{ beginDate(voting) | date: &apos;mediumDate&apos; }}"/> to <x id="INTERPOLATION_1" equiv-text="{{ endDate(voting) | date: &apos;mediumDate&apos; }}"/> </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/voting/voting.component.html</context>
-          <context context-type="linenumber">65,69</context>
+          <context context-type="linenumber">67,71</context>
         </context-group>
-        <target state="needs-translation">
-      Voting during <x id="INTERPOLATION" equiv-text="{{ voting.beginDate.toDate() | date: 'mediumDate' }}"/> to
-      <x id="INTERPOLATION_1" equiv-text="{{ voting.endDate.toDate() | date: 'mediumDate' }}"/>
-    </target>
+        <target state="translated"> Голосование с <x id="INTERPOLATION" equiv-text="{{ beginDate(voting) | date: &apos;mediumDate&apos; }}"/> по <x id="INTERPOLATION_1" equiv-text="{{ endDate(voting) | date: &apos;mediumDate&apos; }}"/> </target>
       </trans-unit>
       <trans-unit id="2091821594770358343" datatype="html">
         <source>Has copyrights</source>
