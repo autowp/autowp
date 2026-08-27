@@ -16,49 +16,49 @@
     <div class="card card-body mb-4">
       <ul class="list-unstyled">
         <li>
-          <i class="bi bi-text-left" aria-hidden="true"></i>
+          <i class="bi bi-text-left me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items" i18n>Items</a>
         </li>
         <li>
-          <i class="bi bi-sort-alpha-up" aria-hidden="true"></i>
+          <i class="bi bi-sort-alpha-up me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/alpha" i18n>Alphabetical vehicles list</a>
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_VEHICLE}"
             >New vehicle</a
           >
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_ENGINE}">New engine</a>
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_TWINS}"
             >New twins group</a
           >
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_BRAND}">New brand</a>
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_FACTORY}"
             >New factory</a
           >
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_MUSEUM}">New museum</a>
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_PERSON}">New person</a>
         </li>
         <li>
-          <i class="bi bi-plus" aria-hidden="true"></i>
+          <i class="bi bi-plus me-1" aria-hidden="true"></i>
           <a routerLink="/moder/items/new" i18n [queryParams]="{item_type_id: ItemType.ITEM_TYPE_COPYRIGHT}"
             >New copyright block</a
           >
@@ -68,31 +68,26 @@
 
     <h3>Task list</h3>
     <ul>
+      <li>Clear pictures&ngsp;<a routerLink="/moder/pictures" [queryParams]="{special_name: 1}">special names</a></li>
       <li>
-        Clear pictures
-        <a routerLink="/moder/pictures" [queryParams]="{special_name: 1}">special names</a>
-      </li>
-      <li>
-        "
-        <a routerLink="/moder/pictures" [queryParams]="{status: 'custom1', perspective_id: 25}">Mixed</a>" to pictures
+        "<a routerLink="/moder/pictures" [queryParams]="{status: 'custom1', perspective_id: 25}">Mixed</a>" to pictures
         with few cars
       </li>
-      <li>
-        Split
-        <a routerLink="/moder/items/too-big">too big cars</a>
-      </li>
+      <li>Split&ngsp;<a routerLink="/moder/items/too-big">too big cars</a></li>
       <li>Move years to model years in North America</li>
       <li>
-        Dash in soviet vehicle names, e.g
-        <a routerLink="/moder/cars/index/name/%D0%92%D0%90%D0%97/no_name/%D0%92%D0%90%D0%97-/no_parent/0/order/1"
+        Dash in soviet vehicle names, e.g&ngsp;<a
+          routerLink="/moder/cars/index/name/%D0%92%D0%90%D0%97/no_name/%D0%92%D0%90%D0%97-/no_parent/0/order/1"
           >ВАЗ</a
         >
       </li>
       <li>
-        Missed type in sidebar menu of
-        <a routerLink="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/17/item_type_id/1">Trucks</a>
-        and
-        <a routerLink="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/19/item_type_id/1">Buses</a>
+        Missed type in sidebar menu of&ngsp;<a
+          routerLink="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/17/item_type_id/1"
+          >Trucks</a
+        >&ngsp;and&ngsp;<a routerLink="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/19/item_type_id/1"
+          >Buses</a
+        >
       </li>
     </ul>
   </div>
