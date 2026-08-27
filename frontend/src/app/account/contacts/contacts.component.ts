@@ -12,6 +12,7 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import Keycloak from 'keycloak-js';
@@ -61,7 +62,7 @@ export class AccountContactsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 198});
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_CONTACTS});
   }
 
   protected deleteContact(userId: string) {

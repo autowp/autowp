@@ -18,6 +18,7 @@ import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {MapGetPicturePointsRequest, MapGetPointsRequest} from '@grpc/spec.pb';
 import {MapClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {divIcon, icon, latLng, marker, Popup, tileLayer} from 'leaflet';
 import {BehaviorSubject, combineLatest, debounceTime, EMPTY, map, switchMap} from 'rxjs';
 
@@ -197,7 +198,7 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 117});
+    this.#pageEnv.set({pageId: PageId.MAP});
 
     combineLatest([this.#bounds$, this.#mode$])
       .pipe(

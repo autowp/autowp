@@ -9,6 +9,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, catchError, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
@@ -77,7 +78,7 @@ export class CarsSpecificationsEditorComponent {
     }),
     map((item) => {
       this.#pageEnv.set({
-        pageId: 102,
+        pageId: PageId.SPECIFICATIONS_EDITOR,
         title: $localize`Specs editor of ${item.nameText}`,
       });
       return item;

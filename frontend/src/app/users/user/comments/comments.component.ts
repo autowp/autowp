@@ -4,6 +4,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {CommentMessageFields, GetMessagesRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
@@ -100,7 +101,7 @@ export class UsersUserCommentsComponent {
       this.order();
       this.#page();
       this.userData();
-      this.#pageEnv.set({pageId: 205});
+      this.#pageEnv.set({pageId: PageId.USER_COMMENTS});
     });
   }
 

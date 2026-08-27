@@ -10,6 +10,7 @@ import {DonationsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
@@ -79,7 +80,7 @@ export class DonateLogComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 196});
+    this.#pageEnv.set({pageId: PageId.DONATE});
   }
 
   protected readonly errorMessage = errorMessage;

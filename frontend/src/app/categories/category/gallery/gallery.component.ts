@@ -6,6 +6,7 @@ import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
@@ -59,7 +60,7 @@ export class CategoryGalleryComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isGalleryPage: true},
-      pageId: 187,
+      pageId: PageId.PICTURE,
       title: '', // data.picture.name_text,
     });
   }
@@ -80,7 +81,7 @@ export class CategoryGalleryComponent implements OnInit {
     if (item) {
       this.#pageEnv.set({
         layout: {isGalleryPage: true},
-        pageId: 187,
+        pageId: PageId.PICTURE,
         title: item.nameText,
       });
     }

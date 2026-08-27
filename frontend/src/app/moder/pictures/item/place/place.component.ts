@@ -12,6 +12,7 @@ import {Picture, PictureListOptions, PicturesRequest, UpdatePictureRequest} from
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
 import {catchError, distinctUntilChanged, EMPTY, map, shareReplay, startWith, switchMap} from 'rxjs';
 
@@ -142,7 +143,7 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 72,
+      pageId: PageId.MODER_PICTURE,
     });
   }
 

@@ -7,6 +7,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage} from 'app/grpc';
 
 @Component({
@@ -29,7 +30,7 @@ export class ModerStatComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 119,
+      pageId: PageId.MODER_STAT,
     });
   }
 

@@ -3,6 +3,7 @@ import type {OnInit} from '@angular/core';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {RemarkModule} from 'ngx-remark';
 
 @Component({
@@ -16,6 +17,6 @@ export class TelegramComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 204});
+    this.#pageEnv.set({pageId: PageId.TELEGRAM});
   }
 }

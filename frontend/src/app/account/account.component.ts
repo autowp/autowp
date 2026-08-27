@@ -8,6 +8,7 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {PictureService} from '@services/picture';
 import {combineLatest, map, of, shareReplay, switchMap} from 'rxjs';
 
@@ -17,7 +18,7 @@ interface SidebarItem {
   icon?: string;
   name: string;
   newCount?: number;
-  pageId?: number;
+  pageId?: PageId;
   routerLink?: string[];
   routerLinkParams?: Record<string, string>;
 }
@@ -58,52 +59,52 @@ export class AccountComponent {
         {
           icon: 'bi-person',
           name: $localize`Profile`,
-          pageId: 129,
+          pageId: PageId.ACCOUNT_PROFILE,
           routerLink: ['/account/profile'],
         },
         {
           icon: 'bi-person-lines-fill',
           name: $localize`Contacts`,
-          pageId: 198,
+          pageId: PageId.ACCOUNT_CONTACTS,
           routerLink: ['/account/contacts'],
         },
         {
           icon: 'bi-envelope-open',
           name: $localize`My e-mail`,
-          pageId: 55,
+          pageId: PageId.ACCOUNT_EMAIL,
           routerLink: ['/account/email'],
         },
         {
           icon: 'bi-lock',
           name: $localize`Access Control`,
-          pageId: 133,
+          pageId: PageId.ACCOUNT_ACCESS,
           routerLink: ['/account/access'],
         },
         {
           icon: 'bi-asterisk',
           name: $localize`My accounts`,
-          pageId: 123,
+          pageId: PageId.ACCOUNT,
           routerLink: ['/account/accounts'],
         },
         {
           count: picturesSummary?.acceptedCount,
           icon: 'bi-grid-3x2-gap-fill',
           name: $localize`My pictures`,
-          pageId: 130,
+          pageId: PageId.ACCOUNT_PICTURES,
           routerLink: ['/users', user.identity ? user.identity : 'user' + user.id, 'pictures'],
         },
         {
           count: picturesSummary?.inboxCount,
           icon: 'bi-grid-3x2-gap-fill',
           name: $localize`Unmoderated`,
-          pageId: 94,
+          pageId: PageId.ACCOUNT_INBOX_PICTURES,
           routerLink: ['/account/inbox-pictures'],
         },
         {
           count: forumSummary ? forumSummary.subscriptionsCount : undefined,
           icon: 'bi-bookmark',
           name: $localize`Forums subscriptions`,
-          pageId: 57,
+          pageId: PageId.FORUM_SUBSCRIPTIONS,
           routerLink: ['/forums/subscriptions'],
         },
         {
@@ -112,7 +113,7 @@ export class AccountComponent {
         {
           icon: 'bi-exclamation-triangle',
           name: $localize`Conflicts`,
-          pageId: 188,
+          pageId: PageId.ACCOUNT_SPECS_CONFLICTS,
           routerLink: ['/account/specs-conflicts'],
         },
         {
@@ -123,14 +124,14 @@ export class AccountComponent {
           icon: 'bi-chat-text',
           name: $localize`Inbox`,
           newCount: messageSummary ? messageSummary.inboxNewCount : undefined,
-          pageId: 128,
+          pageId: PageId.ACCOUNT_MESSAGES,
           routerLink: ['/account/messages'],
         },
         {
           count: messageSummary ? messageSummary.sentCount : undefined,
           icon: 'bi-chat-text',
           name: $localize`Sent`,
-          pageId: 80,
+          pageId: PageId.ACCOUNT_MESSAGES_SENT,
           routerLink: ['/account/messages'],
           routerLinkParams: {folder: 'sent'},
         },
@@ -139,7 +140,7 @@ export class AccountComponent {
           icon: 'bi-chat-text',
           name: $localize`System messages`,
           newCount: messageSummary ? messageSummary.systemNewCount : undefined,
-          pageId: 81,
+          pageId: PageId.ACCOUNT_MESSAGES_SYSTEM,
           routerLink: ['/account/messages'],
           routerLinkParams: {folder: 'system'},
         },

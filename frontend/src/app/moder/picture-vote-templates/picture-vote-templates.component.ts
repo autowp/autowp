@@ -6,6 +6,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {ToastsService} from 'app/toasts/toasts.service';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
@@ -28,7 +29,7 @@ export class ModerPictureVoteTemplatesComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 212,
+      pageId: PageId.MODER_PICTURE_VOTE_TEMPLATES,
     });
   }
 

@@ -14,6 +14,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {chunkBy} from 'app/chunk';
 import {errorMessage} from 'app/grpc';
@@ -133,7 +134,7 @@ export class CategoriesCategoryPicturesComponent {
   constructor() {
     effect(() => {
       if (this.picturesResource.hasValue()) {
-        this.#pageEnv.set({pageId: 22});
+        this.#pageEnv.set({pageId: PageId.CATEGORIES});
       }
     });
   }

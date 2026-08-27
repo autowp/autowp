@@ -5,6 +5,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {map} from 'rxjs';
 
 import {GalleryComponent} from './gallery.component';
@@ -27,7 +28,7 @@ export class GalleryPageComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isGalleryPage: true},
-      pageId: 187,
+      pageId: PageId.PICTURE,
       title: '', // data.picture.name_text,
     });
   }
@@ -36,7 +37,7 @@ export class GalleryPageComponent implements OnInit {
     if (item) {
       this.#pageEnv.set({
         layout: {isGalleryPage: true},
-        pageId: 187,
+        pageId: PageId.PICTURE,
         title: item.nameText,
       });
     }

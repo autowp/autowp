@@ -8,6 +8,7 @@ import {UserFields, UsersRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
@@ -52,7 +53,7 @@ export class ModerUsersComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 203,
+      pageId: PageId.MODER_USERS,
     });
   }
 

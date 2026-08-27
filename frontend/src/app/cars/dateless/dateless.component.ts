@@ -16,6 +16,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
 
@@ -81,7 +82,7 @@ export class CarsDatelessComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 1});
+    this.#pageEnv.set({pageId: PageId.HOME});
   }
 
   protected readonly errorMessage = errorMessage;

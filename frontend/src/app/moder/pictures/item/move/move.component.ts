@@ -25,6 +25,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {
   catchError,
@@ -420,7 +421,7 @@ export class ModerPicturesItemMoveComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 149,
+      pageId: PageId.MODER_PICTURE_MOVE,
     });
   }
 

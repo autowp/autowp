@@ -6,6 +6,7 @@ import {GetSpecificationsRequest, ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of} from 'rxjs';
@@ -90,7 +91,7 @@ export class TwinsGroupSpecificationsComponent {
 
       const group = this.groupResource.value();
       this.#pageEnv.set({
-        pageId: 27,
+        pageId: PageId.TWINS_GROUP_SPECIFICATIONS,
         title: $localize`Specifications of ${group.nameText}`,
       });
     });

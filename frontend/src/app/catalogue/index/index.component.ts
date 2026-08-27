@@ -25,6 +25,7 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
@@ -168,7 +169,7 @@ export class CatalogueIndexComponent {
       }
 
       this.#pageEnv.set({
-        pageId: 10,
+        pageId: PageId.CATALOGUE_INDEX,
         title: brand.nameText,
       });
     });

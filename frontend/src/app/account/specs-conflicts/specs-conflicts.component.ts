@@ -10,6 +10,7 @@ import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {getUnitAbbrTranslation} from '@utils/translations';
 import {combineLatest, distinctUntilChanged, map, of, shareReplay, switchMap} from 'rxjs';
@@ -125,6 +126,6 @@ export class AccountSpecsConflictsComponent implements OnInit {
   protected readonly AttrConflictsRequest = AttrConflictsRequest;
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 188});
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_SPECS_CONFLICTS});
   }
 }

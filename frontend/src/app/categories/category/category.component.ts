@@ -10,6 +10,7 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getItemTypeTranslation} from '@utils/translations';
 
 import {ToastsService} from '../../toasts/toasts.service';
@@ -87,7 +88,7 @@ export class CategoriesCategoryComponent {
     effect(() => {
       const current = this.categoryData()?.current;
       this.pageEnv.set({
-        pageId: 22,
+        pageId: PageId.CATEGORIES,
         title: current?.nameText,
       });
     });

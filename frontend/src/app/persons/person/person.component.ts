@@ -7,6 +7,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
@@ -69,7 +70,7 @@ export class PersonsPersonComponent {
 
       const item = this.itemResource.value();
       this.pageEnv.set({
-        pageId: 213,
+        pageId: PageId.PERSON,
         title: item.nameText,
       });
     });

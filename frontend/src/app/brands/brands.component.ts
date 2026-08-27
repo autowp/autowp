@@ -10,6 +10,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage} from 'app/grpc';
 import {tap} from 'rxjs';
 
@@ -69,7 +70,7 @@ export class BrandsComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 61});
+    this.#pageEnv.set({pageId: PageId.BRANDS});
   }
 
   // A button rather than a link to the fragment, which is what this used to be: index.html carries

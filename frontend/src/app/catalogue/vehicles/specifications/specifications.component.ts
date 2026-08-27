@@ -10,6 +10,7 @@ import {GetSpecificationsRequest, ItemFields} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
@@ -129,7 +130,7 @@ export class CatalogueVehiclesSpecificationsComponent {
       }
 
       this.#pageEnv.set({
-        pageId: 36,
+        pageId: PageId.CATALOGUE_SPECIFICATIONS,
         title: $localize`Specifications of` + ' ' + brand.nameHtml,
       });
     });

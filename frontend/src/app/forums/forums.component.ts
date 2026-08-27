@@ -6,6 +6,7 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {GetThemeRequest, ListThemesRequest, ListTopicsRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getForumsThemeTranslation} from '@utils/translations';
 import {errorMessage} from 'app/grpc';
 import {combineLatest, map} from 'rxjs';
@@ -74,11 +75,11 @@ export class ForumsComponent {
 
       if (data.theme) {
         this.#pageEnv.set({
-          pageId: 43,
+          pageId: PageId.FORUM_THEME,
           title: getForumsThemeTranslation(data.theme.name),
         });
       } else {
-        this.#pageEnv.set({pageId: 42});
+        this.#pageEnv.set({pageId: PageId.FORUMS});
       }
     });
   }

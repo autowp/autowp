@@ -8,6 +8,7 @@ import {DeleteUserAccountRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {RemarkModule} from 'ngx-remark';
 import {BehaviorSubject, catchError, combineLatest, EMPTY, map} from 'rxjs';
 
@@ -40,7 +41,7 @@ export class AccountAccountsComponent implements OnInit {
   protected readonly disconnectFailed = signal(false);
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 123});
+    this.#pageEnv.set({pageId: PageId.ACCOUNT});
   }
 
   protected remove(account: AccountsAccount) {

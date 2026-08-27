@@ -10,6 +10,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -71,6 +72,6 @@ export class AccountInboxPicturesComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 94});
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_INBOX_PICTURES});
   }
 }

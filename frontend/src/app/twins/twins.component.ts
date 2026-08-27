@@ -21,6 +21,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage} from 'app/grpc';
 import {map, of} from 'rxjs';
 
@@ -182,11 +183,11 @@ export class TwinsComponent {
 
       if (brand) {
         this.#pageEnv.set({
-          pageId: 153,
+          pageId: PageId.TWINS_BRAND,
           title: brand.nameOnly,
         });
       } else {
-        this.#pageEnv.set({pageId: 25});
+        this.#pageEnv.set({pageId: PageId.TWINS});
       }
     });
   }

@@ -13,6 +13,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of} from 'rxjs';
 
@@ -139,7 +140,7 @@ export class PicturePageComponent {
         this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
       }
       this.#pageEnv.set({
-        pageId: 187,
+        pageId: PageId.PICTURE,
         title: picture.nameText,
       });
     });

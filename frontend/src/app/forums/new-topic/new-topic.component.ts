@@ -13,6 +13,7 @@ import {ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getForumsThemeTranslation} from '@utils/translations';
 import {
@@ -82,7 +83,7 @@ export class ForumsNewTopicComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 45});
+    this.#pageEnv.set({pageId: PageId.FORUM_NEW_TOPIC});
   }
 
   protected submit(theme: Theme) {

@@ -21,6 +21,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {ContentLanguageService} from '@services/content-language';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getItemTypeTranslation} from '@utils/translations';
 import {
@@ -120,7 +121,7 @@ export class ModerItemParentComponent {
     tap((item) => {
       this.#pageEnv.set({
         layout: {isAdminPage: true},
-        pageId: 78,
+        pageId: PageId.MODER_ITEM,
         title: getItemTypeTranslation(item.itemTypeId, 'name') + ': ' + item.nameText,
       });
     }),

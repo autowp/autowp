@@ -16,6 +16,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {map, of, switchMap} from 'rxjs';
@@ -117,7 +118,7 @@ export class FactoryComponent {
       const factory = this.itemData();
       if (factory) {
         this.#pageEnv.set({
-          pageId: 181,
+          pageId: PageId.FACTORIES,
           title: factory.nameText,
         });
       }

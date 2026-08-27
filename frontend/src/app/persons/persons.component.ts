@@ -22,6 +22,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
@@ -135,7 +136,7 @@ export class PersonsComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 214});
+    this.#pageEnv.set({pageId: PageId.PERSONS});
   }
 
   private prepareItems(items: Item[], authors: boolean): CatalogueListItem[] {

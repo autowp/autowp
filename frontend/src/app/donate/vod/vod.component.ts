@@ -10,6 +10,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {timestampToDate} from '@utils/timestamp';
 import {RemarkModule} from 'ngx-remark';
@@ -143,7 +144,7 @@ export class DonateVodComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 196});
+    this.#pageEnv.set({pageId: PageId.DONATE});
   }
 
   protected submit(e: Event) {

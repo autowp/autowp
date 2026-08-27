@@ -9,6 +9,7 @@ import {AttrAttributeType, ChartDataRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getAttrsTranslation} from '@utils/translations';
 import {errorMessage} from 'app/grpc';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
@@ -87,7 +88,7 @@ export class ChartComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 1});
+    this.#pageEnv.set({pageId: PageId.HOME});
   }
 
   private loadData(id: string) {

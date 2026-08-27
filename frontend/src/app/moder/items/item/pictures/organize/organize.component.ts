@@ -23,6 +23,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
@@ -150,7 +151,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 78,
+      pageId: PageId.MODER_ITEM,
     });
   }
 

@@ -4,6 +4,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage} from 'app/grpc';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
@@ -35,7 +36,7 @@ export class ModerAttrsComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 100,
+      pageId: PageId.MODER_ATTRS,
     });
   }
 

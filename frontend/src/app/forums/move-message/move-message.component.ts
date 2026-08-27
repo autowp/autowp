@@ -14,6 +14,7 @@ import {
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getForumsThemeTranslation} from '@utils/translations';
 import {catchError, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
@@ -69,7 +70,7 @@ export class ForumsMoveMessageComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 83});
+    this.#pageEnv.set({pageId: PageId.FORUM_MOVE});
   }
 
   protected selectTopic(messageId: string, topic: Topic) {

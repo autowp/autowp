@@ -22,6 +22,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {allowedItemTypeCombinations, ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, combineLatest, distinctUntilChanged, EMPTY, forkJoin, map, of, shareReplay, switchMap} from 'rxjs';
@@ -161,7 +162,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 215,
+      pageId: PageId.MODER_ITEM_CATALOGUE_ORGANIZE,
     });
   }
 

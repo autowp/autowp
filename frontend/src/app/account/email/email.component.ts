@@ -7,6 +7,7 @@ import {environment} from '@environment/environment';
 import {MeRequest, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {catchError, EMPTY, map} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
@@ -37,6 +38,6 @@ export class AccountEmailComponent implements OnInit {
     environment.keycloak.url + '/realms/' + environment.keycloak.realm + '/account/#/personal-info';
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 55});
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_EMAIL});
   }
 }

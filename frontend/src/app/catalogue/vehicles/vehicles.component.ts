@@ -27,6 +27,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {getItemTypeTranslation} from '@utils/translations';
@@ -403,7 +404,7 @@ export class CatalogueVehiclesComponent {
 
       const item = this.itemResource.value();
       this.#pageEnv.set({
-        pageId: 33,
+        pageId: PageId.CATALOGUE_VEHICLES,
         title: item.nameText,
       });
     });

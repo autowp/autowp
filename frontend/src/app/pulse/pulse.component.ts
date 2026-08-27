@@ -8,6 +8,7 @@ import {RouterLink} from '@angular/router';
 import {PulseRequest} from '@grpc/spec.pb';
 import {StatisticsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {errorMessage} from 'app/grpc';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
@@ -100,7 +101,7 @@ export class PulseComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 161});
+    this.#pageEnv.set({pageId: PageId.PULSE});
   }
 
   protected selectPeriod(period: Period) {

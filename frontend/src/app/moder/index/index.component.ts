@@ -4,6 +4,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 
 @Component({
   selector: 'app-moder-index',
@@ -20,7 +21,7 @@ export class ModerIndexComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 67,
+      pageId: PageId.MODER,
     });
   }
 }

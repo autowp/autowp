@@ -35,6 +35,7 @@ import {AppContactsService} from '@services/contacts';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
@@ -262,7 +263,7 @@ export class UsersUserComponent {
       const user = this.userData();
       if (user) {
         this.#pageEnv.set({
-          pageId: 62,
+          pageId: PageId.USER,
           title: user.name,
         });
       }

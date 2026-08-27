@@ -6,6 +6,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {RouterLink} from '@angular/router';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {RemarkModule} from 'ngx-remark';
 
@@ -60,6 +61,6 @@ export class DonateComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 196});
+    this.#pageEnv.set({pageId: PageId.DONATE});
   }
 }

@@ -20,6 +20,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
@@ -167,7 +168,7 @@ export class ModerItemsItemComponent {
     tap((item) => {
       this.#pageEnv.set({
         layout: {isAdminPage: true},
-        pageId: 78,
+        pageId: PageId.MODER_ITEM,
         title: item.nameText,
       });
 

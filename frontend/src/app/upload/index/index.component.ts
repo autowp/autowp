@@ -29,6 +29,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getModalComponentRef} from '@utils/modal-component-ref';
@@ -178,7 +179,7 @@ export class UploadIndexComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 29});
+    this.#pageEnv.set({pageId: PageId.UPLOAD});
   }
 
   protected doLogin() {

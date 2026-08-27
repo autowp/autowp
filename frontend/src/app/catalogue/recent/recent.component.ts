@@ -19,6 +19,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
@@ -116,7 +117,7 @@ export class CatalogueRecentComponent {
       }
 
       this.#pageEnv.set({
-        pageId: 15,
+        pageId: PageId.CATALOGUE_RECENT,
         title: $localize`Last pictures of ${this.brandResource.value().nameText}`,
       });
     });

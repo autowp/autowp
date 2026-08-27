@@ -9,6 +9,7 @@ import {MostsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {
   getMostsPeriodsTranslation,
   getMostsRatingParamsTranslation,
@@ -176,7 +177,7 @@ export class MostsContentsComponent implements OnInit {
       this.ratingCatnameNormalized();
       this.typeCatname();
       this.yearsCatname();
-      this.#pageEnv.set({pageId: 21});
+      this.#pageEnv.set({pageId: PageId.MOSTS});
     });
   }
 

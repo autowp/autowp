@@ -26,6 +26,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage} from 'app/grpc';
 import {PaginatorComponent} from 'app/paginator/paginator/paginator.component';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
@@ -153,7 +154,7 @@ export class ModerPicturesSimilarComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 216,
+      pageId: PageId.MODER_PICTURES_SIMILAR,
       title: $localize`Similar pictures`,
     });
 

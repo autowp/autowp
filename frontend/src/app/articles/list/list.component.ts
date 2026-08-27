@@ -10,6 +10,7 @@ import {ArticlesRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
@@ -44,7 +45,7 @@ export class ListComponent implements OnInit {
   readonly #userService = inject(UserService);
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 31});
+    this.#pageEnv.set({pageId: PageId.ARTICLES});
   }
 
   readonly #page = toSignal(

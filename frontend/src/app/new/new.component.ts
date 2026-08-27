@@ -9,6 +9,7 @@ import {NewboxRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {formatDate, formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
 import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap} from 'rxjs';
 
@@ -126,7 +127,7 @@ export class NewComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 51});
+    this.#pageEnv.set({pageId: PageId.ITEM_NEW});
   }
 
   protected readonly formatDate = formatDate;

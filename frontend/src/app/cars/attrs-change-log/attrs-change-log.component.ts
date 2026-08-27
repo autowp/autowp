@@ -10,6 +10,7 @@ import {AttrsClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {errorMessage} from 'app/grpc';
 import {catchError, debounceTime, EMPTY, map, of, switchMap} from 'rxjs';
@@ -95,7 +96,7 @@ export class CarsAttrsChangeLogComponent {
     );
 
   constructor() {
-    this.#pageEnv.set({pageId: 103});
+    this.#pageEnv.set({pageId: PageId.SPECS_ADMIN});
 
     // Syncs the reactive FormControl's displayed value from the URL param (rather than the other
     // way around) - clearUser()/userOnSelect() below both drive user_id through the router, and

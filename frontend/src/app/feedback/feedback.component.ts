@@ -9,6 +9,7 @@ import {CreateFeedbackRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';
@@ -64,7 +65,7 @@ export class FeedbackComponent implements OnInit {
   ngOnInit(): void {
     this.form.removeControl(CAPTCHA as never);
 
-    this.#pageEnv.set({pageId: 89});
+    this.#pageEnv.set({pageId: PageId.FEEDBACK});
   }
 
   protected submit() {

@@ -15,6 +15,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {parseStringToGrpcDate} from '@services/utils';
 import {errorMessage} from 'app/grpc';
 import {map} from 'rxjs';
@@ -80,7 +81,7 @@ export class NewItemComponent {
 
       const item = this.itemResource.value();
       this.#pageEnv.set({
-        pageId: 210,
+        pageId: PageId.ITEM_NEW_CHILD,
         title: item.nameText,
       });
     });

@@ -14,6 +14,7 @@ import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {BehaviorSubject, map, switchMap} from 'rxjs';
 
@@ -52,7 +53,7 @@ export class ModerTrafficComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 77,
+      pageId: PageId.MODER_TRAFFIC,
     });
   }
 

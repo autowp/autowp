@@ -19,6 +19,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {perspectiveIDLogotype, perspectiveIDMixed} from '@services/picture';
 import {
   catchError,
@@ -107,7 +108,7 @@ export class UploadSelectComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 30});
+    this.#pageEnv.set({pageId: PageId.UPLOAD_SELECT});
   }
 
   private brandsObservable$(page: number, search: string): Observable<ItemList> {

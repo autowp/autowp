@@ -23,6 +23,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {getVehicleTypeTranslation} from '@utils/translations';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
@@ -167,7 +168,7 @@ export class CatalogueCarsComponent {
       }
 
       this.#pageEnv.set({
-        pageId: this.currentVehicleType() ? 138 : 14,
+        pageId: this.currentVehicleType() ? PageId.CATALOGUE_CARS_VEHICLE_TYPE : PageId.CATALOGUE_CARS,
         title,
       });
     });

@@ -25,6 +25,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
@@ -339,7 +340,7 @@ export class ModerItemsComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 131,
+      pageId: PageId.MODER_ITEMS,
     });
   }
 

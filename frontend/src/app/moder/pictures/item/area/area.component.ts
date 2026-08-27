@@ -16,6 +16,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
 import type {JcropCrop} from '../../../../jcrop/jcrop.component.js';
@@ -56,7 +57,7 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 148,
+      pageId: PageId.MODER_PICTURE_AREA,
     });
 
     this.#sub = this.#route.paramMap

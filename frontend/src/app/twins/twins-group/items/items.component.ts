@@ -18,6 +18,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {RemarkModule} from 'ngx-remark';
 import {map} from 'rxjs';
@@ -127,7 +128,7 @@ export class TwinsGroupItemsComponent {
       const group = this.groupData();
       if (group) {
         this.#pageEnv.set({
-          pageId: 25,
+          pageId: PageId.TWINS_GROUP,
           title: group.nameText,
         });
       }

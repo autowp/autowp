@@ -14,6 +14,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {TimezoneService} from '@services/timezone';
 import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
@@ -113,7 +114,7 @@ export class AccountProfileComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 129});
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_PROFILE});
   }
 
   private showSavedMessage() {

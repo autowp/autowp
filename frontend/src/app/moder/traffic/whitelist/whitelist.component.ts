@@ -8,6 +8,7 @@ import {DeleteTrafficWhitelistItemRequest} from '@grpc/spec.pb';
 import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError} from 'app/grpc';
 
 @Component({
@@ -47,7 +48,7 @@ export class ModerTrafficWhitelistComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 77,
+      pageId: PageId.MODER_TRAFFIC,
     });
   }
 

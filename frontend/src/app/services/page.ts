@@ -3,19 +3,21 @@ import type {Observer} from 'rxjs';
 import {Service} from '@angular/core';
 import {map, Observable} from 'rxjs';
 
+import type {PageId} from './page-id';
+
 import pagesJson from './pages';
 
 export interface Page {
   childs: Page[];
-  id: number;
+  id: PageId;
 }
 
 @Service()
 export class PageService {
-  readonly #pages = new Map<number, Page>();
-  readonly #parents = new Map<number, null | number>();
+  readonly #pages = new Map<PageId, Page>();
+  readonly #parents = new Map<PageId, null | PageId>();
 
-  private walkPages(pages: Page[], parentID: null | number) {
+  private walkPages(pages: Page[], parentID: null | PageId) {
     for (const page of pages) {
       this.#parents.set(page.id, parentID);
       this.#pages.set(page.id, page);
@@ -23,8 +25,8 @@ export class PageService {
     }
   }
 
-  private isDescendantPrivate(id: number, parentID: number): boolean {
-    let pageId: null | number | undefined = id;
+  private isDescendantPrivate(id: PageId, parentID: PageId): boolean {
+    let pageId: null | PageId | undefined = id;
     while (pageId) {
       if (this.#parents.get(pageId) === parentID) {
         return true;
@@ -51,7 +53,7 @@ export class PageService {
     });
   }
 
-  public isDescendant$(id: number, parentID: number): Observable<boolean> {
+  public isDescendant$(id: PageId, parentID: PageId): Observable<boolean> {
     return this.loadTree$().pipe(
       map(() => {
         if (id === parentID) {

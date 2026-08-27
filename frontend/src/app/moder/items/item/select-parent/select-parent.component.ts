@@ -10,6 +10,7 @@ import {ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {catchError, distinctUntilChanged, EMPTY, map, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
@@ -99,7 +100,7 @@ export class ModerItemsItemSelectParentComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 144,
+      pageId: PageId.MODER_ITEM_SELECT_PARENT,
     });
   }
 

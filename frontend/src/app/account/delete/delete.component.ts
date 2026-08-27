@@ -9,6 +9,7 @@ import {UsersClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
 import {EMPTY, switchMap} from 'rxjs';
@@ -36,7 +37,7 @@ export class AccountDeleteComponent implements OnInit {
   protected readonly invalidParams = signal<InvalidParams>({});
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 137});
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_DELETE});
   }
 
   protected submit() {

@@ -9,6 +9,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {GetTextRequest} from '@grpc/spec.pb';
 import {TextClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {DiffEditorComponent} from 'ngx-monaco-editor-v2';
 import {catchError, combineLatest, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
@@ -113,6 +114,6 @@ export class InfoTextComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 197});
+    this.#pageEnv.set({pageId: PageId.INFO_TEXT});
   }
 }

@@ -1,5 +1,6 @@
 import type {Routes} from '@angular/router';
 
+import {PageId} from '@services/page-id';
 import {perspectiveIDLogotype, perspectiveIDMixed} from '@services/picture';
 
 import {cataloguePathMatcher} from './matcher';
@@ -27,11 +28,11 @@ export const routes: Routes = [
     ],
     data: {
       catname: 'mixed',
-      page_id: 40,
+      page_id: PageId.CATALOGUE_MIXED,
       perspective_id: perspectiveIDMixed,
       picture_page: {
         breadcrumbs: $localize`Miscellaneous`,
-        id: 190,
+        id: PageId.CATALOGUE_MIXED_PICTURE,
       },
       title: $localize`Miscellaneous`,
     },
@@ -55,11 +56,11 @@ export const routes: Routes = [
     ],
     data: {
       catname: 'other',
-      page_id: 41,
+      page_id: PageId.CATALOGUE_OTHER,
       perspective_exclude_id: [perspectiveIDLogotype, perspectiveIDMixed],
       picture_page: {
         breadcrumbs: $localize`Unsorted`,
-        id: 191,
+        id: PageId.CATALOGUE_OTHER_PICTURE,
       },
       title: $localize`Unsorted`,
     },
@@ -83,11 +84,11 @@ export const routes: Routes = [
     ],
     data: {
       catname: 'logotypes',
-      page_id: 39,
+      page_id: PageId.CATALOGUE_LOGOTYPES,
       perspective_id: perspectiveIDLogotype,
       picture_page: {
         breadcrumbs: $localize`Logotypes`,
-        id: 192,
+        id: PageId.CATALOGUE_LOGOTYPES_PICTURE,
       },
       title: $localize`Logotypes`,
     },

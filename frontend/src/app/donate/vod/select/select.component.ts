@@ -17,6 +17,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {catchError, combineLatest, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 
 import {chunk} from '../../../chunk';
@@ -129,7 +130,7 @@ export class DonateVodSelectComponent implements OnDestroy, OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 196});
+    this.#pageEnv.set({pageId: PageId.DONATE});
 
     this.#querySub = this.#select$.subscribe((r) => {
       const brand = r?.brand;

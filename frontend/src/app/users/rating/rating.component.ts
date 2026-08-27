@@ -17,6 +17,7 @@ import {RatingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {errorMessage} from 'app/grpc';
 import {catchError, forkJoin, map, of} from 'rxjs';
@@ -231,6 +232,6 @@ export class UsersRatingComponent implements OnInit {
   protected readonly errorMessage = errorMessage;
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 173});
+    this.#pageEnv.set({pageId: PageId.USERS_RATING});
   }
 }

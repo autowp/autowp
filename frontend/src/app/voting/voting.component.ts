@@ -10,6 +10,7 @@ import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {timestampToDate} from '@utils/timestamp';
 import {errorMessage, isNotFoundError} from 'app/grpc';
@@ -67,7 +68,7 @@ export class VotingComponent {
 
       const voting = this.votingResource.value();
       this.#pageEnv.set({
-        pageId: 157,
+        pageId: PageId.VOTING,
         title: voting.name,
       });
     });

@@ -9,6 +9,7 @@ import {ItemFields, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {map} from 'rxjs';
 
 @Component({
@@ -37,7 +38,7 @@ export class ModerItemsTooBigComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 131,
+      pageId: PageId.MODER_ITEMS,
     });
   }
 }

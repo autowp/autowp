@@ -6,6 +6,7 @@ import {RouterLink} from '@angular/router';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getPerspectiveTranslation} from '@utils/translations';
 import {errorMessage} from 'app/grpc';
 
@@ -29,7 +30,7 @@ export class ModerPerspectivesComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 202,
+      pageId: PageId.MODER_PERSPECTIVES,
     });
   }
 

@@ -5,6 +5,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ArticleByCatnameRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
@@ -58,7 +59,7 @@ export class ArticlesArticleComponent {
 
       const article = this.articleResource.value();
       this.#pageEnv.set({
-        pageId: 32,
+        pageId: PageId.ARTICLE,
         title: article.name,
       });
       this.#meta.updateTag({property: 'og:title', content: article.name});

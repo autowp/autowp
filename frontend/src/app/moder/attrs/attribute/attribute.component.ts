@@ -5,6 +5,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {getAttrListOptionsTranslation, getAttrsTranslation, getUnitNameTranslation} from '@utils/translations';
 import {combineLatest, distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
 
@@ -54,7 +55,7 @@ export class ModerAttrsAttributeComponent {
     tap((attribute) => {
       this.#pageEnv.set({
         layout: {isAdminPage: true},
-        pageId: 101,
+        pageId: PageId.MODER_ATTRIBUTE,
         title: getAttrsTranslation(attribute.name),
       });
     }),

@@ -8,6 +8,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ListTopicsRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {BehaviorSubject, catchError, combineLatest, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -44,7 +45,7 @@ export class ForumsSubscriptionsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 42});
+    this.#pageEnv.set({pageId: PageId.FORUMS});
   }
 
   protected reload() {

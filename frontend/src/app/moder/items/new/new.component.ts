@@ -10,6 +10,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {getItemTypeTranslation} from '@utils/translations';
 import {
@@ -58,7 +59,7 @@ export class ModerItemsNewComponent {
     tap((itemTypeID) => {
       this.#pageEnv.set({
         layout: {isAdminPage: true},
-        pageId: 163,
+        pageId: PageId.MODER_ITEM_NEW,
         title: getItemTypeTranslation(itemTypeID, 'new-item'),
       });
     }),

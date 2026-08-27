@@ -24,6 +24,7 @@ import {CommentsClient, ItemsClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, of, switchMap} from 'rxjs';
 
@@ -187,7 +188,7 @@ export class ModerCommentsComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 110,
+      pageId: PageId.MODER_COMMENTS,
     });
 
     // Reflect the user_id / pictures_of_item_id query params back into the typeahead inputs on

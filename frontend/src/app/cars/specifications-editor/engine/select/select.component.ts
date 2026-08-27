@@ -22,6 +22,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {
   BehaviorSubject,
   catchError,
@@ -86,7 +87,7 @@ export class CarsEngineSelectComponent {
     ),
     tap((item) => {
       this.#pageEnv.set({
-        pageId: 102,
+        pageId: PageId.SPECIFICATIONS_EDITOR,
         title: $localize`Specs editor of ${item.nameText}`,
       });
     }),

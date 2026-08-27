@@ -19,6 +19,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {formatGrpcDate, parseGrpcDate, parseStringToGrpcDate} from '@services/utils';
 import {browserWindow} from '@utils/browser-window';
 import Keycloak from 'keycloak-js';
@@ -161,7 +162,7 @@ export class InboxComponent implements OnInit {
   protected readonly brandID = new FormControl<string>('', {nonNullable: true});
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 76});
+    this.#pageEnv.set({pageId: PageId.INBOX});
   }
 
   protected changeBrand() {

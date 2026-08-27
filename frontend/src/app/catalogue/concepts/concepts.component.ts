@@ -20,6 +20,7 @@ import {
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
@@ -110,7 +111,7 @@ export class CatalogueConceptsComponent {
       }
 
       this.#pageEnv.set({
-        pageId: 37,
+        pageId: PageId.CATALOGUE_CONCEPTS,
         title,
       });
     });

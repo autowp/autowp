@@ -22,6 +22,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
@@ -190,7 +191,7 @@ export class FactoryItemsComponent {
       }
 
       if (this.factoryData()) {
-        this.#pageEnv.set({pageId: 182});
+        this.#pageEnv.set({pageId: PageId.FACTORY_ITEMS});
       }
     });
   }

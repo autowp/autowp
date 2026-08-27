@@ -5,6 +5,8 @@ import {toObservable} from '@angular/core/rxjs-interop';
 import {Title} from '@angular/platform-browser';
 import {of, switchMap} from 'rxjs';
 
+import type {PageId} from './page-id';
+
 import {PageService} from './page';
 
 export interface LayoutParams {
@@ -17,7 +19,7 @@ export interface PageEnv {
     isAdminPage?: boolean;
     isGalleryPage?: boolean;
   };
-  pageId?: number;
+  pageId?: PageId;
   title?: string;
 }
 
@@ -49,7 +51,7 @@ export class PageEnvService {
     this.pageEnv.set(data);
   }
 
-  public isActive$(id: number): Observable<boolean> {
+  public isActive$(id: PageId): Observable<boolean> {
     return this.#pageEnv.pipe(
       switchMap((data) => {
         if (!data?.pageId) {

@@ -7,6 +7,7 @@ import {ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
@@ -77,7 +78,7 @@ export class TwinsGroupGalleryComponent {
       const group = this.groupResource.value();
       this.#pageEnv.set({
         layout: {isGalleryPage: true},
-        pageId: 28,
+        pageId: PageId.TWINS_GROUP_PICTURES,
         title: group.nameText,
       });
     });
@@ -87,7 +88,7 @@ export class TwinsGroupGalleryComponent {
     if (item) {
       this.#pageEnv.set({
         layout: {isGalleryPage: true},
-        pageId: 28,
+        pageId: PageId.TWINS_GROUP_PICTURES,
         title: item.nameText,
       });
     }

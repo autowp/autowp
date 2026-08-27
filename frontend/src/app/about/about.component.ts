@@ -9,6 +9,7 @@ import {RouterLink} from '@angular/router';
 import {StatisticsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {errorMessage} from 'app/grpc';
 import {NgMathPipesModule} from 'ngx-pipes';
@@ -145,7 +146,7 @@ export class AboutComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.#pageEnv.set({pageId: 136});
+    this.#pageEnv.set({pageId: PageId.ABOUT});
   }
 
   protected readonly errorMessage = errorMessage;

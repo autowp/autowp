@@ -23,6 +23,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {errorMessage} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
@@ -264,7 +265,7 @@ export class CategoriesCategoryItemComponent {
     effect(() => {
       const current = this.categoryData()?.current;
       this.#pageEnv.set({
-        pageId: 22,
+        pageId: PageId.CATEGORIES,
         title: current?.nameText ?? '',
       });
     });

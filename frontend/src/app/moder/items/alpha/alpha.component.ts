@@ -9,6 +9,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {combineLatest, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {PaginatorComponent} from '../../../paginator/paginator/paginator.component';
@@ -57,7 +58,7 @@ export class ModerItemsAlphaComponent implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 74,
+      pageId: PageId.MODER_ITEMS_ALPHA,
     });
   }
 }

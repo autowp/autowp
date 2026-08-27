@@ -16,6 +16,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
@@ -144,7 +145,7 @@ export class UsersUserPicturesBrandComponent {
       const brand = this.brandData();
       if (brand) {
         this.#pageEnv.set({
-          pageId: 141,
+          pageId: PageId.USER_PICTURES_BRAND,
           title: $localize`${brand.nameOnly} pictures`,
         });
       }

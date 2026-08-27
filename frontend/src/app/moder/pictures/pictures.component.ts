@@ -37,6 +37,7 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTypeahead} from '@ng
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {parseStringToGrpcDate} from '@services/utils';
 import {VehicleTypeService} from '@services/vehicle-type';
@@ -564,7 +565,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
-      pageId: 73,
+      pageId: PageId.MODER_PICTURES,
     });
 
     this.#addedFromSub = this.addedFrom.valueChanges

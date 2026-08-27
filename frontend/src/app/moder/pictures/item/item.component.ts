@@ -42,6 +42,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
@@ -127,7 +128,7 @@ export class ModerPicturesItemComponent {
     tap((id) => {
       this.#pageEnv.set({
         layout: {isAdminPage: true},
-        pageId: 72,
+        pageId: PageId.MODER_PICTURE,
         title: $localize`Picture №${id}`,
       });
     }),

@@ -7,6 +7,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {AttrZoneAttributesRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
 
 import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
@@ -48,7 +49,7 @@ export class ModerAttrsZoneComponent {
     tap((zone) => {
       this.#pageEnv.set({
         layout: {isAdminPage: true},
-        pageId: 142,
+        pageId: PageId.MODER_ATTRS_ZONE,
         title: zone.name,
       });
     }),

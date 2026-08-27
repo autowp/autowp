@@ -18,6 +18,7 @@ import {
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
@@ -182,7 +183,7 @@ export class CatalogueVehiclesPicturesPictureComponent {
         this.#meta.updateTag({property: 'og:image', content: picture.previewLarge.src});
       }
       this.#pageEnv.set({
-        pageId: 34,
+        pageId: PageId.PICTURES,
         title: picture.nameText,
       });
     });

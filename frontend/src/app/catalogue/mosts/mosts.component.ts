@@ -5,6 +5,7 @@ import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {MostsContentsComponent} from 'app/mosts/contents/contents.component';
 import {map, of, switchMap} from 'rxjs';
@@ -95,7 +96,7 @@ export class CatalogueMostsComponent {
         // after this one (it's a child component) and would otherwise leave the two disagreeing.
         // That child sets no title, so the title set here is the one that reaches the document.
         this.#pageEnv.set({
-          pageId: 21,
+          pageId: PageId.MOSTS,
           title: $localize`${brand.nameText} Mostly`,
         });
       }

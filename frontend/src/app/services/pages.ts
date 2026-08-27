@@ -1,208 +1,192 @@
 import type {Page} from './page';
 
-// Site-wide page-id tree, used by PageService to find a page's ancestors (for menu-item
-// active-state highlighting via isDescendant$()). Generated from the CMS's own page hierarchy.
+import {PageId} from './page-id';
+
+// Page-id hierarchy used by PageService to find a page's ancestors (for menu-item active-state
+// highlighting via isDescendant$()), from the CMS's own page tree. Trimmed to the pages
+// application code refers to (see PageId); the CMS's intermediate grouping nodes were spliced
+// out, their children lifted to the nearest kept ancestor, so every named ancestor -> descendant
+// relationship is preserved.
 const pages: Page[] = [
   {
-    id: 1,
+    id: PageId.HOME,
     childs: [
       {
-        id: 2,
+        id: PageId.TWINS,
         childs: [
           {
-            id: 25,
+            id: PageId.TWINS_GROUP,
             childs: [
+              {id: PageId.TWINS_GROUP_PICTURES, childs: []},
+              {id: PageId.TWINS_GROUP_SPECIFICATIONS, childs: []},
+            ],
+          },
+          {id: PageId.TWINS_BRAND, childs: []},
+        ],
+      },
+      {id: PageId.MOSTS, childs: []},
+      {id: PageId.CATEGORIES, childs: []},
+      {
+        id: PageId.MAP,
+        childs: [
+          {id: PageId.MUSEUM, childs: []},
+          {
+            id: PageId.FACTORIES,
+            childs: [{id: PageId.FACTORY_ITEMS, childs: []}],
+          },
+        ],
+      },
+      {
+        id: PageId.FORUMS,
+        childs: [
+          {
+            id: PageId.FORUM_THEME,
+            childs: [
+              {id: PageId.FORUM_NEW_TOPIC, childs: []},
               {
-                id: 26,
-                childs: [
-                  {id: 28, childs: [{id: 183, childs: []}]},
-                  {id: 27, childs: []},
-                ],
+                id: PageId.FORUM_TOPIC,
+                childs: [{id: PageId.FORUM_MOVE, childs: []}],
               },
-              {id: 153, childs: []},
             ],
           },
-          {id: 21, childs: []},
-          {id: 22, childs: []},
+        ],
+      },
+      {id: PageId.CUTAWAY, childs: []},
+      {
+        id: PageId.USER,
+        childs: [
           {
-            id: 117,
+            id: PageId.USER_PICTURES,
+            childs: [{id: PageId.USER_PICTURES_BRAND, childs: []}],
+          },
+          {id: PageId.USER_COMMENTS, childs: []},
+        ],
+      },
+      {id: PageId.VOTING, childs: []},
+      {
+        id: PageId.ITEM_NEW,
+        childs: [{id: PageId.ITEM_NEW_CHILD, childs: []}],
+      },
+      {id: PageId.BRANDS, childs: []},
+      {
+        id: PageId.MODER,
+        childs: [
+          {id: PageId.MODER_ITEMS_ALPHA, childs: []},
+          {id: PageId.LOG, childs: []},
+          {id: PageId.MODER_TRAFFIC, childs: []},
+          {
+            id: PageId.MODER_ATTRS,
             childs: [
-              {id: 159, childs: []},
-              {id: 181, childs: [{id: 182, childs: []}]},
+              {id: PageId.MODER_ATTRIBUTE, childs: []},
+              {id: PageId.MODER_ATTRS_ZONE, childs: []},
             ],
           },
+          {id: PageId.MODER_STAT, childs: []},
           {
-            id: 42,
+            id: PageId.MODER_PICTURES,
             childs: [
               {
-                id: 43,
+                id: PageId.MODER_PICTURE,
                 childs: [
-                  {id: 45, childs: []},
-                  {id: 44, childs: [{id: 83, childs: []}]},
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {id: 109, childs: []},
-      {
-        id: 62,
-        childs: [
-          {id: 63, childs: [{id: 141, childs: []}]},
-          {id: 205, childs: []},
-        ],
-      },
-      {id: 18, childs: []},
-      {id: 157, childs: []},
-      {id: 19, childs: [{id: 20, childs: []}]},
-      {id: 51, childs: [{id: 209, childs: [{id: 210, childs: []}]}]},
-      {
-        id: 60,
-        childs: [
-          {id: 134, childs: []},
-          {id: 135, childs: []},
-        ],
-      },
-      {id: 61, childs: []},
-      {
-        id: 67,
-        childs: [
-          {
-            id: 68,
-            childs: [
-              {id: 69, childs: []},
-              {id: 70, childs: []},
-              {id: 120, childs: []},
-            ],
-          },
-          {id: 71, childs: []},
-          {id: 74, childs: []},
-          {id: 75, childs: []},
-          {id: 77, childs: []},
-          {id: 97, childs: []},
-          {
-            id: 100,
-            childs: [
-              {id: 101, childs: []},
-              {id: 142, childs: []},
-            ],
-          },
-          {id: 107, childs: []},
-          {id: 114, childs: []},
-          {id: 119, childs: []},
-          {
-            id: 73,
-            childs: [
-              {
-                id: 72,
-                childs: [
-                  {id: 148, childs: []},
-                  {id: 149, childs: []},
+                  {id: PageId.MODER_PICTURE_AREA, childs: []},
+                  {id: PageId.MODER_PICTURE_MOVE, childs: []},
                 ],
               },
             ],
           },
-          {id: 202, childs: []},
-          {id: 203, childs: []},
+          {id: PageId.MODER_PERSPECTIVES, childs: []},
+          {id: PageId.MODER_USERS, childs: []},
           {
-            id: 131,
+            id: PageId.MODER_ITEMS,
             childs: [
               {
-                id: 78,
+                id: PageId.MODER_ITEM,
                 childs: [
-                  {id: 144, childs: []},
-                  {id: 178, childs: []},
-                  {id: 215, childs: []},
+                  {id: PageId.MODER_ITEM_SELECT_PARENT, childs: []},
+                  {id: PageId.MODER_ITEM_CATALOGUE_ORGANIZE, childs: []},
                 ],
               },
-              {id: 163, childs: []},
+              {id: PageId.MODER_ITEM_NEW, childs: []},
             ],
           },
-          {id: 212, childs: []},
-          {id: 110, childs: []},
+          {id: PageId.MODER_PICTURE_VOTE_TEMPLATES, childs: []},
+          {id: PageId.MODER_COMMENTS, childs: []},
         ],
       },
-      {id: 105, childs: []},
-      {id: 106, childs: []},
+      {id: PageId.RULES, childs: []},
       {
-        id: 87,
+        id: PageId.UPLOAD,
+        childs: [{id: PageId.UPLOAD_SELECT, childs: []}],
+      },
+      {
+        id: PageId.FEEDBACK,
+        childs: [{id: PageId.FEEDBACK_SENT, childs: []}],
+      },
+      {id: PageId.ACCOUNT_PROFILE, childs: []},
+      {id: PageId.ACCOUNT, childs: []},
+      {id: PageId.ACCOUNT_MESSAGES_SENT, childs: []},
+      {id: PageId.ACCOUNT_MESSAGES, childs: []},
+      {id: PageId.ACCOUNT_MESSAGES_SYSTEM, childs: []},
+      {id: PageId.ACCOUNT_INBOX_PICTURES, childs: []},
+      {id: PageId.ACCOUNT_EMAIL, childs: []},
+      {id: PageId.ACCOUNT_ACCESS, childs: []},
+      {id: PageId.ACCOUNT_DELETE, childs: []},
+      {id: PageId.ACCOUNT_SPECS_CONFLICTS, childs: []},
+      {id: PageId.ACCOUNT_PICTURES, childs: []},
+      {id: PageId.FORUM_SUBSCRIPTIONS, childs: []},
+      {id: PageId.ACCOUNT_CONTACTS, childs: []},
+      {id: PageId.ABOUT, childs: []},
+      {
+        id: PageId.CATALOGUE_INDEX,
         childs: [
-          {id: 91, childs: []},
-          {id: 29, childs: [{id: 30, childs: []}]},
-          {id: 89, childs: [{id: 93, childs: []}]},
-          {id: 124, childs: []},
-          {id: 211, childs: []},
           {
-            id: 48,
+            id: PageId.CATALOGUE_VEHICLES,
             childs: [
-              {id: 129, childs: []},
-              {id: 54, childs: []},
-              {id: 123, childs: []},
-              {
-                id: 49,
-                childs: [
-                  {id: 80, childs: []},
-                  {id: 128, childs: []},
-                  {id: 81, childs: []},
-                ],
-              },
-              {id: 94, childs: []},
-              {id: 55, childs: [{id: 56, childs: []}]},
-              {id: 133, childs: []},
-              {id: 137, childs: []},
-              {id: 188, childs: []},
-              {id: 130, childs: []},
-              {id: 57, childs: []},
-              {id: 198, childs: []},
+              {id: PageId.PICTURES, childs: []},
+              {id: PageId.CATALOGUE_SPECIFICATIONS, childs: []},
             ],
           },
-          {id: 136, childs: []},
-          {id: 90, childs: []},
-        ],
-      },
-      {
-        id: 10,
-        childs: [
-          {id: 58, childs: []},
-          {id: 59, childs: [{id: 66, childs: [{id: 193, childs: []}]}]},
           {
-            id: 33,
-            childs: [
-              {id: 34, childs: [{id: 194, childs: []}]},
-              {id: 36, childs: []},
-            ],
+            id: PageId.CATALOGUE_CARS,
+            childs: [{id: PageId.CATALOGUE_CARS_VEHICLE_TYPE, childs: []}],
           },
-          {id: 14, childs: [{id: 138, childs: []}]},
-          {id: 37, childs: []},
-          {id: 39, childs: [{id: 192, childs: []}]},
-          {id: 40, childs: [{id: 190, childs: []}]},
-          {id: 15, childs: []},
-          {id: 164, childs: [{id: 165, childs: [{id: 166, childs: [{id: 167, childs: []}]}]}]},
-          {id: 41, childs: [{id: 191, childs: []}]},
-          {id: 208, childs: []},
+          {id: PageId.CATALOGUE_CONCEPTS, childs: []},
+          {
+            id: PageId.CATALOGUE_LOGOTYPES,
+            childs: [{id: PageId.CATALOGUE_LOGOTYPES_PICTURE, childs: []}],
+          },
+          {
+            id: PageId.CATALOGUE_MIXED,
+            childs: [{id: PageId.CATALOGUE_MIXED_PICTURE, childs: []}],
+          },
+          {
+            id: PageId.CATALOGUE_OTHER,
+            childs: [{id: PageId.CATALOGUE_OTHER_PICTURE, childs: []}],
+          },
+          {id: PageId.CATALOGUE_RECENT, childs: []},
+          {id: PageId.CATALOGUE_ENGINES, childs: []},
         ],
       },
-      {id: 31, childs: [{id: 32, childs: []}]},
       {
-        id: 102,
-        childs: [
-          {id: 189, childs: []},
-          {id: 103, childs: []},
-        ],
+        id: PageId.ARTICLES,
+        childs: [{id: PageId.ARTICLE, childs: []}],
       },
-      {id: 161, childs: []},
-      {id: 173, childs: []},
-      {id: 174, childs: []},
-      {id: 76, childs: []},
-      {id: 52, childs: [{id: 53, childs: []}]},
-      {id: 122, childs: []},
-      {id: 79, childs: []},
-      {id: 196, childs: []},
-      {id: 197, childs: []},
-      {id: 201, childs: []},
-      {id: 204, childs: []},
-      {id: 214, childs: [{id: 213, childs: []}]},
+      {
+        id: PageId.SPECIFICATIONS_EDITOR,
+        childs: [{id: PageId.SPECS_ADMIN, childs: []}],
+      },
+      {id: PageId.PULSE, childs: []},
+      {id: PageId.USERS_RATING, childs: []},
+      {id: PageId.INFO_SPEC, childs: []},
+      {id: PageId.INBOX, childs: []},
+      {id: PageId.DONATE, childs: []},
+      {id: PageId.INFO_TEXT, childs: []},
+      {id: PageId.GALLERIES, childs: []},
+      {id: PageId.TELEGRAM, childs: []},
+      {
+        id: PageId.PERSONS,
+        childs: [{id: PageId.PERSON, childs: []}],
+      },
     ],
   },
 ];

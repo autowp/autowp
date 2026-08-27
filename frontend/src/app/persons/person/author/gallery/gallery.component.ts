@@ -5,6 +5,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PictureItemType} from '@grpc/spec.pb';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
 import {GalleryComponent} from 'app/gallery/gallery.component';
 import {map} from 'rxjs';
@@ -44,7 +45,7 @@ export class PersonsPersonAuthorGalleryComponent {
     if (item) {
       this.#pageEnv.set({
         layout: {isGalleryPage: true},
-        pageId: 34,
+        pageId: PageId.PICTURES,
         title: item.nameText,
       });
     }

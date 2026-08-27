@@ -15,6 +15,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
@@ -115,7 +116,7 @@ export class CutawayBrandsBrandComponent {
       }
     });
 
-    this.#pageEnv.set({pageId: 109});
+    this.#pageEnv.set({pageId: PageId.CUTAWAY});
   }
 
   protected readonly errorMessage = errorMessage;
