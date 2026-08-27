@@ -61,3 +61,40 @@
 {{- define "autowp.static.image" -}}
 {{ include "common.images.image" (dict "imageRoot" .Values.static.image "global" .Values.global) }}
 {{- end -}}
+
+{{/*
+Shared egress rules for the workload NetworkPolicies. Only rendered when
+networkPolicy.egress.enabled - see templates/networkpolicy.yaml.
+*/}}
+{{- define "autowp.networkPolicy.commonEgress" -}}
+{{- $np := .Values.networkPolicy -}}
+# DNS to any namespace (kube-dns / CoreDNS).
+- to:
+    - namespaceSelector: {}
+  ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+{{- if $np.allowSameNamespace }}
+# In-namespace dependencies pulled in as subcharts (redis, rabbitmq) and anything else co-located.
+- to:
+    - podSelector: {}
+{{- end }}
+{{- if $np.egress.allowAll }}
+# Escape hatch: everything else (external Postgres, Keycloak, S3, SMTP, Telegram, ...).
+- {}
+{{- end }}
+{{- range $np.egress.extraRules }}
+- to:
+    - ipBlock:
+        cidr: {{ .cidr | quote }}
+  {{- with .ports }}
+  ports:
+    {{- range . }}
+    - port: {{ .port }}
+      protocol: {{ .protocol | default "TCP" }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end -}}

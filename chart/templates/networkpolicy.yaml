@@ -1,0 +1,93 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- $np := .Values.networkPolicy }}
+{{- /*
+  Opt-in NetworkPolicies for the autowp workload pods. Scoped to the two things this chart
+  labels selectably - goautowp-serve and static. The scheduler CronJob pods get no
+  app.kubernetes.io/component label, so they are intentionally not covered here; add pod
+  labels to the CronJob templates first if you want to restrict them too.
+
+  Ingress is locked down to the ingress controller (site traffic + grpc-web + gRPC) and
+  Prometheus (metrics). Egress is only restricted when networkPolicy.egress.enabled, since the
+  backend reaches external Postgres, Keycloak, S3, SMTP and Telegram - getting that list wrong
+  blackholes the app.
+*/}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-netpol" (include "autowp.goautowp.serve.fullname" .) | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: goautowp-serve
+  policyTypes:
+    - Ingress
+    {{- if $np.egress.enabled }}
+    - Egress
+    {{- end }}
+  ingress:
+    # Ingress controller: HTTP/REST gateway (app-port), grpc-web and native gRPC (grpc-port),
+    # the SSR nginx sidecar (assets-port) and the SSR server itself (frontend-port).
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ $np.ingressControllerNamespace | quote }}
+      ports:
+        - port: app-port
+          protocol: TCP
+        - port: grpc-port
+          protocol: TCP
+        - port: assets-port
+          protocol: TCP
+        - port: frontend-port
+          protocol: TCP
+    # Prometheus scraping the Go process metrics.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ $np.monitoringNamespace | quote }}
+      ports:
+        - port: 2112
+          protocol: TCP
+    {{- if $np.allowSameNamespace }}
+    # Any pod in this namespace (keeps in-cluster callers working without enumerating them).
+    - from:
+        - podSelector: {}
+    {{- end }}
+  {{- if $np.egress.enabled }}
+  egress:
+    {{- include "autowp.networkPolicy.commonEgress" . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-netpol" (include "autowp.static.fullname" .) | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: static
+  policyTypes:
+    - Ingress
+    {{- if $np.egress.enabled }}
+    - Egress
+    {{- end }}
+  ingress:
+    # /img/ static assets, served straight from the PVC.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ $np.ingressControllerNamespace | quote }}
+      ports:
+        - port: app-port
+          protocol: TCP
+    {{- if $np.allowSameNamespace }}
+    - from:
+        - podSelector: {}
+    {{- end }}
+  {{- if $np.egress.enabled }}
+  egress:
+    {{- include "autowp.networkPolicy.commonEgress" . | nindent 4 }}
+  {{- end }}
+{{- end }}

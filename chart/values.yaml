@@ -377,3 +377,30 @@ static:
     pullPolicy: IfNotPresent
     pullSecrets: []
 mostsMinVehiclesCount: 200
+## Opt-in NetworkPolicies for the autowp workload pods (goautowp-serve, static) - see
+## templates/networkpolicy.yaml. Off by default: enabling it on a cluster whose CNI does not
+## enforce NetworkPolicy does nothing, and enabling it with the wrong namespace names below
+## silently blackholes site traffic.
+networkPolicy:
+  enabled: false
+  ## Namespace the ingress controller runs in, matched on the kubernetes.io/metadata.name label
+  ## Kubernetes sets on every namespace automatically.
+  ingressControllerNamespace: ingress-nginx
+  ## Namespace Prometheus runs in - allowed to scrape the :2112 metrics port.
+  monitoringNamespace: monitoring
+  ## Also allow every pod in this release's namespace to reach the workload pods. Keeps in-cluster
+  ## clients and the redis/rabbitmq subcharts working without listing each one.
+  allowSameNamespace: true
+  egress:
+    ## Egress restriction is much riskier than ingress: the backend reaches external Postgres,
+    ## Keycloak, S3, SMTP, Telegram and third-party auth. While false, no Egress rule is emitted
+    ## and egress stays open. Turn on only with allowAll or extraRules populated.
+    enabled: false
+    ## Blanket-allow all other egress (still a NetworkPolicy, so it documents intent and blocks
+    ## nothing).
+    allowAll: false
+    ## Extra allowed destinations when egress.enabled. Each entry:
+    ##   - cidr: 10.0.0.0/8
+    ##     ports:
+    ##       - { port: 5432, protocol: TCP }
+    extraRules: []
