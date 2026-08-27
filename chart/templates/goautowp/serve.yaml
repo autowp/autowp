@@ -64,14 +64,25 @@ spec:
           ports:
             - name: assets-port
               containerPort: {{ .Values.frontend.assets.port }}
+          # Gates liveness/readiness until the sidecar's initContainer copy + nginx start finish; up
+          # to failureThreshold*periodSeconds before the pod is declared failed.
+          startupProbe:
+            tcpSocket:
+              port: assets-port
+            periodSeconds: 5
+            failureThreshold: 30
           livenessProbe:
             tcpSocket:
               port: assets-port
-            initialDelaySeconds: 3
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
           readinessProbe:
             tcpSocket:
               port: assets-port
-            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           volumeMounts:
             - mountPath: /srv/browser
               name: frontend-assets
@@ -118,14 +129,25 @@ spec:
           ports:
             - name: frontend-port
               containerPort: 4000
+          # SSR server forks its workers and warms up before it listens; keep liveness from firing
+          # until then.
+          startupProbe:
+            tcpSocket:
+              port: frontend-port
+            periodSeconds: 5
+            failureThreshold: 30
           livenessProbe:
             tcpSocket:
               port: frontend-port
-            initialDelaySeconds: 3
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
           readinessProbe:
             tcpSocket:
               port: frontend-port
-            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           securityContext:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
@@ -181,14 +203,27 @@ spec:
             allowPrivilegeEscalation: false
             seccompProfile:
               type: RuntimeDefault
+          # `serve` runs Postgres migrations before it opens the gRPC port. A cold start against a
+          # busy database can take well over the old liveness initialDelaySeconds of 3s, which killed
+          # the container mid-migration and crashlooped it. The startupProbe gives migrations up to
+          # failureThreshold*periodSeconds (~5min) before liveness takes over.
+          startupProbe:
+            tcpSocket:
+              port: grpc-port
+            periodSeconds: 5
+            failureThreshold: 60
           readinessProbe:
             tcpSocket:
               port: grpc-port
-            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           livenessProbe:
             tcpSocket:
               port: grpc-port
-            initialDelaySeconds: 3
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
       securityContext:
         runAsNonRoot: true
         fsGroup: 101
