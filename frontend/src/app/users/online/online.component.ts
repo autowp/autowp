@@ -15,6 +15,7 @@ import {UserComponent} from '../../user/user/user.component';
   imports: [UserComponent, AsyncPipe],
   templateUrl: './online.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class UsersOnlineComponent {
   protected readonly activeModal = inject(NgbActiveModal);

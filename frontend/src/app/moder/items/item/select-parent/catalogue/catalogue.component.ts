@@ -28,6 +28,7 @@ import {ModerItemsItemSelectParentTreeComponent} from '../tree/tree.component';
   imports: [RouterLink, PaginatorComponent, ModerItemsItemSelectParentTreeComponent, AsyncPipe],
   templateUrl: './catalogue.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemSelectParentCatalogueComponent {
   readonly #route = inject(ActivatedRoute);

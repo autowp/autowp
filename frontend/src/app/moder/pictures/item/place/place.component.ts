@@ -53,6 +53,7 @@ function normalizeLng(lng: number) {
   imports: [RouterLink, FormsModule, ReactiveFormsModule, LeafletModule, AsyncPipe],
   templateUrl: './place.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerPicturesItemPlaceComponent implements OnInit {
   readonly #router = inject(Router);

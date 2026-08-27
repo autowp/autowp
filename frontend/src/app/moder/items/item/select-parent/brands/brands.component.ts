@@ -17,6 +17,7 @@ import {PaginatorComponent} from '../../../../../paginator/paginator/paginator.c
   imports: [PaginatorComponent],
   templateUrl: './brands.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemSelectParentBrandsComponent {
   readonly #route = inject(ActivatedRoute);

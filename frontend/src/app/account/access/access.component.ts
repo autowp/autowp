@@ -10,6 +10,7 @@ import {PageEnvService} from '@services/page-env.service';
   imports: [RouterLink],
   templateUrl: './access.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class AccountAccessComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

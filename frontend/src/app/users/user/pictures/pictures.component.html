@@ -32,7 +32,7 @@
             ></a>
           }
           <h4>
-            <a [routerLink]="['/users', user.identity, 'pictures', brand.catname]">{{ brand.nameOnly }}</a>
+            <a class="me-1" [routerLink]="['/users', user.identity, 'pictures', brand.catname]">{{ brand.nameOnly }}</a>
             <small>({{ brand.descendantPicturesCount }})</small>
           </h4>
         </div>

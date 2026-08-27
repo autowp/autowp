@@ -12,6 +12,7 @@ import {IndexFactoriesFactoryComponent} from './factory/factory.component';
   imports: [RouterLink, IndexFactoriesFactoryComponent, AsyncPipe],
   templateUrl: './factories.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class IndexFactoriesComponent {
   readonly #items = inject(ItemsClient);

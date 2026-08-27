@@ -22,6 +22,7 @@ import {CatalogueService} from '../../catalogue-service';
   imports: [RouterLink],
   templateUrl: './specifications.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueVehiclesSpecificationsComponent {
   readonly #pageEnv = inject(PageEnvService);

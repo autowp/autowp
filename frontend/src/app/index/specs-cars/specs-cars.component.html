@@ -1,7 +1,7 @@
 @if (items(); as items) {
   @if (items && items.length > 0) {
     <h4>
-      <ng-container i18n>Specifications</ng-container>
+      <ng-container i18n>Specifications</ng-container>&ngsp;
       <small><a routerLink="/users/rating" i18n>Statistics</a></small>
     </h4>
     @for (chunk of items; track chunk) {

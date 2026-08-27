@@ -14,6 +14,7 @@ import {IndexBrandsBrandComponent} from './brand/brand.component';
   templateUrl: './brands.component.html',
   styleUrl: './brands.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class IndexBrandsComponent {
   readonly #items = inject(ItemsClient);

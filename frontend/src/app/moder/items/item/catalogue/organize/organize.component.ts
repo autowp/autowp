@@ -37,6 +37,7 @@ import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../../item
   imports: [RouterLink, AsyncPipe, ItemMetaFormComponent, RemarkModule],
   templateUrl: './organize.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsItemOrganizeComponent implements OnInit {
   readonly #itemService = inject(ItemService);

@@ -18,6 +18,7 @@ import {ToastsService} from '../../toasts/toasts.service';
   imports: [FormsModule, InvalidParamsPipe],
   templateUrl: './form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CommentsFormComponent {
   readonly #comments = inject(CommentsClient);

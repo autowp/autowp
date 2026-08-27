@@ -37,6 +37,7 @@ import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../item-meta-
   imports: [RouterLink, AsyncPipe, ItemMetaFormComponent],
   templateUrl: './new.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerItemsNewComponent {
   readonly #itemService = inject(ItemService);

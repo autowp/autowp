@@ -15,6 +15,7 @@ import {errorMessage, isNotFoundError} from 'app/grpc';
   imports: [RouterLink],
   templateUrl: './whitelist.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerTrafficWhitelistComponent implements OnInit {
   readonly #trafficClient = inject(TrafficClient);

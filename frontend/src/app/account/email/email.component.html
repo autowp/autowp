@@ -3,7 +3,7 @@
 </div>
 <div class="card card-body">
   <p>
-    <ng-container i18n>Your current e-mail address:</ng-container>
+    <ng-container i18n>Your current e-mail address:</ng-container>&ngsp;
     @if (email$ | async; as email) {
       <a [href]="email">{{ email }}</a>
     } @else {

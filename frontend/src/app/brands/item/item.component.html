@@ -23,7 +23,7 @@
     [style.background-image]="'url(' + icons().image + ')'"
   ></a>
   <h4>
-    <a [routerLink]="['/', brand.catname]">{{ brand.name }}</a>
+    <a class="me-1" [routerLink]="['/', brand.catname]">{{ brand.name }}</a>
     <small class="badge bg-secondary-subtle text-secondary-emphasis">
       {{ brand.itemsCount - brand.newItemsCount }}
       @if (brand.newItemsCount > 0) {

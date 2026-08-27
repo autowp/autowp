@@ -15,6 +15,7 @@ import {map, of, switchMap} from 'rxjs';
   imports: [RouterLink, RouterOutlet, AsyncPipe],
   templateUrl: './person.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PersonsPersonComponent {
   readonly #router = inject(Router);
