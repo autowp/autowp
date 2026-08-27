@@ -19,15 +19,15 @@
 <div class="modal-footer">
   @if (picture$ | async; as picture) {
     <button type="button" class="btn btn-secondary float-start select-all" (click)="selectAll()">
-      <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+      <i class="bi bi-arrows-fullscreen me-1" aria-hidden="true"></i>
       <span i18n>Select all</span>
     </button>
   }
   <span></span>
-  <button type="button" disabled class="btn btn-secondary float-start" i18n>
+  <button type="button" disabled class="btn btn-secondary float-start me-1" i18n>
     {{ resolution }} (aspect is about {{ aspect }})
   </button>
-  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Close</button>
+  <button type="button" class="btn btn-secondary me-1" i18n (click)="activeModal.dismiss()">Close</button>
   @if (picture$ | async; as picture) {
     <button type="button" class="btn btn-primary" i18n (click)="onSave(picture)">Save changes</button>
   }

@@ -53,6 +53,7 @@ const unresolvedSimilarPictureListOptions = () =>
   imports: [PaginatorComponent, RouterLink, ThumbnailComponent, NgbTypeahead, FormsModule, ReactiveFormsModule],
   templateUrl: './similar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerPicturesSimilarComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

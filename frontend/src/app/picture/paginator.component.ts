@@ -8,6 +8,7 @@ import {RouterLink} from '@angular/router';
   imports: [RouterLink],
   templateUrl: './paginator.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PicturePaginatorComponent {
   readonly paginator = input.required<PicturesPages>();

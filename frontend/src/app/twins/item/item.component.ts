@@ -14,6 +14,7 @@ import {RemarkModule} from 'ngx-remark';
   templateUrl: './item.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class TwinsItemComponent {
   readonly #auth = inject(AuthService);

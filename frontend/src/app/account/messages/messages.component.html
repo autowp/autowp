@@ -62,26 +62,26 @@
               }
               @if (message.message.canDelete) {
                 <a href="#" class="float-end" (click)="deleteMessage(message.message.id)">
-                  <i class="bi bi-trash" aria-hidden="true"></i>
+                  <i class="bi bi-trash me-1" aria-hidden="true"></i>
                   <ng-container i18n>delete</ng-container>
                 </a>
               }
               @if (message.message.canReply) {
                 <span>
-                  <i class="bi bi-reply" aria-hidden="true"></i>
+                  <i class="bi bi-reply me-1" aria-hidden="true"></i>
                   <a href="#" i18n (click)="openMessageForm(folder, message.message.authorId)">reply</a>
                   &nbsp;
                 </span>
               }
               @if (message.message.allMessagesLink && message.message.dialogWithUserId !== '0') {
                 <span>
-                  <i class="bi bi-chat-text" aria-hidden="true"></i>
+                  <i class="bi bi-chat-text me-1" aria-hidden="true"></i>
                   <a
                     routerLink="/account/messages"
                     i18n
                     [queryParams]="{folder: 'dialog', user_id: message.message.dialogWithUserId}"
                     >entire dialog</a
-                  >
+                  >&ngsp;
                   <small>({{ message.message.dialogCount }})</small>
                   &nbsp;
                 </span>

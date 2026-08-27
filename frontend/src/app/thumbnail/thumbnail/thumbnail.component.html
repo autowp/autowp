@@ -58,7 +58,7 @@
         </span>
         @if (picture.views > 0) {
           <span i18n-title title="Views" class="text-nowrap me-2">
-            <i class="bi bi-eye" aria-hidden="true"></i>
+            <i class="bi bi-eye me-1" aria-hidden="true"></i>
             @if (picture.views >= 1000) {
               <span>{{ picture.views / 1000 | number: '1.0-1' }}K</span>
             } @else {
@@ -82,10 +82,10 @@
                       ? picture.commentsCountTotal - picture.commentsCountNew
                       : ''
                   }}<span class="text-danger">+{{ picture.commentsCountNew }}</span>
-                  <i class="bi bi-chat-fill text-danger" aria-hidden="true"></i>
+                  <i class="bi bi-chat-fill text-danger ms-1" aria-hidden="true"></i>
                 } @else {
                   {{ picture.commentsCountTotal }}
-                  <i class="bi bi-chat-fill" aria-hidden="true"></i>
+                  <i class="bi bi-chat-fill ms-1" aria-hidden="true"></i>
                 }
               </a>
             }

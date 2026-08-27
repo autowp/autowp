@@ -37,7 +37,7 @@
           <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" [showSimilar]="false" />
           @if (picture.replaceable; as replaceable) {
             <p class="alert alert-info small" role="alert">
-              <ng-container i18n>Photo suggested to replace</ng-container>
+              <ng-container i18n>Photo suggested to replace</ng-container>&ngsp;
               <a [routerLink]="['/picture', replaceable.identity]">/picture/{{ replaceable.identity }}</a>
             </p>
           }
@@ -50,7 +50,7 @@
                   <app-thumbnail [picture]="dstPicture" [route]="['/picture', dstPicture.identity]" />
                   @if (dstPicture.replaceable; as replaceable) {
                     <p class="alert alert-info small" role="alert">
-                      <ng-container i18n>Photo suggested to replace</ng-container>
+                      <ng-container i18n>Photo suggested to replace</ng-container>&ngsp;
                       <a [routerLink]="['/picture', replaceable.identity]">/picture/{{ replaceable.identity }}</a>
                     </p>
                   }
@@ -62,7 +62,7 @@
                   [disabled]="hideLoadingKey() === picture.id + '-' + dfDistance.dstPictureId"
                   (click)="hideSimilar(picture, dfDistance)"
                 >
-                  <i class="bi bi-x-circle" aria-hidden="true"></i>
+                  <i class="bi bi-x-circle me-1" aria-hidden="true"></i>
                   <ng-container i18n>Not a duplicate</ng-container>
                 </button>
               </div>

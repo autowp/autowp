@@ -32,6 +32,7 @@ import {
   imports: [UserComponent, RouterLink, UserTextComponent, PastTimeIndicatorComponent, PaginatorComponent, AsyncPipe],
   templateUrl: './messages.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class AccountMessagesComponent {
   readonly #messageService = inject(MessageService);

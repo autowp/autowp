@@ -6,24 +6,24 @@
         <div class="nearLinks">
           @if (paginator.previous) {
             <a [routerLink]="prefix().concat([paginator.previous])">
-              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>
               <ng-container i18n>previous</ng-container>
             </a>
           } @else {
             <span>
-              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>
               <ng-container i18n>previous</ng-container>
             </span>
           }
           @if (paginator.next) {
             <a [routerLink]="prefix().concat([paginator.next])">
               <ng-container i18n>next</ng-container>
-              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
             </a>
           } @else {
             <span>
               <ng-container i18n>next</ng-container>
-              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
             </span>
           }
         </div>

@@ -40,6 +40,7 @@ interface ChunkedGroup {
   imports: [RouterLink, PaginatorComponent, TwinsSidebarComponent, AsyncPipe],
   templateUrl: './twins.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class TwinsComponent {
   readonly #route = inject(ActivatedRoute);

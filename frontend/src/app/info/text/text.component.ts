@@ -40,6 +40,7 @@ interface InfoText {
   imports: [RouterLink, UserComponent, AsyncPipe, DiffEditorComponent],
   templateUrl: './text.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class InfoTextComponent implements OnInit {
   readonly #userService = inject(UserService);
