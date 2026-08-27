@@ -57,7 +57,6 @@ var (
 	errFormatNotFound          = errors.New("format not found")
 	errFailedToFormatImage     = errors.New("failed to format image")
 	errFailedToGetImageSize    = errors.New("failed to get image size")
-	errSelfRename              = errors.New("trying to rename to self")
 	errInvalidImageID          = errors.New("invalid image id provided")
 	errFileSizeDetectionFailed = errors.New("failed to determine file size")
 	errParenthesisNotSupported = errors.New("change image name for keys with parenthesis is not supported")
@@ -545,7 +544,12 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 		}
 
 		if destFileName == img.Filepath {
-			return errSelfRename
+			// The image already sits at a name that satisfies the pattern - nothing to
+			// rename. Treat it as success: a concurrent correction (e.g. triggered by an
+			// item rename) may have already moved the file before this call ran, and with
+			// the copy&delete implementation a self-rename would copy the object onto
+			// itself and then delete it.
+			return nil
 		}
 
 		destURL := url.URL{Path: destFileName}
