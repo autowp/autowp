@@ -4,7 +4,8 @@ import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -13,6 +14,7 @@ import {
   GetUserRequest,
   ItemFields,
   ItemListOptions,
+  ItemRequest,
   ItemsRequest,
   ModeratorAttention,
   PictureStatus,
@@ -37,6 +39,7 @@ import {UserComponent} from '../../user/user/user.component';
 })
 export class ModerCommentsComponent implements OnInit {
   readonly #userService = inject(UserService);
+  readonly #destroyRef = inject(DestroyRef);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #router = inject(Router);
@@ -120,7 +123,10 @@ export class ModerCommentsComponent implements OnInit {
   );
 
   readonly #moderatorAttention$: Observable<ModeratorAttention> = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('moderator_attention') ?? '', 10)),
+    map((params) => {
+      const value = parseInt(params.get('moderator_attention') ?? '', 10);
+      return isNaN(value) ? ModeratorAttention.NONE : value;
+    }),
     distinctUntilChanged(),
   );
 
@@ -183,20 +189,58 @@ export class ModerCommentsComponent implements OnInit {
       layout: {isAdminPage: true},
       pageId: 110,
     });
+
+    // Reflect the user_id / pictures_of_item_id query params back into the typeahead inputs on
+    // load (and on back/forward), otherwise the field looks empty while the filter is active.
+    this.userID$
+      .pipe(
+        switchMap((userID) =>
+          userID
+            ? this.#usersClient.getUser(new GetUserRequest({userId: userID})).pipe(catchError(() => EMPTY))
+            : of(null),
+        ),
+        takeUntilDestroyed(this.#destroyRef),
+      )
+      .subscribe((user) => {
+        this.userQuery.setValue(user ? this.userFormatter(user) : '', {emitEvent: false});
+      });
+
+    this.#picturesOfItemID$
+      .pipe(
+        switchMap((itemID) =>
+          itemID
+            ? this.#itemsClient
+                .item(
+                  new ItemRequest({
+                    fields: new ItemFields({nameText: true}),
+                    id: itemID,
+                    language: this.#languageService.language,
+                  }),
+                )
+                .pipe(catchError(() => EMPTY))
+            : of(null),
+        ),
+        takeUntilDestroyed(this.#destroyRef),
+      )
+      .subscribe((item) => {
+        this.itemQuery.setValue(item ? this.itemFormatter(item) : '', {emitEvent: false});
+      });
   }
 
   protected setModeratorAttention() {
     void this.#router.navigate([], {
       queryParams: {
-        moderator_attention: this.moderatorAttention,
+        moderator_attention: this.moderatorAttention.value,
         page: null,
       },
       queryParamsHandling: 'merge',
     });
   }
 
-  protected itemFormatter(x: Item) {
-    return x.nameText;
+  // ngOnInit seeds these controls with a plain name string on a deep link, and NgbTypeahead also
+  // runs inputFormatter over that string - so pass it straight through when it isn't an object.
+  protected itemFormatter(x: Item | string) {
+    return typeof x === 'string' ? x : x.nameText;
   }
 
   protected itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
@@ -221,8 +265,8 @@ export class ModerCommentsComponent implements OnInit {
     });
   }
 
-  protected userFormatter(x: User) {
-    return x.name;
+  protected userFormatter(x: string | User) {
+    return typeof x === 'string' ? x : x.name;
   }
 
   protected userOnSelect(e: NgbTypeaheadSelectItemEvent): void {

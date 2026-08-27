@@ -612,12 +612,14 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     this.hasSelectedItem.set(this.#selected.length > 0);
   }
 
-  protected itemFormatter(x: Item) {
-    return x.nameText;
+  // Accept a bare string too: on a deep link the query params seed these controls with "#<id>"
+  // (see the data$ pipe), and NgbTypeahead runs inputFormatter over that value as well.
+  protected itemFormatter(x: Item | string) {
+    return typeof x === 'string' ? x : x.nameText;
   }
 
-  protected ownerFormatter(x: User) {
-    return x.name;
+  protected ownerFormatter(x: string | User) {
+    return typeof x === 'string' ? x : x.name;
   }
 
   protected itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
