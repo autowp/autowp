@@ -4945,12 +4945,12 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 			// one case race the "Kalina" assertions in the other.
 			brandCatname := fmt.Sprintf("lada-%d-%s", randomInt, testCase.Language)
 
-			itemID := createItem(t, conn, cnt, &Item{
+			itemID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       ruName,
 				ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
 			})
 
-			brandID := createItem(t, conn, cnt, &Item{
+			brandID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       ruBrandName,
 				Catname:    brandCatname,
 				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
