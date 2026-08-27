@@ -4,11 +4,11 @@
       <div>
         <p>
           @if (window.previous) {
-            <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.previous}"
+            <a class="me-1" routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.previous}"
               >←<ng-container i18n>previous</ng-container></a
             >
           } @else {
-            <span>←<ng-container i18n>previous</ng-container></span>
+            <span class="me-1">←<ng-container i18n>previous</ng-container></span>
           }
           @if (window.next) {
             <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.next}"
@@ -20,15 +20,15 @@
         </p>
         <p>
           @if (window.first < window.firstPageInRange) {
-            <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.first}">{{
+            <a class="me-1" routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.first}">{{
               padd(window.first)
             }}</a>
           }
           @if (window.first < window.firstPageInRange - 1) {
-            <span>…</span>
+            <span class="me-1">…</span>
           }
           @for (page of window.pages; track page) {
-            <span>
+            <span class="me-1">
               @if (page !== data.current) {
                 <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: page}">{{ padd(page) }}</a>
               } @else {
@@ -37,7 +37,7 @@
             </span>
           }
           @if (window.last > window.lastPageInRange + 1) {
-            <span>…</span>
+            <span class="me-1">…</span>
           }
           @if (window.last > window.lastPageInRange) {
             <a routerLink="." queryParamsHandling="merge" [queryParams]="{page: window.last}">{{

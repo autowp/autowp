@@ -1,8 +1,8 @@
 @if (ratingCatnameNormalized(); as ratingCatname) {
   <h1 class="mb-4 mosts-header">
-    <span i18n>Most</span>
+    <span class="me-2" i18n>Most</span>
     @if (ratings(); as ratings) {
-      <div class="d-inline-block" ngbDropdown>
+      <div class="d-inline-block me-2" ngbDropdown>
         <a href="#" ngbDropdownToggle (click)="(false)">
           @for (rating of ratings; track rating) {
             @if (rating.catname === ratingCatname) {
@@ -23,9 +23,9 @@
         </div>
       </div>
     }
-    <span i18n>among</span>
+    <span class="me-2" i18n>among</span>
     @if (vehicleTypes(); as vehicleTypes) {
-      <div class="d-inline-block" ngbDropdown>
+      <div class="d-inline-block me-2" ngbDropdown>
         <a href="#" ngbDropdownToggle (click)="(false)">
           @if (typeCatname(); as typeCatname) {
             @for (type of vehicleTypes; track type) {
