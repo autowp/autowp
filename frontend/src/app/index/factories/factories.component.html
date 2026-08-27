@@ -4,7 +4,7 @@
 @if (factories$ | async; as factories) {
   <p>
     @for (factory of factories.items; track factory.id) {
-      <app-index-factories-factory [factory]="factory" />
+      <app-index-factories-factory [factory]="factory" />&ngsp;
     }
   </p>
 } @else {

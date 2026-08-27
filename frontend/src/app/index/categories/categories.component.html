@@ -5,7 +5,7 @@
 @if (result$ | async; as result) {
   <p>
     @for (category of result.items; track category.id) {
-      <app-index-categories-category [category]="category" />
+      <app-index-categories-category [category]="category" />&ngsp;
     }
   </p>
 } @else {
