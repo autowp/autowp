@@ -49,7 +49,5 @@ crt/*.crt
 sonar-scanner-*
 /.scannerwork/
 /crowdin.yml
-openapi.yaml
 /.eslintcache
-/src/rest/*
 /src/grpc/*

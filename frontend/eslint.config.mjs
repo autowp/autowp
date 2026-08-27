@@ -16,7 +16,6 @@ export default defineConfig([
     'node_modules/**/*',
     '.idea/**/*',
     '.angular/**/*',
-    'src/rest/**/*',
     'src/grpc/**/*',
   ]),
   {
@@ -170,7 +169,7 @@ export default defineConfig([
   },
   eslintPluginPrettierRecommended,
   {
-    ignores: ['src/grpc/**/*', 'src/rest/**/*'],
+    ignores: ['src/grpc/**/*'],
   },
   {
     files: ['**/*.html'],
