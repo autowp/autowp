@@ -20,7 +20,6 @@ import {ToastsService} from '../../toasts/toasts.service';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './move-topic.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ForumsMoveTopicComponent implements OnInit {
   readonly #router = inject(Router);

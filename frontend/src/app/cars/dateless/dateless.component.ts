@@ -28,7 +28,6 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
   imports: [RouterLink, PaginatorComponent, ItemComponent],
   templateUrl: './dateless.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CarsDatelessComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

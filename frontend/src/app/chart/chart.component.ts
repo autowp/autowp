@@ -24,7 +24,6 @@ import {ToastsService} from '../toasts/toasts.service';
   templateUrl: './chart.component.html',
   providers: [provideCharts(withDefaultRegisterables())],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ChartComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

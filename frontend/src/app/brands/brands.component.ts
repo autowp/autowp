@@ -35,7 +35,6 @@ function addCSS(document: Document, url: string) {
   imports: [RouterLink, BrandsItemComponent],
   templateUrl: './brands.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class BrandsComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

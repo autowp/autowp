@@ -30,7 +30,6 @@ import {CategoriesService} from '../../service';
   imports: [CommentsComponent, PictureComponent],
   templateUrl: './picture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CategoryPictureComponent {
   readonly #route = inject(ActivatedRoute);

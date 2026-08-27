@@ -16,7 +16,6 @@ import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-t
   imports: [RouterLink, FormsModule, AsyncPipe],
   templateUrl: './picture-vote-templates.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerPictureVoteTemplatesComponent implements OnInit {
   readonly #voteTemplateService = inject(APIPictureModerVoteTemplateService);

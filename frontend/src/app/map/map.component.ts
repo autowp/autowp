@@ -107,7 +107,6 @@ function createClusterMarker(cluster: MapPictureCluster, onClick: () => void): M
   templateUrl: './map.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class MapComponent implements OnDestroy, OnInit {
   readonly #route = inject(ActivatedRoute);

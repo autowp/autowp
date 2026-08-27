@@ -16,7 +16,6 @@ import {UserComponent} from '../../user/user/user.component';
   imports: [UserComponent, AsyncPipe],
   templateUrl: './votes.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CommentsVotesComponent {
   protected readonly activeModal = inject(NgbActiveModal);

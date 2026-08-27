@@ -9,7 +9,6 @@ import {TimeAgoPipe} from '@utils/time-ago.pipe';
   templateUrl: './past-time-indicator.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class PastTimeIndicatorComponent {
   readonly date = input.required<Date | string>();

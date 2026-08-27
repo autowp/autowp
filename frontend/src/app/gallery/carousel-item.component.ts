@@ -71,7 +71,6 @@ function maxBounds(bounds: Dimension, max: Dimension): Dimension {
   host: {
     '(window:resize)': 'onResize()',
   },
-  preserveWhitespaces: false,
 })
 export class CarouselItemComponent implements AfterViewInit {
   readonly #el = inject<ElementRef<HTMLElement>>(ElementRef);

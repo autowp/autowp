@@ -13,7 +13,6 @@ import {RemarkModule} from 'ngx-remark';
   templateUrl: './list-item.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class NewListItemComponent {
   readonly #auth = inject(AuthService);

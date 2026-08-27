@@ -20,7 +20,6 @@ import {CatalogueService} from '../../catalogue-service';
   imports: [GalleryComponent],
   templateUrl: './gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CatalogueVehiclesGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);

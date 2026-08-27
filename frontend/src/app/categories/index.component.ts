@@ -19,7 +19,6 @@ import {CategoriesIndexItemComponent} from './index-item/index-item.component';
   imports: [RouterLink, CategoriesIndexItemComponent],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CategoriesIndexComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

@@ -54,7 +54,6 @@ import {UserComponent} from '../../user/user/user.component';
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class UsersUserComponent {
   readonly #appContactsService = inject(AppContactsService);

@@ -26,7 +26,6 @@ import {ToastsService} from '../../../../toasts/toasts.service';
   templateUrl: './item.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class DonateVodSelectItemComponent {
   readonly #toastService = inject(ToastsService);

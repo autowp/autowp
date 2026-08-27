@@ -47,7 +47,6 @@ export interface CommentInList extends CommentMessage {
   imports: [NgbTooltip, UserComponent, RouterLink, UserTextComponent, CommentsFormComponent, DatePipe, TimeAgoPipe],
   templateUrl: './list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CommentsListComponent implements OnInit {
   protected readonly auth = inject(AuthService);

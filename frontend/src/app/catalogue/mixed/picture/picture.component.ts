@@ -32,7 +32,6 @@ import type {BrandPerspectivePageData} from '../../catalogue.module';
   imports: [RouterLink, CommentsComponent, PictureComponent],
   templateUrl: './picture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CatalogueMixedPictureComponent {
   readonly #route = inject(ActivatedRoute);

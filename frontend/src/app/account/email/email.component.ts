@@ -17,7 +17,6 @@ import {ToastsService} from '../../toasts/toasts.service';
   imports: [AsyncPipe],
   templateUrl: './email.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class AccountEmailComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

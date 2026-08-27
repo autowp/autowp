@@ -32,7 +32,6 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
   imports: [RouterLink, PaginatorComponent, CatalogueListItemComponent],
   templateUrl: './authors.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CutawayAuthorsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

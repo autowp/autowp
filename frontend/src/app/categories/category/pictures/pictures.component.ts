@@ -34,7 +34,6 @@ interface PictureRoute {
   imports: [PaginatorComponent, ThumbnailComponent],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CategoriesCategoryPicturesComponent {
   readonly #pageEnv = inject(PageEnvService);

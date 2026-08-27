@@ -16,7 +16,6 @@ import {RemarkModule} from 'ngx-remark';
   templateUrl: './donate.component.html',
   styleUrl: './donate.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class DonateComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

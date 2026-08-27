@@ -43,7 +43,6 @@ import {CatalogueItemMenuComponent} from '../../item-menu/item-menu.component';
   ],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CatalogueVehiclesPicturesComponent {
   readonly #pageEnv = inject(PageEnvService);

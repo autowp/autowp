@@ -26,7 +26,6 @@ import {CarsAttrsChangeLogRowComponent} from './row/row.component';
   styleUrl: './attrs-change-log.component.scss',
   providers: [CarsAttrsChangeLogItemCacheService],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CarsAttrsChangeLogComponent {
   readonly #route = inject(ActivatedRoute);

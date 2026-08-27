@@ -78,7 +78,6 @@ function computeWindow(pageCount: number, current: number): PageWindow {
   imports: [RouterLink],
   templateUrl: './paginator.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class PaginatorComponent {
   readonly data = input.required<Pages>();

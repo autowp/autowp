@@ -89,7 +89,6 @@ const cropTitle = (image: Image | undefined): string => {
   templateUrl: './index.component.html',
   // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
   changeDetection: ChangeDetectionStrategy.Eager,
-  preserveWhitespaces: false,
 })
 export class UploadIndexComponent implements OnInit {
   readonly #http = inject(HttpClient);

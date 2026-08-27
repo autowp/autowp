@@ -42,7 +42,6 @@ const RECENT_PICTURES_ACCEPTED_IN_DAYS = 365;
   imports: [RouterLink, RemarkModule, CatalogueIndexPicturesComponent, NgbTooltip],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CatalogueIndexComponent {
   readonly #pageEnv = inject(PageEnvService);

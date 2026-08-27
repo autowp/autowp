@@ -45,7 +45,6 @@ import {UploadSelectTreeItemComponent} from './tree-item/tree-item.component';
   imports: [FormsModule, RouterLink, PaginatorComponent, UploadSelectTreeItemComponent, AsyncPipe, ReactiveFormsModule],
   templateUrl: './select.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class UploadSelectComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

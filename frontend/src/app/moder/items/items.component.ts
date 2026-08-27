@@ -91,7 +91,6 @@ const defaultOrder = ItemsRequest.Order.ID_DESC;
   imports: [RouterLink, FormsModule, NgbTypeahead, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './items.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsComponent implements OnInit {
   readonly #vehicleTypeService = inject(VehicleTypeService);

@@ -25,7 +25,6 @@ import {VotingVotesComponent} from './votes/votes.component';
   imports: [RouterLink, FormsModule, NgbProgressbar, CommentsComponent, DatePipe],
   templateUrl: './voting.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class VotingComponent {
   readonly #route = inject(ActivatedRoute);

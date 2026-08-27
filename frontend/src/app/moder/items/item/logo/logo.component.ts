@@ -15,7 +15,6 @@ import {catchError, EMPTY, switchMap} from 'rxjs';
   imports: [NgbProgressbar, AsyncPipe, InvalidParamsPipe, RemarkModule],
   templateUrl: './logo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsItemLogoComponent {
   readonly #auth = inject(AuthService);

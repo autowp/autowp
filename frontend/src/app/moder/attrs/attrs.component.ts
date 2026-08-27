@@ -15,7 +15,6 @@ import {ModerAttrsAttributeListComponent} from './attribute-list/attribute-list.
   imports: [RouterLink, ModerAttrsAttributeListComponent],
   templateUrl: './attrs.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerAttrsComponent implements OnInit {
   readonly #attrsService = inject(APIAttrsService);

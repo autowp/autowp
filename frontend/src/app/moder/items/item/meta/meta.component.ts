@@ -26,7 +26,6 @@ import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../item-me
   imports: [NgbProgressbar, ItemMetaFormComponent, AsyncPipe],
   templateUrl: './meta.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsItemMetaComponent implements OnInit {
   readonly #auth = inject(AuthService);

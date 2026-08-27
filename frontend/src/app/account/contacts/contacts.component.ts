@@ -26,7 +26,6 @@ import {UserComponent} from '../../user/user/user.component';
   imports: [RouterLink, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './contacts.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class AccountContactsComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

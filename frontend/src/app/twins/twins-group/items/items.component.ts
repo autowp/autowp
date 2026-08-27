@@ -31,7 +31,6 @@ import {TwinsItemComponent} from '../../item/item.component';
   imports: [TwinsItemComponent, CommentsComponent, RemarkModule],
   templateUrl: './items.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class TwinsGroupItemsComponent {
   readonly #route = inject(ActivatedRoute);

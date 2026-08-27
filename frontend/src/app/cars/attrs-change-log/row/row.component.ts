@@ -28,7 +28,6 @@ import {CarsAttrsChangeLogItemCacheService} from '../item-cache.service';
   imports: [RouterLink, UserComponent, AsyncPipe, DatePipe, TimeAgoPipe, NgbTooltip],
   templateUrl: './row.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CarsAttrsChangeLogRowComponent implements OnInit {
   readonly #itemCache = inject(CarsAttrsChangeLogItemCacheService);

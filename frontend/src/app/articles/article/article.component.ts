@@ -14,7 +14,6 @@ import {map} from 'rxjs';
   imports: [RouterLink],
   templateUrl: './article.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ArticlesArticleComponent {
   readonly #router = inject(Router);

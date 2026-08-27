@@ -51,7 +51,6 @@ const center = (lat: null | number | string, lng: null | number | string): LatLn
     },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class MapPointComponent implements ControlValueAccessor {
   readonly #zone = inject(NgZone);

@@ -45,7 +45,6 @@ interface DayCount {
   imports: [RouterLink, NewListItemComponent, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent],
   templateUrl: './new.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class NewComponent implements OnInit {
   readonly #router = inject(Router);

@@ -16,7 +16,6 @@ import {InfoSpecRowComponent} from './row/row.component';
   imports: [RouterLink, InfoSpecRowComponent],
   templateUrl: './spec.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class InfoSpecComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

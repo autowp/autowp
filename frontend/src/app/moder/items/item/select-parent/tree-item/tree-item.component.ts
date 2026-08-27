@@ -18,7 +18,6 @@ import {ModerItemsItemSelectParentTreeComponent} from '../tree/tree.component';
   imports: [forwardRef(() => ModerItemsItemSelectParentTreeComponent), AsyncPipe],
   templateUrl: './tree-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsItemSelectParentTreeItemComponent {
   readonly #toastService = inject(ToastsService);

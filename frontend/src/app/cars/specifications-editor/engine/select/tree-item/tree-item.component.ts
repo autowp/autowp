@@ -21,7 +21,6 @@ import {errorMessage} from 'app/grpc';
   standalone: true,
   templateUrl: './tree-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CarsSelectEngineTreeItemComponent {
   readonly #itemsClient = inject(ItemsClient);

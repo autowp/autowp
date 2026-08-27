@@ -14,7 +14,6 @@ import {switchMap} from 'rxjs';
   imports: [AsyncPipe, NameCountComponent],
   templateUrl: './brand.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class IndexBrandsBrandComponent {
   readonly #itemsClient = inject(ItemsClient);

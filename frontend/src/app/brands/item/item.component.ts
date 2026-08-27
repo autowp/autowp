@@ -15,7 +15,6 @@ import {switchMap} from 'rxjs';
   imports: [RouterLink, NgbPopover, AsyncPipe],
   templateUrl: './item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class BrandsItemComponent {
   readonly #itemsClient = inject(ItemsClient);

@@ -43,7 +43,6 @@ interface PictureRoute {
   imports: [CategoriesListItemComponent, RouterLink, PaginatorComponent, RemarkModule],
   templateUrl: './item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CategoriesCategoryItemComponent {
   readonly #pageEnv = inject(PageEnvService);

@@ -20,7 +20,6 @@ import {UserComponent} from '../../user/user/user.component';
   imports: [RouterLink, PastTimeIndicatorComponent, UserComponent],
   templateUrl: './theme-summary.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ForumsThemeSummaryComponent implements OnInit {
   readonly #grpc = inject(ForumsClient);

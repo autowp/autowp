@@ -20,7 +20,6 @@ import {ForumsTopicListComponent} from '../topic-list/topic-list.component';
   imports: [ForumsTopicListComponent, PaginatorComponent, AsyncPipe],
   templateUrl: './subscriptions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ForumsSubscriptionsComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

@@ -33,7 +33,6 @@ import {MuseumMapComponent} from './map/museum-map.component';
   imports: [RouterLink, CommentsComponent, ThumbnailComponent, RemarkModule, MuseumMapComponent, AsyncPipe],
   templateUrl: './museum.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class MuseumComponent {
   readonly #auth = inject(AuthService);

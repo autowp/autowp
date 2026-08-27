@@ -42,7 +42,6 @@ interface AttrUserValueListItem {
   imports: [NgbTooltip, UserComponent, FormsModule, DatePipe, TimeAgoPipe],
   templateUrl: './specs-admin.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CarsSpecsAdminComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

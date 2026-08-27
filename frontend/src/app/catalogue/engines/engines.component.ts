@@ -30,7 +30,6 @@ import {convertChildsCounts} from '../catalogue-service';
   imports: [RouterLink, PaginatorComponent, CatalogueListItemComponent],
   templateUrl: './engines.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CatalogueEnginesComponent {
   readonly #pageEnv = inject(PageEnvService);

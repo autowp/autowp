@@ -33,7 +33,6 @@ interface ListItem {
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerPictureMoveItemComponent {
   readonly #itemsClient = inject(ItemsClient);

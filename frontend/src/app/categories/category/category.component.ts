@@ -29,7 +29,6 @@ export interface CategoryPathItem {
   imports: [RouterLink, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLinkActive, RouterOutlet, AsyncPipe],
   templateUrl: './category.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CategoriesCategoryComponent {
   protected readonly pageEnv = inject(PageEnvService);

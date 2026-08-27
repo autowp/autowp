@@ -37,7 +37,6 @@ import {UserComponent} from '../../user/user/user.component';
   imports: [RouterLink, FormsModule, NgbTypeahead, UserComponent, PaginatorComponent, AsyncPipe, ReactiveFormsModule],
   templateUrl: './comments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerCommentsComponent implements OnInit {
   readonly #userService = inject(UserService);

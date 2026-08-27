@@ -28,7 +28,6 @@ interface SidebarItem {
   imports: [RouterLink, RouterOutlet, AsyncPipe],
   templateUrl: './account.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class AccountComponent {
   readonly #messageService = inject(MessageService);

@@ -45,7 +45,6 @@ interface RatingRow {
   imports: [RouterLink, UserComponent, DecimalPipe],
   templateUrl: './rating.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class UsersRatingComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

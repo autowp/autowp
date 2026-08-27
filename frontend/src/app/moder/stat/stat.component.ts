@@ -15,7 +15,6 @@ import {errorMessage} from 'app/grpc';
   imports: [RouterLink, NgbProgressbar],
   templateUrl: './stat.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerStatComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

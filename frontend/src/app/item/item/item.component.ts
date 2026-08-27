@@ -14,7 +14,6 @@ import {RemarkModule} from 'ngx-remark';
   templateUrl: './item.component.html',
   styleUrl: './item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ItemComponent {
   readonly #auth = inject(AuthService);

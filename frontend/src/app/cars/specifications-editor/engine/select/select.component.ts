@@ -46,7 +46,6 @@ import {CarsSelectEngineTreeItemComponent} from './tree-item/tree-item.component
   imports: [RouterLink, CarsSelectEngineTreeItemComponent, FormsModule, PaginatorComponent, AsyncPipe],
   templateUrl: './select.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CarsEngineSelectComponent {
   readonly #itemsClient = inject(ItemsClient);

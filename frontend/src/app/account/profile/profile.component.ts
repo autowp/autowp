@@ -35,7 +35,6 @@ interface FormControls {
   imports: [FormsModule, AsyncPipe, InvalidParamsPipe, ReactiveFormsModule, RemarkModule],
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class AccountProfileComponent implements OnInit {
   readonly #http = inject(HttpClient);

@@ -30,7 +30,6 @@ interface ListItem {
   imports: [RouterLink, UserComponent, AsyncPipe, DatePipe],
   templateUrl: './traffic.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerTrafficComponent implements OnInit {
   readonly #trafficClient = inject(TrafficClient);

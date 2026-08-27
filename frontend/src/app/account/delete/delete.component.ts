@@ -22,7 +22,6 @@ import {ToastsService} from '../../toasts/toasts.service';
   imports: [FormsModule, InvalidParamsPipe, RemarkModule],
   templateUrl: './delete.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class AccountDeleteComponent implements OnInit {
   readonly #router = inject(Router);

@@ -43,7 +43,6 @@ function addCSS(document: Document, url: string) {
   imports: [RouterLink],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class UsersUserPicturesComponent implements OnInit {
   readonly #userService = inject(UserService);

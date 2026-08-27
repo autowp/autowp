@@ -42,7 +42,6 @@ interface InboxData {
   imports: [RouterLink, FormsModule, PaginatorComponent, AsyncPipe, DatePipe, ThumbnailComponent, ReactiveFormsModule],
   templateUrl: './inbox.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class InboxComponent implements OnInit {
   readonly #router = inject(Router);

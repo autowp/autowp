@@ -33,7 +33,6 @@ import {CatalogueService} from '../../../catalogue-service';
   imports: [RouterLink, CommentsComponent, PictureComponent],
   templateUrl: './picture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CatalogueVehiclesPicturesPictureComponent {
   readonly #pageEnv = inject(PageEnvService);

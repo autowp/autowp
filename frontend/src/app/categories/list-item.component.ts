@@ -22,7 +22,6 @@ interface PictureThumbRoute {
   imports: [ItemHeaderComponent, RouterLink, AsyncPipe, RemarkModule],
   templateUrl: './list-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class CategoriesListItemComponent {
   readonly #auth = inject(AuthService);

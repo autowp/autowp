@@ -41,7 +41,6 @@ import {IndexTwinsComponent} from './twins/twins.component';
   ],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class IndexComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);

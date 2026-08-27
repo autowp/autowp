@@ -16,7 +16,6 @@ import {map, of} from 'rxjs';
   imports: [],
   templateUrl: './specifications.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class TwinsGroupSpecificationsComponent {
   readonly #route = inject(ActivatedRoute);

@@ -22,7 +22,6 @@ type RawSpecsCarItem = Omit<CatalogueListItem, 'contributors'> & {contributorIds
   imports: [RouterLink, CatalogueListItemComponent],
   templateUrl: './specs-cars.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class IndexSpecsCarsComponent {
   readonly #languageService = inject(LanguageService);

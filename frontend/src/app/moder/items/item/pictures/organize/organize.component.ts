@@ -40,7 +40,6 @@ import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../../item
   imports: [RouterLink, ItemMetaFormComponent, RemarkModule],
   templateUrl: './organize.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemService = inject(ItemService);

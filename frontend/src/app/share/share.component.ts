@@ -8,7 +8,6 @@ import {browserWindow} from '@utils/browser-window';
   templateUrl: './share.component.html',
   styleUrl: './share.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ShareComponent {
   readonly #window = browserWindow();

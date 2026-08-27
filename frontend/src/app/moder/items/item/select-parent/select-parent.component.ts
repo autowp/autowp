@@ -33,7 +33,6 @@ import {ModerItemsItemSelectParentTwinsComponent} from './twins/twins.component'
   ],
   templateUrl: './select-parent.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsItemSelectParentComponent implements OnInit {
   readonly #router = inject(Router);

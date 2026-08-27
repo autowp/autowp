@@ -15,7 +15,6 @@ import {cropSummary, JcropComponent} from '../../jcrop/jcrop.component';
   imports: [AsyncPipe, JcropComponent],
   templateUrl: './crop.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class UploadCropComponent {
   protected readonly activeModal = inject(NgbActiveModal);

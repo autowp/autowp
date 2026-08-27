@@ -27,7 +27,6 @@ import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-ite
   imports: [RouterLink, PaginatorComponent, ModerItemsItemSelectParentTreeItemComponent, AsyncPipe],
   templateUrl: './twins.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsItemSelectParentTwinsComponent {
   readonly #route = inject(ActivatedRoute);

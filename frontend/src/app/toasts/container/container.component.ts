@@ -9,7 +9,6 @@ import {ToastsService} from '../toasts.service';
   templateUrl: './container.component.html',
   styleUrl: './container.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ContainerComponent {
   protected readonly toastService = inject(ToastsService);

@@ -11,7 +11,6 @@ import {PageId} from '@services/page-id';
   imports: [RouterLink],
   templateUrl: './index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerIndexComponent implements AfterViewInit {
   readonly #pageEnv = inject(PageEnvService);

@@ -19,7 +19,6 @@ import {PaginatorComponent} from '../../../paginator/paginator/paginator.compone
   imports: [RouterLink, PaginatorComponent, AsyncPipe],
   templateUrl: './alpha.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsAlphaComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

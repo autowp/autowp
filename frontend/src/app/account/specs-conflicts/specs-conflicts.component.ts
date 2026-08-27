@@ -52,7 +52,6 @@ function mapFilter(filter: null | string): AttrConflictsRequest.Filter {
   imports: [RouterLink, UserComponent, PaginatorComponent, AsyncPipe],
   templateUrl: './specs-conflicts.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class AccountSpecsConflictsComponent implements OnInit {
   readonly #languageService = inject(LanguageService);

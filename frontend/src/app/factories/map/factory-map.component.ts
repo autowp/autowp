@@ -9,7 +9,6 @@ import {icon, latLng, marker, tileLayer} from 'leaflet';
   imports: [LeafletModule],
   templateUrl: './factory-map.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class FactoryMapComponent {
   readonly latitude = input.required<number>();

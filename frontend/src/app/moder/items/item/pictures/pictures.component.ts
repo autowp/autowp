@@ -27,7 +27,6 @@ import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.comp
   imports: [RouterLink, AsyncPipe, ThumbnailComponent],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerItemsItemPicturesComponent {
   readonly #picturesClient = inject(PicturesClient);

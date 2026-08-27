@@ -27,7 +27,6 @@ import {ToastsService} from '../../../../toasts/toasts.service';
   imports: [RouterLink, JcropComponent],
   templateUrl: './crop.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class ModerPicturesItemCropComponent implements OnDestroy, OnInit {
   readonly #router = inject(Router);

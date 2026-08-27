@@ -13,7 +13,6 @@ import {IndexCategoriesCategoryComponent} from './category/category.component';
   imports: [RouterLink, IndexCategoriesCategoryComponent, AsyncPipe, RemarkModule],
   templateUrl: './categories.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class IndexCategoriesComponent {
   readonly #items = inject(ItemsClient);

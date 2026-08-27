@@ -14,7 +14,6 @@ import {errorMessage} from 'app/grpc';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './tree-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class UploadSelectTreeItemComponent {
   readonly #itemsClient = inject(ItemsClient);

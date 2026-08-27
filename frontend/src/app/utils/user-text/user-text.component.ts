@@ -31,7 +31,6 @@ interface CommentTextLine {
   imports: [UserComponent, RouterLink, AsyncPipe],
   templateUrl: './user-text.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class UserTextComponent {
   readonly #userService = inject(UserService);

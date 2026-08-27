@@ -37,7 +37,6 @@ interface DonateLogData {
   imports: [RouterLink, NgbTooltip, UserComponent, CurrencyPipe, DatePipe, TimeAgoPipe],
   templateUrl: './log.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class DonateLogComponent implements OnInit {
   readonly #userService = inject(UserService);

@@ -10,7 +10,6 @@ import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './name-count.component.html',
   styleUrl: './name-count.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class NameCountComponent {
   readonly routerLink = input.required<string | string[]>();

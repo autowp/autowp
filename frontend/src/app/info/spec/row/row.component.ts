@@ -6,7 +6,6 @@ import {ChangeDetectionStrategy, Component, input} from '@angular/core';
   selector: 'app-info-spec-row',
   templateUrl: './row.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class InfoSpecRowComponent {
   readonly row = input.required<Spec>();

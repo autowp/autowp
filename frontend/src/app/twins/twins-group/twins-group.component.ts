@@ -16,7 +16,6 @@ import {TwinsSidebarComponent} from '../sidebar.component';
   imports: [RouterLink, RouterLinkActive, RouterOutlet, TwinsSidebarComponent],
   templateUrl: './twins-group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class TwinsGroupComponent {
   readonly #route = inject(ActivatedRoute);

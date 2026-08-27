@@ -14,7 +14,6 @@ import {switchMap} from 'rxjs';
   imports: [AsyncPipe, NameCountComponent],
   templateUrl: './factory.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class IndexFactoriesFactoryComponent {
   readonly #itemsClient = inject(ItemsClient);

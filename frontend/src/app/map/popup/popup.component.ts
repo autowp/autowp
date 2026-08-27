@@ -8,7 +8,6 @@ import {RouterLink} from '@angular/router';
   imports: [RouterLink],
   templateUrl: './popup.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class MapPopupComponent {
   readonly item = input.required<MapPoint>();

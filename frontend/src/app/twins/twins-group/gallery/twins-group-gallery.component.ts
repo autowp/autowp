@@ -18,7 +18,6 @@ import {map} from 'rxjs';
   imports: [GalleryComponent],
   templateUrl: './twins-group-gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  preserveWhitespaces: false,
 })
 export class TwinsGroupGalleryComponent {
   readonly #route = inject(ActivatedRoute);
