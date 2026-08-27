@@ -52,6 +52,7 @@ import {UsersOnlineComponent} from './users/online/online.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class AppComponent {
   readonly #auth = inject(AuthService);

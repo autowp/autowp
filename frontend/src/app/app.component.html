@@ -84,7 +84,7 @@
           @if (authenticated$ | async) {
             <li class="nav-item">
               <a class="nav-link" routerLink="/account/messages" routerLinkActive="active">
-                <i class="bi bi-chat-fill" aria-hidden="true"></i>
+                <i class="bi bi-chat-fill me-1" aria-hidden="true"></i>
                 @if (newPersonalMessages$ | async; as newPersonalMessages) {
                   @if (newPersonalMessages > 0) {
                     <span class="badge rounded-pill text-bg-secondary">{{ newPersonalMessages }}</span>
@@ -95,7 +95,7 @@
           } @else {
             <li class="nav-item">
               <button type="button" class="btn nav-link" (click)="doLogin()">
-                <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
                 <ng-container i18n="@@login/sign-in">Sign in</ng-container>
               </button>
             </li>
@@ -113,34 +113,34 @@
               <div class="dropdown-divider d-block d-sm-block d-md-block d-lg-block d-xl-none"></div>
 
               <a routerLink="/upload" class="dropdown-item" routerLinkActive="active">
-                <i class="bi bi-upload" aria-hidden="true"></i>
+                <i class="bi bi-upload me-1" aria-hidden="true"></i>
                 <ng-container i18n>Add picture</ng-container>
               </a>
               <a routerLink="/feedback" class="dropdown-item" routerLinkActive="active">
-                <i class="bi bi-chat-fill" aria-hidden="true"></i>
+                <i class="bi bi-chat-fill me-1" aria-hidden="true"></i>
                 <ng-container i18n>Feedback</ng-container>
               </a>
               <a href="#" class="dropdown-item" (click)="showOnlineUsers()">
-                <i class="bi bi-people-fill" aria-hidden="true"></i>
+                <i class="bi bi-people-fill me-1" aria-hidden="true"></i>
                 <ng-container i18n>Who is online?</ng-container>
               </a>
               @if (authenticated$ | async) {
                 <a routerLink="/account/contacts" class="dropdown-item" routerLinkActive="active">
-                  <i class="bi bi-people-fill" aria-hidden="true"></i>
+                  <i class="bi bi-people-fill me-1" aria-hidden="true"></i>
                   <ng-container i18n>Contacts</ng-container>
                 </a>
                 <a routerLink="/account/profile" class="dropdown-item" routerLinkActive="active">
-                  <i class="bi bi-person-fill" aria-hidden="true"></i>
+                  <i class="bi bi-person-fill me-1" aria-hidden="true"></i>
                   <ng-container i18n>Cabinet</ng-container>
                 </a>
               }
               <a routerLink="/about" class="dropdown-item" routerLinkActive="active">
-                <i class="bi bi-info" aria-hidden="true"></i>
+                <i class="bi bi-info me-1" aria-hidden="true"></i>
                 <ng-container i18n>About us</ng-container>
               </a>
               @if (authenticated$ | async) {
                 <a href="#" class="dropdown-item" (click)="signOut()">
-                  <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                  <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>
                   <ng-container i18n>Sign out</ng-container>
                 </a>
               }
