@@ -24,7 +24,7 @@
   @if (item(); as item) {
     <div class="page-header">
       <h1>
-        <ng-container i18n>All pictures of</ng-container>
+        <ng-container i18n>All pictures of</ng-container>&ngsp;
         <app-item-header
           [item]="{
             nameHTML: item.nameHtml,
@@ -36,11 +36,11 @@
     </div>
     @if (isModer$ | async) {
       <p>
-        <i class="bi bi-gear-fill" aria-hidden="true"></i>
+        <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
         <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
         @if (canAddItem$ | async; as canAddItem) {
           @if (canAddItem && item.isGroup) {
-            <i class="bi bi-plus" aria-hidden="true"></i>
+            <i class="bi bi-plus me-1" aria-hidden="true"></i>
             <a
               style="text-transform: lowercase"
               routerLink="/moder/items/new"
@@ -51,14 +51,14 @@
         }
         @if (canAcceptPicture$ | async; as canAcceptPicture) {
           @if (canAcceptPicture && item.inboxPicturesCount && item.inboxPicturesCount > 0) {
-            <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+            <i class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></i>
             <a routerLink="/moder/pictures" [queryParams]="{item_id: item.id, status: 'inbox'}">
               <ng-container i18n>inbox</ng-container> ({{ item.inboxPicturesCount }})
             </a>
           }
         }
         @if (item.commentsAttentionsCount) {
-          <i class="bi bi-chat-fill" aria-hidden="true"></i>
+          <i class="bi bi-chat-fill me-1" aria-hidden="true"></i>
           <a routerLink="/moder/comments" [queryParams]="{pictures_of_item_id: item.id, moderator_attention: 1}">
             <ng-container i18n>comments</ng-container> ({{ item.commentsAttentionsCount }})
           </a>

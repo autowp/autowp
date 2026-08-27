@@ -15,7 +15,7 @@
     <div class="col-lg-4 col-md-4">
       @if (data.prev && data.prev.date) {
         <h3 class="text-start">
-          &#x2190;
+          &#x2190;&ngsp;
           <a [routerLink]="['/new', formatDate(data.prev.date)]">{{ data.prev.date | date: 'mediumDate' }}</a>
           <br />
           <small
@@ -54,8 +54,7 @@
               other {{{data.next.count}} pictures}
             }</span
             >)</small
-          >
-          &#x2192;
+          >&ngsp; &#x2192;
         </h3>
       }
     </div>

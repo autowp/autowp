@@ -2,7 +2,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-twitter"
+    class="btn btn-sm bi bi-twitter me-1"
     aria-hidden="true"
     title="Twitter"
     [href]="buildURL('https://twitter.com/intent/tweet/?', {url: url(), text: text()})"
@@ -10,7 +10,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-google"
+    class="btn btn-sm bi bi-google me-1"
     aria-hidden="true"
     title="Google"
     [href]="buildURL('https://plus.google.com/share?', {url: url()})"
@@ -18,7 +18,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-linkedin"
+    class="btn btn-sm bi bi-linkedin me-1"
     aria-hidden="true"
     title="LinkedIn"
     [href]="
@@ -28,7 +28,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-reddit"
+    class="btn btn-sm bi bi-reddit me-1"
     aria-hidden="true"
     title="Reddit"
     [href]="buildURL('https://reddit.com/submit/?', {url: url()})"
@@ -36,7 +36,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-pinterest"
+    class="btn btn-sm bi bi-pinterest me-1"
     aria-hidden="true"
     title="Pinterest"
     [href]="buildURL('https://pinterest.com/pin/create/button/?', {url: url(), media: url(), description: text()})"
@@ -44,7 +44,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-whatsapp"
+    class="btn btn-sm bi bi-whatsapp me-1"
     aria-hidden="true"
     title="Whatsapp"
     [href]="buildURL('whatsapp://send?', {url: url(), text: text() + ' ' + url()})"
@@ -52,7 +52,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-telegram"
+    class="btn btn-sm bi bi-telegram me-1"
     aria-hidden="true"
     title="Telegram"
     [href]="buildURL('https://telegram.me/share/url?', {text: text(), url: url()})"
@@ -60,7 +60,7 @@
   <a
     rel="noopener"
     target="_blank"
-    class="btn btn-sm bi bi-envelope-open"
+    class="btn btn-sm bi bi-envelope-open me-1"
     aria-hidden="true"
     title="E-mail"
     [href]="buildURL('mailto:?', {subject: text(), body: url()})"

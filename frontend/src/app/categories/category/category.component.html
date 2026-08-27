@@ -54,11 +54,11 @@
       @if (category(); as category) {
         @if (isModer$ | async) {
           <p class="mb-4">
-            <i class="bi bi-gear-fill" aria-hidden="true"></i>
+            <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
             <a i18n [routerLink]="['/moder/items/item', current.id]">edit</a>
             @if (canAddCar$ | async) {
               <span>
-                <i class="bi bi-plus" aria-hidden="true"></i>
+                <i class="bi bi-plus me-1" aria-hidden="true"></i>
                 <a routerLink="/moder/items/new" [queryParams]="category.queryParams">{{ category.title }}</a>
               </span>
             }
@@ -69,13 +69,13 @@
     <ul class="nav nav-pills mb-4">
       <li class="nav-item">
         <a class="nav-link" routerLink="." routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-          <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
+          <i class="bi bi-sort-down-alt me-1" aria-hidden="true"></i>
           <ng-container i18n>details</ng-container>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" routerLink="pictures" routerLinkActive="active">
-          <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+          <i class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></i>
           <ng-container i18n>all pictures</ng-container>
         </a>
       </li>
