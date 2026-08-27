@@ -138,9 +138,6 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   drops an inline gap that used to come from template whitespace, restore it with `&ngsp;` (a
   single significant space between bare text and an element) or, for repeated inline lists / icon
   rows, a Bootstrap spacing utility — never by re-adding `preserveWhitespaces: true`.
-  `frontend/scripts/whitespace-audit-batch.mjs` and `ws-locate.mjs` still help audit templates;
-  their heuristics treat custom `<app-*>` elements and CSS-inline `div.d-inline-block` as
-  block-level and under-count gaps between sibling `@for`/`@if` blocks, so eyeball in the browser.
 - **Spacing** — prefer Bootstrap utility classes (`me-1`/`me-2`, `ms-1`, `gap-1`, `d-flex
   flex-wrap gap-2`) in the template over a component `styles`/`styleUrl` rule with
   `margin-inline-end` & co.
