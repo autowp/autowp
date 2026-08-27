@@ -32,6 +32,7 @@ import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.compone
   imports: [PaginatorComponent, ThumbnailComponent, RemarkModule],
   templateUrl: './info.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PersonsPersonInfoComponent {
   readonly #router = inject(Router);

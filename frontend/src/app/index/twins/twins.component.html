@@ -1,5 +1,5 @@
 <h4>
-  <ng-container i18n>Twins</ng-container> <small><a routerLink="/twins" i18n>all</a></small>
+  <ng-container i18n>Twins</ng-container>&ngsp;<small><a routerLink="/twins" i18n>all</a></small>
 </h4>
 @if (items$ | async; as items) {
   <p>
@@ -12,7 +12,7 @@
       />
     }
     @if (items.count > (items.items?.length || 0)) {
-      <ng-container i18n>… and</ng-container>
+      <ng-container i18n>… and</ng-container>&ngsp;
       <a routerLink="/twins" i18n="@@more-n-companies">{items.count - (items.items?.length||0), plural,
         one {more {{ items.count - (items.items?.length || 0) }} company}
         other {more {{ items.count - (items.items?.length || 0) }} companies}

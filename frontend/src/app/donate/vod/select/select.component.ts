@@ -30,6 +30,7 @@ import {DonateVodSelectItemComponent} from './item/item.component';
   imports: [RouterLink, DonateVodSelectItemComponent, PaginatorComponent],
   templateUrl: './select.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class DonateVodSelectComponent implements OnDestroy, OnInit {
   readonly #route = inject(ActivatedRoute);

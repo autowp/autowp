@@ -18,6 +18,7 @@ import {ToastsService} from '../../../toasts/toasts.service';
   imports: [RouterLink, AsyncPipe],
   templateUrl: './engine.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CarsSpecificationsEditorEngineComponent {
   readonly #auth = inject(AuthService);

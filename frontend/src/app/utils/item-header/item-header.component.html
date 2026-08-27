@@ -2,7 +2,7 @@
   <span [innerHTML]="item.nameHTML"></span>
   @if (item.design) {
     <sup class="design-brand mx-2"
-      ><ng-container i18n>designed by</ng-container>
+      ><ng-container i18n>designed by</ng-container>&ngsp;
       <a [routerLink]="item.design.route">{{ item.design.name }}</a>
     </sup>
   }

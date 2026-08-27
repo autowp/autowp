@@ -16,25 +16,29 @@
             </em>
           </h6-->
           }
-          <a routerLink="/cars/select-engine" class="btn btn-primary" i18n [queryParams]="{item_id: item.id}"
+          <a routerLink="/cars/select-engine" class="btn btn-primary me-1" i18n [queryParams]="{item_id: item.id}"
             >Select another engine</a
           >
           @if (item.engineItemId) {
-            <button type="button" class="btn btn-warning" i18n (click)="cancelInheritance(item)">Cancel engine</button>
+            <button type="button" class="btn btn-warning me-1" i18n (click)="cancelInheritance(item)">
+              Cancel engine
+            </button>
           }
           @if (!item.engineInherit) {
-            <button type="button" class="btn btn-warning" i18n (click)="inheritEngine(item)">Inherit engine</button>
+            <button type="button" class="btn btn-warning me-1" i18n (click)="inheritEngine(item)">
+              Inherit engine
+            </button>
           }
         </div>
       } @else {
         <p i18n>[not selected]</p>
-        <a routerLink="/cars/select-engine" class="btn btn-primary" i18n [queryParams]="{item_id: item.id}"
+        <a routerLink="/cars/select-engine" class="btn btn-primary me-1" i18n [queryParams]="{item_id: item.id}"
           >Select engine</a
         >
         @if (!item.engineInherit) {
-          <button type="button" class="btn btn-warning" i18n (click)="inheritEngine(item)">Inherit engine</button>
+          <button type="button" class="btn btn-warning me-1" i18n (click)="inheritEngine(item)">Inherit engine</button>
         } @else {
-          <button type="button" class="btn btn-warning" i18n (click)="cancelInheritance(item)">
+          <button type="button" class="btn btn-warning me-1" i18n (click)="cancelInheritance(item)">
             Don't inherit engine
           </button>
         }

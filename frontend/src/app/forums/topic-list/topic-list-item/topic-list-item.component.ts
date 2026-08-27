@@ -23,6 +23,7 @@ import {catchError, of, throwError} from 'rxjs';
   imports: [RouterLink, PastTimeIndicatorComponent, UserComponent],
   templateUrl: './topic-list-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ForumsTopicListItemComponent implements OnInit {
   readonly #comments = inject(CommentsClient);

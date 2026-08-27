@@ -26,12 +26,12 @@
       <div class="text-end mb-3">
         @if (!topic.subscription) {
           <button type="button" class="btn btn-link subscription" (click)="subscribe(topic)">
-            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <i class="bi bi-envelope me-1" aria-hidden="true"></i>
             <ng-container i18n>Subscribe to new replies notifications</ng-container>
           </button>
         } @else {
           <button type="button" class="btn btn-link subscription" (click)="unsubscribe(topic)">
-            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <i class="bi bi-envelope me-1" aria-hidden="true"></i>
             <ng-container i18n>Unsubscribe from notifications</ng-container>
           </button>
         }

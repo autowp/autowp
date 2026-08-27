@@ -21,6 +21,7 @@ const rates: Record<string, number> = {
   templateUrl: './donate.component.html',
   styleUrl: './donate.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class IndexDonateComponent {
   protected readonly languageService = inject(LanguageService);

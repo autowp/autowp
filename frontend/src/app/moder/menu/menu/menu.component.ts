@@ -24,6 +24,7 @@ interface MenuItem {
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class MenuComponent {
   protected readonly auth = inject(AuthService);

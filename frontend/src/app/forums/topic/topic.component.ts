@@ -28,6 +28,7 @@ import {MESSAGES_PER_PAGE} from '../forums.module';
   imports: [RouterLink, CommentsComponent, AsyncPipe],
   templateUrl: './topic.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ForumsTopicComponent {
   readonly #route = inject(ActivatedRoute);

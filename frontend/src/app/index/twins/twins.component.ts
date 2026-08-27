@@ -12,6 +12,7 @@ import {RemarkModule} from 'ngx-remark';
   imports: [RouterLink, AsyncPipe, RemarkModule, NameCountComponent],
   templateUrl: './twins.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class IndexTwinsComponent {
   readonly #items = inject(ItemsClient);

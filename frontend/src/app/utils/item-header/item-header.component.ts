@@ -17,6 +17,7 @@ export interface ItemHeader {
   imports: [RouterLink],
   templateUrl: './item-header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ItemHeaderComponent {
   readonly item = input.required<ItemHeader>();
