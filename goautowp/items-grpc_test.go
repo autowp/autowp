@@ -4904,65 +4904,64 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 	)
 
 	ruName := fmt.Sprintf("Лада %d Калина", randomInt)
-	brandCatname := fmt.Sprintf("lada-%d", randomInt)
 	ruBrandName := fmt.Sprintf("Лада %d", randomInt)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		Name:       ruName,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
-	})
-
-	brandID := createItem(t, conn, cnt, &Item{
-		Name:       ruBrandName,
-		Catname:    brandCatname,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
-		IsGroup:    true,
-	})
-
-	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(
-			ctx,
-			authorizationHeader,
-			bearerPrefix+adminToken.AccessToken,
-		),
-		&ItemParent{
-			ItemId: itemID, ParentId: brandID,
-		},
-	)
-	require.NoError(t, err)
-
 	testCases := []struct {
-		Name        string
-		Language    string
-		NewName     string
-		FullName    string
-		NewFullName string
-		BrandName   string
-		RouterLink  []string
+		Name               string
+		Language           string
+		NewName            string
+		FullName           string
+		NewFullName        string
+		BrandName          string
+		CheckNewRouterLink bool
 	}{
 		{
-			Language:    schema.EnglishLanguageCode,
-			BrandName:   fmt.Sprintf("Lada %d", randomInt),
-			FullName:    fmt.Sprintf("Lada %d Kalina", randomInt),
-			Name:        "Kalina",
-			NewFullName: fmt.Sprintf("Lada %d Granta", randomInt),
-			NewName:     "Granta",
-			RouterLink:  []string{"/", brandCatname, "granta"},
+			Language:           schema.EnglishLanguageCode,
+			BrandName:          fmt.Sprintf("Lada %d", randomInt),
+			FullName:           fmt.Sprintf("Lada %d Kalina", randomInt),
+			Name:               "Kalina",
+			NewFullName:        fmt.Sprintf("Lada %d Granta", randomInt),
+			NewName:            "Granta",
+			CheckNewRouterLink: true,
 		},
 		{
-			Language:    schema.RussianLanguageCode,
-			BrandName:   ruBrandName,
-			FullName:    ruName,
-			Name:        "Калина",
-			NewFullName: fmt.Sprintf("Лада %d Гранта", randomInt),
-			NewName:     "Гранта",
-			RouterLink:  nil,
+			Language:           schema.RussianLanguageCode,
+			BrandName:          ruBrandName,
+			FullName:           ruName,
+			Name:               "Калина",
+			NewFullName:        fmt.Sprintf("Лада %d Гранта", randomInt),
+			NewName:            "Гранта",
+			CheckNewRouterLink: false,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			t.Parallel()
+
+			// Each language case gets its own brand/vehicle pair: the auto-derived
+			// item_parent catname is language-neutral (taken from the English name),
+			// so sharing one vehicle across parallel cases lets the "Granta" rename in
+			// one case race the "Kalina" assertions in the other.
+			brandCatname := fmt.Sprintf("lada-%d-%s", randomInt, testCase.Language)
+
+			itemID := createItem(t, conn, cnt, &Item{
+				Name:       ruName,
+				ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+			})
+
+			brandID := createItem(t, conn, cnt, &Item{
+				Name:       ruBrandName,
+				Catname:    brandCatname,
+				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+				IsGroup:    true,
+			})
+
+			_, err := client.CreateItemParent(
+				apiCtx,
+				&ItemParent{ItemId: itemID, ParentId: brandID},
+			)
+			require.NoError(t, err)
 
 			_, err = client.UpdateItemLanguage(
 				apiCtx,
@@ -5009,8 +5008,8 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 				for _, group := range section.GetGroups() {
 					require.Equal(t, testCase.NewName, group.GetName())
 
-					if testCase.RouterLink != nil {
-						require.Equal(t, testCase.RouterLink, group.GetRouterLink())
+					if testCase.CheckNewRouterLink {
+						require.Equal(t, []string{"/", brandCatname, "granta"}, group.GetRouterLink())
 					}
 				}
 			}
