@@ -27,6 +27,7 @@ const VOD_TIMEZONE = 'UTC';
   imports: [RouterLink, ItemOfDayComponent, AsyncPipe, RemarkModule],
   templateUrl: './vod.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class DonateVodComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);

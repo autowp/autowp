@@ -1,6 +1,6 @@
 @if (_item$ | async; as item) {
   <h2>
-    <span [innerHtml]="item.nameHtml"></span>
+    <span [innerHtml]="item.nameHtml"></span>&ngsp;
     <small>
       @if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE) {
         <span i18n>vehicle of the day</span>
@@ -16,7 +16,7 @@
   </h2>
 } @else {
   <h2 class="placeholder-glow">
-    <span class="placeholder w-25"></span>
+    <span class="placeholder w-25 me-1"></span>
     <small>
       <span class="placeholder" style="width: 10%"></span>
     </small>
@@ -84,12 +84,12 @@
   <p>
     @if (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
       <span>
-        <span class="bi bi-text-left" aria-hidden="true"></span>
+        <span class="bi bi-text-left me-1" aria-hidden="true"></span>
         <a i18n [routerLink]="['/category', item.catname]">details</a>
       </span>
       @if (item.acceptedPicturesCount && item.acceptedPicturesCount > 6) {
         <span>
-          <span class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></span>
+          <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
           <a [routerLink]="['/category', item.catname, 'pictures']"
             ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
           >
@@ -103,7 +103,7 @@
       item.route.length
     ) {
       <span>
-        <span class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></span>
+        <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
         <a [routerLink]="item.route"><ng-container i18n>details</ng-container> ({{ item.acceptedPicturesCount }})</a>
       </span>
     }
@@ -115,7 +115,7 @@
       item.route.length
     ) {
       <span>
-        <span class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></span>
+        <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
         <a [routerLink]="item.route"
           ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
         >
@@ -124,7 +124,7 @@
     @if (item.twins) {
       @for (group of item.twins; track group.id) {
         <span>
-          <span class="bi bi-circle-half" aria-hidden="true"></span>
+          <span class="bi bi-circle-half me-1" aria-hidden="true"></span>
           <a i18n [routerLink]="['/twins/group', group.id]">twins</a>
         </span>
       }
@@ -132,13 +132,13 @@
     @if (item.categories) {
       @for (category of item.categories; track category.id) {
         <span>
-          <span class="bi bi-tag-fill" aria-hidden="true"></span>
+          <span class="bi bi-tag-fill me-1" aria-hidden="true"></span>
           <a [routerLink]="['/category', category.catname]" [innerHTML]="category.nameHtml"></a>
         </span>
       }
     }
     <span>
-      <span class="bi bi-trophy" aria-hidden="true"></span>
+      <span class="bi bi-trophy me-1" aria-hidden="true"></span>
       <a routerLink="/donate/vod" i18n>Want to choose next?</a>
     </span>
   </p>

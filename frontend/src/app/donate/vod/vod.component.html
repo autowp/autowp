@@ -32,7 +32,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
             @if (date.active) {
               <span>
                 <strong>{{ date.name }}</strong>
-                <span class="bi bi-check" aria-hidden="true"></span>
+                <span class="bi bi-check ms-1" aria-hidden="true"></span>
               </span>
             } @else {
               <span>
@@ -134,7 +134,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
   }
   @if (vod$ | async; as vod) {
     <p>
-      <ng-container i18n>Price:</ng-container>
+      <ng-container i18n>Price:</ng-container>&ngsp;
       <strong>{{ vod.sum }}<ng-container i18n>rubles</ng-container></strong>
       (<span i18n>about {{ '$' + (vod.sum / usdToRub).toFixed(2) }}</span
       >)
@@ -145,7 +145,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
       <div class="btn-group mb-3" role="group">
         <input type="radio" class="btn-check" name="paymentType" value="AC" autocomplete="off" checked id="btn1" />
         <label class="btn btn-secondary" for="btn1">
-          <span class="bi bi-credit-card" aria-hidden="true"></span>
+          <span class="bi bi-credit-card me-1" aria-hidden="true"></span>
           <ng-container i18n>Credit card</ng-container>
         </label>
         <input type="radio" class="btn-check" name="paymentType" value="PC" autocomplete="off" id="btn3" />
@@ -159,7 +159,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
   @if ((date$ | async) === null || (item$ | async) === null) {
     <div>
       <button type="button" class="btn btn-secondary" disabled>
-        <span class="bi bi-credit-card" aria-hidden="true"></span>
+        <span class="bi bi-credit-card me-1" aria-hidden="true"></span>
         <ng-container i18n>Credit card</ng-container>
       </button>
       <button type="button" class="btn btn-secondary" disabled i18n>YooMoney</button>

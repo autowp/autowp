@@ -44,14 +44,14 @@
           <span class="vote">
             <a
               href="#"
-              class="vote-up d-inline-block"
+              class="vote-up d-inline-block me-1"
               [class.active]="row.message.userVote > 0"
               (click)="vote(row.message, 1)"
               (keyup.enter)="vote(row.message, 1)"
             >
-              <i class="bi bi-hand-thumbs-up-fill" aria-hidden="true"></i>
+              <i class="bi bi-hand-thumbs-up-fill me-1" aria-hidden="true"></i>
             </a>
-            <a href="#" class="value" [class.zero]="row.message.vote === 0" (click)="showVotes(row.message)">
+            <a href="#" class="value me-1" [class.zero]="row.message.vote === 0" (click)="showVotes(row.message)">
               {{ (row.message.vote > 0 ? '+' : '') + row.message.vote }}
             </a>
             <a
@@ -61,16 +61,16 @@
               (click)="vote(row.message, -1)"
               (keyup.enter)="vote(row.message, -1)"
             >
-              <i class="bi bi-hand-thumbs-down-fill" aria-hidden="true"></i>
+              <i class="bi bi-hand-thumbs-down-fill me-1" aria-hidden="true"></i>
             </a>
           </span>
         } @else if (row.message.vote !== 0) {
           <span class="vote">
-            <i class="bi bi-hand-thumbs-up" aria-hidden="true"></i>
+            <i class="bi bi-hand-thumbs-up me-1" aria-hidden="true"></i>
             <a href="#" class="value" (click)="showVotes(row.message)" (keyup.enter)="showVotes(row.message)">{{
               row.message.vote
             }}</a>
-            <i class="bi bi-hand-thumbs-down" aria-hidden="true"></i>
+            <i class="bi bi-hand-thumbs-down me-1" aria-hidden="true"></i>
           </span>
         }
         @if (authenticated() && deep() < 21 && !row.message.deleted) {

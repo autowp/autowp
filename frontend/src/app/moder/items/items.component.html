@@ -14,7 +14,7 @@
 </div>
 
 <div class="nav nav-pills mb-4">
-  <a class="nav-link" routerLink="." i18n [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 19}"
+  <a class="nav-link me-1" routerLink="." i18n [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 19}"
     >Buses without type</a
   >
   <a class="nav-link" routerLink="." i18n [queryParams]="{vehicle_type_id: 'empty', vehicle_childs_type_id: 17}"
@@ -154,7 +154,7 @@
             (selectItem)="ancestorOnSelect($event)"
           />
           <button class="btn btn-outline-secondary" type="button" [disabled]="!ancestorID" (click)="clearAncestor()">
-            <span class="bi bi-x" aria-hidden="true"></span>
+            <span class="bi bi-x me-1" aria-hidden="true"></span>
           </button>
         </div>
       </div>
@@ -164,7 +164,13 @@
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" name="no_parent" value="1" [(ngModel)]="noParent" (change)="onNoParentChanged()" />
+          <input
+            type="checkbox"
+            name="no_parent"
+            value="1"
+            [(ngModel)]="noParent"
+            (change)="onNoParentChanged()"
+          />&ngsp;
           <ng-container i18n>Without parents</ng-container>
         </label>
       </div>
@@ -189,7 +195,7 @@
           [queryParams]="{list: null}"
           [class.active]="!data.listMode"
         >
-          <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+          <i class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></i>
         </a>
         <a
           routerLink="."
@@ -198,7 +204,7 @@
           [queryParams]="{list: '1', order: 'name'}"
           [class.active]="data.listMode"
         >
-          <i class="bi bi-list" aria-hidden="true"></i>
+          <i class="bi bi-list me-1" aria-hidden="true"></i>
         </a>
       </div>
 

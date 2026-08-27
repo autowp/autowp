@@ -25,7 +25,7 @@
           }
         </div>
         <p>
-          <ng-container i18n>Known as:</ng-container>
+          <ng-container i18n>Known as:</ng-container>&ngsp;
           <strong>«{{ user.name }}»</strong>
         </p>
         @if (timestampToDate(user.createTime); as date) {
@@ -43,7 +43,7 @@
         <p i18n>Database id: {{ user.id }}</p>
         @if (user && isNotMe()) {
           <p>
-            <i class="bi bi-reply" aria-hidden="true"></i>
+            <i class="bi bi-reply me-1" aria-hidden="true"></i>
             <a href="#" i18n (click)="openMessageForm(user)">Send personal message</a>
           </p>
         }
@@ -57,12 +57,12 @@
           @if (user.picturesAdded > 0) {
             <div>
               <p>
-                <ng-container i18n>Images uploaded:</ng-container>
+                <ng-container i18n>Images uploaded:</ng-container>&ngsp;
                 <strong>{{ user.picturesAdded }}</strong>
               </p>
               @if (user.picturesAcceptedCount < user.picturesAdded) {
                 <p>
-                  <ng-container i18n>left on site:</ng-container>
+                  <ng-container i18n>left on site:</ng-container>&ngsp;
                   <strong>{{ user.picturesAcceptedCount }}</strong>
                 </p>
               }
@@ -173,7 +173,7 @@
           @if (comments && comments.length > 0) {
             <div>
               <h2>
-                <ng-container i18n>Recent comments</ng-container>
+                <ng-container i18n>Recent comments</ng-container>&ngsp;
                 <small>
                   <a i18n [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id, 'comments']"
                     >all</a

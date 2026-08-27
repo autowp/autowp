@@ -51,6 +51,7 @@ export interface CatalogueListItemPicture {
   imports: [ItemHeaderComponent, RouterLink, AsyncPipe, UserComponent, RemarkModule],
   templateUrl: './list-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class CatalogueListItemComponent {
   readonly #auth = inject(AuthService);

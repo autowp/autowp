@@ -127,7 +127,7 @@
       @if (item.childsCounts) {
         @if (item.childsCounts.tuning > 0) {
           <li class="list-inline-item">
-            <i class="bi bi-text-left" aria-hidden="true"></i>
+            <i class="bi bi-text-left me-1" aria-hidden="true"></i>
             <a [routerLink]="item.details.routerLink.concat('tuning')"
               ><ng-container i18n>related</ng-container> ({{ item.childsCounts.tuning }})</a
             >
@@ -135,7 +135,7 @@
         }
         @if (item.childsCounts.sport > 0) {
           <li class="list-inline-item">
-            <i class="bi bi-text-left" aria-hidden="true"></i>
+            <i class="bi bi-text-left me-1" aria-hidden="true"></i>
             <a [routerLink]="item.details.routerLink.concat('sport')"
               ><ng-container i18n>sport</ng-container> ({{ item.childsCounts.sport }})</a
             >

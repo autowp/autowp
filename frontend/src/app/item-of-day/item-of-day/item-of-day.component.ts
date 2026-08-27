@@ -16,6 +16,7 @@ import {UserComponent} from '../../user/user/user.component';
   templateUrl: './item-of-day.component.html',
   styleUrl: './item-of-day.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ItemOfDayComponent {
   readonly item$ = input.required<Observable<Item>>();
