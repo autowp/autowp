@@ -131,6 +131,30 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   tokens for internationalization into `messages.xlf` file. Each time frontend code was changed check for
   new internationalization tokens and translate them into other `messages.*.xlf files`
 
+### Frontend conventions
+
+- **`preserveWhitespaces: false`** — every component is being migrated to it (Angular's SSR
+  recommendation); `tsconfig.json` still defaults to `true`. Never "fix" a whitespace regression by
+  removing the flag. Migrate remaining components with `frontend/scripts/whitespace-audit-batch.mjs`
+  (lists candidates by risk) and `frontend/scripts/ws-locate.mjs` (prints `file:line` + the nodes
+  flanking each risky whitespace). Both heuristics have blind spots — custom `<app-*>` elements and
+  CSS-inline `div.d-inline-block` are treated as block-level, and gaps between sibling `@for`/`@if`
+  blocks are under-counted — so eyeball migrated templates in the browser.
+- After migrating, restore the inline gaps that came from template whitespace with `&ngsp;` (a
+  single significant space between bare text and an element) or, for repeated inline lists / icon
+  rows, Bootstrap spacing utilities.
+- **Spacing** — prefer Bootstrap utility classes (`me-1`/`me-2`, `ms-1`, `gap-1`, `d-flex
+  flex-wrap gap-2`) in the template over a component `styles`/`styleUrl` rule with
+  `margin-inline-end` & co.
+- **i18n text** — put `i18n` on a `<ng-container i18n>` wrapping just the text, not on an element
+  that prettier might reflow onto multiple lines (adding a class can push a `<button i18n>` past
+  printWidth 120). A wrapped element's leading/trailing whitespace can leak into the extracted
+  message and change its id, orphaning the translation. Do not pin lines with `<!-- prettier-ignore -->`.
+- **Page ids** — `src/app/services/page-id.ts` (`PageId` enum) names every CMS page id the app
+  refers to. Use `PageId.*` in `pageEnv.set({pageId})`, the account sidebar, and route `data`, never
+  a bare number. `src/app/services/pages.ts` is the trimmed page hierarchy (only `PageId` members,
+  used for menu active-state via `PageService.isDescendant$`).
+
 ## Cross-cutting notes
 
 - Auth for both gRPC and REST is backed by Keycloak (`goautowp/auth.go`, `KeycloakConfig`); local
