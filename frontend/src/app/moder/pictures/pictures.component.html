@@ -15,14 +15,14 @@
 
 <div class="nav nav-pills mb-4">
   <a
-    class="nav-link"
+    class="nav-link me-1"
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{order: PicturesRequest.Order.ORDER_CREATED_AT_DESC, status: 'inbox'}"
     >Inbox</a
   >
   <a
-    class="nav-link"
+    class="nav-link me-1"
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{
@@ -34,35 +34,35 @@
     >Missing perspective</a
   >
   <a
-    class="nav-link"
+    class="nav-link me-1"
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{order: PicturesRequest.Order.ORDER_REMOVING_DATE, status: 'removing'}"
     >Delete queue</a
   >
   <a
-    class="nav-link"
+    class="nav-link me-1"
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{order: PicturesRequest.Order.ORDER_CREATED_AT_DESC, requests: 3, status: 'custom1'}"
     >Votes</a
   >
   <a
-    class="nav-link"
+    class="nav-link me-1"
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{order: PicturesRequest.Order.ORDER_COMMENTS, comments: 1}"
     >Comments</a
   >
   <a
-    class="nav-link"
+    class="nav-link me-1"
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{order: PicturesRequest.Order.ORDER_MODER_VOTES, requests: 3, status: 'custom1'}"
     >New votes</a
   >
   <a
-    class="nav-link"
+    class="nav-link me-1"
     routerLink="/moder/pictures"
     i18n
     [queryParams]="{order: PicturesRequest.Order.ORDER_CREATED_AT_DESC, status: 'inbox', replace: 'true'}"
@@ -352,7 +352,7 @@
       </div>
 
       <a
-        class="btn mb-3"
+        class="btn mb-3 me-1"
         routerLink="."
         queryParamsHandling="merge"
         [class.btn-primary]="specialName()"
@@ -363,7 +363,7 @@
       </a>
 
       <a
-        class="btn mb-3"
+        class="btn mb-3 me-1"
         routerLink="."
         queryParamsHandling="merge"
         [class.btn-primary]="lost()"
@@ -374,7 +374,7 @@
       </a>
 
       <a
-        class="btn mb-3"
+        class="btn mb-3 me-1"
         routerLink="."
         queryParamsHandling="merge"
         [class.btn-primary]="gps()"
@@ -385,7 +385,7 @@
       </a>
 
       <a
-        class="btn mb-3"
+        class="btn mb-3 me-1"
         routerLink="."
         queryParamsHandling="merge"
         [class.btn-primary]="similar()"
@@ -421,7 +421,7 @@
   </div>
   <div class="col-lg-8 col-md-8">
     <h2>
-      <ng-container i18n>Pictures</ng-container>
+      <ng-container i18n>Pictures</ng-container>&ngsp;
 
       @if (data$ | async; as data) {
         @if (data.paginator; as paginator) {

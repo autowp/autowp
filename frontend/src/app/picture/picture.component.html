@@ -7,7 +7,7 @@
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item.design; as design) {
               <sup class="design-brand">
-                <ng-container i18n>designed by</ng-container>
+                <ng-container i18n>designed by</ng-container>&ngsp;
                 <a [routerLink]="design.route">{{ design.name }}</a>
               </sup>
             }
@@ -21,7 +21,7 @@
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item.design; as design) {
               <sup class="design-brand">
-                <ng-container i18n>designed by</ng-container>
+                <ng-container i18n>designed by</ng-container>&ngsp;
                 <a [routerLink]="design.route">{{ design.name }}</a>
               </sup>
             }
@@ -169,7 +169,7 @@
         @for (item of items; track item.itemId) {
           @if (item.type === PictureItemType.PICTURE_ITEM_AUTHOR) {
             <p>
-              <ng-container i18n>Author:</ng-container>
+              <ng-container i18n>Author:</ng-container>&ngsp;
               <a [routerLink]="['/persons', item.item?.id]" [innerHTML]="item.item?.nameHtml"></a>
             </p>
           }
@@ -196,7 +196,7 @@
           }
           @if (item.hasText && item.route) {
             <p>
-              <i class="bi bi-text-left" aria-hidden="true"></i>
+              <i class="bi bi-text-left me-1" aria-hidden="true"></i>
               <a i18n [routerLink]="item.route">details</a>
             </p>
           }
@@ -204,7 +204,7 @@
       }
       @if (picture.replaceable) {
         <p>
-          <ng-container i18n>Picture suggested to replace</ng-container>
+          <ng-container i18n>Picture suggested to replace</ng-container>&ngsp;
           <a [routerLink]="['/picture', picture.replaceable.identity]" [innerHTML]="picture.replaceable.nameHtml"></a>
         </p>
       }
@@ -243,7 +243,7 @@
         }
         @if (osmURL(); as osmURL) {
           <li>
-            <span class="bi bi-pin-map" aria-hidden="true"></span>
+            <span class="bi bi-pin-map me-1" aria-hidden="true"></span>
             <a i18n="@@picture/location" [href]="osmURL">Coordinates</a>
           </li>
         }
@@ -269,27 +269,27 @@
       <ul class="unstyled">
         @for (link of linksData(); track link) {
           <li>
-            <a target="_blank" [href]="link.url"><i class="bi bi-globe" aria-hidden="true"></i> {{ link.name }}</a>
+            <a target="_blank" [href]="link.url"><i class="bi bi-globe me-1" aria-hidden="true"></i> {{ link.name }}</a>
           </li>
         }
         @for (category of categoriesData(); track category.id) {
           <li>
             <a [routerLink]="['/category', category.catname]">
-              <i class="bi bi-tag-fill" aria-hidden="true"></i> <span [innerHTML]="category.nameHtml"></span>
+              <i class="bi bi-tag-fill me-1" aria-hidden="true"></i> <span [innerHTML]="category.nameHtml"></span>
             </a>
           </li>
         }
         @for (group of twinsData(); track group.id) {
           <li>
             <a [routerLink]="['/twins/group', group.id]">
-              <i class="bi bi-circle-half" aria-hidden="true"></i> <span [innerHTML]="group.nameHtml"></span>
+              <i class="bi bi-circle-half me-1" aria-hidden="true"></i> <span [innerHTML]="group.nameHtml"></span>
             </a>
           </li>
         }
         @for (factory of factoriesData(); track factory.id) {
           <li>
             <a [routerLink]="['/factories', factory.id]">
-              <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
+              <i class="bi bi-gear-wide-connected me-1" aria-hidden="true"></i>
               <span [innerHTML]="factory.nameHtml"></span>
             </a>
           </li>
@@ -307,7 +307,7 @@
                 ) {
                   <li>
                     <a [routerLink]="['/cars/specifications-editor']" [queryParams]="{item_id: pictureItem.itemId}"
-                      ><i class="bi bi-pencil-fill" aria-hidden="true"></i>
+                      ><i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>
                       <ng-container i18n>edit specs</ng-container></a
                     >
                   </li>
@@ -315,7 +315,7 @@
                 @if (item.hasSpecs && item.specsRoute) {
                   <li>
                     <a [routerLink]="item.specsRoute">
-                      <i class="bi bi-card-list" aria-hidden="true"></i>
+                      <i class="bi bi-card-list me-1" aria-hidden="true"></i>
                       <span i18n>Specifications of</span>
                       <span [innerHTML]="item.nameHtml"></span>
                     </a>
@@ -335,14 +335,14 @@
             @if (items.length > 1) {
               <li ngbDropdown>
                 <button type="button" ngbDropdownToggle class="btn btn-link" style="padding: 0">
-                  <ng-container i18n>Add picture</ng-container>
+                  <ng-container i18n>Add picture</ng-container>&ngsp;
                   <span class="caret" aria-hidden="true"></span>
                 </button>
                 <div ngbDropdownMenu>
                   @for (item of items; track item.itemId) {
                     <a class="dropdown-item" routerLink="/upload" [queryParams]="{item_id: item.itemId}">
-                      <i class="bi bi-upload" aria-hidden="true"></i>
-                      <ng-container i18n>Add picture</ng-container>
+                      <i class="bi bi-upload me-1" aria-hidden="true"></i>
+                      <ng-container i18n>Add picture</ng-container>&ngsp;
                       <span [innerHTML]="item.item?.nameHtml"></span>
                     </a>
                   }
@@ -352,8 +352,8 @@
               @for (item of items; track item.itemId) {
                 <li>
                   <a routerLink="/upload" [queryParams]="{item_id: item.itemId}">
-                    <i class="bi bi-upload" aria-hidden="true"></i>
-                    <ng-container i18n>Add picture</ng-container>
+                    <i class="bi bi-upload me-1" aria-hidden="true"></i>
+                    <ng-container i18n>Add picture</ng-container>&ngsp;
                     <span [innerHTML]="item.item?.nameHtml"></span>
                   </a>
                 </li>
@@ -366,7 +366,7 @@
             @if (pictureItems.length > 0) {
               <li>
                 <a routerLink="/upload" [queryParams]="{replace: picture.id}">
-                  <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                  <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>
                   <ng-container i18n="@@picture/propose-image-replacement">Propose image replacement</ng-container>
                 </a>
               </li>
@@ -466,13 +466,13 @@
           }
           <div class="col-md-4">
             <p>
-              <i class="bi bi-gear-fill" aria-hidden="true"></i>
+              <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
               <a i18n [routerLink]="['/moder/pictures', picture.id]">Edit picture №{{ picture.id }}</a>
             </p>
             @if (pictureItemsData(); as items) {
               @for (item of items; track item.itemId) {
                 <p>
-                  <i class="bi bi-gear-fill" aria-hidden="true"></i>
+                  <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
                   <a [routerLink]="['/moder/items/item', item.itemId]">
                     <ng-container i18n>Edit item</ng-container> <span [innerHTML]="item.item?.nameHtml"></span>
                   </a>
@@ -480,7 +480,7 @@
               }
               @for (brand of brandsData(); track brand.id) {
                 <p>
-                  <i class="bi bi-gear-fill" aria-hidden="true"></i>
+                  <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
                   <a [routerLink]="['/moder/items/item', brand.id]">
                     <ng-container i18n>Edit item</ng-container> <span [innerHTML]="brand.nameHtml"></span>
                   </a>

@@ -66,12 +66,12 @@
     <div class="col-md-6">
       <div class="card card-body">
         <div>
-          <ng-container i18n>Public URL:</ng-container>
+          <ng-container i18n>Public URL:</ng-container>&ngsp;
           <a [routerLink]="['/picture', picture.identity]">/picture/{{ picture.identity }}</a>
         </div>
         @if (picture.image) {
           <div style="overflow: hidden; text-overflow: ellipsis">
-            <ng-container i18n>Image:</ng-container>
+            <ng-container i18n>Image:</ng-container>&ngsp;
             <a [href]="picture.image.src">{{ picture.image.src }}</a>
           </div>
         }
@@ -80,7 +80,7 @@
         </div>
         <div>
           <a [routerLink]="['/moder/pictures', picture.id, 'place']">
-            <span class="bi bi-pin-map" aria-hidden="true"></span>
+            <span class="bi bi-pin-map me-1" aria-hidden="true"></span>
             Location
             @if (picture.point) {
               <span>: {{ picture.point.latitude }},{{ picture.point.longitude }}</span>
@@ -93,7 +93,7 @@
       <div class="card card-body">
         <div i18n>Database id: {{ picture.id }}</div>
         <div>
-          <ng-container i18n>Resolution:</ng-container>
+          <ng-container i18n>Resolution:</ng-container>&ngsp;
           <strong>{{ picture.width }}×{{ picture.height }}</strong>
         </div>
         @if (picture.dpiX || picture.dpiY) {
@@ -104,13 +104,13 @@
         }
         @if (picture.image) {
           <div>
-            <ng-container i18n>File size:</ng-container>
+            <ng-container i18n>File size:</ng-container>&ngsp;
             <strong>{{ picture.image.filesize | bytes: 2 }}</strong>
           </div>
         }
         @if (picture.createTime; as createdAt) {
           <div>
-            <ng-container i18n>Upload date:</ng-container>
+            <ng-container i18n>Upload date:</ng-container>&ngsp;
             <strong [ngbTooltip]="createdAt.toDate() | date: 'medium'">{{ createdAt.toDate() | timeAgo }}</strong>
           </div>
         }
@@ -159,7 +159,7 @@
                       [routerLink]="['/moder/pictures', picture.id, 'area']"
                       [queryParams]="{item_id: item.itemId, type: item.type}"
                     >
-                      <i class="bi bi-crop" aria-hidden="true"></i>
+                      <i class="bi bi-crop me-1" aria-hidden="true"></i>
                       <ng-container i18n>Pick item area</ng-container>
                     </a>
                   }
@@ -173,7 +173,7 @@
                       [routerLink]="['/moder/pictures', picture.id, 'move']"
                       [queryParams]="{src_item_id: item.itemId, src_type: item.type}"
                     >
-                      <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                      <i class="bi bi-arrow-right me-1" aria-hidden="true"></i>
                       <ng-container i18n>move to</ng-container> …
                     </a>
                     @if (lastItem$ | async; as lastItem) {
@@ -193,8 +193,8 @@
                                 class="dropdown-item"
                                 (click)="moveItem(picture.id + '', item.type, item.itemId, lastItem.item.id)"
                               >
-                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                                <ng-container i18n>move to</ng-container>
+                                <i class="bi bi-arrow-right me-1" aria-hidden="true"></i>
+                                <ng-container i18n>move to</ng-container>&ngsp;
                                 <span [innerHTML]="lastItem.item.nameHtml"></span>
                               </button>
                             }
@@ -211,8 +211,8 @@
                                   brand_id: itemParentCache.parentId,
                                 }"
                               >
-                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                                <ng-container i18n>move to</ng-container>
+                                <i class="bi bi-arrow-right me-1" aria-hidden="true"></i>
+                                <ng-container i18n>move to</ng-container>&ngsp;
                                 <span [innerHTML]="itemParentCache.parentItem?.nameHtml"></span> …
                               </a>
                             }
@@ -230,7 +230,7 @@
                     style="margin: 0"
                     (click)="deletePictureItem(item)"
                   >
-                    <span class="bi bi-x" aria-hidden="true"></span>
+                    <span class="bi bi-x me-1" aria-hidden="true"></span>
                   </button>
                 </td>
               }
@@ -246,7 +246,7 @@
             @if (lastItem.item.itemTypeId !== ItemType.ITEM_TYPE_COPYRIGHT) {
               <div>
                 <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 1)">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <ng-container i18n>add to</ng-container> (content)
                   <span [innerHTML]="lastItem.item.nameHtml"></span>
                 </button>
@@ -255,7 +255,7 @@
             @if (lastItem.item.itemTypeId === ItemType.ITEM_TYPE_PERSON) {
               <div>
                 <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 2)">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <ng-container i18n>add to</ng-container> (author)
                   <span [innerHTML]="lastItem.item.nameHtml"></span>
                 </button>
@@ -263,7 +263,7 @@
             } @else if (lastItem.item.itemTypeId === ItemType.ITEM_TYPE_COPYRIGHT) {
               <div>
                 <button type="button" class="btn btn-secondary" (click)="addItem(picture.id + '', lastItem.item, 3)">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <ng-container i18n>add to</ng-container> (copyrights)
                   <span [innerHTML]="lastItem.item.nameHtml"></span>
                 </button>
@@ -273,7 +273,7 @@
         }
         <div>
           <a class="btn btn-success" [routerLink]="['/moder/pictures', picture.id, 'move']">
-            <i class="bi bi-plus" aria-hidden="true"></i>
+            <i class="bi bi-plus me-1" aria-hidden="true"></i>
             <ng-container i18n>add to</ng-container> …
           </a>
         </div>
@@ -394,20 +394,20 @@
           <div class="card card-body mb-4">
             <div>
               <p>
-                <ng-container i18n>Photo suggested to replace</ng-container>
+                <ng-container i18n>Photo suggested to replace</ng-container>&ngsp;
                 <a [routerLink]="['/picture', picture.replaceable.identity]"
                   >/picture/{{ picture.replaceable.identity }}</a
                 >
               </p>
               @if (picture.rights?.accept) {
                 <button type="button" class="btn btn-success" (click)="acceptReplace(picture.id)">
-                  <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                  <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>
                   <ng-container i18n>Accept and remove double</ng-container>
                 </button>
               }
               @if (picture.rights?.accept) {
                 <button type="button" class="btn btn-warning" (click)="cancelReplace(picture.id)">
-                  <i class="bi bi-x" aria-hidden="true"></i>
+                  <i class="bi bi-x me-1" aria-hidden="true"></i>
                   <ng-container i18n>Cancel replacement</ng-container>
                 </button>
               }
@@ -488,7 +488,7 @@
                   [disabled]="repairLoading()"
                   (click)="normalizePicture(picture.id)"
                 >
-                  <i class="bi bi-reception-4" aria-hidden="true"></i>
+                  <i class="bi bi-reception-4 me-1" aria-hidden="true"></i>
                   <ng-container i18n>Normalize</ng-container>
                 </button>
               }
@@ -499,7 +499,7 @@
                   [disabled]="repairLoading()"
                   (click)="flopPicture(picture.id)"
                 >
-                  <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                  <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>
                   <ng-container i18n>Flop</ng-container>
                 </button>
               }
@@ -509,7 +509,7 @@
                   [routerLink]="['/moder/pictures', picture.id, 'crop']"
                   [class.disabled]="repairLoading()"
                 >
-                  <i class="bi bi-crop" aria-hidden="true"></i>
+                  <i class="bi bi-crop me-1" aria-hidden="true"></i>
                   <ng-container i18n>Crop area</ng-container>
                 </a>
               }
@@ -521,7 +521,7 @@
                 [disabled]="repairLoading()"
                 (click)="repairPicture(picture.id)"
               >
-                <i class="bi bi-wrench" aria-hidden="true"></i>
+                <i class="bi bi-wrench me-1" aria-hidden="true"></i>
                 <ng-container i18n>Repair all files</ng-container>
               </button>
               <button
@@ -530,7 +530,7 @@
                 [disabled]="repairLoading()"
                 (click)="correctFileNames(picture.id)"
               >
-                <i class="bi bi-wrench" aria-hidden="true"></i>
+                <i class="bi bi-wrench me-1" aria-hidden="true"></i>
                 <ng-container i18n>Rebuild files names</ng-container>
               </button>
             </div>
@@ -544,7 +544,7 @@
           <div class="card card-body mb-4">
             @for (dfDistance of picture.dfDistances?.items || []; track dfDistance.dstPictureId) {
               <p class="alert alert-warning" role="alert">
-                <span class="bi bi-file-earmark-image" aria-hidden="true"></span>
+                <span class="bi bi-file-earmark-image me-1" aria-hidden="true"></span>
                 <a i18n [routerLink]="['/moder/pictures', dfDistance.dstPictureId]"
                   >Similar picture: {{ dfDistance.distance }}</a
                 >
@@ -573,7 +573,7 @@
           @if (ip$ | async; as ip) {
             @if (ip.address) {
               <div>
-                <ng-container i18n>IP-address of uploader:</ng-container>
+                <ng-container i18n>IP-address of uploader:</ng-container>&ngsp;
                 <strong>{{ ip.address }}</strong>
                 <br />
                 @if (ip.blacklist) {

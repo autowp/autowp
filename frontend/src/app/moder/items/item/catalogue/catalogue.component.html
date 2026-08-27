@@ -63,12 +63,12 @@
                               [routerLink]="['/moder/items/item', item.id, 'select-parent']"
                               [queryParams]="{tab: 'brands'}"
                             >
-                              <i class="bi bi-plus" aria-hidden="true"></i>
+                              <i class="bi bi-plus me-1" aria-hidden="true"></i>
                               <ng-container i18n>Brand …</ng-container>
                             </a>
                             @for (brand of suggestions$ | async; track brand.id) {
                               <a class="dropdown-item" href="#" (click)="addParent(item, brand.id)">
-                                <i class="bi bi-plus" aria-hidden="true"></i>
+                                <i class="bi bi-plus me-1" aria-hidden="true"></i>
                                 <span i18n>Brand {{ brand.nameText }}</span>
                               </a>
                             }
@@ -84,7 +84,7 @@
           @for (parentsItem of parents$ | async; track parentsItem) {
             <tr>
               <td>
-                <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                <i class="bi bi-arrow-up me-1" aria-hidden="true"></i>
                 <a
                   [routerLink]="['/moder/items/item', parentsItem.parentId]"
                   [queryParams]="{tab: 'catalogue'}"
@@ -93,7 +93,7 @@
                 @if (parentsItem.duplicateParent) {
                   <div class="text-warning">
                     <small>
-                      <ng-container i18n>Possible duplicate: vehicle already inherited via:</ng-container>
+                      <ng-container i18n>Possible duplicate: vehicle already inherited via:</ng-container>&ngsp;
                       <a
                         [routerLink]="['/moder/items/item', parentsItem.duplicateParent.id]"
                         [innerHTML]="parentsItem.duplicateParent.nameHtml"
@@ -105,7 +105,7 @@
               <td>
                 <a [routerLink]="['/moder/item-parent', parentsItem.itemId, parentsItem.parentId]">
                   {{ item.name }}
-                  <span class="bi bi-pencil-fill" aria-hidden="true"></span>
+                  <span class="bi bi-pencil-fill me-1" aria-hidden="true"></span>
                 </a>
               </td>
               <td class="urls">
@@ -121,7 +121,7 @@
                     class="btn btn-sm btn-danger"
                     (click)="deleteParent(item, parentsItem.parentId)"
                   >
-                    <i class="bi bi-x" aria-hidden="true"></i>
+                    <i class="bi bi-x me-1" aria-hidden="true"></i>
                   </button>
                 </td>
               }
@@ -130,7 +130,7 @@
           <tr class="success">
             <td colspan="2">
               &nbsp;&nbsp;&nbsp;&nbsp;
-              <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              <i class="bi bi-arrow-right me-1" aria-hidden="true"></i>
               <span [innerHTML]="item.nameHtml"></span>
             </td>
             <td class="urls">
@@ -146,7 +146,7 @@
           @for (childsItem of childs$ | async; track childsItem) {
             <tr>
               <td>
-                <i class="bi bi-arrow-down" aria-hidden="true"></i>
+                <i class="bi bi-arrow-down me-1" aria-hidden="true"></i>
                 @if (childsItem.type === ItemParentType.ITEM_TYPE_TUNING) {
                   <span i18n>Related:</span>
                 } @else if (childsItem.type === ItemParentType.ITEM_TYPE_DESIGN) {
@@ -162,7 +162,7 @@
                 @if (childsItem.duplicateChild) {
                   <div class="text-warning">
                     <small>
-                      <ng-container i18n>Possible duplicate: vehicle already in submodel:</ng-container>
+                      <ng-container i18n>Possible duplicate: vehicle already in submodel:</ng-container>&ngsp;
                       <a
                         [routerLink]="['/moder/items/item', childsItem.duplicateChild.id]"
                         [innerHTML]="childsItem.duplicateChild.nameHtml"
@@ -174,7 +174,7 @@
               <td>
                 <a [routerLink]="['/moder/item-parent', childsItem.itemId, childsItem.parentId]">
                   {{ item.name }}
-                  <span class="bi bi-pencil-fill" aria-hidden="true"></span>
+                  <span class="bi bi-pencil-fill me-1" aria-hidden="true"></span>
                 </a>
               </td>
               <td class="urls">
@@ -186,7 +186,7 @@
               @if (canMove) {
                 <td>
                   <button type="button" class="btn btn-sm btn-danger" (click)="deleteChild(item, childsItem.itemId)">
-                    <i class="bi bi-x" aria-hidden="true"></i>
+                    <i class="bi bi-x me-1" aria-hidden="true"></i>
                   </button>
                 </td>
               }
@@ -196,7 +196,7 @@
             @if (item.itemTypeId === ItemType.ITEM_TYPE_BRAND) {
               <tr>
                 <td colspan="2">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
                     i18n
@@ -209,7 +209,7 @@
               </tr>
               <tr>
                 <td colspan="2">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
                     i18n
@@ -223,7 +223,7 @@
             } @else if (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
               <tr>
                 <td colspan="2">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
                     i18n
@@ -236,7 +236,7 @@
               </tr>
               <tr>
                 <td colspan="2">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
                     i18n
@@ -249,7 +249,7 @@
               </tr>
               <tr>
                 <td colspan="2">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <a
                     routerLink="/moder/items/new"
                     i18n
@@ -268,7 +268,7 @@
             ) {
               <tr>
                 <td colspan="2">
-                  <i class="bi bi-plus" aria-hidden="true"></i>
+                  <i class="bi bi-plus me-1" aria-hidden="true"></i>
                   <a routerLink="/moder/items/new" [queryParams]="{item_type_id: item.itemTypeId, parent_id: item.id}">
                     @if (item.itemTypeId === ItemType.ITEM_TYPE_ENGINE) {
                       <ng-container i18n>add engine</ng-container>

@@ -31,7 +31,9 @@
         @if (canEditSpecifications$ | async; as canEditSpecifications) {
           @if (specsAllowed() && canEditSpecifications) {
             <p>
-              <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
+              <a class="me-1" routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}"
+                >edit specs</a
+              >
               @if (item.specificationsCount) {
                 <span class="badge rounded-pill text-bg-secondary">{{ item.specificationsCount }}</span>
               }
@@ -56,10 +58,10 @@
           >
             <span>
               @if (item.subscription) {
-                <i class="bi bi-check" aria-hidden="true"></i>
+                <i class="bi bi-check me-1" aria-hidden="true"></i>
                 <ng-container i18n>Subscribed</ng-container>
               } @else {
-                <i class="bi bi-x" aria-hidden="true"></i>
+                <i class="bi bi-x me-1" aria-hidden="true"></i>
                 <ng-container i18n>Not subscribed</ng-container>
               }
             </span>
@@ -71,23 +73,23 @@
 
   @if (activeTab$ | async; as activeTab) {
     <div class="nav nav-pills" style="margin-bottom: 10px">
-      <a class="nav-link" routerLink="." [class.active]="activeTab === 'meta'" [queryParams]="{tab: 'meta'}">
-        <span class="glyphicon glyphicon-pencil"></span>
+      <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'meta'" [queryParams]="{tab: 'meta'}">
+        <span class="glyphicon glyphicon-pencil me-1"></span>
         <span i18n>Meta</span>
         @if (metaTab.count) {
           <span class="badge rounded-pill text-bg-secondary">{{ metaTab.count }}</span>
         }
       </a>
-      <a class="nav-link" routerLink="." [class.active]="activeTab === 'name'" [queryParams]="{tab: 'name'}">
-        <span class="glyphicon glyphicon-align-left"></span>
+      <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'name'" [queryParams]="{tab: 'name'}">
+        <span class="glyphicon glyphicon-align-left me-1"></span>
         <span i18n>Name and description</span>
         @if (nameTab.count) {
           <span class="badge rounded-pill text-bg-secondary">{{ nameTab.count }}</span>
         }
       </a>
       @if (logoTab.visible) {
-        <a class="nav-link" routerLink="." [class.active]="activeTab === 'logo'" [queryParams]="{tab: 'logo'}">
-          <span class="glyphicon glyphicon-align-left"></span>
+        <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'logo'" [queryParams]="{tab: 'logo'}">
+          <span class="glyphicon glyphicon-align-left me-1"></span>
           <span i18n>Logotype</span>
           @if (logoTab.count) {
             <span class="badge rounded-pill text-bg-secondary">{{ logoTab.count }}</span>
@@ -108,7 +110,12 @@
         </a>
       }
       @if (vehiclesTab.visible) {
-        <a class="nav-link" routerLink="." [class.active]="activeTab === 'vehicles'" [queryParams]="{tab: 'vehicles'}">
+        <a
+          class="nav-link me-1"
+          routerLink="."
+          [class.active]="activeTab === 'vehicles'"
+          [queryParams]="{tab: 'vehicles'}"
+        >
           <span i18n>Vehicles</span>
           @if (vehiclesTab.count) {
             <span class="badge rounded-pill text-bg-secondary">{{ vehiclesTab.count }}</span>
@@ -116,8 +123,8 @@
         </a>
       }
       @if (treeTab.visible) {
-        <a class="nav-link" routerLink="." [class.active]="activeTab === 'tree'" [queryParams]="{tab: 'tree'}">
-          <span class="bi bi-tree" aria-hidden="true"></span>
+        <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'tree'" [queryParams]="{tab: 'tree'}">
+          <span class="bi bi-tree me-1" aria-hidden="true"></span>
           <span i18n>Tree</span>
           @if (treeTab.count) {
             <span class="badge rounded-pill text-bg-secondary">{{ treeTab.count }}</span>
@@ -125,8 +132,13 @@
         </a>
       }
       @if (picturesTab.visible) {
-        <a class="nav-link" routerLink="." [class.active]="activeTab === 'pictures'" [queryParams]="{tab: 'pictures'}">
-          <span class="glyphicon glyphicon-th"></span>
+        <a
+          class="nav-link me-1"
+          routerLink="."
+          [class.active]="activeTab === 'pictures'"
+          [queryParams]="{tab: 'pictures'}"
+        >
+          <span class="glyphicon glyphicon-th me-1"></span>
           <span i18n>Pictures</span>
           @if (picturesTab.count) {
             <span class="badge rounded-pill text-bg-secondary">{{ picturesTab.count }}</span>
@@ -134,8 +146,8 @@
         </a>
       }
       @if (linksTab.visible) {
-        <a class="nav-link" routerLink="." [class.active]="activeTab === 'links'" [queryParams]="{tab: 'links'}">
-          <span class="glyphicon glyphicon-globe"></span>
+        <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'links'" [queryParams]="{tab: 'links'}">
+          <span class="glyphicon glyphicon-globe me-1"></span>
           <span i18n>Links</span>
           @if (linksTab.count) {
             <span class="badge rounded-pill text-bg-secondary">{{ linksTab.count }}</span>
