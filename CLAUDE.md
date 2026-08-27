@@ -133,16 +133,14 @@ in `angular.json`) — don't assume Karma/Jest is set up.
 
 ### Frontend conventions
 
-- **`preserveWhitespaces: false`** — every component is being migrated to it (Angular's SSR
-  recommendation); `tsconfig.json` still defaults to `true`. Never "fix" a whitespace regression by
-  removing the flag. Migrate remaining components with `frontend/scripts/whitespace-audit-batch.mjs`
-  (lists candidates by risk) and `frontend/scripts/ws-locate.mjs` (prints `file:line` + the nodes
-  flanking each risky whitespace). Both heuristics have blind spots — custom `<app-*>` elements and
-  CSS-inline `div.d-inline-block` are treated as block-level, and gaps between sibling `@for`/`@if`
-  blocks are under-counted — so eyeball migrated templates in the browser.
-- After migrating, restore the inline gaps that came from template whitespace with `&ngsp;` (a
+- **`preserveWhitespaces: false`** — set globally in `tsconfig.json`'s `angularCompilerOptions`
+  (Angular's SSR recommendation); no component overrides it, and none should. When a template edit
+  drops an inline gap that used to come from template whitespace, restore it with `&ngsp;` (a
   single significant space between bare text and an element) or, for repeated inline lists / icon
-  rows, Bootstrap spacing utilities.
+  rows, a Bootstrap spacing utility — never by re-adding `preserveWhitespaces: true`.
+  `frontend/scripts/whitespace-audit-batch.mjs` and `ws-locate.mjs` still help audit templates;
+  their heuristics treat custom `<app-*>` elements and CSS-inline `div.d-inline-block` as
+  block-level and under-count gaps between sibling `@for`/`@if` blocks, so eyeball in the browser.
 - **Spacing** — prefer Bootstrap utility classes (`me-1`/`me-2`, `ms-1`, `gap-1`, `d-flex
   flex-wrap gap-2`) in the template over a component `styles`/`styleUrl` rule with
   `margin-inline-end` & co.
