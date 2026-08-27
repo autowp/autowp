@@ -29,6 +29,7 @@ import {ToastsService} from '../../../../toasts/toasts.service';
   imports: [RouterLink, JcropComponent],
   templateUrl: './area.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
   readonly #router = inject(Router);

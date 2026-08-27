@@ -104,7 +104,7 @@ Please note that image submissions are moderated. This means that all images wil
                 <app-thumbnail [picture]="picture.picture" [route]="['/picture', picture.picture.identity]" />
                 <p>
                   <button type="button" class="btn btn-link btn-sm" (click)="crop(picture)">
-                    <i class="bi bi-crop" aria-hidden="true"></i>
+                    <i class="bi bi-crop me-1" aria-hidden="true"></i>
                     @if (picture.cropTitle) {
                       <span>{{ picture.cropTitle }}</span>
                     } @else {
@@ -140,7 +140,7 @@ Please note that adding pictures is moderated. That is, all pictures will be rev
           />
           <p style="margin: 10px">
             <a routerLink="/upload/select" class="btn btn-primary btn-lg">
-              <i class="bi bi-upload" aria-hidden="true"></i>
+              <i class="bi bi-upload me-1" aria-hidden="true"></i>
               <ng-container i18n>Add picture</ng-container>
             </a>
           </p>

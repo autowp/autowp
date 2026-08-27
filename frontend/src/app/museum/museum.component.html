@@ -17,7 +17,7 @@
   </div>
   @if (museumModer$ | async) {
     <p>
-      <i class="bi bi-gear-fill" aria-hidden="true"></i>
+      <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
       <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
     </p>
   }
@@ -36,7 +36,7 @@
         <remark [markdown]="item.description" />
         @if (links.items && links.items.length > 0) {
           <p>
-            <ng-container i18n>Web-site:</ng-container>
+            <ng-container i18n>Web-site:</ng-container>&ngsp;
             @for (link of links.items; track link.id) {
               <a [href]="link.url">{{ link.name ? link.name : link.url }}</a>
               <br />

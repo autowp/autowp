@@ -34,6 +34,7 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
   imports: [RouterLink, PaginatorComponent, AsyncPipe, CatalogueListItemComponent],
   templateUrl: './items.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class FactoryItemsComponent {
   readonly #route = inject(ActivatedRoute);

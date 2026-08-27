@@ -29,6 +29,7 @@ import {FactoryMapComponent} from './map/factory-map.component';
   imports: [RouterLink, AsyncPipe, ThumbnailComponent, RemarkModule, FactoryMapComponent],
   templateUrl: './factories.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class FactoryComponent {
   readonly #route = inject(ActivatedRoute);

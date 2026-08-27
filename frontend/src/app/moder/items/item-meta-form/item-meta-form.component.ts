@@ -174,6 +174,7 @@ function specsToPlain(options: Spec[], deep: number): ItemMetaFormAPISpec[] {
   templateUrl: './item-meta-form.component.html',
   styleUrl: './styles.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ItemMetaFormComponent {
   readonly #specService = inject(SpecService);

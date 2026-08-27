@@ -72,6 +72,7 @@ interface SrcSelection {
   imports: [RouterLink, PaginatorComponent, FormsModule, ReactiveFormsModule, ModerPictureMoveItemComponent, AsyncPipe],
   templateUrl: './move.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class ModerPicturesItemMoveComponent implements OnInit {
   readonly #router = inject(Router);

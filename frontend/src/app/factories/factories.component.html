@@ -16,11 +16,11 @@
     <h1 [innerHTML]="factory.nameHtml"></h1>
   </div>
   <div class="nav nav-pills mb-3">
-    <a class="nav-link active" routerLink="." [innerHTML]="factory.nameHtml"></a>
-    <a class="nav-link" i18n [routerLink]="['/factories', factory.id, 'items']">Products</a>
+    <a class="nav-link active me-1" routerLink="." [innerHTML]="factory.nameHtml"></a>
+    <a class="nav-link me-1" i18n [routerLink]="['/factories', factory.id, 'items']">Products</a>
     @if (isModer$ | async) {
       <a class="nav-link" [routerLink]="['/moder/items/item', factory.id]">
-        <i class="bi bi-gear-fill" aria-hidden="true"></i>
+        <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
         <ng-container i18n>edit</ng-container>
       </a>
     }

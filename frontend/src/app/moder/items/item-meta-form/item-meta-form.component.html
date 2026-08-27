@@ -444,7 +444,7 @@
                   (invalidParams() && invalidParams()['is_group'])
                 "
                 [formControl]="isGroup"
-              />
+              />&ngsp;
               <ng-container i18n>Group</ng-container>
             </label>
           </div>
@@ -467,7 +467,7 @@
             @for (child of items; track child.id) {
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" [value]="child.id" (change)="onCheckboxChange($event, control)" />
+                  <input type="checkbox" [value]="child.id" (change)="onCheckboxChange($event, control)" />&ngsp;
                   <span [innerHTML]="child.nameHtml"></span>
                 </label>
               </div>

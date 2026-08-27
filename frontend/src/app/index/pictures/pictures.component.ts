@@ -22,6 +22,7 @@ const RELOAD_THROTTLE_MS = 15000;
   imports: [RouterLink, AsyncPipe, ThumbnailComponent],
   templateUrl: './pictures.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class IndexPicturesComponent {
   readonly #picturesClient = inject(PicturesClient);

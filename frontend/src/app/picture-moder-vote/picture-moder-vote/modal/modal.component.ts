@@ -11,6 +11,7 @@ import {APIPictureModerVoteTemplateService} from '../../../api/picture-moder-vot
   imports: [FormsModule],
   templateUrl: './modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespaces: false,
 })
 export class PictureModerVoteModalComponent {
   protected readonly activeModal = inject(NgbActiveModal);

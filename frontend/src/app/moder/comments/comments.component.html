@@ -86,7 +86,7 @@
   <div class="col-md-8">
     @if (data$ | async; as data) {
       <h2>
-        <ng-container i18n>Comments</ng-container>
+        <ng-container i18n>Comments</ng-container>&ngsp;
         @if (data.paginator; as paginator) {
           @if (paginator && paginator.totalItemCount) {
             <small i18n="@@n-comments">{paginator.totalItemCount, plural,

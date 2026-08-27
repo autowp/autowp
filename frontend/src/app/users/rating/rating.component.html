@@ -77,7 +77,7 @@
               } @else if (brandsResource.value()?.[row.userId]; as brands) {
                 <div>
                   @for (brand of brands.brands; track brand) {
-                    <a [routerLink]="brand.route">{{ brand.name || 'unnamed' }}</a>
+                    <a class="me-1" [routerLink]="brand.route">{{ brand.name || 'unnamed' }}</a>
                     <span class="badge rounded-pill text-bg-secondary">{{
                       (+brand.volume > 0 ? '+' : '') + brand.volume
                     }}</span>
