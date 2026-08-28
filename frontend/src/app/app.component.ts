@@ -36,7 +36,7 @@ import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {browserWindow} from '@utils/browser-window';
 import {isPrerendering} from '@utils/is-prerendering';
-import {Angulartics2GoogleAnalytics} from 'angulartics2';
+import {Angulartics2GoogleGlobalSiteTag} from 'angulartics2';
 import Keycloak from 'keycloak-js';
 import {RemarkComponent} from 'ngx-remark';
 import {map, of, shareReplay} from 'rxjs';
@@ -157,11 +157,12 @@ export class AppComponent {
   protected readonly showConsentBanner = computed(() => this.#isBrowser && !this.consent.resolved());
 
   constructor() {
-    const angulartics = inject(Angulartics2GoogleAnalytics);
+    const angulartics = inject(Angulartics2GoogleGlobalSiteTag);
 
-    // Google Analytics loads lazily and only after the visitor accepts analytics cookies (never
-    // during SSR, never in dev). Loading it - and starting Angulartics' pageview tracking - is what
-    // sets the _ga/_gid cookies and contacts google-analytics.com, so it stays behind consent.
+    // Google Analytics (GA4) loads lazily and only after the visitor accepts analytics cookies
+    // (never during SSR, never in dev). Loading it - and starting Angulartics' pageview tracking -
+    // is what sets the _ga/_ga_* cookies and contacts google-analytics.com, so it stays behind
+    // consent.
     const win = this.#window;
     if (win && environment.production && environment.gaTrackingId) {
       let started = false;

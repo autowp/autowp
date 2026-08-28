@@ -1,6 +1,6 @@
 export const environment = {
   apiUrl: '',
-  gaTrackingId: 'UA-24654784-1',
+  gaTrackingId: 'G-611KDM03DX',
   grpcHost: '',
   ssrGrpcHost: 'http://localhost:8080',
   keycloak: {

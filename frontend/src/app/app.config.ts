@@ -140,7 +140,12 @@ export const appConfig: ApplicationConfig = {
       NgbCollapseModule,
       NgbDropdownModule,
       GrpcCoreModule.forRoot(),
-      Angulartics2Module.forRoot(),
+      Angulartics2Module.forRoot({
+        gst: {
+          anonymizeIp: true,
+          trackingIds: environment.gaTrackingId ? [environment.gaTrackingId] : [],
+        },
+      }),
       NgbModule,
     ),
     provideGrpcWebClient({

@@ -1,44 +1,41 @@
-interface GaQueue {
-  (...args: unknown[]): void;
-  l?: number;
-  q: unknown[];
-}
-
-interface GaWindow {
-  ga?: GaQueue;
-  GoogleAnalyticsObject?: string;
+interface GtagWindow {
+  dataLayer?: unknown[];
+  gtag?: (...args: unknown[]) => void;
 }
 
 /**
- * Injects Google's `analytics.js` and creates the tracker - Universal Analytics (`ga()`), matching
- * the `Angulartics2GoogleAnalytics` integration this app uses.
+ * Injects Google's `gtag.js` and bootstraps a GA4 tag, matching the
+ * `Angulartics2GoogleGlobalSiteTag` integration this app uses.
  *
  * Call only in the browser, and only once the visitor has consented to analytics cookies: this is
- * what sets the `_ga`/`_gid` cookies and contacts google-analytics.com. Idempotent - a second call
- * is a no-op. `win`/`doc` are passed in rather than read as globals so it stays testable and SSR-safe.
+ * what sets the `_ga`/`_ga_*` cookies and contacts googletagmanager.com / google-analytics.com.
+ * Idempotent - a second call is a no-op. `win`/`doc` are passed in rather than read as globals so it
+ * stays testable and SSR-safe.
+ *
+ * `send_page_view: false`: Angulartics2 owns page-view tracking (it replays the buffered initial
+ * navigation to `startTracking()` and every route change after), so letting `config` fire its own
+ * initial page_view would double-count the landing page.
  */
-export function loadGoogleAnalytics(trackingId: string, win: Window, doc: Document): void {
-  const w = win as GaWindow & Window;
+export function loadGoogleAnalytics(measurementId: string, win: Window, doc: Document): void {
+  const w = win as GtagWindow & Window;
 
-  if (w.ga) {
+  if (w.gtag) {
     return;
   }
 
-  const queue: unknown[] = [];
-  const ga = ((...args: unknown[]): void => {
-    queue.push(args);
-  }) as GaQueue;
-  ga.q = queue;
-  ga.l = Date.now();
+  const dataLayer: unknown[] = w.dataLayer ?? [];
+  w.dataLayer = dataLayer;
 
-  w.GoogleAnalyticsObject = 'ga';
-  w.ga = ga;
+  const gtag = (...args: unknown[]): void => {
+    dataLayer.push(args);
+  };
+  w.gtag = gtag;
 
   const script = doc.createElement('script');
   script.async = true;
-  script.src = 'https://www.google-analytics.com/analytics.js';
+  script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(measurementId);
   doc.head.appendChild(script);
 
-  w.ga('create', trackingId, 'auto');
-  w.ga('set', 'anonymizeIp', true);
+  gtag('js', new Date());
+  gtag('config', measurementId, {anonymize_ip: true, send_page_view: false});
 }

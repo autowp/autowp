@@ -15072,8 +15072,8 @@ This process is irreversible, so think it over carefully and don&apos;t make a h
         </context-group>
       <target state="translated">Прыняць усе</target>
       </trans-unit>
-      <trans-unit id="2364670553729970211" datatype="html">
-        <source>*Last updated: 28 August 2026*
+      <trans-unit id="privacy-policy-body" datatype="html">
+        <source>*Last updated: 29 August 2026*
 
 This Privacy Policy explains how the websites **wheelsage.org** and **autowp.ru** (together, the &quot;Site&quot;) collect, use, and share information about you. It is written to meet the requirements of the EU General Data Protection Regulation (GDPR) and, for visitors in Russia, Federal Law No. 152-FZ &quot;On Personal Data&quot;.
 
@@ -15146,7 +15146,7 @@ We use:
 
 * **Strictly necessary cookies** — set by our authentication system when you sign in, to keep you signed in. The Site cannot work without them, so they are not subject to consent.
 * **Small values in your browser&apos;s local storage** — such as your cookie choice (`cookie-consent`) and interface preferences. These stay on your device and are not sent to us.
-* **Analytics cookies** — set only after you accept them: Google Analytics `_ga` (expires after about two years) and `_gid` (expires after 24 hours), which help us understand how the Site is used. We have enabled IP anonymisation.
+* **Analytics cookies** — set only after you accept them: Google Analytics (GA4) `_ga` and `_ga_*` (each expires after about two years), which help us understand how the Site is used. We have enabled IP anonymisation, and Google Signals (cross-device tracking and advertising features) is switched off.
 
 You can change or withdraw your choice at any time through the **&quot;Cookie settings&quot;** link in the Site footer, and you can block or delete cookies in your browser settings.
 
@@ -15165,7 +15165,7 @@ Questions about this Policy or your personal data: [autowp@gmail.com](mailto:aut
           <context context-type="sourcefile">src/app/policy/policy.component.ts</context>
           <context context-type="linenumber">13,97</context>
         </context-group>
-      <target state="translated">*Апошняе абнаўленне: 28 жніўня 2026 г.*
+      <target state="translated">*Апошняе абнаўленне: 29 жніўня 2026 г.*
 
 Гэтая Палітыка канфідэнцыяльнасці тлумачыць, як вэб-сайты **wheelsage.org** і **autowp.ru** (разам — «Сайт») збіраюць, выкарыстоўваюць і перадаюць інфармацыю пра вас. Яна складзена ў адпаведнасці з патрабаваннямі Агульнага рэгламенту ЕС аб абароне даных (GDPR), а для наведвальнікаў з Расіі — Федэральнага закона № 152-ФЗ «Аб персанальных даных».
 
@@ -15238,7 +15238,7 @@ Questions about this Policy or your personal data: [autowp@gmail.com](mailto:aut
 
 * **Строга неабходныя файлы cookie** — усталёўваюцца нашай сістэмай аўтэнтыфікацыі пры ўваходзе, каб вы заставаліся аўтарызаванымі. Без іх Сайт не працуе, таму згоды яны не патрабуюць.
 * **Невялікія значэнні ў лакальным сховішчы браўзера** — напрыклад, ваш выбар наконт cookie (`cookie-consent`) і налады інтэрфейсу. Яны застаюцца на вашай прыладзе і нам не дасылаюцца.
-* **Аналітычныя файлы cookie** — усталёўваюцца толькі пасля таго, як вы іх прымеце: Google Analytics `_ga` (тэрмін дзеяння — каля двух гадоў) і `_gid` (тэрмін дзеяння — 24 гадзіны), якія дапамагаюць нам зразумець, як выкарыстоўваецца Сайт. Мы ўключылі абязасобліванне IP-адраса.
+* **Аналітычныя файлы cookie** — усталёўваюцца толькі пасля таго, як вы іх прымеце: Google Analytics (GA4) `_ga` і `_ga_*` (тэрмін дзеяння кожнага — каля двух гадоў), якія дапамагаюць нам зразумець, як выкарыстоўваецца Сайт. Мы ўключылі абязасобліванне IP-адраса і адключылі Google Signals (міжпрыладнае адсочванне і рэкламныя функцыі).
 
 Вы можаце змяніць або адклікаць свой выбар у любы момант па спасылцы **«Налады cookie»** ў ніжнім калонтытуле Сайта, а таксама блакаваць ці выдаляць файлы cookie ў наладах браўзера.
 

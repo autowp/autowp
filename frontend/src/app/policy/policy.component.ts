@@ -9,8 +9,11 @@ import {RemarkComponent} from 'ngx-remark';
 // The whole policy is one $localize block (rendered as Markdown by <remark>, like about.component)
 // rather than dozens of <p i18n> elements: a legal text has to be translated as a coherent whole,
 // and a single translation unit can't be left half-updated or orphaned paragraph-by-paragraph when
-// the wording changes. Keep the "Last updated" date in the first line in sync with real changes.
-const policyText = $localize`*Last updated: 28 August 2026*
+// the wording changes. The explicit @@privacy-policy-body id keeps the translation unit stable
+// across small wording edits (a bumped date, a reworded cookie line) instead of re-keying and
+// orphaning all nine translations. Keep the "Last updated" date in the first line in sync with real
+// changes.
+const policyText = $localize`:@@privacy-policy-body:*Last updated: 29 August 2026*
 
 This Privacy Policy explains how the websites **wheelsage.org** and **autowp.ru** (together, the "Site") collect, use, and share information about you. It is written to meet the requirements of the EU General Data Protection Regulation (GDPR) and, for visitors in Russia, Federal Law No. 152-FZ "On Personal Data".
 
@@ -83,7 +86,7 @@ We use:
 
 * **Strictly necessary cookies** — set by our authentication system when you sign in, to keep you signed in. The Site cannot work without them, so they are not subject to consent.
 * **Small values in your browser's local storage** — such as your cookie choice (\`cookie-consent\`) and interface preferences. These stay on your device and are not sent to us.
-* **Analytics cookies** — set only after you accept them: Google Analytics \`_ga\` (expires after about two years) and \`_gid\` (expires after 24 hours), which help us understand how the Site is used. We have enabled IP anonymisation.
+* **Analytics cookies** — set only after you accept them: Google Analytics (GA4) \`_ga\` and \`_ga_*\` (each expires after about two years), which help us understand how the Site is used. We have enabled IP anonymisation, and Google Signals (cross-device tracking and advertising features) is switched off.
 
 You can change or withdraw your choice at any time through the **"Cookie settings"** link in the Site footer, and you can block or delete cookies in your browser settings.
 
