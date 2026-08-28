@@ -77,14 +77,14 @@
         <span class="glyphicon glyphicon-pencil me-1"></span>
         <span i18n>Meta</span>
         @if (metaTab.count) {
-          <span class="badge rounded-pill text-bg-secondary">{{ metaTab.count }}</span>
+          <span class="badge rounded-pill text-bg-secondary ms-1">{{ metaTab.count }}</span>
         }
       </a>
       <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'name'" [queryParams]="{tab: 'name'}">
         <span class="glyphicon glyphicon-align-left me-1"></span>
         <span i18n>Name and description</span>
         @if (nameTab.count) {
-          <span class="badge rounded-pill text-bg-secondary">{{ nameTab.count }}</span>
+          <span class="badge rounded-pill text-bg-secondary ms-1">{{ nameTab.count }}</span>
         }
       </a>
       @if (logoTab.visible) {
@@ -92,7 +92,7 @@
           <span class="glyphicon glyphicon-align-left me-1"></span>
           <span i18n>Logotype</span>
           @if (logoTab.count) {
-            <span class="badge rounded-pill text-bg-secondary">{{ logoTab.count }}</span>
+            <span class="badge rounded-pill text-bg-secondary ms-1">{{ logoTab.count }}</span>
           }
         </a>
       }
@@ -105,7 +105,7 @@
         >
           <span i18n>Catalogue</span>
           @if (catalogueTab.count) {
-            <span class="badge rounded-pill text-bg-secondary">{{ catalogueTab.count }}</span>
+            <span class="badge rounded-pill text-bg-secondary ms-1">{{ catalogueTab.count }}</span>
           }
         </a>
       }
@@ -118,7 +118,7 @@
         >
           <span i18n>Vehicles</span>
           @if (vehiclesTab.count) {
-            <span class="badge rounded-pill text-bg-secondary">{{ vehiclesTab.count }}</span>
+            <span class="badge rounded-pill text-bg-secondary ms-1">{{ vehiclesTab.count }}</span>
           }
         </a>
       }
@@ -127,7 +127,7 @@
           <span class="bi bi-tree me-1" aria-hidden="true"></span>
           <span i18n>Tree</span>
           @if (treeTab.count) {
-            <span class="badge rounded-pill text-bg-secondary">{{ treeTab.count }}</span>
+            <span class="badge rounded-pill text-bg-secondary ms-1">{{ treeTab.count }}</span>
           }
         </a>
       }
@@ -141,7 +141,7 @@
           <span class="glyphicon glyphicon-th me-1"></span>
           <span i18n>Pictures</span>
           @if (picturesTab.count) {
-            <span class="badge rounded-pill text-bg-secondary">{{ picturesTab.count }}</span>
+            <span class="badge rounded-pill text-bg-secondary ms-1">{{ picturesTab.count }}</span>
           }
         </a>
       }
@@ -150,7 +150,7 @@
           <span class="glyphicon glyphicon-globe me-1"></span>
           <span i18n>Links</span>
           @if (linksTab.count) {
-            <span class="badge rounded-pill text-bg-secondary">{{ linksTab.count }}</span>
+            <span class="badge rounded-pill text-bg-secondary ms-1">{{ linksTab.count }}</span>
           }
         </a>
       }

@@ -14,7 +14,7 @@
               <a [routerLink]="item.routerLink" [innerHtml]="item.item.nameHtml"></a>
             } @else {
               <div ngbDropdown class="d-inline-block" placement="bottom-right" (openChange)="dropdownOpenChange(item)">
-                <a [routerLink]="item.routerLink" [innerHtml]="item.item.nameHtml"></a>
+                <a [routerLink]="item.routerLink" [innerHtml]="item.item.nameHtml"></a>&ngsp;
                 <a ngbDropdownToggle style="cursor: pointer"></a>
                 <div ngbDropdownMenu>
                   @if (!item.loaded) {
