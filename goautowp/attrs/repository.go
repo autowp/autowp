@@ -101,6 +101,7 @@ type Repository struct {
 	zoneAttributesTreeMutex sync.Mutex
 	zoneAttributes          map[int64][]*schema.AttrsAttributeRow
 	zoneAttributesTree      map[int64]map[int64][]*schema.AttrsAttributeRow
+	engineAttributesMutex   sync.Mutex
 	engineAttributes        []int64
 	itemsRepository         *items.Repository
 	picturesRepository      *pictures.Repository
@@ -130,6 +131,7 @@ func NewRepository(
 		listOptions:             make(map[int64]map[int64]string),
 		listOptionsMutex:        sync.Mutex{},
 		listOptionsChilds:       make(map[int64]map[int64][]int64),
+		engineAttributesMutex:   sync.Mutex{},
 		engineAttributes:        make([]int64, 0),
 		itemsRepository:         itemsRepository,
 		picturesRepository:      picturesRepository,
@@ -2403,16 +2405,26 @@ func (s *Repository) getUserValueWeight(ctx context.Context, userID int64) (floa
 }
 
 func (s *Repository) getEngineAttributeIDs(ctx context.Context) ([]int64, error) {
+	s.engineAttributesMutex.Lock()
+	defer s.engineAttributesMutex.Unlock()
+
 	if len(s.engineAttributes) > 0 {
 		return s.engineAttributes, nil
 	}
 
+	var ids []int64
+
 	err := s.db.Select(schema.AttrsZoneAttributesTableAttributeIDCol).
 		From(schema.AttrsZoneAttributesTable).
 		Where(schema.AttrsZoneAttributesTableZoneIDCol.Eq(engineZoneID)).
-		ScanValsContext(ctx, &s.engineAttributes)
+		ScanValsContext(ctx, &ids)
+	if err != nil {
+		return nil, err
+	}
 
-	return s.engineAttributes, err
+	s.engineAttributes = ids
+
+	return s.engineAttributes, nil
 }
 
 func (s *Repository) isEngineAttributeID(ctx context.Context, attrID int64) (bool, error) {
