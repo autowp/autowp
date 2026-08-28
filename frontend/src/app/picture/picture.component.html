@@ -231,8 +231,7 @@
         }
         @if (ownerData(); as owner) {
           <li>
-            <ng-container i18n>Added by:</ng-container>
-            <app-user [user]="owner" />,
+            <ng-container i18n>Added by:</ng-container>&ngsp; <app-user [user]="owner" />,
             @if (createdDate(); as date) {
               <span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span>
             }
@@ -248,7 +247,7 @@
           </li>
         }
         <li>
-          <ng-container i18n>Picture status:</ng-container>
+          <ng-container i18n>Picture status:</ng-container>&ngsp;
           @if (picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
             <ng-container i18n>Undecided</ng-container>
           } @else if (picture.status === PictureStatus.PICTURE_STATUS_ACCEPTED) {
