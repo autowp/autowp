@@ -1811,10 +1811,12 @@ func TestGetPictureIP(t *testing.T) {
 	ips := []net.IP{net.IPv4(172, 18, 0, 1), net.IPv4allrouter, net.IPv4allsys, net.IPv4bcast}
 
 	for _, ip := range ips {
+		// random is a shared *rand.Rand (not safe for concurrent use); draw on the parent
+		// goroutine before the parallel subtest starts.
+		identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
+
 		t.Run(ip.String(), func(t *testing.T) {
 			t.Parallel()
-
-			identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
 
 			var pictureID int64
 

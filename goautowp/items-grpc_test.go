@@ -670,10 +670,13 @@ func TestSetItemParentLanguage(t *testing.T) {
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	for i, testCase := range cases {
+		// random is a shared *rand.Rand (not safe for concurrent use); draw on the parent
+		// goroutine before the parallel subtest starts.
+		randomInt := random.Int()
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
-			randomInt := random.Int()
 			childName := fmt.Sprintf(testCase.ChildName, randomInt)
 			parentName := fmt.Sprintf(testCase.ParentName, randomInt)
 
