@@ -2527,18 +2527,6 @@ Good luck.</source>
         </context-group>
         <target state="translated">注销</target>
       </trans-unit>
-      <trans-unit id="layout/language-contributing" datatype="html">
-        <source>Want to contribute?</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">170,179</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">261,267</context>
-        </context-group>
-        <target state="translated">想要加入更多语言?</target>
-      </trans-unit>
       <trans-unit id="layout/brand" datatype="html">
         <source>WheelsAge.org</source>
         <context-group purpose="location">
