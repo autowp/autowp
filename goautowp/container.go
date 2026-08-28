@@ -15,6 +15,7 @@ import (
 	"github.com/autowp/goautowp/ban"
 	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/contentreport"
 	"github.com/autowp/goautowp/email"
 	"github.com/autowp/goautowp/feedback"
 	"github.com/autowp/goautowp/hosts"
@@ -69,6 +70,7 @@ type Container struct {
 	contactsRepository           *ContactsRepository
 	duplicateFinder              *DuplicateFinder
 	donationsGrpcServer          *DonationsGRPCServer
+	contentReports               *contentreport.Repository
 	emailSender                  email.Sender
 	events                       *Events
 	feedback                     *feedback.Repository
@@ -916,6 +918,19 @@ func (s *Container) feedbackLocked() (*feedback.Repository, error) {
 	return s.feedback, nil
 }
 
+func (s *Container) contentReportsRepositoryLocked(ctx context.Context) (*contentreport.Repository, error) {
+	if s.contentReports == nil {
+		db, err := s.goquDBLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.contentReports = contentreport.NewRepository(db)
+	}
+
+	return s.contentReports, nil
+}
+
 func (s *Container) ipExtractorLocked(ctx context.Context) (*IPExtractor, error) {
 	banRepository, err := s.banRepositoryLocked(ctx)
 	if err != nil {
@@ -1666,12 +1681,18 @@ func (s *Container) grpcServerLocked(ctx context.Context) (*GRPCServer, error) {
 			return nil, err
 		}
 
+		contentReports, err := s.contentReportsRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.grpcServer = NewGRPCServer(
 			auth,
 			cfg.Recaptcha,
 			commentsRepository,
 			ipExtractor,
 			fb,
+			contentReports,
 			cfg.Captcha,
 		)
 	}

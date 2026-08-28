@@ -39,6 +39,9 @@ service Autowp {
       get: "/v3/autowp/timezones"
     };
   }
+  rpc CreateContentReport(CreateContentReportRequest) returns (google.protobuf.Empty) {}
+  rpc GetContentReports(ContentReportsRequest) returns (ContentReportsResponse) {}
+  rpc ResolveContentReport(ResolveContentReportRequest) returns (google.protobuf.Empty) {}
 }
 
 service Forums {
@@ -971,6 +974,67 @@ message Feedback {
   string email = 2;
   string message = 3;
   string captcha = 4;
+}
+
+enum ContentReportEntityType {
+  CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED = 0;
+  CONTENT_REPORT_ENTITY_TYPE_PICTURE = 1;
+  CONTENT_REPORT_ENTITY_TYPE_COMMENT = 2;
+}
+
+enum ContentReportReason {
+  CONTENT_REPORT_REASON_UNSPECIFIED = 0;
+  CONTENT_REPORT_REASON_COPYRIGHT = 1;
+  CONTENT_REPORT_REASON_ILLEGAL = 2;
+  CONTENT_REPORT_REASON_SPAM = 3;
+  CONTENT_REPORT_REASON_PRIVACY = 4;
+  CONTENT_REPORT_REASON_OTHER = 5;
+}
+
+enum ContentReportStatus {
+  CONTENT_REPORT_STATUS_UNSPECIFIED = 0;
+  CONTENT_REPORT_STATUS_OPEN = 1;
+  CONTENT_REPORT_STATUS_ACCEPTED = 2;
+  CONTENT_REPORT_STATUS_REJECTED = 3;
+}
+
+message CreateContentReportRequest {
+  ContentReportEntityType entity_type = 1;
+  int64 entity_id = 2;
+  ContentReportReason reason = 3;
+  string message = 4;
+  string captcha = 5;
+}
+
+message ContentReport {
+  int64 id = 1;
+  ContentReportEntityType entity_type = 2;
+  int64 entity_id = 3;
+  ContentReportReason reason = 4;
+  string message = 5;
+  int64 reporter_id = 6;
+  google.protobuf.Timestamp create_time = 7;
+  ContentReportStatus status = 8;
+  int64 resolved_by = 9;
+  google.protobuf.Timestamp resolve_time = 10;
+  string resolution = 11;
+}
+
+message ContentReportsRequest {
+  ContentReportStatus status = 1;
+  ContentReportEntityType entity_type = 2;
+  int32 page = 3;
+}
+
+message ContentReportsResponse {
+  repeated ContentReport items = 1;
+  Pages paginator = 2;
+}
+
+message ResolveContentReportRequest {
+  int64 id = 1;
+  bool accepted = 2;
+  string resolution = 3;
 }
 
 message DeleteTrafficWhitelistItemRequest {

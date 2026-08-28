@@ -8,6 +8,7 @@ import (
 
 	"github.com/autowp/goautowp/comments"
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/contentreport"
 	"github.com/autowp/goautowp/feedback"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/validation"
@@ -52,6 +53,7 @@ type GRPCServer struct {
 	comments        *comments.Repository
 	ipExtractor     *IPExtractor
 	feedback        *feedback.Repository
+	contentReports  *contentreport.Repository
 	captchaEnabled  bool
 }
 
@@ -61,6 +63,7 @@ func NewGRPCServer(
 	comments *comments.Repository,
 	ipExtractor *IPExtractor,
 	feedback *feedback.Repository,
+	contentReports *contentreport.Repository,
 	captchaEnabled bool,
 ) *GRPCServer {
 	return &GRPCServer{ //nolint:exhaustruct
@@ -69,6 +72,7 @@ func NewGRPCServer(
 		comments:        comments,
 		ipExtractor:     ipExtractor,
 		feedback:        feedback,
+		contentReports:  contentReports,
 		captchaEnabled:  captchaEnabled,
 	}
 }
