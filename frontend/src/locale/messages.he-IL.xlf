@@ -15063,12 +15063,12 @@ This process is irreversible, so think it over carefully and don&apos;t make a h
         </context-group>
       <target state="translated">קבל הכול</target>
       </trans-unit>
-      <trans-unit id="6110636050047560496" datatype="html">
+      <trans-unit id="2364670553729970211" datatype="html">
         <source>*Last updated: 28 August 2026*
 
 This Privacy Policy explains how the websites **wheelsage.org** and **autowp.ru** (together, the &quot;Site&quot;) collect, use, and share information about you. It is written to meet the requirements of the EU General Data Protection Regulation (GDPR) and, for visitors in Russia, Federal Law No. 152-FZ &quot;On Personal Data&quot;.
 
-The Site is a community car catalogue and encyclopaedia operated by the Site&apos;s administration (&quot;we&quot;, &quot;us&quot;). For any question about this Policy or your personal data, contact us at [autowp@yandex.ru](mailto:autowp@yandex.ru).
+The Site is a community car catalogue and encyclopaedia operated by the Site&apos;s administration (&quot;we&quot;, &quot;us&quot;). For any question about this Policy or your personal data, contact us at [autowp@gmail.com](mailto:autowp@gmail.com).
 
 ## Our approach
 
@@ -15129,7 +15129,7 @@ Under the GDPR you have the right to access your data, have it corrected or eras
 
 Under Federal Law No. 152-FZ you may obtain information about how your data is processed and request that it be corrected, blocked, or destroyed if it is incomplete, outdated, inaccurate, unlawfully obtained, or no longer needed for the purpose of processing.
 
-To exercise any of these rights, email us at [autowp@yandex.ru](mailto:autowp@yandex.ru). You can edit your profile at any time, and you can delete your account from the [account deletion page](/account/delete). To withdraw consent to the processing of your personal data under 152-FZ, email us with the subject line &quot;Withdrawal of consent to personal data processing&quot;.
+To exercise any of these rights, email us at [autowp@gmail.com](mailto:autowp@gmail.com). You can edit your profile at any time, and you can delete your account from the [account deletion page](/account/delete). To withdraw consent to the processing of your personal data under 152-FZ, email us with the subject line &quot;Withdrawal of consent to personal data processing&quot;.
 
 ## Cookies
 
@@ -15151,7 +15151,7 @@ We may update this Policy from time to time. The current version is always avail
 
 ## Contact
 
-Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:autowp@yandex.ru).</source>
+Questions about this Policy or your personal data: [autowp@gmail.com](mailto:autowp@gmail.com).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/policy/policy.component.ts</context>
           <context context-type="linenumber">13,97</context>
@@ -15160,7 +15160,7 @@ Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:aut
 
 מדיניות פרטיות זו מסבירה כיצד האתרים **wheelsage.org** ו-**autowp.ru** (יחד, "האתר") אוספים, משתמשים ומשתפים מידע עליך. היא נכתבה כדי לעמוד בדרישות התקנה הכללית של האיחוד האירופי להגנת נתונים (GDPR), ולגבי מבקרים הנמצאים ברוסיה — בדרישות החוק הפדרלי מס' 152-FZ "בעניין נתונים אישיים".
 
-האתר הוא קטלוג ואנציקלופדיה קהילתיים של כלי רכב, המופעלים על ידי הנהלת האתר ("אנחנו"). לכל שאלה בנוגע למדיניות זו או לנתונים האישיים שלך, פנה אלינו בכתובת [autowp@yandex.ru](mailto:autowp@yandex.ru).
+האתר הוא קטלוג ואנציקלופדיה קהילתיים של כלי רכב, המופעלים על ידי הנהלת האתר ("אנחנו"). לכל שאלה בנוגע למדיניות זו או לנתונים האישיים שלך, פנה אלינו בכתובת [autowp@gmail.com](mailto:autowp@gmail.com).
 
 ## הגישה שלנו
 
@@ -15221,7 +15221,7 @@ Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:aut
 
 על פי החוק הפדרלי מס' 152-FZ, תוכל לקבל מידע על אופן עיבוד הנתונים שלך ולדרוש את תיקונם, חסימתם או השמדתם אם הם חסרים, מיושנים, שגויים, הושגו שלא כדין או אינם נחוצים עוד למטרת העיבוד.
 
-כדי לממש כל אחת מזכויות אלה, כתוב אלינו לכתובת [autowp@yandex.ru](mailto:autowp@yandex.ru). באפשרותך לערוך את הפרופיל שלך בכל עת ולמחוק את חשבונך מ[עמוד מחיקת החשבון](/account/delete). כדי לחזור בך מהסכמה לעיבוד הנתונים האישיים שלך לפי 152-FZ, כתוב אלינו עם הנושא "חזרה מהסכמה לעיבוד נתונים אישיים".
+כדי לממש כל אחת מזכויות אלה, כתוב אלינו לכתובת [autowp@gmail.com](mailto:autowp@gmail.com). באפשרותך לערוך את הפרופיל שלך בכל עת ולמחוק את חשבונך מ[עמוד מחיקת החשבון](/account/delete). כדי לחזור בך מהסכמה לעיבוד הנתונים האישיים שלך לפי 152-FZ, כתוב אלינו עם הנושא "חזרה מהסכמה לעיבוד נתונים אישיים".
 
 ## קובצי Cookie
 
@@ -15243,7 +15243,7 @@ Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:aut
 
 ## יצירת קשר
 
-שאלות בנוגע למדיניות זו או לנתונים האישיים שלך: [autowp@yandex.ru](mailto:autowp@yandex.ru).</target>
+שאלות בנוגע למדיניות זו או לנתונים האישיים שלך: [autowp@gmail.com](mailto:autowp@gmail.com).</target>
       </trans-unit>
     </body>
   </file>

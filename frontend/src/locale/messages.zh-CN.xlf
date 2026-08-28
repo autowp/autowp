@@ -15074,12 +15074,12 @@ This process is irreversible, so think it over carefully and don&apos;t make a h
         </context-group>
       <target state="translated">全部接受</target>
       </trans-unit>
-      <trans-unit id="6110636050047560496" datatype="html">
+      <trans-unit id="2364670553729970211" datatype="html">
         <source>*Last updated: 28 August 2026*
 
 This Privacy Policy explains how the websites **wheelsage.org** and **autowp.ru** (together, the &quot;Site&quot;) collect, use, and share information about you. It is written to meet the requirements of the EU General Data Protection Regulation (GDPR) and, for visitors in Russia, Federal Law No. 152-FZ &quot;On Personal Data&quot;.
 
-The Site is a community car catalogue and encyclopaedia operated by the Site&apos;s administration (&quot;we&quot;, &quot;us&quot;). For any question about this Policy or your personal data, contact us at [autowp@yandex.ru](mailto:autowp@yandex.ru).
+The Site is a community car catalogue and encyclopaedia operated by the Site&apos;s administration (&quot;we&quot;, &quot;us&quot;). For any question about this Policy or your personal data, contact us at [autowp@gmail.com](mailto:autowp@gmail.com).
 
 ## Our approach
 
@@ -15140,7 +15140,7 @@ Under the GDPR you have the right to access your data, have it corrected or eras
 
 Under Federal Law No. 152-FZ you may obtain information about how your data is processed and request that it be corrected, blocked, or destroyed if it is incomplete, outdated, inaccurate, unlawfully obtained, or no longer needed for the purpose of processing.
 
-To exercise any of these rights, email us at [autowp@yandex.ru](mailto:autowp@yandex.ru). You can edit your profile at any time, and you can delete your account from the [account deletion page](/account/delete). To withdraw consent to the processing of your personal data under 152-FZ, email us with the subject line &quot;Withdrawal of consent to personal data processing&quot;.
+To exercise any of these rights, email us at [autowp@gmail.com](mailto:autowp@gmail.com). You can edit your profile at any time, and you can delete your account from the [account deletion page](/account/delete). To withdraw consent to the processing of your personal data under 152-FZ, email us with the subject line &quot;Withdrawal of consent to personal data processing&quot;.
 
 ## Cookies
 
@@ -15162,7 +15162,7 @@ We may update this Policy from time to time. The current version is always avail
 
 ## Contact
 
-Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:autowp@yandex.ru).</source>
+Questions about this Policy or your personal data: [autowp@gmail.com](mailto:autowp@gmail.com).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/policy/policy.component.ts</context>
           <context context-type="linenumber">13,97</context>
@@ -15171,7 +15171,7 @@ Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:aut
 
 本隐私政策说明 **wheelsage.org** 和 **autowp.ru** 网站（合称“本网站”）如何收集、使用和共享有关您的信息。本政策依据欧盟《通用数据保护条例》（GDPR），以及针对身处俄罗斯的访问者依据第 152-FZ 号联邦法律《个人数据法》而制定。
 
-本网站是由网站管理方（“我们”）运营的社区汽车目录和百科全书。如对本政策或您的个人数据有任何疑问，请通过 [autowp@yandex.ru](mailto:autowp@yandex.ru) 与我们联系。
+本网站是由网站管理方（“我们”）运营的社区汽车目录和百科全书。如对本政策或您的个人数据有任何疑问，请通过 [autowp@gmail.com](mailto:autowp@gmail.com) 与我们联系。
 
 ## 我们的原则
 
@@ -15232,7 +15232,7 @@ Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:aut
 
 根据第 152-FZ 号联邦法律，您可以获取有关如何处理您数据的信息，并在数据不完整、过时、不准确、非法获取或不再为处理目的所需时，要求更正、封锁或销毁这些数据。
 
-如需行使上述任何权利，请致函 [autowp@yandex.ru](mailto:autowp@yandex.ru)。您可以随时编辑个人资料，并可在[账户删除页面](/account/delete)删除您的账户。如需依据 152-FZ 撤回对处理您个人数据的同意，请致函我们，主题注明“撤回对个人数据处理的同意”。
+如需行使上述任何权利，请致函 [autowp@gmail.com](mailto:autowp@gmail.com)。您可以随时编辑个人资料，并可在[账户删除页面](/account/delete)删除您的账户。如需依据 152-FZ 撤回对处理您个人数据的同意，请致函我们，主题注明“撤回对个人数据处理的同意”。
 
 ## Cookie
 
@@ -15254,7 +15254,7 @@ Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:aut
 
 ## 联系方式
 
-有关本政策或您个人数据的问题：[autowp@yandex.ru](mailto:autowp@yandex.ru)。</target>
+有关本政策或您个人数据的问题：[autowp@gmail.com](mailto:autowp@gmail.com)。</target>
       </trans-unit>
     </body>
   </file>

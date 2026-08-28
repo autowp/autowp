@@ -14,7 +14,7 @@ const policyText = $localize`*Last updated: 28 August 2026*
 
 This Privacy Policy explains how the websites **wheelsage.org** and **autowp.ru** (together, the "Site") collect, use, and share information about you. It is written to meet the requirements of the EU General Data Protection Regulation (GDPR) and, for visitors in Russia, Federal Law No. 152-FZ "On Personal Data".
 
-The Site is a community car catalogue and encyclopaedia operated by the Site's administration ("we", "us"). For any question about this Policy or your personal data, contact us at [autowp@yandex.ru](mailto:autowp@yandex.ru).
+The Site is a community car catalogue and encyclopaedia operated by the Site's administration ("we", "us"). For any question about this Policy or your personal data, contact us at [autowp@gmail.com](mailto:autowp@gmail.com).
 
 ## Our approach
 
@@ -75,7 +75,7 @@ Under the GDPR you have the right to access your data, have it corrected or eras
 
 Under Federal Law No. 152-FZ you may obtain information about how your data is processed and request that it be corrected, blocked, or destroyed if it is incomplete, outdated, inaccurate, unlawfully obtained, or no longer needed for the purpose of processing.
 
-To exercise any of these rights, email us at [autowp@yandex.ru](mailto:autowp@yandex.ru). You can edit your profile at any time, and you can delete your account from the [account deletion page](/account/delete). To withdraw consent to the processing of your personal data under 152-FZ, email us with the subject line "Withdrawal of consent to personal data processing".
+To exercise any of these rights, email us at [autowp@gmail.com](mailto:autowp@gmail.com). You can edit your profile at any time, and you can delete your account from the [account deletion page](/account/delete). To withdraw consent to the processing of your personal data under 152-FZ, email us with the subject line "Withdrawal of consent to personal data processing".
 
 ## Cookies
 
@@ -97,7 +97,7 @@ We may update this Policy from time to time. The current version is always avail
 
 ## Contact
 
-Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:autowp@yandex.ru).`;
+Questions about this Policy or your personal data: [autowp@gmail.com](mailto:autowp@gmail.com).`;
 
 @Component({
   selector: 'app-policy',
