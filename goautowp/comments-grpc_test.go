@@ -6,6 +6,7 @@ import (
 	"github.com/autowp/goautowp/config"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 func TestAddEmptyCommentShouldReturnError(t *testing.T) {
@@ -263,16 +264,8 @@ func TestVoteComment(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	// delete comment
-	_, err = client.SetDeleted(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CommentsSetDeletedRequest{
-			CommentId: commentItem.GetId(),
-			Deleted:   true,
-		},
-	)
-	require.ErrorContains(t, err, "PermissionDenied")
-
+	// delete comment - author self-delete is covered by TestDeleteOwnComment; here a moderator
+	// removes it so the comment survives as a tombstone for the vote/restore checks below.
 	_, err = client.SetDeleted(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 		&CommentsSetDeletedRequest{
@@ -321,6 +314,87 @@ func TestVoteComment(t *testing.T) {
 		},
 	)
 	require.ErrorContains(t, err, "PermissionDenied")
+}
+
+func TestDeleteOwnComment(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	client := NewCommentsClient(conn)
+	cfg := config.LoadConfig(".")
+
+	goquDB, err := cnt.GoquDB(t.Context())
+	require.NoError(t, err)
+
+	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
+
+	commentItem, err := client.Add(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
+		&AddCommentRequest{
+			ItemId:  1,
+			TypeId:  CommentsType_ARTICLES_TYPE_ID,
+			Message: "to be removed by its author",
+		},
+	)
+	require.NoError(t, err)
+
+	// the author removes their own comment - no moderator role required
+	_, err = client.SetDeleted(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
+		&CommentsSetDeletedRequest{CommentId: commentItem.GetId(), Deleted: true},
+	)
+	require.NoError(t, err)
+
+	// nothing hangs off it, so it is gone entirely
+	_, err = client.GetMessage(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
+		&GetMessageRequest{Id: commentItem.GetId()},
+	)
+	require.Error(t, err)
+}
+
+func TestUpdateOwnComment(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+
+	client := NewCommentsClient(conn)
+	cfg := config.LoadConfig(".")
+
+	goquDB, err := cnt.GoquDB(t.Context())
+	require.NoError(t, err)
+
+	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
+
+	commentItem, err := client.Add(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
+		&AddCommentRequest{
+			ItemId:  1,
+			TypeId:  CommentsType_ARTICLES_TYPE_ID,
+			Message: "first revision",
+		},
+	)
+	require.NoError(t, err)
+
+	_, err = client.UpdateComment(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
+		&UpdateCommentRequest{
+			Comment:    &CommentMessage{Id: commentItem.GetId(), Text: "second revision"},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"text"}},
+		},
+	)
+	require.NoError(t, err)
+
+	msg, err := client.GetMessage(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
+		&GetMessageRequest{
+			Id:     commentItem.GetId(),
+			Fields: &CommentMessageFields{Text: true},
+		},
+	)
+	require.NoError(t, err)
+	require.Equal(t, "second revision", msg.GetText())
 }
 
 func TestCompleteComment(t *testing.T) {
