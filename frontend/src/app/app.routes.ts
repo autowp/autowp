@@ -82,6 +82,10 @@ export const routes: Routes = [
   {loadChildren: () => import('./policy/policy-routing.module').then((m) => m.routes), path: 'policy'},
   {loadChildren: () => import('./tos/terms-routing.module').then((m) => m.routes), path: 'tos'},
   {
+    loadChildren: () => import('./copyright/copyright-routing.module').then((m) => m.routes),
+    path: 'copyright',
+  },
+  {
     loadChildren: () => import('./telegram/telegram-routing.module').then((m) => m.routes),
     path: 'telegram',
   },

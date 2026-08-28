@@ -15528,6 +15528,100 @@ Questions about these Terms: [autowp@gmail.com](mailto:autowp@gmail.com).
         <source>Accept and continue</source>
       <target state="translated">接受并继续</target>
       </trans-unit>
+      <trans-unit id="copyright-policy-body" datatype="html">
+        <source>*Last updated: 29 August 2026*
+
+The websites **wheelsage.org** and **autowp.ru** (the &quot;Site&quot;) host pictures and text submitted by their visitors. We respect the rights of copyright and other rights holders and act on valid complaints. This page explains how to report material on the Site that infringes your rights, and how someone whose upload was removed can respond.
+
+## Reporting an infringement
+
+The quickest way is the **&quot;Report&quot;** button shown on every picture and comment — choose &quot;Copyright infringement&quot; and, if you can, add the details below.
+
+You can also email us at [autowp@gmail.com](mailto:autowp@gmail.com) with the subject line &quot;Copyright complaint&quot;. Please include:
+
+* identification of the work you say is infringed (for example, a link to the original, or a description);
+* the address (URL) of the material on the Site that you are complaining about;
+* your name and contact details, and, if you are acting for the rights holder, in what capacity;
+* a statement that you believe in good faith that the use is not authorised by the rights holder, its agent, or the law;
+* a statement that the information in your complaint is accurate, and that you are the rights holder or authorised to act on their behalf.
+
+We may pass the information in your complaint, including your identity, to the person who uploaded the material, so that they can respond.
+
+## What we do
+
+When we receive a valid complaint we remove or disable access to the material within a reasonable time. We tell the person who uploaded it why it was removed and how to respond, unless the law prevents us from doing so.
+
+Accounts of users who repeatedly upload infringing material are suspended or closed.
+
+## If your upload was removed
+
+If material you uploaded was removed and you believe that was a mistake — because the work is yours, you have permission to use it, or it was misidentified — you can ask us to restore it. Use the appeal link in the message we sent you, or email [autowp@gmail.com](mailto:autowp@gmail.com), and include:
+
+* the address (URL) or identifier of the material that was removed;
+* the reason you believe the removal was a mistake;
+* your name and contact details, and a statement that the information is accurate.
+
+We may share your response, including your identity, with the person who complained. If they do not pursue the matter further, we may restore the material.
+
+## Trademarks, privacy, and other rights
+
+Use the same button or email address to report material that infringes a trademark, discloses private information, or uses someone&apos;s image or name without the consent the law requires. Describe the right you are relying on and identify the material as above.
+
+## Contact
+
+[autowp@gmail.com](mailto:autowp@gmail.com)
+</source>
+      <target state="translated">*最后更新：2026 年 8 月 29 日*
+
+**wheelsage.org** 和 **autowp.ru** 网站（“本网站”）托管由访客提交的图片和文字。我们尊重著作权人及其他权利人的权利，并对有效投诉采取行动。本页说明如何举报本网站上侵犯您权利的材料，以及被删除上传内容的人如何回应。
+
+## 如何举报侵权
+
+最快的方式是每张图片和每条评论旁的**“举报”**按钮：选择“著作权侵权”，并尽量补充下列信息。
+
+您也可以发送邮件至 [autowp@gmail.com](mailto:autowp@gmail.com)，主题为“著作权投诉”。请包含：
+
+* 对您主张被侵权作品的标识（例如原作链接或说明）；
+* 您所投诉的本网站材料的地址（URL）；
+* 您的姓名和联系方式；如您代表权利人，还需说明身份；
+* 一份声明，表明您善意地认为该使用未获权利人、其代理人或法律授权；
+* 一份声明，表明您投诉中的信息准确，且您是权利人或获授权代其行事。
+
+我们可能会将您投诉中的信息（包括您的身份）转交给上传该材料的人，以便其回应。
+
+## 我们的处理
+
+收到有效投诉后，我们会在合理时间内删除材料或禁用其访问。除非法律禁止，我们会告知上传者删除原因及回应方式。
+
+反复上传侵权材料的用户账户将被暂停或关闭。
+
+## 如果您的上传被删除
+
+如果您上传的材料被删除，而您认为这是错误——因为作品是您的、您有使用许可，或材料被认错——您可以请求我们恢复。请使用我们发送给您的消息中的申诉链接，或发送邮件至 [autowp@gmail.com](mailto:autowp@gmail.com)，并包含：
+
+* 被删除材料的地址（URL）或标识；
+* 您认为删除属于错误的理由；
+* 您的姓名和联系方式，以及一份信息准确的声明。
+
+我们可能会将您的回应（包括您的身份）告知投诉人。如其不再追究，我们可恢复该材料。
+
+## 商标、隐私及其他权利
+
+对于侵犯商标、泄露私人信息，或未经法律要求的同意使用他人肖像或姓名的材料，请使用同一按钮或同一邮箱举报。请说明您所依据的权利，并按上文标识该材料。
+
+## 联系方式
+
+[autowp@gmail.com](mailto:autowp@gmail.com)
+</target>
+      </trans-unit>
+      <trans-unit id="1669309075536257063" datatype="html">
+        <source>Copyright and content complaints</source>
+      <target state="translated">版权与内容投诉</target>
+      </trans-unit>
+      <trans-unit id="8768506950499277937" datatype="html">
+        <source>Copyright</source>
+      <target state="translated">版权</target>
+      </trans-unit>
       <trans-unit id="5490315184415589290" datatype="html">
         <source>Blocked until</source>
       <target state="translated">封禁至</target>

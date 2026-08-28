@@ -49,6 +49,8 @@ export const serverRoutes: ServerRoute[] = [
 
   {path: 'chart/**', renderMode: RenderMode.Client}, // Chart.js (ng2-charts), no platform guard yet
 
+  {path: 'copyright', renderMode: RenderMode.Prerender}, // static text, no per-request data
+
   {path: 'cutaway/**', renderMode: RenderMode.Server},
 
   // donate and donate/log are content. success is a fixed thank-you page with no per-request data,

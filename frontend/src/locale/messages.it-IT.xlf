@@ -15538,6 +15538,100 @@ Domande sulle presenti Condizioni: [autowp@gmail.com](mailto:autowp@gmail.com).
         <source>Accept and continue</source>
       <target state="translated">Accetta e continua</target>
       </trans-unit>
+      <trans-unit id="copyright-policy-body" datatype="html">
+        <source>*Last updated: 29 August 2026*
+
+The websites **wheelsage.org** and **autowp.ru** (the &quot;Site&quot;) host pictures and text submitted by their visitors. We respect the rights of copyright and other rights holders and act on valid complaints. This page explains how to report material on the Site that infringes your rights, and how someone whose upload was removed can respond.
+
+## Reporting an infringement
+
+The quickest way is the **&quot;Report&quot;** button shown on every picture and comment — choose &quot;Copyright infringement&quot; and, if you can, add the details below.
+
+You can also email us at [autowp@gmail.com](mailto:autowp@gmail.com) with the subject line &quot;Copyright complaint&quot;. Please include:
+
+* identification of the work you say is infringed (for example, a link to the original, or a description);
+* the address (URL) of the material on the Site that you are complaining about;
+* your name and contact details, and, if you are acting for the rights holder, in what capacity;
+* a statement that you believe in good faith that the use is not authorised by the rights holder, its agent, or the law;
+* a statement that the information in your complaint is accurate, and that you are the rights holder or authorised to act on their behalf.
+
+We may pass the information in your complaint, including your identity, to the person who uploaded the material, so that they can respond.
+
+## What we do
+
+When we receive a valid complaint we remove or disable access to the material within a reasonable time. We tell the person who uploaded it why it was removed and how to respond, unless the law prevents us from doing so.
+
+Accounts of users who repeatedly upload infringing material are suspended or closed.
+
+## If your upload was removed
+
+If material you uploaded was removed and you believe that was a mistake — because the work is yours, you have permission to use it, or it was misidentified — you can ask us to restore it. Use the appeal link in the message we sent you, or email [autowp@gmail.com](mailto:autowp@gmail.com), and include:
+
+* the address (URL) or identifier of the material that was removed;
+* the reason you believe the removal was a mistake;
+* your name and contact details, and a statement that the information is accurate.
+
+We may share your response, including your identity, with the person who complained. If they do not pursue the matter further, we may restore the material.
+
+## Trademarks, privacy, and other rights
+
+Use the same button or email address to report material that infringes a trademark, discloses private information, or uses someone&apos;s image or name without the consent the law requires. Describe the right you are relying on and identify the material as above.
+
+## Contact
+
+[autowp@gmail.com](mailto:autowp@gmail.com)
+</source>
+      <target state="translated">*Ultimo aggiornamento: 29 agosto 2026*
+
+I siti **wheelsage.org** e **autowp.ru** (il «Sito») ospitano immagini e testi inviati dai visitatori. Rispettiamo i diritti dei titolari del diritto d’autore e di altri diritti e diamo seguito alle segnalazioni valide. Questa pagina spiega come segnalare un contenuto del Sito che viola i suoi diritti e come rispondere quando il suo caricamento è stato rimosso.
+
+## Come segnalare una violazione
+
+Il modo più rapido è il pulsante **«Segnala»** mostrato su ogni immagine e commento: scelga «Violazione del diritto d’autore» e, se possibile, aggiunga i dati che seguono.
+
+Può anche scriverci a [autowp@gmail.com](mailto:autowp@gmail.com) con oggetto «Reclamo per violazione del diritto d’autore». Indichi:
+
+* l’identificazione dell’opera che ritiene violata (ad esempio un link all’originale o una descrizione);
+* l’indirizzo (URL) del contenuto sul Sito oggetto della segnalazione;
+* il suo nome e i suoi recapiti e, se agisce per il titolare dei diritti, a quale titolo;
+* una dichiarazione che ritiene in buona fede che l’uso non sia autorizzato dal titolare dei diritti, dal suo rappresentante o dalla legge;
+* una dichiarazione che le informazioni della segnalazione sono esatte e che lei è il titolare dei diritti o è autorizzato ad agire per suo conto.
+
+Possiamo trasmettere le informazioni della sua segnalazione, compresa la sua identità, alla persona che ha caricato il contenuto affinché possa rispondere.
+
+## Cosa facciamo
+
+Quando riceviamo una segnalazione valida, rimuoviamo il contenuto o ne disabilitiamo l’accesso entro un tempo ragionevole. Comunichiamo a chi lo ha caricato perché è stato rimosso e come rispondere, salvo che la legge ce lo impedisca.
+
+Gli account degli utenti che caricano ripetutamente contenuti che violano diritti altrui vengono sospesi o chiusi.
+
+## Se il suo caricamento è stato rimosso
+
+Se un contenuto che ha caricato è stato rimosso e lei ritiene che si tratti di un errore — perché l’opera è sua, ha il permesso di usarla o è stata identificata erroneamente —, può chiederci di ripristinarla. Usi il link di ricorso del messaggio che le abbiamo inviato, oppure scriva a [autowp@gmail.com](mailto:autowp@gmail.com), indicando:
+
+* l’indirizzo (URL) o l’identificativo del contenuto rimosso;
+* il motivo per cui ritiene che la rimozione sia un errore;
+* il suo nome e i suoi recapiti e una dichiarazione che le informazioni sono esatte.
+
+Possiamo condividere la sua risposta, compresa la sua identità, con chi ha presentato la segnalazione. Se questa persona non dà seguito alla questione, potremo ripristinare il contenuto.
+
+## Marchi, riservatezza e altri diritti
+
+Usi lo stesso pulsante o lo stesso indirizzo per segnalare contenuti che violano un marchio, divulgano informazioni private o usano l’immagine o il nome di una persona senza il consenso richiesto dalla legge. Descriva il diritto che invoca e identifichi il contenuto come sopra.
+
+## Contatti
+
+[autowp@gmail.com](mailto:autowp@gmail.com)
+</target>
+      </trans-unit>
+      <trans-unit id="1669309075536257063" datatype="html">
+        <source>Copyright and content complaints</source>
+      <target state="translated">Diritto d’autore e segnalazioni di contenuti</target>
+      </trans-unit>
+      <trans-unit id="8768506950499277937" datatype="html">
+        <source>Copyright</source>
+      <target state="translated">Diritto d’autore</target>
+      </trans-unit>
       <trans-unit id="5490315184415589290" datatype="html">
         <source>Blocked until</source>
       <target state="translated">Bloccato fino al</target>
