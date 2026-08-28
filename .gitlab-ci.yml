@@ -70,7 +70,7 @@ test-goautowp:
     - dclint .
     - go mod download
     - go mod verify
-    - golangci-lint run ./... -v --timeout 5m
+    - golangci-lint run ./... -v --timeout 10m
     - govulncheck ./...
 
     - waitforit -address=tcp://docker:2375 -timeout=30
