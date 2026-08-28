@@ -659,12 +659,23 @@ func TestOrderByCreatedAt(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	name := "TestOrderByCreatedAt" + strconv.Itoa(int(random.Uint32()%100000))
+	// Each item gets an explicit, strictly increasing created_at: the column has no default, so
+	// otherwise every row here is NULL and OrderByCreatedAt has nothing to order by - which only
+	// looks deterministic until concurrent inserts from other tests reshuffle the heap scan.
+	createdAt := time.Now().Add(-time.Hour)
+	nextCreatedAt := func() sql.NullTime {
+		createdAt = createdAt.Add(time.Second)
+
+		return sql.NullTime{Time: createdAt, Valid: true}
+	}
+
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
 		Name:            name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
+		CreatedAt:       nextCreatedAt(),
 	})
 
 	subName := name + "sub"
@@ -674,6 +685,7 @@ func TestOrderByCreatedAt(t *testing.T) {
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
+		CreatedAt:       nextCreatedAt(),
 	})
 
 	success, err := repository.CreateItemParent(
@@ -686,21 +698,26 @@ func TestOrderByCreatedAt(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, success)
 
+	var lastItemID int64
+
 	for i := range 10 {
 		subSubName := name + "_" + strconv.Itoa(i)
-		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+		lastItemID = CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
 			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
+			CreatedAt:       nextCreatedAt(),
 		})
 
 		success, err = repository.CreateItemParent(
-			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+			ctx, lastItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
 		)
 		require.NoError(t, err)
 		require.True(t, success)
 	}
+
+	// OrderByCreatedAt is newest-first, so the last item created leads and the brand trails.
 
 	// with pagination
 	list, pages, err := repository.List(ctx, &query.ItemListOptions{
@@ -715,7 +732,7 @@ func TestOrderByCreatedAt(t *testing.T) {
 	require.Equal(t, int32(12), pages.TotalItemCount)
 	require.Equal(t, int32(12), pages.PageCount)
 	require.Equal(t, int32(1), pages.Current)
-	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, lastItemID, list[0].ID)
 	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
 
 	// without pagination
@@ -727,7 +744,8 @@ func TestOrderByCreatedAt(t *testing.T) {
 	require.NotEmpty(t, list)
 	require.Len(t, list, 12)
 	require.Nil(t, pages)
-	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, lastItemID, list[0].ID)
+	require.Equal(t, itemID, list[len(list)-1].ID)
 	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
 }
 

@@ -3566,7 +3566,7 @@ func (s *Repository) orderBy(
 	case OrderByDescendantPicturesCount:
 		columns = []columnOrder{{col: s.descendantPicturesCountColumn, asc: false}}
 	case OrderByCreatedAt:
-		columns = []columnOrder{{col: s.createdAtColumn, asc: false}}
+		columns = []columnOrder{{col: s.createdAtColumn, asc: false}, {col: s.idColumn, asc: false}}
 	case OrderByName:
 		columns = []columnOrder{
 			{col: s.nameColumn, asc: true},
@@ -3641,6 +3641,7 @@ func (s *Repository) wrapperOrderBy(
 	case OrderByCreatedAt:
 		return []exp.OrderedExpression{
 			wrapperAliasTable.Col(schema.ItemTableCreatedAtColName).Desc(),
+			wrapperAliasTable.Col(schema.ItemTableIDColName).Desc(),
 		}, []interface{}{}
 	case OrderByName:
 		return []exp.OrderedExpression{
@@ -3703,6 +3704,7 @@ func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.Ordered
 	case OrderByCreatedAt:
 		orderByExp = []exp.OrderedExpression{
 			aliasTable.Col(schema.ItemTableCreatedAtColName).Desc(),
+			aliasTable.Col(schema.ItemTableIDColName).Desc(),
 		}
 	case OrderByName:
 		orderByExp = []exp.OrderedExpression{
