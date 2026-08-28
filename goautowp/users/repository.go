@@ -610,10 +610,26 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 
 	oldImageID := user.Img
 
+	// Anonymise the row, don't just flag it deleted: the account's public contributions
+	// (comments, pictures, catalogue edits) stay, but nothing left on this row identifies who
+	// made them. Keycloak holds the authoritative credentials and is deleted above; name and
+	// timezone are NOT NULL so they are reset rather than nulled.
 	_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
-		schema.UserTableDeletedColName: true,
-		schema.UserTableUUIDColName:    nil,
-		schema.UserTableImgColName:     nil,
+		schema.UserTableDeletedColName:        true,
+		schema.UserTableUUIDColName:           nil,
+		schema.UserTableImgColName:            nil,
+		schema.UserTableEmailColName:          nil,
+		schema.UserTableEmailToCheckColName:   nil,
+		schema.UserTableEmailCheckCodeColName: nil,
+		schema.UserTablePasswordColName:       nil,
+		schema.UserTableLoginColName:          nil,
+		schema.UserTableIdentityColName:       nil,
+		schema.UserTableLastIPColName:         nil,
+		schema.UserTableNameColName:           "",
+		schema.UserTableTimezoneColName:       "UTC",
+		schema.UserTableURLColName:            "",
+		schema.UserTableOwnCarColName:         "",
+		schema.UserTableDreamCarColName:       "",
 	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
 	if err != nil {
 		return false, err
@@ -648,6 +664,16 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 	_, err = s.db.Delete(schema.UserItemSubscribeTable).
 		Where(schema.UserItemSubscribeTableUserIDCol.Eq(userID)).
 		Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	// De-identify messages this user sent: the recipient keeps the conversation, but a NULL
+	// from_user_id reads as a system message (see messaging.Repository) rather than naming the
+	// gone account.
+	_, err = s.db.Update(schema.PersonalMessageTable).Set(goqu.Record{
+		schema.PersonalMessageTableFromUserIDColName: nil,
+	}).Where(schema.PersonalMessageTableFromUserIDCol.Eq(userID)).Executor().ExecContext(ctx)
 	if err != nil {
 		return false, err
 	}

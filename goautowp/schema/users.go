@@ -39,6 +39,9 @@ const (
 	UserTablePicturesAddedColName     = "pictures_added"
 	UserTableImgColName               = "img"
 	UserTableGreenColName             = "green"
+	UserTableURLColName               = "url"
+	UserTableOwnCarColName            = "own_car"
+	UserTableDreamCarColName          = "dream_car"
 )
 
 var ( //nolint: dupl
