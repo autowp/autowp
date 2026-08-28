@@ -1796,7 +1796,7 @@ func TestGetBrands(t *testing.T) {
 			})
 
 			// setup text
-			_, err = client.UpdateItemLanguage(
+			_, err := client.UpdateItemLanguage(
 				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 				&ItemLanguage{
 					ItemId:   brandID,

@@ -1720,7 +1720,7 @@ func TestGetPicturesOrders(t *testing.T) {
 				},
 			}
 
-			_, err = client.GetPictures(
+			_, err := client.GetPictures(
 				metadata.AppendToOutgoingContext(
 					ctx,
 					authorizationHeader,

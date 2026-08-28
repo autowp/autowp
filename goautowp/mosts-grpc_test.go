@@ -780,10 +780,12 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 	}
 
 	for _, tt := range tests {
+		// random is a shared *rand.Rand (not safe for concurrent use); draw the value on the
+		// parent goroutine before the parallel subtest starts.
+		randomInt := random.Int()
+
 		t.Run(tt.ratingCatname, func(t *testing.T) {
 			t.Parallel()
-
-			randomInt := random.Int()
 
 			brandID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
 				Name:       fmt.Sprintf("brand-%d", randomInt),
@@ -809,7 +811,7 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 				EndYear:    1950,
 			})
 
-			_, err = itemsClient.CreateItemParent(
+			_, err := itemsClient.CreateItemParent(
 				metadata.AppendToOutgoingContext(
 					ctx,
 					authorizationHeader,
