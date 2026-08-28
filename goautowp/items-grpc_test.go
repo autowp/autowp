@@ -701,7 +701,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 				SpecId:         testCase.ParentSpecID,
 			})
 
-			_, err = client.CreateItemParent(
+			_, err := client.CreateItemParent(
 				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 				&ItemParent{
 					ItemId: itemID, ParentId: parentID, Catname: "child-item", Type: ItemParentType_ITEM_TYPE_DEFAULT,
@@ -2026,7 +2026,7 @@ func TestBrandSections2(t *testing.T) {
 			})
 
 			// setup text
-			_, err = client.UpdateItemLanguage(
+			_, err := client.UpdateItemLanguage(
 				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
 				&ItemLanguage{
 					ItemId:   childID,
