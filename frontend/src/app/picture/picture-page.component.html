@@ -6,9 +6,9 @@
   </ol>
 </nav>
 
-@if (canonicalResource.error() ?? pictureResource.error(); as error) {
+@if (pictureResource.error(); as error) {
   <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
-} @else if (canonicalResource.isLoading() || pictureResource.isLoading()) {
+} @else if (pictureResource.isLoading()) {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 } @else if (pictureResource.value(); as picture) {
   <div>
