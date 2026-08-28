@@ -31,9 +31,28 @@
       }
     </div>
     <div class="content">
-      @if ((canRemoveComments() || !row.message.deleted) && row.message.text) {
+      @if (row.message.showEdit) {
+        <form class="comment-edit mb-2" (submit)="saveEdit(row.message)">
+          <textarea
+            name="editText"
+            rows="4"
+            maxlength="16000"
+            class="form-control"
+            [(ngModel)]="row.message.editText"
+          ></textarea>
+          <div class="mt-1">
+            <button type="submit" class="btn btn-sm btn-primary" i18n>Save</button>
+            <button type="button" class="btn btn-sm btn-secondary ms-1" (click)="cancelEdit(row.message)">
+              <ng-container i18n>Cancel</ng-container>
+            </button>
+          </div>
+        </form>
+      } @else if ((canRemoveComments() || !row.message.deleted) && row.message.text) {
         <div class="text">
           <app-user-text [text]="row.message.text" />
+          @if (row.updatedDate; as updatedDate) {
+            <span class="text-muted small ms-1" i18n [ngbTooltip]="updatedDate | date: 'medium'">(edited)</span>
+          }
         </div>
       }
       @if (canRemoveComments() || row.message.deleted) {
@@ -83,6 +102,20 @@
           <button type="button" class="btn btn-sm btn-success resolve" (click)="reply(row.message, true)">
             <i class="bi bi-reply me-1" aria-hidden="true"></i>
             <ng-container i18n>reply & resolve</ng-container>
+          </button>
+        }
+        @if (row.canManageOwn && !row.message.showEdit) {
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="startEdit(row.message)">
+            <i class="bi bi-pencil me-1" aria-hidden="true"></i>
+            <span class="d-none d-md-inline" i18n>Edit</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm float-end"
+            (click)="setIsDeleted(row.message, true)"
+          >
+            <i class="bi bi-trash me-1" aria-hidden="true"></i>
+            <span class="d-none d-md-inline" i18n>Delete</span>
           </button>
         }
         @if (canRemoveComments()) {

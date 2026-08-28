@@ -15257,6 +15257,18 @@ Questions about this Policy or your personal data: [autowp@gmail.com](mailto:aut
         <source>Blocked until</source>
       <target state="translated">Блокировка до</target>
       </trans-unit>
+      <trans-unit id="5606146754353538813" datatype="html">
+        <source>Don&apos;t inherit engine</source>
+      <target state="translated">Не наследовать двигатель</target>
+      </trans-unit>
+      <trans-unit id="6793590364065695387" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="{{ resolution }}"/> (aspect is about <x id="INTERPOLATION_1" equiv-text="{{ aspect }}"/>) </source>
+      <target state="translated"> <x id="INTERPOLATION" equiv-text="{{ resolution }}"/> (соотношение сторон около <x id="INTERPOLATION_1" equiv-text="{{ aspect }}"/>) </target>
+      </trans-unit>
+      <trans-unit id="3981371971991105705" datatype="html">
+        <source>(edited)</source>
+      <target state="translated">(изменено)</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

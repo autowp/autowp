@@ -264,12 +264,18 @@ func extractMessage(
 		ip = row.IP.IPNet.IP.String()
 	}
 
+	var updateTime *timestamppb.Timestamp
+	if row.UpdatedAt.Valid {
+		updateTime = timestamppb.New(row.UpdatedAt.Time)
+	}
+
 	return &CommentMessage{
 		Id:                 row.ID,
 		TypeId:             typeID,
 		ItemId:             row.ItemID,
 		ParentId:           parentID,
 		CreateTime:         timestamppb.New(row.CreatedAt),
+		UpdateTime:         updateTime,
 		Deleted:            row.Deleted,
 		ModeratorAttention: ma,
 		IsNew:              isNew,
@@ -441,21 +447,90 @@ func (s *CommentsGRPCServer) SetDeleted(
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	if !util.Contains(userCtx.Roles, users.RoleCommentsModer) {
-		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
-	}
+	isModer := util.Contains(userCtx.Roles, users.RoleCommentsModer)
 
 	if in.GetDeleted() {
-		err = s.repository.QueueDeleteMessage(ctx, in.GetCommentId(), userCtx.UserID, in.GetReason())
+		// An author may delete their own comment; only a moderator can delete anyone's (with a
+		// reason and a notification - see QueueDeleteMessage).
+		if isModer {
+			err = s.repository.QueueDeleteMessage(ctx, in.GetCommentId(), userCtx.UserID, in.GetReason())
+		} else {
+			err = s.repository.DeleteMessageByAuthor(ctx, in.GetCommentId(), userCtx.UserID)
+		}
 	} else {
+		if !isModer {
+			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
+		}
+
 		err = s.repository.RestoreMessage(ctx, in.GetCommentId())
 	}
 
 	if err != nil {
-		return &emptypb.Empty{}, status.Error(codes.Internal, err.Error())
+		return &emptypb.Empty{}, commentWriteError(err)
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func (s *CommentsGRPCServer) UpdateComment(
+	ctx context.Context,
+	in *UpdateCommentRequest,
+) (*emptypb.Empty, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if userCtx.UserID == 0 {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
+	comment := in.GetComment()
+	if comment.GetId() == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "id is zero")
+	}
+
+	if !util.Contains(in.GetUpdateMask().GetPaths(), "text") {
+		return &emptypb.Empty{}, nil
+	}
+
+	message, problems, err := commentMessageInputFilter.IsValidString(comment.GetText())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(problems) > 0 {
+		fvs := make([]*errdetails.BadRequest_FieldViolation, 0, len(problems))
+		for _, problem := range problems {
+			fvs = append(fvs, &errdetails.BadRequest_FieldViolation{
+				Field:       commentMessageField,
+				Description: problem,
+			})
+		}
+
+		return nil, wrapFieldViolations(fvs)
+	}
+
+	if err = s.repository.UpdateMessage(ctx, comment.GetId(), userCtx.UserID, message); err != nil {
+		return nil, commentWriteError(err)
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func commentWriteError(err error) error {
+	switch {
+	case err == nil:
+		return nil
+	case errors.Is(err, comments.ErrMessageNotFound):
+		return status.Error(codes.NotFound, err.Error())
+	case errors.Is(err, comments.ErrNotMessageAuthor):
+		return status.Error(codes.PermissionDenied, err.Error())
+	case errors.Is(err, comments.ErrMessageLocked), errors.Is(err, comments.ErrMessageIsDeleted):
+		return status.Error(codes.FailedPrecondition, err.Error())
+	default:
+		return status.Error(codes.Internal, err.Error())
+	}
 }
 
 func (s *CommentsGRPCServer) MoveComment(
@@ -536,6 +611,16 @@ func (s *CommentsGRPCServer) VoteComment(
 	}, nil
 }
 
+// commentMessageInputFilter trims and length-checks a comment body. Shared by Add and
+// UpdateComment so both enforce the same rules.
+var commentMessageInputFilter = validation.InputFilter{
+	Filters: []validation.FilterInterface{&validation.StringTrimFilter{}},
+	Validators: []validation.ValidatorInterface{
+		&validation.NotEmpty{},
+		&validation.StringLength{Min: 0, Max: comments.MaxMessageLength},
+	},
+}
+
 func (s *AddCommentRequest) Validate(
 	ctx context.Context,
 	repository *comments.Repository,
@@ -547,15 +632,7 @@ func (s *AddCommentRequest) Validate(
 		err      error
 	)
 
-	msgInputFilter := validation.InputFilter{
-		Filters: []validation.FilterInterface{&validation.StringTrimFilter{}},
-		Validators: []validation.ValidatorInterface{
-			&validation.NotEmpty{},
-			&validation.StringLength{Min: 0, Max: comments.MaxMessageLength},
-		},
-	}
-
-	s.Message, problems, err = msgInputFilter.IsValidString(s.GetMessage())
+	s.Message, problems, err = commentMessageInputFilter.IsValidString(s.GetMessage())
 	if err != nil {
 		return nil, err
 	}

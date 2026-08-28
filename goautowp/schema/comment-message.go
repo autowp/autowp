@@ -38,6 +38,7 @@ const (
 	CommentMessageTableRepliesCountColName       = "replies_count"
 	CommentMessageTableVoteColName               = "vote"
 	CommentMessageTableDatetimeColName           = "datetime"
+	CommentMessageTableUpdatedAtColName          = "updated_at"
 	CommentMessageTableMessageColName            = "message"
 	CommentMessageTableIPColName                 = "ip"
 )
@@ -48,6 +49,7 @@ type CommentMessageRow struct {
 	ItemID             int64                            `db:"item_id"`
 	ParentID           sql.NullInt64                    `db:"parent_id"`
 	CreatedAt          time.Time                        `db:"datetime"`
+	UpdatedAt          sql.NullTime                     `db:"updated_at"`
 	Deleted            bool                             `db:"deleted"`
 	ModeratorAttention CommentMessageModeratorAttention `db:"moderator_attention"`
 	AuthorID           sql.NullInt64                    `db:"author_id"`
@@ -68,16 +70,18 @@ var (
 	CommentMessageTableAuthorIDCol = CommentMessageTable.Col(
 		CommentMessageTableAuthorIDColName,
 	)
-	CommentMessageTableDatetimeCol = CommentMessageTable.Col(CommentMessageTableDatetimeColName)
-	CommentMessageTableVoteCol     = CommentMessageTable.Col(
+	CommentMessageTableDatetimeCol  = CommentMessageTable.Col(CommentMessageTableDatetimeColName)
+	CommentMessageTableUpdatedAtCol = CommentMessageTable.Col(CommentMessageTableUpdatedAtColName)
+	CommentMessageTableVoteCol      = CommentMessageTable.Col(
 		CommentMessageTableVoteColName,
 	)
 	CommentMessageTableParentIDCol = CommentMessageTable.Col(
 		CommentMessageTableParentIDColName,
 	)
-	CommentMessageTableMessageCol = CommentMessageTable.Col(CommentMessageTableMessageColName)
-	CommentMessageTableIPCol      = CommentMessageTable.Col(CommentMessageTableIPColName)
-	CommentMessageTableDeletedCol = CommentMessageTable.Col(
+	CommentMessageTableMessageCol      = CommentMessageTable.Col(CommentMessageTableMessageColName)
+	CommentMessageTableIPCol           = CommentMessageTable.Col(CommentMessageTableIPColName)
+	CommentMessageTableRepliesCountCol = CommentMessageTable.Col(CommentMessageTableRepliesCountColName)
+	CommentMessageTableDeletedCol      = CommentMessageTable.Col(
 		CommentMessageTableDeletedColName,
 	)
 	CommentMessageTableModeratorAttentionCol = CommentMessageTable.Col(

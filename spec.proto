@@ -232,6 +232,7 @@ service Comments {
   rpc UnSubscribe(CommentsUnSubscribeRequest) returns (google.protobuf.Empty) {}
   rpc View(CommentsViewRequest) returns (google.protobuf.Empty) {}
   rpc SetDeleted(CommentsSetDeletedRequest) returns (google.protobuf.Empty) {}
+  rpc UpdateComment(UpdateCommentRequest) returns (google.protobuf.Empty) {}
   rpc MoveComment(CommentsMoveCommentRequest) returns (google.protobuf.Empty) {}
   rpc VoteComment(CommentsVoteCommentRequest) returns (CommentsVoteCommentResponse) {}
   rpc Add(AddCommentRequest) returns (AddCommentResponse) {}
@@ -2725,6 +2726,14 @@ message CommentMessage {
   int32 userVote = 15;
   repeated CommentMessage replies = 16;
   PictureStatus picture_status = 17;
+  // Set once the author edits after the silent grace period; absent otherwise.
+  google.protobuf.Timestamp update_time = 18;
+}
+
+message UpdateCommentRequest {
+  CommentMessage comment = 1;
+
+  google.protobuf.FieldMask update_mask = 2;
 }
 
 message AddCommentResponse {

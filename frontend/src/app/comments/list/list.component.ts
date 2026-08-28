@@ -1,5 +1,5 @@
 import type {OnInit, ResourceRef} from '@angular/core';
-import type {CommentMessage, CommentsType, User} from '@grpc/spec.pb';
+import type {CommentsType, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {DatePipe} from '@angular/common';
@@ -14,16 +14,20 @@ import {
   output,
 } from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {
+  CommentMessage,
   CommentMessageFields,
   CommentsSetDeletedRequest,
   CommentsVoteCommentRequest,
   GetMessageRequest,
   ModeratorAttention,
+  UpdateCommentRequest,
 } from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
 import {getModalComponentRef} from '@utils/modal-component-ref';
@@ -38,13 +42,24 @@ import {CommentsFormComponent} from '../form/form.component';
 import {CommentsVotesComponent} from '../votes/votes.component';
 
 export interface CommentInList extends CommentMessage {
+  editText?: string;
   resolve?: boolean;
+  showEdit?: boolean;
   showReply?: boolean;
 }
 
 @Component({
   selector: 'app-comments-list',
-  imports: [NgbTooltip, UserComponent, RouterLink, UserTextComponent, CommentsFormComponent, DatePipe, TimeAgoPipe],
+  imports: [
+    NgbTooltip,
+    UserComponent,
+    RouterLink,
+    UserTextComponent,
+    CommentsFormComponent,
+    DatePipe,
+    TimeAgoPipe,
+    FormsModule,
+  ],
   templateUrl: './list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -110,6 +125,12 @@ export class CommentsListComponent implements OnInit {
     const currentUser = this.currentUser();
 
     return this.messages().map((message) => ({
+      // Author acting on their own comment: edit and delete, but not once it is deleted or a
+      // moderator has flagged it (the backend rejects those too).
+      canManageOwn:
+        currentUser?.id === message.authorId &&
+        !message.deleted &&
+        message.moderatorAttention !== ModeratorAttention.REQUIRED,
       canVote: !!(currentUser && currentUser.id !== message.authorId),
       // Computed here (from seconds/nanos) rather than via message.createTime.toDate() in the
       // template: after this component is recreated from a TransferState-seeded resource on
@@ -117,6 +138,7 @@ export class CommentsListComponent implements OnInit {
       // instance, so createTime has no .toDate() method even though it still has seconds/nanos.
       createdDate: timestampToDate(message.createTime),
       message,
+      updatedDate: timestampToDate(message.updateTime),
       user: usersById[message.authorId] ?? null,
     }));
   });
@@ -184,6 +206,45 @@ export class CommentsListComponent implements OnInit {
   protected reply(message: CommentInList, resolve: boolean) {
     message.showReply = true;
     message.resolve = resolve;
+  }
+
+  protected startEdit(message: CommentInList) {
+    message.editText = message.text;
+    message.showEdit = true;
+  }
+
+  protected cancelEdit(message: CommentInList) {
+    message.showEdit = false;
+  }
+
+  protected saveEdit(message: CommentInList) {
+    this.#commentsGrpc
+      .updateComment(
+        new UpdateCommentRequest({
+          comment: new CommentMessage({id: message.id, text: (message.editText ?? '').trim()}),
+          updateMask: new FieldMask({paths: ['text']}),
+        }),
+      )
+      .pipe(
+        // Re-fetch so the "edited" marker and text come from the server (the silent grace period
+        // is enforced there - the client can't know whether this edit set update_time).
+        switchMap(() =>
+          this.#commentsGrpc.getMessage(
+            new GetMessageRequest({fields: new CommentMessageFields({text: true}), id: message.id}),
+          ),
+        ),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: (response) => {
+          message.text = response.text;
+          message.updateTime = response.updateTime;
+          message.showEdit = false;
+          this.#cdr.markForCheck();
+        },
+      });
   }
 
   protected showVotes(message: CommentMessage) {

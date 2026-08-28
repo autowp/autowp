@@ -28,6 +28,13 @@ This runs `protoc` with `--go_out`/`--go-grpc_out` into `goautowp/` and `--ng_ou
 `protoc-gen-ng` (from `frontend/node_modules/.bin`) to be on `PATH`. CI runs this before building
 either side, so a proto change without regenerating output will build stale code locally.
 
+### API conventions
+
+- **Update RPCs carry a field mask.** An `UpdateXxxRequest` message is
+  `{ Xxx resource = 1; google.protobuf.FieldMask update_mask = 2; }` (see `UpdateUserRequest`);
+  the handler applies only the fields listed in `update_mask.GetPaths()`. Do not add per-field
+  scalar `UpdateXxxRequest` messages.
+
 ## Backend (goautowp/)
 
 All commands below run from `goautowp/`.

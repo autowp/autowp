@@ -25,8 +25,8 @@ import (
 var (
 	errUnknownTypeID                          = errors.New("unknown type_id")
 	errArticleNotFound                        = errors.New("article not found")
-	errMessageNotFound                        = errors.New("message not found")
-	errMessageIsDeleted                       = errors.New("message is deleted")
+	ErrMessageNotFound                        = errors.New("message not found")
+	ErrMessageIsDeleted                       = errors.New("message is deleted")
 	errAlreadyVoted                           = errors.New("already voted")
 	errInvalidType                            = errors.New("invalid type")
 	errPictureNotFound                        = errors.New("picture not found")
@@ -39,7 +39,13 @@ var (
 	errNoRowsReturned    = errors.New("no rows returned")
 	errPictureRemoved    = errors.New("picture is removed")
 	errForumsTopicClosed = errors.New("forum topic is closed")
+	ErrNotMessageAuthor  = errors.New("not the message author")
+	ErrMessageLocked     = errors.New("message is locked by a moderator")
 )
+
+// commentEditGracePeriod is how long after posting an author can still edit silently. A later
+// edit sets updated_at and the "edited" marker shows.
+const commentEditGracePeriod = 5 * time.Minute
 
 const CommentMessagePreviewLength = 60
 
@@ -285,6 +291,129 @@ func (s *Repository) RestoreMessage(ctx context.Context, commentID int64) error 
 	return err
 }
 
+// UpdateMessage lets the author rewrite their own comment. Fails if the caller isn't the author,
+// the comment is deleted, or a moderator has flagged it. Edits within commentEditGracePeriod of
+// posting stay silent; later ones set updated_at, which drives the "edited" marker.
+func (s *Repository) UpdateMessage(ctx context.Context, commentID int64, byUserID int64, message string) error {
+	var row struct {
+		AuthorID           sql.NullInt64                           `db:"author_id"`
+		Deleted            bool                                    `db:"deleted"`
+		ModeratorAttention schema.CommentMessageModeratorAttention `db:"moderator_attention"`
+		CreatedAt          time.Time                               `db:"datetime"`
+	}
+
+	found, err := s.db.Select(
+		schema.CommentMessageTableAuthorIDCol,
+		schema.CommentMessageTableDeletedCol,
+		schema.CommentMessageTableModeratorAttentionCol,
+		schema.CommentMessageTableDatetimeCol,
+	).
+		From(schema.CommentMessageTable).
+		Where(schema.CommentMessageTableIDCol.Eq(commentID)).
+		ScanStructContext(ctx, &row)
+	if err != nil {
+		return err
+	}
+
+	if !found {
+		return ErrMessageNotFound
+	}
+
+	if !row.AuthorID.Valid || row.AuthorID.Int64 != byUserID {
+		return ErrNotMessageAuthor
+	}
+
+	if row.Deleted {
+		return ErrMessageIsDeleted
+	}
+
+	if row.ModeratorAttention == schema.CommentMessageModeratorAttentionRequired {
+		return ErrMessageLocked
+	}
+
+	set := goqu.Record{schema.CommentMessageTableMessageColName: message}
+	if time.Since(row.CreatedAt) > commentEditGracePeriod {
+		set[schema.CommentMessageTableUpdatedAtColName] = goqu.Func("NOW")
+	}
+
+	ctx = context.WithoutCancel(ctx)
+
+	_, err = s.db.Update(schema.CommentMessageTable).
+		Set(set).
+		Where(schema.CommentMessageTableIDCol.Eq(commentID)).
+		Executor().ExecContext(ctx)
+
+	return err
+}
+
+// DeleteMessageByAuthor removes the author's own comment: a hard delete when nothing hangs off
+// it, a tombstone (deleted flag, no reason, no PM) when it has replies so the thread stays
+// readable. Idempotent if already deleted.
+func (s *Repository) DeleteMessageByAuthor(ctx context.Context, commentID int64, byUserID int64) error {
+	var row struct {
+		AuthorID           sql.NullInt64                           `db:"author_id"`
+		Deleted            bool                                    `db:"deleted"`
+		ModeratorAttention schema.CommentMessageModeratorAttention `db:"moderator_attention"`
+		RepliesCount       int32                                   `db:"replies_count"`
+		ParentID           sql.NullInt64                           `db:"parent_id"`
+	}
+
+	found, err := s.db.Select(
+		schema.CommentMessageTableAuthorIDCol,
+		schema.CommentMessageTableDeletedCol,
+		schema.CommentMessageTableModeratorAttentionCol,
+		schema.CommentMessageTableRepliesCountCol,
+		schema.CommentMessageTableParentIDCol,
+	).
+		From(schema.CommentMessageTable).
+		Where(schema.CommentMessageTableIDCol.Eq(commentID)).
+		ScanStructContext(ctx, &row)
+	if err != nil {
+		return err
+	}
+
+	if !found {
+		return ErrMessageNotFound
+	}
+
+	if !row.AuthorID.Valid || row.AuthorID.Int64 != byUserID {
+		return ErrNotMessageAuthor
+	}
+
+	if row.Deleted {
+		return nil
+	}
+
+	if row.ModeratorAttention == schema.CommentMessageModeratorAttentionRequired {
+		return ErrMessageLocked
+	}
+
+	ctx = context.WithoutCancel(ctx)
+
+	if row.RepliesCount > 0 {
+		_, err = s.db.Update(schema.CommentMessageTable).
+			Set(goqu.Record{
+				schema.CommentMessageTableDeletedColName:    true,
+				schema.CommentMessageTableDeletedByColName:  byUserID,
+				schema.CommentMessageTableDeleteDateColName: goqu.Func("NOW"),
+			}).
+			Where(schema.CommentMessageTableIDCol.Eq(commentID)).
+			Executor().ExecContext(ctx)
+
+		return err
+	}
+
+	if _, err = s.deleteMessage(ctx, commentID); err != nil {
+		return err
+	}
+
+	if row.ParentID.Valid {
+		return s.UpdateMessageRepliesCount(ctx, row.ParentID.Int64)
+	}
+
+	return nil
+}
+
 func (s *Repository) GetCommentType(
 	ctx context.Context,
 	commentID int64,
@@ -478,11 +607,11 @@ func (s *Repository) Add(
 		}
 
 		if !success {
-			return 0, errMessageNotFound
+			return 0, ErrMessageNotFound
 		}
 
 		if deleted {
-			return 0, errMessageIsDeleted
+			return 0, ErrMessageIsDeleted
 		}
 	}
 
@@ -1341,7 +1470,7 @@ func (s *Repository) MessagePage(
 	}
 
 	if !success {
-		return 0, 0, 0, errMessageNotFound
+		return 0, 0, 0, ErrMessageNotFound
 	}
 
 	parentRow := struct {
@@ -2049,7 +2178,8 @@ func (s *Repository) columns(fetchMessage bool, fetchVote bool, fetchIP bool) []
 	columns := []interface{}{
 		schema.CommentMessageTableIDCol, schema.CommentMessageTableTypeIDCol,
 		schema.CommentMessageTableItemIDCol, schema.CommentMessageTableParentIDCol,
-		schema.CommentMessageTableDatetimeCol, schema.CommentMessageTableDeletedCol,
+		schema.CommentMessageTableDatetimeCol, schema.CommentMessageTableUpdatedAtCol,
+		schema.CommentMessageTableDeletedCol,
 		schema.CommentMessageTableModeratorAttentionCol, schema.CommentMessageTableAuthorIDCol,
 	}
 
