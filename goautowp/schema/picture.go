@@ -61,6 +61,8 @@ var (
 	PictureTableAcceptDatetimeCol     = PictureTable.Col(PictureTableAcceptDatetimeColName)
 	PictureTableContentCountCol       = PictureTable.Col(PictureTableContentCountColName)
 	PictureTableRemovingDateCol       = PictureTable.Col(PictureTableRemovingDateColName)
+	PictureTableIPCol                 = PictureTable.Col(PictureTableIPColName)
+	PictureTableCreatedAtCol          = PictureTable.Col(PictureTableCreatedAtColName)
 )
 
 type PictureRow struct {

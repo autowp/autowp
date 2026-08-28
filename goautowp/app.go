@@ -456,6 +456,13 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
+	anonymizedIPs, err := usersRep.AnonymizeOldContentIPs(ctx)
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof("Content IPs anonymized: %d", anonymizedIPs)
+
 	messRepo, err := s.container.MessagingRepository(ctx)
 	if err != nil {
 		return err

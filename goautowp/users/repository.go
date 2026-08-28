@@ -678,6 +678,33 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 		return false, err
 	}
 
+	// Drop the poster's IP from everything this user contributed. The content stays; only the
+	// address recorded for moderation goes. AnonymizeOldContentIPs clears these on a 6-month
+	// timer anyway (see SchedulerDaily); this just does it immediately for a deleted account.
+	_, err = s.db.Update(schema.CommentMessageTable).
+		Set(goqu.Record{schema.CommentMessageTableIPColName: nil}).
+		Where(schema.CommentMessageTableAuthorIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = s.db.Update(schema.PictureTable).
+		Set(goqu.Record{schema.PictureTableIPColName: nil}).
+		Where(schema.PictureTableOwnerIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = s.db.Update(schema.ForumsTopicsTable).
+		Set(goqu.Record{schema.ForumsTopicsTableAuthorIPColName: nil}).
+		Where(schema.ForumsTopicsTableAuthorIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
 	return true, nil
 }
 
@@ -1206,6 +1233,50 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// ipRetentionMonths is how long a poster's IP address is kept on their contributions before
+// AnonymizeOldContentIPs clears it. It is a moderation aid (ban-evasion, sock-puppets) whose
+// value decays within weeks, so the privacy policy commits to at most six months.
+const ipRetentionMonths = 6
+
+// AnonymizeOldContentIPs nulls the IP address recorded against comments, pictures and forum
+// topics older than ipRetentionMonths. Run daily from SchedulerDaily; returns the number of
+// rows changed across all three tables.
+func (s *Repository) AnonymizeOldContentIPs(ctx context.Context) (int64, error) {
+	cutoff := goqu.L("NOW() - make_interval(months => ?)", ipRetentionMonths)
+
+	commentsAffected, err := execRowsAffected(ctx, s.db.Update(schema.CommentMessageTable).
+		Set(goqu.Record{schema.CommentMessageTableIPColName: nil}).
+		Where(schema.CommentMessageTableIPCol.IsNotNull(), schema.CommentMessageTableDatetimeCol.Lt(cutoff)))
+	if err != nil {
+		return 0, err
+	}
+
+	picturesAffected, err := execRowsAffected(ctx, s.db.Update(schema.PictureTable).
+		Set(goqu.Record{schema.PictureTableIPColName: nil}).
+		Where(schema.PictureTableIPCol.IsNotNull(), schema.PictureTableCreatedAtCol.Lt(cutoff)))
+	if err != nil {
+		return 0, err
+	}
+
+	topicsAffected, err := execRowsAffected(ctx, s.db.Update(schema.ForumsTopicsTable).
+		Set(goqu.Record{schema.ForumsTopicsTableAuthorIPColName: nil}).
+		Where(schema.ForumsTopicsTableAuthorIPCol.IsNotNull(), schema.ForumsTopicsTableCreatedAtCol.Lt(cutoff)))
+	if err != nil {
+		return 0, err
+	}
+
+	return commentsAffected + picturesAffected + topicsAffected, nil
+}
+
+func execRowsAffected(ctx context.Context, upd *goqu.UpdateDataset) (int64, error) {
+	res, err := upd.Executor().ExecContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
 }
 
 func (s *Repository) IncrementUploads(ctx context.Context, id int64) error {
