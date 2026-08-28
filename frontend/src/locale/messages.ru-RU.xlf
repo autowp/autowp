@@ -15071,6 +15071,188 @@ This process is irreversible, so think it over carefully and don&apos;t make a h
         </context-group>
       <target state="translated">Принять все</target>
       </trans-unit>
+      <trans-unit id="6110636050047560496" datatype="html">
+        <source>*Last updated: 28 August 2026*
+
+This Privacy Policy explains how the websites **wheelsage.org** and **autowp.ru** (together, the &quot;Site&quot;) collect, use, and share information about you. It is written to meet the requirements of the EU General Data Protection Regulation (GDPR) and, for visitors in Russia, Federal Law No. 152-FZ &quot;On Personal Data&quot;.
+
+The Site is a community car catalogue and encyclopaedia operated by the Site&apos;s administration (&quot;we&quot;, &quot;us&quot;). For any question about this Policy or your personal data, contact us at [autowp@yandex.ru](mailto:autowp@yandex.ru).
+
+## Our approach
+
+We collect as little as we can. We do not show advertising, we do not use third-party tracking or profiling, and we never sell your data. Analytics stays off until you turn it on. We do not ask for your real name. Running an account-based site still involves some personal data — an email address, an IP address in our logs, and whatever you choose to post — and the rest of this Policy explains exactly what, and why.
+
+## What we collect
+
+Information you provide:
+
+* **Account data** — when you register, your username, email address, and password are handled by our authentication system (Keycloak). Your profile may also hold a display name, avatar, preferred language, and time zone.
+* **Content you submit** — comments, forum posts, private messages, catalogue and specification edits, votes, and pictures you upload. A picture may carry metadata added by your camera, such as the date and the GPS coordinates where it was taken; that metadata is stored and may be shown publicly together with the picture. Uploaded images are stored on our own servers (on the `s3.wheelsage.org` subdomain), not with a third-party cloud service.
+* **Correspondence** — messages you send us through the feedback form, by email, or via the Telegram bot.
+
+Information collected automatically:
+
+* **Technical data** — your IP address, browser type and version, the page that referred you, and the pages you request, recorded in server logs.
+* **Cookies and local storage** — see the &quot;Cookies&quot; section below.
+
+We do not ask for, and do not knowingly collect, special categories of data (such as health, political views, or religious beliefs).
+
+## Why we use it, and our legal basis
+
+We use your information to:
+
+* **operate your account and provide the Site to you** — necessary to perform our agreement with you;
+* **publish the content you choose to submit** — on the basis of your submission and that agreement;
+* **keep the Site secure** — detect and prevent spam, abuse, and unauthorised access, apply rate limits, and automatically block abusive clients — on the basis of our legitimate interest in protecting the Site and its users;
+* **send you service messages and the notifications you subscribed to** — to perform our agreement with you, or on the basis of our legitimate interests;
+* **measure how the Site is used**, through analytics cookies — only on the basis of your consent;
+* **comply with the law** and respond to lawful requests — where we are under a legal obligation.
+
+For visitors in Russia: we process the personal data you enter into forms on the Site on the basis of the consent you give by submitting those forms, and you may withdraw that consent at any time (see the &quot;Your rights&quot; section below). Anonymised usage statistics are collected only if your browser allows cookies and JavaScript.
+
+## Who we share it with
+
+Your content — including your username and anything you post or upload — is **public**: it is visible to every visitor and can be indexed by search engines. Please think carefully before posting anything you would not want to be public.
+
+We also rely on a small number of service providers that process data on our behalf, under contract and only on our instructions:
+
+* **hosting and network providers** whose data centres and connectivity our servers depend on;
+* **email delivery** for account and notification messages;
+* **Google Analytics** (Google LLC) — only if you accept analytics cookies; Google receives your shortened IP address and usage events;
+* **Telegram** — only if you choose to use our Telegram bot.
+
+We do not sell your personal data. We disclose it to public authorities only where we are legally required to do so.
+
+## International transfers
+
+The Site is operated from, and your data is processed in, Russia and the European Union, and by the providers listed above, some of which are located in other countries, including the United States (Google). Where we transfer personal data out of the European Economic Area, we rely on an adequacy decision or on the European Commission&apos;s Standard Contractual Clauses. Because your content is public, it is by its nature accessible worldwide.
+
+## How long we keep it
+
+We keep personal data for as long as your account exists and for as long as it is needed for the purposes described above; after that, we keep it only as long as required to meet legal obligations, resolve disputes, and enforce our agreements. Server logs and security-related data are kept for a limited period and then deleted or anonymised. When you delete your account we delete or anonymise your personal data, except where the law requires us to keep it; contributions you made to the catalogue may remain, dissociated from your account.
+
+## Your rights
+
+Under the GDPR you have the right to access your data, have it corrected or erased, restrict or object to its processing, receive it in a portable format, and withdraw consent at any time without affecting processing already carried out. You also have the right to lodge a complaint with the data protection supervisory authority in your country.
+
+Under Federal Law No. 152-FZ you may obtain information about how your data is processed and request that it be corrected, blocked, or destroyed if it is incomplete, outdated, inaccurate, unlawfully obtained, or no longer needed for the purpose of processing.
+
+To exercise any of these rights, email us at [autowp@yandex.ru](mailto:autowp@yandex.ru). You can edit your profile at any time, and you can delete your account from the [account deletion page](/account/delete). To withdraw consent to the processing of your personal data under 152-FZ, email us with the subject line &quot;Withdrawal of consent to personal data processing&quot;.
+
+## Cookies
+
+We use:
+
+* **Strictly necessary cookies** — set by our authentication system when you sign in, to keep you signed in. The Site cannot work without them, so they are not subject to consent.
+* **Small values in your browser&apos;s local storage** — such as your cookie choice (`cookie-consent`) and interface preferences. These stay on your device and are not sent to us.
+* **Analytics cookies** — set only after you accept them: Google Analytics `_ga` (expires after about two years) and `_gid` (expires after 24 hours), which help us understand how the Site is used. We have enabled IP anonymisation.
+
+You can change or withdraw your choice at any time through the **&quot;Cookie settings&quot;** link in the Site footer, and you can block or delete cookies in your browser settings.
+
+## Children
+
+The Site is not directed to children under the age of 16, or the lower age of digital consent set by your country, and we do not knowingly collect their personal data. If you believe a child has given us personal data, contact us and we will delete it.
+
+## Changes to this Policy
+
+We may update this Policy from time to time. The current version is always available at wheelsage.org/policy and autowp.ru/policy, with the date of the last change shown at the top. If a change is significant, we will make reasonable efforts to bring it to your attention.
+
+## Contact
+
+Questions about this Policy or your personal data: [autowp@yandex.ru](mailto:autowp@yandex.ru).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/policy/policy.component.ts</context>
+          <context context-type="linenumber">13,97</context>
+        </context-group>
+      <target state="translated">*Последнее обновление: 28 августа 2026 г.*
+
+Настоящая Политика конфиденциальности описывает, как сайты **wheelsage.org** и **autowp.ru** (далее вместе — «Сайт») собирают, используют и передают информацию о вас. Она составлена с учётом требований Общего регламента ЕС по защите данных (GDPR), а для посетителей из России — Федерального закона № 152-ФЗ «О персональных данных».
+
+Сайт — это общественный каталог и энциклопедия автомобилей, управляемые администрацией Сайта (далее — «мы»). По любым вопросам об этой Политике или о ваших персональных данных пишите нам на [autowp@yandex.ru](mailto:autowp@yandex.ru).
+
+## Наш подход
+
+Мы собираем как можно меньше. Мы не показываем рекламу, не используем сторонний трекинг и профилирование и никогда не продаём ваши данные. Аналитика остаётся выключенной, пока вы её не включите. Мы не спрашиваем ваше настоящее имя. Тем не менее сайт с учётными записями всё равно связан с обработкой некоторых персональных данных — адреса электронной почты, IP-адреса в наших журналах и всего, что вы решите опубликовать, — и остальная часть этой Политики объясняет, что именно и зачем.
+
+## Какие данные мы собираем
+
+Данные, которые вы предоставляете:
+
+* **Данные учётной записи** — при регистрации ваше имя пользователя, адрес электронной почты и пароль обрабатываются нашей системой аутентификации (Keycloak). В профиле также могут храниться отображаемое имя, аватар, предпочитаемый язык и часовой пояс.
+* **Контент, который вы размещаете** — комментарии, сообщения на форуме, личные сообщения, правки каталога и характеристик, голоса и загружаемые вами изображения. Изображение может содержать метаданные, добавленные камерой, например дату и координаты GPS места съёмки; эти метаданные сохраняются и могут отображаться публично вместе с изображением. Загружаемые изображения хранятся на наших собственных серверах (на субдомене `s3.wheelsage.org`), а не в стороннем облачном сервисе.
+* **Переписка** — сообщения, которые вы направляете нам через форму обратной связи, по электронной почте или через бота Telegram.
+
+Данные, собираемые автоматически:
+
+* **Технические данные** — ваш IP-адрес, тип и версия браузера, страница-источник перехода и запрашиваемые вами страницы, фиксируемые в журналах сервера.
+* **Файлы cookie и локальное хранилище** — см. раздел «Файлы cookie» ниже.
+
+Мы не запрашиваем и сознательно не собираем специальные категории данных (например, о здоровье, политических взглядах или религиозных убеждениях).
+
+## Для чего мы используем данные и на каком правовом основании
+
+Мы используем вашу информацию, чтобы:
+
+* **вести вашу учётную запись и предоставлять вам Сайт** — это необходимо для исполнения соглашения с вами;
+* **публиковать контент, который вы решили разместить** — на основании факта его отправки вами и указанного соглашения;
+* **обеспечивать безопасность Сайта** — выявлять и предотвращать спам, злоупотребления и несанкционированный доступ, применять ограничения частоты запросов и автоматически блокировать недобросовестных клиентов — на основании нашего законного интереса в защите Сайта и его пользователей;
+* **отправлять вам служебные сообщения и уведомления, на которые вы подписались** — для исполнения соглашения с вами либо на основании наших законных интересов;
+* **оценивать, как используется Сайт**, с помощью аналитических файлов cookie — только на основании вашего согласия;
+* **соблюдать закон** и отвечать на правомерные запросы — когда у нас есть правовая обязанность.
+
+Для посетителей из России: персональные данные, которые вы вводите в формы на Сайте, мы обрабатываем на основании согласия, которое вы даёте, отправляя эти формы; вы можете отозвать это согласие в любой момент (см. раздел «Ваши права» ниже). Обезличенная статистика использования собирается только если ваш браузер разрешает файлы cookie и JavaScript.
+
+## Кому мы передаём данные
+
+Ваш контент — включая имя пользователя и всё, что вы публикуете или загружаете, — является **публичным**: он виден каждому посетителю и может индексироваться поисковыми системами. Пожалуйста, тщательно обдумывайте, прежде чем размещать то, что не хотели бы делать общедоступным.
+
+Мы также привлекаем небольшое число поставщиков услуг, которые обрабатывают данные от нашего имени, по договору и только по нашим указаниям:
+
+* **поставщики хостинга и сети**, от чьих дата-центров и связности зависят наши серверы;
+* **доставка электронной почты** для учётных и уведомительных сообщений;
+* **Google Analytics** (Google LLC) — только если вы принимаете аналитические файлы cookie; Google получает ваш сокращённый IP-адрес и события использования;
+* **Telegram** — только если вы решите воспользоваться нашим ботом Telegram.
+
+Мы не продаём ваши персональные данные. Мы раскрываем их государственным органам только тогда, когда это требуется по закону.
+
+## Трансграничная передача данных
+
+Сайт управляется, а ваши данные обрабатываются, на территории России и Европейского союза, а также у перечисленных выше поставщиков, часть которых находится в других странах, включая США (Google). При передаче персональных данных за пределы Европейской экономической зоны мы опираемся на решение о достаточном уровне защиты либо на Стандартные договорные условия Европейской комиссии. Поскольку ваш контент является публичным, он по своей природе доступен во всём мире.
+
+## Сколько мы храним данные
+
+Мы храним персональные данные, пока существует ваша учётная запись и пока они нужны для описанных выше целей; после этого — только столько, сколько требуется для исполнения правовых обязанностей, разрешения споров и защиты наших соглашений. Журналы сервера и данные, связанные с безопасностью, хранятся ограниченное время, а затем удаляются или обезличиваются. При удалении вами учётной записи мы удаляем или обезличиваем ваши персональные данные, кроме случаев, когда закон обязывает нас их сохранить; сделанный вами вклад в каталог может остаться, отделённый от вашей учётной записи.
+
+## Ваши права
+
+Согласно GDPR вы имеете право на доступ к своим данным, их исправление или удаление, ограничение обработки или возражение против неё, получение данных в переносимом формате, а также на отзыв согласия в любой момент без ущерба для обработки, уже осуществлённой ранее. Вы также вправе подать жалобу в надзорный орган по защите данных в вашей стране.
+
+Согласно Федеральному закону № 152-ФЗ вы можете получить сведения об обработке ваших данных и потребовать их исправления, блокирования или уничтожения, если они неполны, устарели, неточны, получены с нарушением закона или более не нужны для целей обработки.
+
+Чтобы воспользоваться любым из этих прав, напишите нам на [autowp@yandex.ru](mailto:autowp@yandex.ru). Вы можете в любой момент отредактировать свой профиль и удалить учётную запись на [странице удаления учётной записи](/account/delete). Чтобы отозвать согласие на обработку персональных данных по 152-ФЗ, напишите нам письмо с темой «Отзыв согласия на обработку персональных данных».
+
+## Файлы cookie
+
+Мы используем:
+
+* **Строго необходимые файлы cookie** — устанавливаются нашей системой аутентификации при входе, чтобы вы оставались авторизованы. Без них Сайт не работает, поэтому согласия они не требуют.
+* **Небольшие значения в локальном хранилище браузера** — например, ваш выбор в отношении cookie (`cookie-consent`) и настройки интерфейса. Они остаются на вашем устройстве и нам не передаются.
+* **Аналитические файлы cookie** — устанавливаются только после того, как вы их примете: Google Analytics `_ga` (срок действия — около двух лет) и `_gid` (срок действия — 24 часа), которые помогают нам понять, как используется Сайт. Мы включили обезличивание IP-адреса.
+
+Вы можете изменить или отозвать свой выбор в любой момент по ссылке **«Настройки cookie»** в нижнем колонтитуле Сайта, а также блокировать или удалять файлы cookie в настройках браузера.
+
+## Дети
+
+Сайт не предназначен для детей младше 16 лет или младше более низкого возраста цифрового согласия, установленного в вашей стране, и мы сознательно не собираем их персональные данные. Если вы полагаете, что ребёнок предоставил нам персональные данные, свяжитесь с нами, и мы их удалим.
+
+## Изменения в этой Политике
+
+Мы можем время от времени обновлять эту Политику. Актуальная версия всегда доступна по адресам wheelsage.org/policy и autowp.ru/policy, с указанием даты последнего изменения вверху. Если изменение существенное, мы приложим разумные усилия, чтобы довести его до вашего сведения.
+
+## Контакты
+
+Вопросы об этой Политике или о ваших персональных данных: [autowp@yandex.ru](mailto:autowp@yandex.ru).</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
