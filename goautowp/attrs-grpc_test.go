@@ -1099,7 +1099,7 @@ func TestSetValuesRaceConditions(t *testing.T) {
 			go func(ctx context.Context) {
 				defer wg.Done()
 
-				_, err = client.SetUserValues(
+				_, err := client.SetUserValues(
 					metadata.AppendToOutgoingContext(
 						ctx,
 						authorizationHeader,
@@ -1118,7 +1118,7 @@ func TestSetValuesRaceConditions(t *testing.T) {
 				assert.NoError(t, err)
 
 				// check values
-				_, err := client.GetValues(
+				_, err = client.GetValues(
 					metadata.AppendToOutgoingContext(
 						ctx,
 						authorizationHeader,
