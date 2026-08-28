@@ -15253,6 +15253,290 @@ Questions about this Policy or your personal data: [autowp@gmail.com](mailto:aut
 
 Вопросы об этой Политике или о ваших персональных данных: [autowp@yandex.ru](mailto:autowp@yandex.ru).</target>
       </trans-unit>
+      <trans-unit id="terms-of-service-body" datatype="html">
+        <source>*Last updated: 29 August 2026*
+
+These Terms of Service (&quot;Terms&quot;) are an agreement between you and the administration of the websites **wheelsage.org** and **autowp.ru** (together, the &quot;Site&quot;, &quot;we&quot;, &quot;us&quot;) about your use of the Site. The Site is a community car catalogue and encyclopaedia.
+
+By creating an account on the Site, or by otherwise using the Site, you agree to these Terms. If you do not agree, please do not use the Site.
+
+## Related documents
+
+These Terms work together with:
+
+* the [Privacy Policy](/policy), which explains what personal data we handle and why;
+* the [Rules](/rules), which set out how to behave on the Site and how to edit the catalogue.
+
+The Privacy Policy and the Rules are part of these Terms. If a specific Rule and these Terms conflict, these Terms prevail.
+
+## Who may use the Site
+
+You must be at least 16 years old, or the lower age of digital consent set by the law of your country, to create an account. By registering you confirm that you meet this requirement.
+
+Each person may hold one account. You are responsible for everything done through your account and for keeping your sign-in credentials secure. Tell us promptly if you believe someone else has used your account.
+
+## Your content
+
+&quot;Your content&quot; means everything you submit to the Site: comments, forum posts, private messages, catalogue and specification edits, votes, and pictures you upload.
+
+You keep ownership of your content. We do not claim ownership of it and we do not sell it.
+
+### What you promise about your content
+
+For everything you submit, you confirm that:
+
+* you are the author, or you have all the rights and permissions needed to submit it and to grant the licences below;
+* it does not infringe anyone&apos;s copyright, trademark, image rights, privacy, or other rights;
+* it is not unlawful, defamatory, misleading, or malicious, and contains no malware;
+* where a picture shows an identifiable person, you have their consent if the law requires it;
+* the source, author, and licensing information you enter into the upload form is accurate.
+
+### Licence you grant to the Site
+
+For all of your content, you grant us a non-exclusive, worldwide, royalty-free licence to store, reproduce, adapt (for example, to resize and crop pictures and to generate thumbnails and other format variants), publish, and display it, and to cache and distribute it through our infrastructure and content-delivery network — **solely to operate, secure, and promote the Site**. This licence lasts while your content is on the Site and for a reasonable period afterwards for backups.
+
+You also grant every other user the right to view your content on the Site and to quote your comments and forum posts in discussion on the Site.
+
+### Public licence you choose for a picture
+
+When the upload form lets you place a picture under a public licence (such as a [Creative Commons](https://creativecommons.org/) licence) or dedicate it to the public domain, that choice is recorded, shown together with the picture, and allows anyone to reuse the picture on those terms. To the extent the licence you choose is irrevocable, your choice is irrevocable; the operational licence above continues to apply regardless.
+
+If you do not choose a public licence, the picture stays under your copyright and only the operational licence above applies — being on the Site does not put it in the public domain.
+
+### Attribution and provenance
+
+We may display, with each picture, the uploader&apos;s username, the author and source information you provided, and any licence that applies. Removing, hiding, or falsifying that information — including watermarks and credits added by the author or rights holder — is a breach of these Terms.
+
+## Moderation, removal, and complaints
+
+Every picture upload is reviewed before it is published. We may remove or restrict any content, and refuse or reverse any catalogue edit, that breaches these Terms, the Rules, or the law, or that does not meet the catalogue&apos;s quality requirements.
+
+Where we remove your content or restrict your account, we will tell you the reason and how to appeal, unless the law prevents us from doing so. How this works is described in the Rules and the Privacy Policy.
+
+### Copyright complaints
+
+If you believe content on the Site infringes your copyright, email us at [autowp@gmail.com](mailto:autowp@gmail.com) with the subject line &quot;Copyright complaint&quot; and include:
+
+* identification of the work you say is infringed;
+* the address (URL) of the material on the Site;
+* your contact details;
+* a statement that you believe in good faith that the use is not authorised by the rights holder or the law;
+* a statement that the information in your complaint is accurate and that you are the rights holder or authorised to act for them.
+
+We remove or disable access to material that is the subject of a valid complaint, and, where appropriate, we tell the person who posted it, who may ask us to restore it if they believe the complaint is mistaken. We suspend or close the accounts of users who repeatedly infringe.
+
+## How you may not use the Site
+
+You must not:
+
+* download or copy the Site&apos;s content in bulk, or use automated means to access it, beyond what a published API or the Site&apos;s `robots.txt` allows;
+* try to break, probe, or circumvent the Site&apos;s security, or overload or disrupt the Site or its infrastructure;
+* use the Site to distribute spam, malware, or unlawful material;
+* impersonate another person or misrepresent your connection with anyone;
+* create a new account to get around a suspension or a closed account.
+
+## Our intellectual property
+
+The Site&apos;s software, visual design, database structure, and the selection and arrangement of the catalogue are ours or our licensors&apos; and are protected by law. The Site&apos;s own source code is published on [GitHub](https://github.com/autowp/autowp) under the licence stated there. Catalogue text and data contributed by users are made available for reuse on the terms shown on the Site. You may link to any page of the Site.
+
+## Disclaimers
+
+The Site and the catalogue are provided &quot;as is&quot; and &quot;as available&quot;. The catalogue is a community reference work: we do not warrant that its information is accurate, complete, or up to date, and you should not rely on it for any decision that matters without checking it independently. We do not warrant that the Site will be uninterrupted or error-free.
+
+Nothing in these Terms excludes or limits anything that cannot be excluded or limited under the law that applies to you, including your mandatory rights as a consumer.
+
+## Liability
+
+To the fullest extent permitted by the law that applies to you, we are not liable for:
+
+* indirect or consequential loss;
+* loss of data, profit, or goodwill;
+* loss arising from your reliance on catalogue information or on content posted by other users.
+
+Nothing here limits our liability for death or personal injury caused by our negligence, for fraud, or for anything else that the law does not allow us to limit.
+
+## Indemnity
+
+If we suffer loss or reasonable costs because your content or your use of the Site broke these Terms or infringed someone&apos;s rights, you agree to reimburse us for that loss and those costs. This does not apply to the extent the loss was our fault, and — if you used the Site as a consumer — it applies only where the loss resulted from your breach of these Terms or your negligence.
+
+## Suspension and termination
+
+You may stop using the Site at any time and delete your account from the [account deletion page](/account/delete).
+
+We may suspend or end your access to the Site if you seriously or repeatedly breach these Terms, the Rules, or the law, or where we need to protect the Site or other users. Where it is practical, we will give you notice and a chance to put things right first.
+
+Content you contributed to the catalogue may remain on the Site after your account ends, dissociated from you, as described in the Privacy Policy. Clauses that by their nature should continue after termination — the licences you granted for content still on the Site, your promises about your content, the disclaimers, the liability limits, and the indemnity — continue to apply.
+
+## Changes to these Terms
+
+We may update these Terms. The current version is always available at wheelsage.org/tos and autowp.ru/tos, with the date of the last change shown at the top. If a change is significant, we will make reasonable efforts to notify registered users before it takes effect — for example, by a notice on the Site or by asking you to review the Terms the next time you sign in. If you keep using the Site after a change takes effect, you accept the updated Terms.
+
+## Governing law and disputes
+
+These Terms are governed by the mandatory consumer-protection and other non-waivable laws of the country where you live, and otherwise by the law of the place from which the Site is operated.
+
+If something goes wrong, please contact us first through the [feedback form](/feedback) — most issues are resolved quickly that way. Nothing in these Terms takes away your right to bring proceedings in the courts of your own country where the law gives you that right. If you live in the EU, you can also use the European Commission&apos;s [online dispute resolution platform](https://ec.europa.eu/consumers/odr).
+
+## General
+
+If any part of these Terms is found to be unenforceable, the rest continues to apply. If we do not enforce a term, that is not a waiver of it. You may not transfer your rights or obligations under these Terms; we may transfer ours to a successor operator of the Site, on notice, provided your rights are not reduced.
+
+These Terms, together with the Privacy Policy and the Rules, are the whole agreement between you and us about your use of the Site. The English version of these Terms governs; translations are provided for convenience.
+
+## Contact
+
+Questions about these Terms: [autowp@gmail.com](mailto:autowp@gmail.com).
+</source>
+      <target state="translated">*Последнее обновление: 29 августа 2026 г.*
+
+Настоящие Условия использования («Условия») — это соглашение между вами и администрацией сайтов **wheelsage.org** и **autowp.ru** (вместе — «Сайт», «мы») о том, как вы пользуетесь Сайтом. Сайт представляет собой общественный автомобильный каталог и энциклопедию.
+
+Создавая учётную запись на Сайте или иным образом пользуясь Сайтом, вы соглашаетесь с настоящими Условиями. Если вы не согласны, пожалуйста, не пользуйтесь Сайтом.
+
+## Связанные документы
+
+Настоящие Условия действуют совместно с:
+
+* [Политикой конфиденциальности](/policy), которая объясняет, какие персональные данные мы обрабатываем и зачем;
+* [Правилами](/rules), которые устанавливают, как вести себя на Сайте и как редактировать каталог.
+
+Политика конфиденциальности и Правила являются частью настоящих Условий. Если отдельное Правило противоречит настоящим Условиям, преимущественную силу имеют настоящие Условия.
+
+## Кто может пользоваться Сайтом
+
+Чтобы создать учётную запись, вам должно быть не менее 16 лет либо не меньше возраста цифрового согласия, установленного законом вашей страны. Регистрируясь, вы подтверждаете, что соответствуете этому требованию.
+
+Одному человеку разрешается иметь одну учётную запись. Вы отвечаете за всё, что делается через вашу учётную запись, и за сохранность своих учётных данных. Незамедлительно сообщите нам, если считаете, что вашей учётной записью воспользовался кто-то другой.
+
+## Ваш контент
+
+«Ваш контент» — это всё, что вы размещаете на Сайте: комментарии, сообщения на форуме, личные сообщения, правки каталога и характеристик, голоса и загружаемые вами изображения.
+
+Права на ваш контент остаются за вами. Мы не претендуем на владение им и не продаём его.
+
+### Что вы гарантируете в отношении своего контента
+
+В отношении всего, что вы размещаете, вы подтверждаете, что:
+
+* вы являетесь автором либо обладаете всеми правами и разрешениями, необходимыми для размещения этого контента и предоставления лицензий, указанных ниже;
+* он не нарушает ничьих авторских прав, товарных знаков, прав на изображение, неприкосновенности частной жизни или иных прав;
+* он не является незаконным, порочащим, вводящим в заблуждение или вредоносным и не содержит вредоносного кода;
+* если на изображении показано определённое лицо, у вас есть его согласие, когда этого требует закон;
+* сведения об источнике, авторе и лицензии, которые вы вводите в форму загрузки, достоверны.
+
+### Лицензия, которую вы предоставляете Сайту
+
+На весь ваш контент вы предоставляете нам неисключительную, безвозмездную, всемирную лицензию хранить, воспроизводить, адаптировать (например, изменять размер и кадрировать изображения, создавать миниатюры и другие форматные варианты), публиковать и отображать его, а также кэшировать и распространять его через нашу инфраструктуру и сеть доставки контента — **исключительно для работы, защиты и продвижения Сайта**. Эта лицензия действует, пока ваш контент находится на Сайте, и в течение разумного срока после этого — для резервных копий.
+
+Вы также предоставляете каждому другому пользователю право просматривать ваш контент на Сайте и цитировать ваши комментарии и сообщения форума в обсуждениях на Сайте.
+
+### Публичная лицензия, которую вы выбираете для изображения
+
+Когда форма загрузки позволяет вам разместить изображение под публичной лицензией (например, лицензией [Creative Commons](https://creativecommons.org/)) или передать его в общественное достояние, этот выбор фиксируется, отображается вместе с изображением и позволяет любому повторно использовать изображение на этих условиях. В той мере, в какой выбранная вами лицензия является безотзывной, ваш выбор безотзывен; операционная лицензия, указанная выше, продолжает действовать в любом случае.
+
+Если вы не выбираете публичную лицензию, изображение остаётся под вашим авторским правом, и применяется только операционная лицензия, указанная выше, — размещение на Сайте не переводит изображение в общественное достояние.
+
+### Атрибуция и происхождение
+
+Вместе с каждым изображением мы можем отображать имя пользователя, который его загрузил, указанные вами сведения об авторе и источнике, а также применимую лицензию. Удаление, сокрытие или искажение этих сведений — в том числе водяных знаков и указаний авторства, добавленных автором или правообладателем, — является нарушением настоящих Условий.
+
+## Модерация, удаление и жалобы
+
+Каждая загрузка изображения проверяется до публикации. Мы можем удалить или ограничить любой контент, а также отклонить или отменить любую правку каталога, которые нарушают настоящие Условия, Правила или закон либо не отвечают требованиям каталога к качеству.
+
+Когда мы удаляем ваш контент или ограничиваем вашу учётную запись, мы сообщаем вам причину и порядок обжалования, если этому не препятствует закон. Как это устроено, описано в Правилах и Политике конфиденциальности.
+
+### Жалобы на нарушение авторских прав
+
+Если вы считаете, что контент на Сайте нарушает ваши авторские права, напишите нам на [autowp@yandex.ru](mailto:autowp@yandex.ru) с темой письма «Жалоба на нарушение авторских прав» и укажите:
+
+* идентификацию произведения, права на которое, по вашему мнению, нарушены;
+* адрес (URL) материала на Сайте;
+* ваши контактные данные;
+* заявление о том, что вы добросовестно полагаете, что использование не разрешено правообладателем или законом;
+* заявление о том, что сведения в вашей жалобе достоверны и что вы являетесь правообладателем либо уполномочены действовать от его имени.
+
+Мы удаляем материал, ставший предметом обоснованной жалобы, или закрываем к нему доступ и при необходимости уведомляем разместившее его лицо, которое может попросить нас восстановить материал, если считает жалобу ошибочной. Мы приостанавливаем или закрываем учётные записи пользователей, которые неоднократно нарушают чужие права.
+
+## Как нельзя пользоваться Сайтом
+
+Вам запрещается:
+
+* массово скачивать или копировать контент Сайта либо получать к нему доступ автоматическими средствами сверх того, что допускает опубликованный API или файл `robots.txt` Сайта;
+* пытаться взломать, исследовать или обойти защиту Сайта, а также перегружать или нарушать работу Сайта или его инфраструктуры;
+* использовать Сайт для распространения спама, вредоносного кода или незаконных материалов;
+* выдавать себя за другое лицо или искажать свою связь с кем-либо;
+* создавать новую учётную запись, чтобы обойти приостановку или закрытие учётной записи.
+
+## Наша интеллектуальная собственность
+
+Программное обеспечение Сайта, его визуальное оформление, структура базы данных, а также подбор и расположение материалов каталога принадлежат нам или нашим лицензиарам и охраняются законом. Собственный исходный код Сайта опубликован на [GitHub](https://github.com/autowp/autowp) на условиях указанной там лицензии. Текст и данные каталога, добавленные пользователями, предоставляются для повторного использования на условиях, указанных на Сайте. Вы можете ссылаться на любую страницу Сайта.
+
+## Отказ от гарантий
+
+Сайт и каталог предоставляются «как есть» и «как доступно». Каталог — это общественное справочное издание: мы не гарантируем, что его сведения точны, полны или актуальны, и вам не следует полагаться на них при принятии значимых решений без самостоятельной проверки. Мы не гарантируем бесперебойной или безошибочной работы Сайта.
+
+Ничто в настоящих Условиях не исключает и не ограничивает то, что не может быть исключено или ограничено по применимому к вам закону, включая ваши императивные права потребителя.
+
+## Ответственность
+
+В максимальной степени, допустимой применимым к вам законом, мы не несём ответственности за:
+
+* косвенные или сопутствующие убытки;
+* потерю данных, прибыли или деловой репутации;
+* убытки, возникшие из-за того, что вы положились на сведения каталога или на контент, размещённый другими пользователями.
+
+Ничто здесь не ограничивает нашу ответственность за смерть или причинение вреда здоровью вследствие нашей небрежности, за мошенничество или за что-либо иное, ответственность за что закон ограничивать не позволяет.
+
+## Возмещение
+
+Если мы понесём убытки или разумные расходы из-за того, что ваш контент или ваше использование Сайта нарушили настоящие Условия либо чьи-либо права, вы соглашаетесь возместить нам эти убытки и расходы. Это не применяется в той мере, в какой убытки возникли по нашей вине, и — если вы пользовались Сайтом как потребитель — применяется только тогда, когда убытки стали следствием вашего нарушения настоящих Условий или вашей небрежности.
+
+## Приостановка и прекращение
+
+Вы можете прекратить пользоваться Сайтом в любой момент и удалить свою учётную запись на [странице удаления учётной записи](/account/delete).
+
+Мы можем приостановить или прекратить ваш доступ к Сайту, если вы грубо или неоднократно нарушаете настоящие Условия, Правила или закон либо если нам нужно защитить Сайт или других пользователей. Когда это практически возможно, мы сначала уведомим вас и дадим возможность устранить нарушение.
+
+Контент, который вы внесли в каталог, может остаться на Сайте после прекращения вашей учётной записи, будучи отделённым от вас, как описано в Политике конфиденциальности. Положения, которые по своей природе должны действовать после прекращения, — лицензии, предоставленные вами на контент, который остаётся на Сайте, ваши гарантии в отношении контента, отказ от гарантий, ограничения ответственности и возмещение — продолжают применяться.
+
+## Изменения настоящих Условий
+
+Мы можем обновлять настоящие Условия. Действующая редакция всегда доступна по адресам wheelsage.org/tos и autowp.ru/tos, с указанием даты последнего изменения вверху. Если изменение существенно, мы приложим разумные усилия, чтобы уведомить зарегистрированных пользователей до его вступления в силу — например, объявлением на Сайте или предложением ознакомиться с Условиями при следующем входе. Если вы продолжаете пользоваться Сайтом после вступления изменения в силу, вы принимаете обновлённые Условия.
+
+## Применимое право и споры
+
+Настоящие Условия регулируются императивными нормами о защите прав потребителей и иными неотменяемыми нормами страны вашего проживания, а в остальном — правом места, из которого осуществляется работа Сайта.
+
+Если что-то пошло не так, пожалуйста, сначала свяжитесь с нами через [форму обратной связи](/feedback) — так большинство вопросов решается быстро. Ничто в настоящих Условиях не лишает вас права обращаться в суды вашей страны, когда закон предоставляет вам такое право. Если вы проживаете в ЕС, вы также можете воспользоваться [платформой онлайн-урегулирования споров](https://ec.europa.eu/consumers/odr) Европейской комиссии.
+
+## Общие положения
+
+Если какая-либо часть настоящих Условий будет признана не имеющей силы, остальные положения продолжают действовать. Если мы не применяем какое-либо положение, это не означает отказа от него. Вы не вправе передавать свои права или обязанности по настоящим Условиям; мы можем передать свои права правопреемнику — оператору Сайта, с уведомлением, при условии, что ваши права не будут ущемлены.
+
+Настоящие Условия вместе с Политикой конфиденциальности и Правилами составляют полное соглашение между вами и нами относительно вашего использования Сайта. Преимущественную силу имеет английская редакция настоящих Условий; переводы предоставляются для удобства.
+
+## Контакты
+
+Вопросы по настоящим Условиям: [autowp@yandex.ru](mailto:autowp@yandex.ru).
+</target>
+      </trans-unit>
+      <trans-unit id="2029980907058777630" datatype="html">
+        <source>Terms of Service</source>
+      <target state="translated">Условия использования</target>
+      </trans-unit>
+      <trans-unit id="6138850216922661011" datatype="html">
+        <source>We&apos;ve updated our Terms of Service</source>
+      <target state="translated">Мы обновили Условия использования</target>
+      </trans-unit>
+      <trans-unit id="2976121577859173762" datatype="html">
+        <source>To keep using your account, please review and accept the current Terms of Service.</source>
+      <target state="translated">Чтобы продолжить пользоваться учётной записью, ознакомьтесь с действующими Условиями использования и примите их.</target>
+      </trans-unit>
+      <trans-unit id="840486925111364575" datatype="html">
+        <source>Accept and continue</source>
+      <target state="translated">Принять и продолжить</target>
+      </trans-unit>
       <trans-unit id="5490315184415589290" datatype="html">
         <source>Blocked until</source>
       <target state="translated">Блокировка до</target>

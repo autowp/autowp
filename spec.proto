@@ -142,6 +142,7 @@ service Users {
   rpc DeleteUserAccount(DeleteUserAccountRequest) returns (google.protobuf.Empty) {}
   rpc DeleteUserPhoto(DeleteUserPhotoRequest) returns (google.protobuf.Empty) {}
   rpc RecordConsent(RecordConsentRequest) returns (google.protobuf.Empty) {}
+  rpc AcceptTerms(AcceptTermsRequest) returns (google.protobuf.Empty) {}
 }
 
 service Rating {
@@ -894,6 +895,8 @@ message User {
   int32 pictures_accepted_count = 24;
   string last_ip = 25;
   string login = 26;
+  // Set on Me() only: the signed-in user has not accepted the current Terms of Service version.
+  bool terms_acceptance_required = 27;
 }
 
 message Contact {
@@ -1089,6 +1092,10 @@ message RecordConsentRequest {
   bool analytics = 1;
   int32 policy_version = 2;
 }
+
+// The server records its own current Terms version for the authenticated user, so the request
+// carries nothing - a client cannot accept a stale or future version.
+message AcceptTermsRequest {}
 
 message UpdateUserRequest {
   User user = 1;

@@ -42,9 +42,11 @@ const (
 	UserTableURLColName               = "url"
 	UserTableOwnCarColName            = "own_car"
 	UserTableDreamCarColName          = "dream_car"
+	UserTableTermsVersionColName      = "terms_version"
+	UserTableTermsAcceptedAtColName   = "terms_accepted_at"
 )
 
-var ( //nolint: dupl
+var (
 	UserTable                     = goqu.T(UserTableName)
 	UserTableIDCol                = UserTable.Col(UserTableIDColName)
 	UserTableDeletedCol           = UserTable.Col(UserTableDeletedColName)
@@ -71,6 +73,7 @@ var ( //nolint: dupl
 	UserTableTimezoneCol          = UserTable.Col(UserTableTimezoneColName)
 	UserTablePicturesAddedCol     = UserTable.Col(UserTablePicturesAddedColName)
 	UserTableGreenCol             = UserTable.Col(UserTableGreenColName)
+	UserTableTermsVersionCol      = UserTable.Col(UserTableTermsVersionColName)
 )
 
 type UsersRow struct {
@@ -94,4 +97,5 @@ type UsersRow struct {
 	Login         *string     `db:"login"`
 	Green         bool        `db:"green"`
 	UUID          pgtype.UUID `db:"uuid"`
+	TermsVersion  *int32      `db:"terms_version"`
 }

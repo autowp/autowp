@@ -440,6 +440,26 @@ func (s *UsersGRPCServer) RecordConsent(
 	return &emptypb.Empty{}, nil
 }
 
+func (s *UsersGRPCServer) AcceptTerms(
+	ctx context.Context,
+	_ *AcceptTermsRequest,
+) (*emptypb.Empty, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if userCtx.UserID == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	if err = s.userRepository.AcceptTerms(ctx, userCtx.UserID); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func (s *UsersGRPCServer) UpdateUser(
 	ctx context.Context,
 	in *UpdateUserRequest,

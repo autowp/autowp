@@ -1,0 +1,16 @@
+<div class="terms-gate" role="dialog" aria-modal="true" aria-labelledby="terms-gate-title">
+  <div class="terms-gate__card">
+    <h2 id="terms-gate-title" i18n>We've updated our Terms of Service</h2>
+    <p i18n>To keep using your account, please review and accept the current Terms of Service.</p>
+    <p class="terms-gate__links">
+      <a routerLink="/tos" target="_blank" rel="noopener" i18n>Terms of Service</a>
+      <a routerLink="/policy" target="_blank" rel="noopener" i18n>Privacy Policy</a>
+      <a routerLink="/rules" target="_blank" rel="noopener" i18n>Rules</a>
+    </p>
+    <div class="terms-gate__actions">
+      <button type="button" class="btn btn-primary" [disabled]="submitting()" (click)="accept()">
+        <ng-container i18n>Accept and continue</ng-container>
+      </button>
+    </div>
+  </div>
+</div>

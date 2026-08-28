@@ -117,6 +117,9 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'telegram', renderMode: RenderMode.Prerender}, // static text, no per-request data
 
   {path: 'top-view/**', renderMode: RenderMode.Server},
+
+  {path: 'tos', renderMode: RenderMode.Prerender}, // static text, no per-request data
+
   {path: 'twins/**', renderMode: RenderMode.Server},
 
   {path: 'upload/**', renderMode: RenderMode.Client}, // auth-gated file upload, no SSR value

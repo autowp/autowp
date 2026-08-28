@@ -61,7 +61,7 @@ const (
 	ItemYearMax           = 2100
 )
 
-var ( //nolint: dupl
+var (
 	ItemTable                          = goqu.T(ItemTableName)
 	ItemTableIDCol                     = ItemTable.Col(ItemTableIDColName)
 	ItemTableBodyCol                   = ItemTable.Col(ItemTableBodyColName)

@@ -57,6 +57,10 @@ func (s *UserExtractor) Extract(
 
 	isMe := row.ID == currentUserID
 
+	if isMe {
+		user.TermsAcceptanceRequired = row.TermsVersion == nil || *row.TermsVersion < users.TermsVersion
+	}
+
 	if !row.Deleted || util.Contains(currentUserRoles, users.RoleAdmin) {
 		longAway := true
 

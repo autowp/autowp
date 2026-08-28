@@ -272,6 +272,7 @@ All images are posted for educational purposes.
         <a href="https://github.com/autowp/autowp-frontend/tree/master/src/locale" i18n="@@layout/language-contributing"
           >Want to contribute?</a
         >
+        <a routerLink="/tos" i18n>Terms of Service</a>
         <a routerLink="/policy" i18n>Privacy Policy</a>
         <a href="#" i18n (click)="openCookieSettings()">Cookie settings</a>
       </p>
@@ -283,4 +284,8 @@ All images are posted for educational purposes.
 
 @if (showConsentBanner()) {
   <app-cookie-consent />
+}
+
+@if (showTermsGate()) {
+  <app-terms-gate (accepted)="onTermsAccepted()" />
 }

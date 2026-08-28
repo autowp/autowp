@@ -80,6 +80,7 @@ export const routes: Routes = [
   {loadChildren: () => import('./pulse/pulse-routing.module').then((m) => m.routes), path: 'pulse'},
   {loadChildren: () => import('./rules/rules-routing.module').then((m) => m.routes), path: 'rules'},
   {loadChildren: () => import('./policy/policy-routing.module').then((m) => m.routes), path: 'policy'},
+  {loadChildren: () => import('./tos/terms-routing.module').then((m) => m.routes), path: 'tos'},
   {
     loadChildren: () => import('./telegram/telegram-routing.module').then((m) => m.routes),
     path: 'telegram',

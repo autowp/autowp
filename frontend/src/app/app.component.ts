@@ -13,7 +13,7 @@ import {
   Renderer2,
   signal,
 } from '@angular/core';
-import {rxResource, takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {environment} from '@environment/environment';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
@@ -44,6 +44,7 @@ import {map, of, shareReplay} from 'rxjs';
 import {CookieConsentComponent} from './cookie-consent/cookie-consent.component';
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {PageNotFoundComponent} from './not-found.component';
+import {TermsGateComponent} from './terms-gate/terms-gate.component';
 import {ContainerComponent} from './toasts/container/container.component';
 import {ToastsService} from './toasts/toasts.service';
 import {UsersOnlineComponent} from './users/online/online.component';
@@ -65,6 +66,7 @@ import {UsersOnlineComponent} from './users/online/online.component';
     RemarkComponent,
     PageNotFoundComponent,
     CookieConsentComponent,
+    TermsGateComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -156,6 +158,15 @@ export class AppComponent {
   // showing the banner server-side would flash it for visitors who have already answered.
   protected readonly showConsentBanner = computed(() => this.#isBrowser && !this.consent.resolved());
 
+  // Blocking Terms-of-Service gate for signed-in users whose accepted version is behind the
+  // current one (Me() sets `termsAcceptanceRequired`). #termsAccepted suppresses it for the rest
+  // of the session once the user accepts, without waiting for a fresh Me().
+  readonly #currentUser = toSignal(this.#auth.user$);
+  readonly #termsAccepted = signal(false);
+  protected readonly showTermsGate = computed(
+    () => this.#isBrowser && !this.#termsAccepted() && !!this.#currentUser()?.termsAcceptanceRequired,
+  );
+
   constructor() {
     const angulartics = inject(Angulartics2GoogleGlobalSiteTag);
 
@@ -236,5 +247,9 @@ export class AppComponent {
     this.consent.reopen();
 
     return false;
+  }
+
+  protected onTermsAccepted(): void {
+    this.#termsAccepted.set(true);
   }
 }

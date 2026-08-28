@@ -61,6 +61,11 @@ type AutowpResourceAccess struct {
 
 const KeycloakExternalAccountID = "keycloak"
 
+// TermsVersion is the current revision of the Terms of Service. Bump it whenever the Terms change
+// materially: a user whose stored terms_version is below this (or NULL) is asked to accept again
+// by the in-app gate. Keep in sync with the "Last updated" date in the frontend terms.component.
+const TermsVersion = 1
+
 // CreateUserOptions CreateUserOptions.
 type CreateUserOptions struct {
 	UserName        string `json:"user_name"`
@@ -177,7 +182,7 @@ func (s *Repository) Users(
 
 	valuePtrs := []interface{}{
 		&row.ID, &row.Name, &row.Deleted, &row.Identity, &row.LastOnline, &row.Green, &row.SpecsWeight, &row.Img,
-		&row.EMail, &row.PicturesTotal, &row.SpecsVolume, &row.Language, &row.UUID,
+		&row.EMail, &row.PicturesTotal, &row.SpecsVolume, &row.Language, &row.UUID, &row.TermsVersion,
 	}
 
 	alias := query.UserTableAlias
@@ -201,6 +206,7 @@ func (s *Repository) Users(
 			schema.UserTableSpecsVolumeColName,
 		), aliasTable.Col(schema.UserTableLanguageColName),
 		aliasTable.Col(schema.UserTableUUIDColName),
+		aliasTable.Col(schema.UserTableTermsVersionColName),
 	}
 
 	if fields.VotesLeft {
@@ -615,21 +621,22 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 	// made them. Keycloak holds the authoritative credentials and is deleted above; name and
 	// timezone are NOT NULL so they are reset rather than nulled.
 	_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
-		schema.UserTableDeletedColName:        true,
-		schema.UserTableUUIDColName:           nil,
-		schema.UserTableImgColName:            nil,
-		schema.UserTableEmailColName:          nil,
-		schema.UserTableEmailToCheckColName:   nil,
-		schema.UserTableEmailCheckCodeColName: nil,
-		schema.UserTablePasswordColName:       nil,
-		schema.UserTableLoginColName:          nil,
-		schema.UserTableIdentityColName:       nil,
-		schema.UserTableLastIPColName:         nil,
-		schema.UserTableNameColName:           "",
-		schema.UserTableTimezoneColName:       "UTC",
-		schema.UserTableURLColName:            "",
-		schema.UserTableOwnCarColName:         "",
-		schema.UserTableDreamCarColName:       "",
+		schema.UserTableDeletedColName:         true,
+		schema.UserTableUUIDColName:            nil,
+		schema.UserTableImgColName:             nil,
+		schema.UserTableEmailColName:           nil,
+		schema.UserTableEmailToCheckColName:    nil,
+		schema.UserTableEmailCheckCodeColName:  nil,
+		schema.UserTablePasswordColName:        nil,
+		schema.UserTableLoginColName:           nil,
+		schema.UserTableIdentityColName:        nil,
+		schema.UserTableLastIPColName:          nil,
+		schema.UserTableNameColName:            "",
+		schema.UserTableTimezoneColName:        "UTC",
+		schema.UserTableURLColName:             "",
+		schema.UserTableOwnCarColName:          "",
+		schema.UserTableDreamCarColName:        "",
+		schema.UserTableTermsAcceptedAtColName: nil,
 	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
 	if err != nil {
 		return false, err
@@ -1298,6 +1305,18 @@ func (s *Repository) RecordConsent(ctx context.Context, userID int64, analytics 
 		schema.UserConsentLogTableAnalyticsColName:     analytics,
 		schema.UserConsentLogTablePolicyVersionColName: policyVersion,
 	}).Executor().ExecContext(ctx)
+
+	return err
+}
+
+// AcceptTerms records that the user has accepted the current TermsVersion of the Terms of Service.
+// Overwrites any earlier acceptance - only the latest version and time are kept (see the two
+// columns on the users table); there is no per-version history.
+func (s *Repository) AcceptTerms(ctx context.Context, userID int64) error {
+	_, err := s.db.Update(schema.UserTable).Set(goqu.Record{
+		schema.UserTableTermsVersionColName:    TermsVersion,
+		schema.UserTableTermsAcceptedAtColName: goqu.Func("NOW"),
+	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
 
 	return err
 }

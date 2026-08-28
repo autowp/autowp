@@ -1,0 +1,42 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+
+.terms-gate {
+  position: fixed;
+  inset: 0;
+  z-index: $zindex-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 60%);
+
+  &__card {
+    max-width: 32rem;
+    width: 100%;
+    background: $body-bg;
+    border-radius: $border-radius;
+    box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 30%);
+    padding: 1.5rem;
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+    }
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
