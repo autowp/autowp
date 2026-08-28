@@ -8,7 +8,7 @@
         <span i18n>theme of the day</span>
       }
       @if (user$() | async; as user) {
-        <span>
+        &ngsp;<span>
           <span class="text-nowrap">by <app-user [user]="user" /></span>
         </span>
       }
