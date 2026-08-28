@@ -1,5 +1,8 @@
 import {isPlatformBrowser} from '@angular/common';
 import {computed, inject, PLATFORM_ID, Service, signal} from '@angular/core';
+import {RecordConsentRequest} from '@grpc/spec.pb';
+import {UsersClient} from '@grpc/spec.pbsc';
+import Keycloak from 'keycloak-js';
 
 /**
  * Stored form of the visitor's cookie choice. `version` lets us re-prompt after the policy or the
@@ -20,6 +23,9 @@ export interface ConsentDecision {
  *
  * SSR has no `localStorage`, so `decision()` starts `null` on the server and the banner is only
  * rendered in the browser.
+ *
+ * For a signed-in visitor every decision is also appended to a server-side log (GDPR Art. 7(1)
+ * accountability); anonymous visitors' choices stay in `localStorage` only.
  */
 @Service()
 export class ConsentService {
@@ -28,6 +34,8 @@ export class ConsentService {
   static readonly STORAGE_KEY = 'cookie-consent';
 
   readonly #isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  readonly #keycloak = inject(Keycloak);
+  readonly #usersClient = inject(UsersClient);
 
   readonly #decision = signal<ConsentDecision | null>(this.#read());
   readonly decision = this.#decision.asReadonly();
@@ -93,5 +101,21 @@ export class ConsentService {
     } catch {
       // private mode / storage disabled - the choice still applies for this session via the signal
     }
+
+    this.#logToServer(decision);
+  }
+
+  #logToServer(decision: ConsentDecision): void {
+    if (!this.#keycloak.authenticated) {
+      return;
+    }
+
+    this.#usersClient
+      .recordConsent(new RecordConsentRequest({analytics: decision.analytics, policyVersion: decision.version}))
+      .subscribe({
+        error: () => {
+          // Best-effort accountability copy; the localStorage record is what actually gates GA.
+        },
+      });
   }
 }

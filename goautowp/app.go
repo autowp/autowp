@@ -463,6 +463,13 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	logrus.Infof("Content IPs anonymized: %d", anonymizedIPs)
 
+	purgedConsent, err := usersRep.PurgeOldConsentLog(ctx)
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof("Consent log rows purged: %d", purgedConsent)
+
 	messRepo, err := s.container.MessagingRepository(ctx)
 	if err != nil {
 		return err

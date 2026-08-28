@@ -1290,6 +1290,37 @@ func (s *Repository) IncrementUploads(ctx context.Context, id int64) error {
 	return err
 }
 
+// RecordConsent appends the user's current cookie-consent choice to user_consent_log. The table
+// is append-only: one row per decision, kept for GDPR Art. 7(1) accountability.
+func (s *Repository) RecordConsent(ctx context.Context, userID int64, analytics bool, policyVersion int32) error {
+	_, err := s.db.Insert(schema.UserConsentLogTable).Rows(goqu.Record{
+		schema.UserConsentLogTableUserIDColName:        userID,
+		schema.UserConsentLogTableAnalyticsColName:     analytics,
+		schema.UserConsentLogTablePolicyVersionColName: policyVersion,
+	}).Executor().ExecContext(ctx)
+
+	return err
+}
+
+// consentLogRetentionYears is how long a consent record is kept. It survives account deletion
+// (Art. 17(3)(e): defence of legal claims), but not forever - a complaint that old is out of time.
+const consentLogRetentionYears = 3
+
+// PurgeOldConsentLog deletes consent records older than consentLogRetentionYears. Run daily from
+// SchedulerDaily; returns the number of rows removed.
+func (s *Repository) PurgeOldConsentLog(ctx context.Context) (int64, error) {
+	res, err := s.db.Delete(schema.UserConsentLogTable).
+		Where(schema.UserConsentLogTableCreatedAtCol.Lt(
+			goqu.L("NOW() - make_interval(years => ?)", consentLogRetentionYears),
+		)).
+		Executor().ExecContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
+}
+
 func (s *Repository) ensureUserExportedToKeycloak(
 	ctx context.Context,
 	userID int64,

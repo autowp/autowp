@@ -419,6 +419,27 @@ func (s *UsersGRPCServer) DeleteUserPhoto(
 	return &emptypb.Empty{}, nil
 }
 
+func (s *UsersGRPCServer) RecordConsent(
+	ctx context.Context,
+	in *RecordConsentRequest,
+) (*emptypb.Empty, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if userCtx.UserID == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	err = s.userRepository.RecordConsent(ctx, userCtx.UserID, in.GetAnalytics(), in.GetPolicyVersion())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func (s *UsersGRPCServer) UpdateUser(
 	ctx context.Context,
 	in *UpdateUserRequest,
