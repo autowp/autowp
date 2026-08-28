@@ -2,8 +2,9 @@ import type {Picture} from '@grpc/spec.pb';
 
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {PictureItemType} from '@grpc/spec.pb';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
@@ -19,7 +20,7 @@ import {map} from 'rxjs';
 export class PersonsPersonAuthorGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
 
   protected picturesRouterLink: string[] = [];
 
@@ -35,7 +36,7 @@ export class PersonsPersonAuthorGalleryComponent {
   constructor() {
     effect(() => {
       if (!this.identity()) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
   }

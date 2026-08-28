@@ -3,10 +3,11 @@ import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
@@ -24,7 +25,7 @@ import {GalleryComponent} from '../../../gallery/gallery.component';
 export class CatalogueMixedGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
@@ -42,7 +43,7 @@ export class CatalogueMixedGalleryComponent {
 
   // Missing catname/identity, or a not-found brand, are all surfaced as a NOT_FOUND resource
   // error rather than an imperative Router.navigate() inside the stream — see the constructor
-  // effect() below, which is the single place that navigates off this resource's error() signal.
+  // effect() below, which is the single place that reports not-found off this resource's error() signal.
   //
   // `id` is suffixed with data().catname (mixed/other/logotypes all share this component) and the
   // brand catname read once at construction time — see the identical note on
@@ -82,7 +83,7 @@ export class CatalogueMixedGalleryComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
   }

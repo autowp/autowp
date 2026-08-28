@@ -3,8 +3,9 @@ import type {Item, Picture} from '@grpc/spec.pb';
 
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
@@ -23,7 +24,7 @@ import {CategoriesService} from '../../service';
 export class CategoryGalleryComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #categoriesService = inject(CategoriesService);
 
   protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
@@ -51,7 +52,7 @@ export class CategoryGalleryComponent implements OnInit {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.dataResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
   }

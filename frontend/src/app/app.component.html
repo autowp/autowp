@@ -185,7 +185,11 @@
   [class.container]="!pageEnv.layoutParams().isGalleryPage"
   [class.container-fluid]="pageEnv.layoutParams().isGalleryPage"
 >
-  <router-outlet />
+  @if (notFound.active()) {
+    <app-page-not-found />
+  } @else {
+    <router-outlet />
+  }
 
   @if (!pageEnv.layoutParams().isAdminPage && !pageEnv.layoutParams().isGalleryPage) {
     <div class="bottom-line">

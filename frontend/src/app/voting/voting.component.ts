@@ -4,11 +4,12 @@ import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {CommentsType, CreateVoteRequest, VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth.service';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {getModalComponentRef} from '@utils/modal-component-ref';
@@ -28,7 +29,7 @@ import {VotingVotesComponent} from './votes/votes.component';
 })
 export class VotingComponent {
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   protected readonly auth = inject(AuthService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #modalService = inject(NgbModal);
@@ -54,7 +55,7 @@ export class VotingComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.votingResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

@@ -3,11 +3,12 @@ import type {MostsItem, MostsRating, MostsVehicleType, YearsRange} from '@grpc/s
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {Router, RouterLink} from '@angular/router';
+import {RouterLink} from '@angular/router';
 import {MostsItemsRequest} from '@grpc/spec.pb';
 import {MostsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {
@@ -59,7 +60,7 @@ export class MostsContentsComponent implements OnInit {
   readonly #mostsClient = inject(MostsClient);
   readonly #languageService = inject(LanguageService);
   readonly #injector = inject(Injector);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
 
   readonly prefix = input.required<string[]>();
   readonly ratingCatname = input.required<null | string>();
@@ -164,7 +165,7 @@ export class MostsContentsComponent implements OnInit {
     // HTTP 200 with an error message on every one of them.
     effect(() => {
       if (isNotFoundError(this.itemsResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
 

@@ -4,7 +4,7 @@ import type {Observable} from 'rxjs';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   GetBrandSectionsRequest,
   ItemFields,
@@ -24,6 +24,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {getCatalogueSectionsTranslation} from '@utils/translations';
@@ -48,7 +49,7 @@ export class CatalogueIndexComponent {
   readonly #meta = inject(Meta);
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #picturesClient = inject(PicturesClient);
@@ -76,9 +77,9 @@ export class CatalogueIndexComponent {
   // key, and seed itself with BMW's data instead of fetching Toyota's.
   //
   // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
-  // than an imperative Router.navigate() inside the stream (which raced SSR's whenStable() the
-  // same way the picture-page canonicalResource did) — see the constructor effect() below, which
-  // is the single place that navigates or toasts off this resource's error()/value() signals.
+  // than an imperative Router.navigate() inside the stream — see the constructor effect() below,
+  // which is the single place that reports not-found or toasts off this resource's
+  // error()/value() signals.
   //
   // brandResource's `id` also folds in isModer() *as read once at construction*, which matters for
   // one specific race: isModer starts as its toSignal initialValue (false) and flips once Keycloak
@@ -143,15 +144,14 @@ export class CatalogueIndexComponent {
   });
 
   constructor() {
-    // Router.navigate() is fire-and-forget here (not folded into the resource stream): it runs
-    // outside brandResource's own pending-task lifecycle, so there's no window where the resource
-    // can settle and let SSR's whenStable() serialize before the redirect it triggered has
-    // actually registered - matching the pattern in ArticlesArticleComponent/PicturePageComponent.
-    // Non-NOT_FOUND errors aren't toasted here - the template already renders
+    // NOT_FOUND is reported to NotFoundService (AppComponent renders <app-page-not-found> in place
+    // of the outlet) rather than via Router.navigate(['/error-404']): SSR doesn't honour an
+    // imperative navigation fired mid-render - whenStable() can serialize a blank outlet before it
+    // registers. Non-NOT_FOUND errors aren't toasted here - the template already renders
     // `errorMessage(brandResource.error())` inline, so a toast would just duplicate it.
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

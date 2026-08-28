@@ -21,6 +21,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {isNotFoundError, notFoundError} from 'app/grpc';
 import {catchError, EMPTY, of, switchMap} from 'rxjs';
 
@@ -153,6 +154,7 @@ function galleryPageNumberByIndex(index: number): number {
 })
 export class GalleryComponent implements OnInit {
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
   readonly #toastService = inject(ToastsService);
@@ -185,8 +187,8 @@ export class GalleryComponent implements OnInit {
   // debounceTime(10) on identity, both before ever making an HTTP call, only register as pending
   // via ZoneStablePendingTask, the zone-based-CD bridge that holds a task while any macrotask is
   // pending; it covers them today, but it disappears with the zone, and then SSR could serialize a
-  // 200 before the NOT_FOUND redirect below had even fired. See the constructor effect(), the
-  // single place that navigates off this resource's error() signal.
+  // 200 before the NOT_FOUND report below had even fired. See the constructor effect(), the
+  // single place that reports not-found off this resource's error() signal.
   //
   // Non-NOT_FOUND errors are toasted and resolved with the unchanged state rather than left as a
   // resource error - this mirrors the previous behavior of leaving the last-good gallery on screen
@@ -200,13 +202,13 @@ export class GalleryComponent implements OnInit {
   protected galleryResource!: ResourceRef<GalleryState | undefined>;
 
   constructor() {
-    // Router.navigate() is fire-and-forget here (not folded into the resource stream): it runs
-    // outside galleryResource's own pending-task lifecycle, so there's no window where the
-    // resource can settle and let SSR's whenStable() serialize before the redirect it triggered has
-    // actually registered.
+    // NOT_FOUND is reported to NotFoundService (AppComponent renders <app-page-not-found> in place
+    // of the outlet) rather than via Router.navigate(['/error-404']): SSR doesn't honour an
+    // imperative navigation fired mid-render - whenStable() can serialize a blank outlet before it
+    // registers.
     effect(() => {
       if (isNotFoundError(this.galleryResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
   }
@@ -316,7 +318,7 @@ export class GalleryComponent implements OnInit {
     return this.#picturesClient.getGallery(new GalleryRequest({request})).pipe(
       catchError((response: unknown) => {
         if (isNotFoundError(response)) {
-          void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+          this.#notFound.report();
         } else {
           this.#toastService.handleError(response);
         }

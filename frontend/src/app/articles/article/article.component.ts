@@ -1,9 +1,10 @@
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {ArticleByCatnameRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
@@ -16,7 +17,7 @@ import {map} from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticlesArticleComponent {
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #articlesClient = inject(ArticlesClient);
   readonly #pageEnv = inject(PageEnvService);
@@ -45,7 +46,7 @@ export class ArticlesArticleComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.articleResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

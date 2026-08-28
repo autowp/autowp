@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {
   CommentsType,
   PictureFields,
@@ -13,6 +13,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
@@ -32,7 +33,7 @@ export class PersonsPersonAuthorPictureComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #meta = inject(Meta);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
@@ -110,7 +111,7 @@ export class PersonsPersonAuthorPictureComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.pictureResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

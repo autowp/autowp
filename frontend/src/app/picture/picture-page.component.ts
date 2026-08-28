@@ -12,6 +12,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
@@ -31,6 +32,7 @@ export class PicturePageComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #meta = inject(Meta);
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
@@ -106,13 +108,15 @@ export class PicturePageComponent {
   protected readonly CommentsType = CommentsType;
 
   constructor() {
-    // Router.navigate() is fire-and-forget here (not folded into either resource's stream): it
-    // runs outside both resources' own pending-task lifecycles, so there's no window where a
-    // resource can settle and let SSR's whenStable() serialize before the redirect it triggered
-    // has actually registered.
+    // NOT_FOUND is reported to NotFoundService (AppComponent renders <app-page-not-found> in place
+    // of the outlet) rather than via Router.navigate(['/error-404']): SSR doesn't honour an
+    // imperative navigation fired mid-render - whenStable() can serialize a blank outlet before it
+    // registers. The canonical-route redirect below stays a Router.navigate() because it targets a
+    // real URL; it's still fire-and-forget so a resource can't settle and let whenStable() run
+    // before it registers.
     effect(() => {
       if (isNotFoundError(this.canonicalResource.error()) || isNotFoundError(this.pictureResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

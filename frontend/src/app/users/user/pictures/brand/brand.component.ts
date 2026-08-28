@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
   ItemListOptions,
@@ -15,6 +15,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
@@ -32,7 +33,7 @@ import {ThumbnailComponent} from '../../../../thumbnail/thumbnail/thumbnail.comp
 })
 export class UsersUserPicturesBrandComponent {
   readonly #userService = inject(UserService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
@@ -137,7 +138,7 @@ export class UsersUserPicturesBrandComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error()) || isNotFoundError(this.brandResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

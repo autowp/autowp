@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {
   ItemFields,
   ItemLinkListOptions,
@@ -17,6 +17,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
@@ -34,7 +35,7 @@ import {ThumbnailComponent} from '../../../thumbnail/thumbnail/thumbnail.compone
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonsPersonInfoComponent {
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #itemsClient = inject(ItemsClient);
   readonly #auth = inject(AuthService);
@@ -150,7 +151,7 @@ export class PersonsPersonInfoComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

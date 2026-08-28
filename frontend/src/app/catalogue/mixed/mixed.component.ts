@@ -3,7 +3,7 @@ import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
   ItemListOptions,
@@ -16,6 +16,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
@@ -35,7 +36,7 @@ import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component'
 export class CatalogueMixedComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
@@ -53,9 +54,8 @@ export class CatalogueMixedComponent {
   });
 
   // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
-  // than an imperative Router.navigate() inside the stream (which races SSR's whenStable() the
-  // same way the picture-page canonicalResource did) — see the constructor effect() below, which
-  // is the single place that navigates off this resource's error() signal.
+  // than an imperative Router.navigate() inside the stream — see the constructor effect() below,
+  // which is the single place that reports not-found off this resource's error() signal.
   //
   // `id` is suffixed with data().catname (mixed/other/logotypes all share this component) and the
   // brand catname read once at construction time — a static id would let a second instance of
@@ -97,7 +97,7 @@ export class CatalogueMixedComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

@@ -4,7 +4,7 @@ import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CommentMessageFields,
   CreateContactRequest,
@@ -34,6 +34,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {AppContactsService} from '@services/contacts';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
@@ -58,7 +59,7 @@ import {UserComponent} from '../../user/user/user.component';
 export class UsersUserComponent {
   readonly #appContactsService = inject(AppContactsService);
   readonly #messageDialogService = inject(MessageDialogService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #userService = inject(UserService);
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
@@ -256,7 +257,7 @@ export class UsersUserComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

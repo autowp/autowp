@@ -3,7 +3,7 @@ import type {Topic} from '@grpc/spec.pb';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CommentsSubscribeRequest,
   CommentsType,
@@ -13,6 +13,7 @@ import {
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {getForumsThemeTranslation} from '@utils/translations';
@@ -31,7 +32,7 @@ import {MESSAGES_PER_PAGE} from '../forums.module';
 })
 export class ForumsTopicComponent {
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #pageEnv = inject(PageEnvService);
   protected readonly auth = inject(AuthService);
   readonly #toastService = inject(ToastsService);
@@ -82,7 +83,7 @@ export class ForumsTopicComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.topicResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

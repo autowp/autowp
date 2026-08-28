@@ -20,6 +20,7 @@ import {skipAuthMetadata} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {MessageService} from '@services/message';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {browserWindow} from '@utils/browser-window';
 import {isPrerendering} from '@utils/is-prerendering';
@@ -29,6 +30,7 @@ import {RemarkComponent} from 'ngx-remark';
 import {map, of, shareReplay} from 'rxjs';
 
 import {MenuComponent} from './moder/menu/menu/menu.component';
+import {PageNotFoundComponent} from './not-found.component';
 import {ContainerComponent} from './toasts/container/container.component';
 import {ToastsService} from './toasts/toasts.service';
 import {UsersOnlineComponent} from './users/online/online.component';
@@ -48,6 +50,7 @@ import {UsersOnlineComponent} from './users/online/online.component';
     ContainerComponent,
     AsyncPipe,
     RemarkComponent,
+    PageNotFoundComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -56,6 +59,7 @@ import {UsersOnlineComponent} from './users/online/online.component';
 export class AppComponent {
   readonly #auth = inject(AuthService);
   protected readonly router = inject(Router);
+  protected readonly notFound = inject(NotFoundService);
   readonly #messageService = inject(MessageService);
   readonly #toastService = inject(ToastsService);
   protected readonly pageEnv = inject(PageEnvService);
