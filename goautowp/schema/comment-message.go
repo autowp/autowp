@@ -34,6 +34,7 @@ const (
 	CommentMessageTableDeletedColName            = "deleted"
 	CommentMessageTableDeletedByColName          = "deleted_by"
 	CommentMessageTableDeleteDateColName         = "delete_date"
+	CommentMessageTableDeleteReasonColName       = "delete_reason"
 	CommentMessageTableRepliesCountColName       = "replies_count"
 	CommentMessageTableVoteColName               = "vote"
 	CommentMessageTableDatetimeColName           = "datetime"

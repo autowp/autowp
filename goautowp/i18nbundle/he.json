@@ -7,10 +7,10 @@
   "carlist/years": "years of production",
   "present-time-abbr": "pr.",
   "pm/new-picture-%s-vote-%s/accept": "New picture accept vote\n{{.Picture}}\nReason: {{.Reason}}",
-  "pm/new-picture-%s-vote-%s/delete": "New picture delete vote\n{{.Picture}}\nReason: {{.Reason}}",
+  "pm/new-picture-%s-vote-%s/delete": "New picture delete vote\n{{.Picture}}\nReason: {{.Reason}}\n{{.Appeal}}",
   "pm/user-%s-edited-picture-copyrights-%s-%s": "User {{.User}} edited picture copyrights\n{{.PictureURL}}",
   "pm/your-picture-accepted-%s": "Your picture was accepted\n{{.PictureURL}}",
-  "pm/your-picture-%s-enqueued-to-remove-%s": "Your picture {{.PictureURL}} enqueued to remove\n{{.Reasons}}",
+  "pm/your-picture-%s-enqueued-to-remove-%s": "Your picture {{.PictureURL}} enqueued to remove\n{{.Reasons}}\n{{.Appeal}}",
   "pm/user-%s-accept-replace-%s-%s": "{{.ModeratorURL}} accept replacement {{.PictureURL}} to {{.ReplacementPictureURL}}",
   "pm/user-%s-adds-item-%s-%s-to-item-%s-%s": "User {{ .UserURL }} added {{ .ItemName }} ( {{ .ItemModerURL }} ) to {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
   "pm/user-%s-set-inherited-vehicle-engine-%s-%s": "{{ .UserURL }} set inherited engine to vehicle {{ .ItemName }} ( {{ .ItemModerURL }} )",
@@ -569,5 +569,7 @@
   "perspective/mascot": "mascot",
   "perspective/sketch": "sketch",
   "perspective/mixed": "mixed",
-  "perspective/exterior-details": "exterior details"
+  "perspective/exterior-details": "exterior details",
+  "pm/moderation-appeal": "החלטה זו התקבלה על ידי מנהל. אם לדעתך מדובר בטעות, הודע לנו באמצעות טופס יצירת הקשר.",
+  "pm/comment-deleted": "התגובה שלך הוסרה על ידי מנהל.\nסיבה: {{.Reason}}\n{{.Appeal}}"
 }

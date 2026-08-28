@@ -2279,11 +2279,14 @@ func (s *PicturesGRPCServer) notifyVote(
 	}
 
 	tpl := "pm/new-picture-%s-vote-%s/delete"
+	send := s.sendLocalizedModerationMessage
+
 	if vote > 0 {
 		tpl = "pm/new-picture-%s-vote-%s/accept"
+		send = s.sendLocalizedMessage
 	}
 
-	return s.sendLocalizedMessage(
+	return send(
 		ctx, userID, picture.OwnerID, tpl,
 		func(lang string) (map[string]interface{}, error) {
 			uri, err := s.hostManager.URIByLanguage(lang)
@@ -2462,6 +2465,27 @@ func (s *PicturesGRPCServer) sendLocalizedMessage(
 	ctx context.Context, userID int64, receiverID sql.NullInt64, messageID string,
 	templateDataFunc func(lang string) (map[string]interface{}, error),
 ) error {
+	return s.sendLocalizedMessageVia(
+		ctx, userID, receiverID, messageID, templateDataFunc, s.messagingRepository.CreateMessageFromTemplate,
+	)
+}
+
+// sendLocalizedModerationMessage is sendLocalizedMessage for a moderator decision: the rendered
+// message also gets the standard {{.Appeal}} line (DSA Art. 17 statement of reasons).
+func (s *PicturesGRPCServer) sendLocalizedModerationMessage(
+	ctx context.Context, userID int64, receiverID sql.NullInt64, messageID string,
+	templateDataFunc func(lang string) (map[string]interface{}, error),
+) error {
+	return s.sendLocalizedMessageVia(
+		ctx, userID, receiverID, messageID, templateDataFunc, s.messagingRepository.CreateModerationMessageFromTemplate,
+	)
+}
+
+func (s *PicturesGRPCServer) sendLocalizedMessageVia(
+	ctx context.Context, userID int64, receiverID sql.NullInt64, messageID string,
+	templateDataFunc func(lang string) (map[string]interface{}, error),
+	send func(context.Context, int64, int64, string, map[string]interface{}, string) error,
+) error {
 	if !receiverID.Valid || (receiverID.Int64 == userID) {
 		return nil
 	}
@@ -2487,14 +2511,7 @@ func (s *PicturesGRPCServer) sendLocalizedMessage(
 		return err
 	}
 
-	return s.messagingRepository.CreateMessageFromTemplate(
-		ctx,
-		0,
-		receiver.ID,
-		messageID,
-		templateData,
-		receiver.Language,
-	)
+	return send(ctx, 0, receiver.ID, messageID, templateData, receiver.Language)
 }
 
 func (s *PicturesGRPCServer) notifyAccepted(
@@ -2548,7 +2565,7 @@ func (s *PicturesGRPCServer) notifyRemoving(
 ) error {
 	ctx = context.WithoutCancel(ctx)
 
-	return s.sendLocalizedMessage(
+	return s.sendLocalizedModerationMessage(
 		ctx, userID, pic.OwnerID, "pm/your-picture-%s-enqueued-to-remove-%s",
 		func(lang string) (map[string]interface{}, error) {
 			deleteRequests, err := s.repository.NegativeVotes(ctx, pic.ID)

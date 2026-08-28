@@ -6,10 +6,10 @@
   "carlist/years": "года выпуска",
   "present-time-abbr": "н.в.",
   "pm/new-picture-%s-vote-%s/accept": "Подана заявка на принятие добавленной вами картинки\n{{.Picture}}\nПричина: {{.Reason}}",
-  "pm/new-picture-%s-vote-%s/delete": "Подана заявка на удаление добавленной вами картинки\n{{.Picture}}\nПричина: {{.Reason}}",
+  "pm/new-picture-%s-vote-%s/delete": "Подана заявка на удаление добавленной вами картинки\n{{.Picture}}\nПричина: {{.Reason}}\n{{.Appeal}}",
   "pm/user-%s-edited-picture-copyrights-%s-%s": "Пользователь {{.User}} редактировал текст копирайтов изображения\n{{.PictureURL}}",
   "pm/your-picture-accepted-%s": "Добавленная вами картинка принята на сайт\n{{.PictureURL}}",
-  "pm/your-picture-%s-enqueued-to-remove-%s": "Добавленная вами картинка {{.PictureURL}} поставлена в очередь на удаление\n{{.Reasons}}",
+  "pm/your-picture-%s-enqueued-to-remove-%s": "Добавленная вами картинка {{.PictureURL}} поставлена в очередь на удаление\n{{.Reasons}}\n{{.Appeal}}",
   "pm/user-%s-accept-replace-%s-%s": "{{.ModeratorURL}} принял замену {{.PictureURL}} на {{.ReplacementPictureURL}}",
   "pm/user-%s-removed-item-%s-%s-from-item-%s-%s": "Пользователь {{ .UserURL }} удалил {{ .ItemName }} ( {{ .ItemModerURL }} ) из {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
   "pm/user-%s-adds-item-%s-%s-to-item-%s-%s": "Пользователь {{ .UserURL }} добавил {{ .ItemName }} ( {{ .ItemModerURL }} ) в {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
@@ -569,5 +569,7 @@
   "perspective/mascot": "маскот",
   "perspective/sketch": "эскиз",
   "perspective/mixed": "разное",
-  "perspective/exterior-details": "детали экстерьера"
+  "perspective/exterior-details": "детали экстерьера",
+  "pm/moderation-appeal": "Это решение принято модератором. Если вы считаете его ошибочным, сообщите нам через форму обратной связи.",
+  "pm/comment-deleted": "Ваш комментарий удалён модератором.\nПричина: {{.Reason}}\n{{.Appeal}}"
 }

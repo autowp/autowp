@@ -1805,6 +1805,7 @@ message CommentsViewRequest {
 message CommentsSetDeletedRequest {
   int64 comment_id = 1;
   bool deleted = 2;
+  string reason = 3;
 }
 
 message CommentsMoveCommentRequest {

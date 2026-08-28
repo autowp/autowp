@@ -231,13 +231,20 @@ func (s *Repository) QueueDeleteMessage(
 	ctx context.Context,
 	commentID int64,
 	byUserID int64,
+	reason string,
 ) error {
-	var moderatorAttention schema.CommentMessageModeratorAttention
+	var row struct {
+		ModeratorAttention schema.CommentMessageModeratorAttention `db:"moderator_attention"`
+		AuthorID           sql.NullInt64                           `db:"author_id"`
+	}
 
-	success, err := s.db.Select(schema.CommentMessageTableModeratorAttentionCol).
+	success, err := s.db.Select(
+		schema.CommentMessageTableModeratorAttentionCol,
+		schema.CommentMessageTableAuthorIDCol,
+	).
 		From(schema.CommentMessageTable).
 		Where(schema.CommentMessageTableIDCol.Eq(commentID)).
-		ScanValContext(ctx, &moderatorAttention)
+		ScanStructContext(ctx, &row)
 	if err != nil {
 		return err
 	}
@@ -246,20 +253,24 @@ func (s *Repository) QueueDeleteMessage(
 		return sql.ErrNoRows
 	}
 
-	if moderatorAttention == schema.CommentMessageModeratorAttentionRequired {
+	if row.ModeratorAttention == schema.CommentMessageModeratorAttentionRequired {
 		return errCommentWithModerAttentionCantBeDeleted
 	}
 
 	_, err = s.db.Update(schema.CommentMessageTable).
 		Set(goqu.Record{
-			schema.CommentMessageTableDeletedColName:    true,
-			schema.CommentMessageTableDeletedByColName:  byUserID,
-			schema.CommentMessageTableDeleteDateColName: goqu.Func("NOW"),
+			schema.CommentMessageTableDeletedColName:      true,
+			schema.CommentMessageTableDeletedByColName:    byUserID,
+			schema.CommentMessageTableDeleteDateColName:   goqu.Func("NOW"),
+			schema.CommentMessageTableDeleteReasonColName: sql.NullString{String: reason, Valid: reason != ""},
 		}).
 		Where(schema.CommentMessageTableIDCol.Eq(commentID)).
 		Executor().ExecContext(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return s.notifyCommentDeleted(ctx, row.AuthorID, byUserID, reason)
 }
 
 func (s *Repository) RestoreMessage(ctx context.Context, commentID int64) error {
@@ -1681,6 +1692,41 @@ func (s *Repository) DeleteTopic(
 	}
 
 	return nil
+}
+
+// notifyCommentDeleted tells the comment's author a moderator removed it, with the reason and the
+// standard appeal line (DSA Art. 17). No-op when the author deleted their own comment or has left.
+func (s *Repository) notifyCommentDeleted(
+	ctx context.Context,
+	authorID sql.NullInt64,
+	byUserID int64,
+	reason string,
+) error {
+	if !authorID.Valid || authorID.Int64 == byUserID {
+		return nil
+	}
+
+	notDeleted := false
+
+	author, err := s.userRepository.User(
+		ctx,
+		&query.UserListOptions{ID: authorID.Int64, Deleted: &notDeleted},
+		users.UserFields{},
+		users.OrderByNone,
+	)
+	if err != nil && !errors.Is(err, users.ErrUserNotFound) {
+		return err
+	}
+
+	if author == nil {
+		return nil
+	}
+
+	return s.messageRepository.CreateModerationMessageFromTemplate(
+		ctx, 0, author.ID, "pm/comment-deleted",
+		map[string]interface{}{"Reason": reason},
+		author.Language,
+	)
 }
 
 func (s *Repository) moveMessageRecursive(

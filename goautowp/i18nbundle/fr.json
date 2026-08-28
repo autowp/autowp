@@ -6,10 +6,10 @@
   "carlist/years": "années de production",
   "present-time-abbr": "pr.",
   "pm/new-picture-%s-vote-%s/accept": "Vote accepter pour la nouvelle image\n{{.Picture}}\nRaison: {{.Reason}}",
-  "pm/new-picture-%s-vote-%s/delete": "Vote pour suppression de la nouvelle image\n{{.Picture}}\nRaison: {{.Reason}}",
+  "pm/new-picture-%s-vote-%s/delete": "Vote pour suppression de la nouvelle image\n{{.Picture}}\nRaison: {{.Reason}}\n{{.Appeal}}",
   "pm/user-%s-edited-picture-copyrights-%s-%s": "L'utilisateur {{.User}} a modifié les droits d'auteur de l'image\n{{.PictureURL}}",
   "pm/your-picture-accepted-%s": "Votre image a été acceptée\n{{.PictureURL}}",
-  "pm/your-picture-%s-enqueued-to-remove-%s": "Votre image {{.PictureURL}} est en attente de suppression\n{{.Reasons}}",
+  "pm/your-picture-%s-enqueued-to-remove-%s": "Votre image {{.PictureURL}} est en attente de suppression\n{{.Reasons}}\n{{.Appeal}}",
   "pm/user-%s-accept-replace-%s-%s": "{{.ModeratorURL}} a accepté le remplacement de {{.PictureURL}} par {{.ReplacementPictureURL}}",
   "pm/user-%s-removed-item-%s-%s-from-item-%s-%s": "L'utilisateur {{ .UserURL }} a enlevé {{ .ItemName }} ( {{ .ItemModerURL }} ) de {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
   "pm/user-%s-adds-item-%s-%s-to-item-%s-%s": "L'utilisateur {{ .UserURL }} a ajouté {{ .ItemName }} ( {{ .ItemModerURL }} ) de {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
@@ -569,5 +569,7 @@
   "perspective/mascot": "mascotte",
   "perspective/sketch": "croquis",
   "perspective/mixed": "mixte",
-  "perspective/exterior-details": "détails extérieurs"
+  "perspective/exterior-details": "détails extérieurs",
+  "pm/moderation-appeal": "Cette décision a été prise par un modérateur. Si vous pensez qu’il s’agit d’une erreur, signalez-le-nous via le formulaire de contact.",
+  "pm/comment-deleted": "Votre commentaire a été supprimé par un modérateur.\nRaison : {{.Reason}}\n{{.Appeal}}"
 }

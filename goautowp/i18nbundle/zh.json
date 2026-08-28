@@ -1,15 +1,15 @@
 {
   "pm/user-%s-post-new-message-%s": "{{.Name}} posted new message\n{{.Message}}",
-  "pm/user-%s-replies-to-you-%s" : "{{.Name}}回复了您\n{{.Message}}",
+  "pm/user-%s-replies-to-you-%s": "{{.Name}}回复了您\n{{.Message}}",
   "pm/achievement-granted": "恭喜！您获得了一个新成就。\n{{.ProfileURL}}",
   "carlist/model-years": "年款",
   "carlist/years": "生产年份",
   "present-time-abbr": "至今",
   "pm/new-picture-%s-vote-%s/accept": "收到接受图片表决\n{{.Picture}}\nReason: {{.Reason}}",
-  "pm/new-picture-%s-vote-%s/delete": "收到删除图片表决\n{{.Picture}}\nReason: {{.Reason}}",
+  "pm/new-picture-%s-vote-%s/delete": "收到删除图片表决\n{{.Picture}}\nReason: {{.Reason}}\n{{.Appeal}}",
   "pm/user-%s-edited-picture-copyrights-%s-%s": "用户{{.User}}编辑了图片版权\n{{.PictureURL}}",
   "pm/your-picture-accepted-%s": "您的图片已通过\n{{.PictureURL}}",
-  "pm/your-picture-%s-enqueued-to-remove-%s": "您的图片{{.PictureURL}}已被删除\n{{.Reasons}}",
+  "pm/your-picture-%s-enqueued-to-remove-%s": "您的图片{{.PictureURL}}已被删除\n{{.Reasons}}\n{{.Appeal}}",
   "pm/user-%s-accept-replace-%s-%s": "{{.ModeratorURL}}接受了替换申请{{.PictureURL}} to {{.ReplacementPictureURL}}",
   "pm/user-%s-removed-item-%s-%s-from-item-%s-%s": "User {{ .UserURL }} removed {{ .ItemName }} ( {{ .ItemModerURL }} ) from {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
   "pm/user-%s-adds-item-%s-%s-to-item-%s-%s": "User {{ .UserURL }} added {{ .ItemName }} ( {{ .ItemModerURL }} ) to {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
@@ -569,5 +569,7 @@
   "perspective/mascot": "立标",
   "perspective/sketch": "草图",
   "perspective/mixed": "mixed",
-  "perspective/exterior-details": "外观细节"
+  "perspective/exterior-details": "外观细节",
+  "pm/moderation-appeal": "此决定由版主作出。如果您认为这是错误，请通过反馈表单告知我们。",
+  "pm/comment-deleted": "您的评论已被版主删除。\n原因：{{.Reason}}\n{{.Appeal}}"
 }

@@ -446,7 +446,7 @@ func (s *CommentsGRPCServer) SetDeleted(
 	}
 
 	if in.GetDeleted() {
-		err = s.repository.QueueDeleteMessage(ctx, in.GetCommentId(), userCtx.UserID)
+		err = s.repository.QueueDeleteMessage(ctx, in.GetCommentId(), userCtx.UserID, in.GetReason())
 	} else {
 		err = s.repository.RestoreMessage(ctx, in.GetCommentId())
 	}

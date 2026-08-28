@@ -210,6 +210,38 @@ func (s *Repository) CreateMessageFromTemplate(
 	return s.CreateMessage(ctx, fromUserID, toUserID, text)
 }
 
+// ModerationAppealMessageID is the standard "a moderator did this, here is how to contest it"
+// line. Templates for takedowns / restrictions / bans reference it as {{.Appeal}}, and
+// CreateModerationMessageFromTemplate fills it in.
+const ModerationAppealMessageID = "pm/moderation-appeal"
+
+// CreateModerationMessageFromTemplate is CreateMessageFromTemplate for a moderator decision: it
+// always makes a localized {{.Appeal}} available so the recipient is told who acted and how to
+// contest it (DSA Art. 17 statement of reasons).
+func (s *Repository) CreateModerationMessageFromTemplate(
+	ctx context.Context,
+	fromUserID int64,
+	toUserID int64,
+	messageID string,
+	templateData map[string]interface{},
+	lang string,
+) error {
+	appeal, err := s.i18n.Localizer(lang).Localize(&i18n.LocalizeConfig{
+		DefaultMessage: &i18n.Message{ID: ModerationAppealMessageID},
+	})
+	if err != nil {
+		return err
+	}
+
+	if templateData == nil {
+		templateData = map[string]interface{}{}
+	}
+
+	templateData["Appeal"] = appeal
+
+	return s.CreateMessageFromTemplate(ctx, fromUserID, toUserID, messageID, templateData, lang)
+}
+
 func (s *Repository) CreateMessage(
 	ctx context.Context,
 	fromUserID int64,

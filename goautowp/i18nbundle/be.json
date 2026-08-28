@@ -6,10 +6,10 @@
   "carlist/years": "года выпуску",
   "present-time-abbr": "н.ч.",
   "pm/new-picture-%s-vote-%s/accept": "Пададзена заяўка на прыняцце дададзенай вамі карцінкі\n{{.Picture}}\nПрычына: {{.Reason}}",
-  "pm/new-picture-%s-vote-%s/delete": "Пададзена заяўка на выдаленне дададзенай вамі карцінкі\n{{.Picture}}\nПрычына: {{.Reason}}",
+  "pm/new-picture-%s-vote-%s/delete": "Пададзена заяўка на выдаленне дададзенай вамі карцінкі\n{{.Picture}}\nПрычына: {{.Reason}}\n{{.Appeal}}",
   "pm/user-%s-edited-picture-copyrights-%s-%s": "Карыстальнік {{.User}} рэдагаваў тэкст капірайтаў выявы\n{{.PictureURL}}",
   "pm/your-picture-accepted-%s": "Дададзеная вамі карцінка прынятая на сайт\n{{.PictureURL}}",
-  "pm/your-picture-%s-enqueued-to-remove-%s": "Дададзеная вамі карцінка {{.PictureURL}} пастаўлена ў чаргу на выдаленне\n{{.Reasons}}",
+  "pm/your-picture-%s-enqueued-to-remove-%s": "Дададзеная вамі карцінка {{.PictureURL}} пастаўлена ў чаргу на выдаленне\n{{.Reasons}}\n{{.Appeal}}",
   "pm/user-%s-accept-replace-%s-%s": "{{.ModeratorURL}} прыняў замену {{.PictureURL}} на {{.ReplacementPictureURL}}",
   "pm/user-%s-removed-item-%s-%s-from-item-%s-%s": "Карыстальнік {{ .UserURL }} выдаліў {{ .ItemName }} ( {{ .ItemModerURL }} ) з {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
   "pm/user-%s-adds-item-%s-%s-to-item-%s-%s": "Карыстальнік {{ .UserURL }} дадаў {{ .ItemName }} ( {{ .ItemModerURL }} ) у {{ .ParentItemName }} ( {{ .ParentItemModerURL }} )",
@@ -569,5 +569,7 @@
   "perspective/mascot": "маскот",
   "perspective/sketch": "эскіз",
   "perspective/mixed": "рознае",
-  "perspective/exterior-details": "дэталі экстэр'ера"
+  "perspective/exterior-details": "дэталі экстэр'ера",
+  "pm/moderation-appeal": "Гэтае рашэнне прынята мадэратарам. Калі вы лічыце яго памылковым, паведаміце нам праз форму зваротнай сувязі.",
+  "pm/comment-deleted": "Ваш каментарый выдалены мадэратарам.\nПрычына: {{.Reason}}\n{{.Appeal}}"
 }
