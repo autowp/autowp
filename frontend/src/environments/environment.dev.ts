@@ -1,5 +1,6 @@
 export const environment = {
   apiUrl: '',
+  gaTrackingId: '',
   grpcHost: '',
   // eslint-disable-next-line sonarjs/no-clear-text-protocols
   ssrGrpcHost: 'http://goautowp-serve:8080',

@@ -273,9 +273,14 @@ All images are posted for educational purposes.
           >Want to contribute?</a
         >
         <a routerLink="/policy" i18n>Privacy Policy</a>
+        <a href="#" i18n (click)="openCookieSettings()">Cookie settings</a>
       </p>
     </footer>
   }
 </div>
 
 <app-toasts aria-live="polite" aria-atomic="true" />
+
+@if (showConsentBanner()) {
+  <app-cookie-consent />
+}

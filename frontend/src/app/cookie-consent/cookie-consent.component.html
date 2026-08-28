@@ -1,0 +1,18 @@
+<div class="cookie-consent" role="dialog" aria-live="polite" aria-label="Cookie consent" i18n-aria-label>
+  <div class="container">
+    <p class="cookie-consent__text">
+      <ng-container i18n
+        >We use cookies that are necessary for the site to work, and — only with your consent — analytics cookies that
+        help us understand how the site is used.</ng-container
+      >
+      &ngsp;
+      <a routerLink="/policy" i18n>Learn more</a>
+    </p>
+    <div class="cookie-consent__actions">
+      <button type="button" class="btn btn-outline-secondary" i18n (click)="consent.rejectAll()">
+        Reject non-essential
+      </button>
+      <button type="button" class="btn btn-primary" i18n (click)="consent.acceptAll()">Accept all</button>
+    </div>
+  </div>
+</div>

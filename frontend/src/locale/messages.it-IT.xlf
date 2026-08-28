@@ -15036,6 +15036,54 @@ Questo processo è irreversibile, quindi riflettete bene e non prendete decision
         </context-group>
         <target state="translated">Distanza</target>
       </trans-unit>
+      <trans-unit id="3340358994057820932" datatype="html">
+        <source>Cookie settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">276,282</context>
+        </context-group>
+      <target state="translated">Impostazioni dei cookie</target>
+      </trans-unit>
+      <trans-unit id="7910408219947091899" datatype="html">
+        <source>Cookie consent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/cookie-consent/cookie-consent.component.html</context>
+          <context context-type="linenumber">1,3</context>
+        </context-group>
+      <target state="translated">Consenso ai cookie</target>
+      </trans-unit>
+      <trans-unit id="5885417137727472134" datatype="html">
+        <source>We use cookies that are necessary for the site to work, and — only with your consent — analytics cookies that help us understand how the site is used.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/cookie-consent/cookie-consent.component.html</context>
+          <context context-type="linenumber">5,9</context>
+        </context-group>
+      <target state="translated">Utilizziamo cookie necessari al funzionamento del sito e — solo con il tuo consenso — cookie analitici che ci aiutano a capire come viene utilizzato il sito.</target>
+      </trans-unit>
+      <trans-unit id="819996403327805209" datatype="html">
+        <source>Learn more</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/cookie-consent/cookie-consent.component.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      <target state="translated">Scopri di più</target>
+      </trans-unit>
+      <trans-unit id="5753041237669781721" datatype="html">
+        <source> Reject non-essential </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/cookie-consent/cookie-consent.component.html</context>
+          <context context-type="linenumber">13,15</context>
+        </context-group>
+      <target state="translated"> Rifiuta i non essenziali </target>
+      </trans-unit>
+      <trans-unit id="8083493007965546479" datatype="html">
+        <source>Accept all</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/cookie-consent/cookie-consent.component.html</context>
+          <context context-type="linenumber">15,19</context>
+        </context-group>
+      <target state="translated">Accetta tutti</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

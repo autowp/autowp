@@ -1,8 +1,18 @@
 import type {Language} from '@services/language';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Renderer2, signal} from '@angular/core';
+import {AsyncPipe, DOCUMENT, isPlatformBrowser} from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  PLATFORM_ID,
+  Renderer2,
+  signal,
+} from '@angular/core';
 import {rxResource, takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {environment} from '@environment/environment';
@@ -18,6 +28,8 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {skipAuthMetadata} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
+import {ConsentService} from '@services/consent';
+import {loadGoogleAnalytics} from '@services/google-analytics';
 import {LanguageService} from '@services/language';
 import {MessageService} from '@services/message';
 import {NotFoundService} from '@services/not-found';
@@ -29,6 +41,7 @@ import Keycloak from 'keycloak-js';
 import {RemarkComponent} from 'ngx-remark';
 import {map, of, shareReplay} from 'rxjs';
 
+import {CookieConsentComponent} from './cookie-consent/cookie-consent.component';
 import {MenuComponent} from './moder/menu/menu/menu.component';
 import {PageNotFoundComponent} from './not-found.component';
 import {ContainerComponent} from './toasts/container/container.component';
@@ -51,6 +64,7 @@ import {UsersOnlineComponent} from './users/online/online.component';
     AsyncPipe,
     RemarkComponent,
     PageNotFoundComponent,
+    CookieConsentComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -60,6 +74,8 @@ export class AppComponent {
   readonly #auth = inject(AuthService);
   protected readonly router = inject(Router);
   protected readonly notFound = inject(NotFoundService);
+  protected readonly consent = inject(ConsentService);
+  readonly #isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly #messageService = inject(MessageService);
   readonly #toastService = inject(ToastsService);
   protected readonly pageEnv = inject(PageEnvService);
@@ -136,8 +152,30 @@ export class AppComponent {
   );
   protected readonly isNavbarCollapsed = signal(true);
 
+  // Rendered only in the browser: SSR has no localStorage, so the choice can't be known there and
+  // showing the banner server-side would flash it for visitors who have already answered.
+  protected readonly showConsentBanner = computed(() => this.#isBrowser && !this.consent.resolved());
+
   constructor() {
-    const angulartics2GoogleAnalytics = inject(Angulartics2GoogleAnalytics);
+    const angulartics = inject(Angulartics2GoogleAnalytics);
+
+    // Google Analytics loads lazily and only after the visitor accepts analytics cookies (never
+    // during SSR, never in dev). Loading it - and starting Angulartics' pageview tracking - is what
+    // sets the _ga/_gid cookies and contacts google-analytics.com, so it stays behind consent.
+    const win = this.#window;
+    if (win && environment.production && environment.gaTrackingId) {
+      let started = false;
+
+      effect(() => {
+        if (started || !this.consent.analyticsAllowed()) {
+          return;
+        }
+
+        started = true;
+        loadGoogleAnalytics(environment.gaTrackingId, win, this.#document);
+        angulartics.startTracking();
+      });
+    }
 
     toObservable(this.pageEnv.layoutParams)
       .pipe(takeUntilDestroyed(this.#destroyRef))
@@ -157,10 +195,6 @@ export class AppComponent {
     }
 
     this.searchHostname = searchHostname;
-
-    if (environment.production) {
-      angulartics2GoogleAnalytics.startTracking();
-    }
   }
 
   protected doLogin() {
@@ -195,5 +229,11 @@ export class AppComponent {
     if (open) {
       this.categoriesRequested.set(true);
     }
+  }
+
+  protected openCookieSettings(): boolean {
+    this.consent.reopen();
+
+    return false;
   }
 }
