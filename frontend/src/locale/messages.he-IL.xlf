@@ -15245,6 +15245,10 @@ Questions about this Policy or your personal data: [autowp@gmail.com](mailto:aut
 
 שאלות בנוגע למדיניות זו או לנתונים האישיים שלך: [autowp@gmail.com](mailto:autowp@gmail.com).</target>
       </trans-unit>
+      <trans-unit id="5490315184415589290" datatype="html">
+        <source>Blocked until</source>
+      <target state="translated">חסום עד</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

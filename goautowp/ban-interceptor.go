@@ -18,6 +18,10 @@ import (
 
 const errBannedMessage = "banned"
 
+// banExemptMethod stays reachable from a banned address so the Access denied page can call it to
+// show the visitor why they were blocked. It only ever reports the caller's own ban status.
+const banExemptMethod = "/goautowp.Autowp/GetIP"
+
 const (
 	// How long one address' ban lookup is reused before the database is asked again. This check
 	// runs ahead of *every* gRPC call and REST request, and a single server-side rendered page
@@ -138,11 +142,13 @@ func BanUnaryServerInterceptor(banChecker *BanChecker) grpc.UnaryServerIntercept
 	return func(
 		ctx context.Context,
 		req interface{},
-		_ *grpc.UnaryServerInfo,
+		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		if p, ok := realip.FromContext(ctx); ok && banChecker.IsBanned(ctx, net.ParseIP(p.String())) {
-			return nil, status.Error(codes.PermissionDenied, errBannedMessage)
+		if info.FullMethod != banExemptMethod {
+			if p, ok := realip.FromContext(ctx); ok && banChecker.IsBanned(ctx, net.ParseIP(p.String())) {
+				return nil, status.Error(codes.PermissionDenied, errBannedMessage)
+			}
 		}
 
 		return handler(ctx, req)

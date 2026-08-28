@@ -35,6 +35,7 @@ import {authInterceptor$, GrpcLogInterceptor} from '@services/api.service';
 import {AuthService} from '@services/auth.service';
 import {AppContactsService} from '@services/contacts';
 import {ContentLanguageService} from '@services/content-language';
+import {GrpcBannedInterceptor} from '@services/grpc-banned.interceptor';
 import {IpService} from '@services/ip';
 import {ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
@@ -146,6 +147,7 @@ export const appConfig: ApplicationConfig = {
       settings: {host: environment.grpcHost},
     }),
     {multi: true, provide: GRPC_INTERCEPTORS, useClass: GrpcLogInterceptor},
+    {multi: true, provide: GRPC_INTERCEPTORS, useClass: GrpcBannedInterceptor},
     // Was written but never registered, so nothing ever reached it: chunk-load failures went
     // unhandled in the browser, and render failures were logged by Angular's default handler with
     // no clue which page they came from.

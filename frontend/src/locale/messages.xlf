@@ -4490,8 +4490,38 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
       <trans-unit id="1211573871136189242" datatype="html">
         <source>Access denied</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forbidden.component.ts</context>
-          <context context-type="linenumber">8,11</context>
+          <context context-type="sourcefile">src/app/forbidden.component.html</context>
+          <context context-type="linenumber">1,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4775550080689015987" datatype="html">
+        <source>Reason</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forbidden.component.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/picture-vote-templates/picture-vote-templates.component.html</context>
+          <context context-type="linenumber">35,36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">609,610</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/traffic.component.html</context>
+          <context context-type="linenumber">44,46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/users/user/user.component.html</context>
+          <context context-type="linenumber">306,307</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5490315184415589290" datatype="html">
+        <source>Blocked until</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forbidden.component.html</context>
+          <context context-type="linenumber">7,10</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2074425614536419038" datatype="html">
@@ -6697,25 +6727,6 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/picture-vote-templates/picture-vote-templates.component.html</context>
           <context context-type="linenumber">32,36</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4775550080689015987" datatype="html">
-        <source>Reason</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/picture-vote-templates/picture-vote-templates.component.html</context>
-          <context context-type="linenumber">35,36</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
-          <context context-type="linenumber">609,610</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/traffic/traffic.component.html</context>
-          <context context-type="linenumber">44,46</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/users/user/user.component.html</context>
-          <context context-type="linenumber">306,307</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7262833732459145559" datatype="html">

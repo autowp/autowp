@@ -15256,6 +15256,10 @@ Questions about this Policy or your personal data: [autowp@gmail.com](mailto:aut
 
 有关本政策或您个人数据的问题：[autowp@gmail.com](mailto:autowp@gmail.com)。</target>
       </trans-unit>
+      <trans-unit id="5490315184415589290" datatype="html">
+        <source>Blocked until</source>
+      <target state="translated">封禁至</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

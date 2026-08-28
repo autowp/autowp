@@ -15266,6 +15266,10 @@ Possiamo aggiornare la presente Informativa di tanto in tanto. La versione in vi
 
 Domande sulla presente Informativa o sui Suoi dati personali: [autowp@gmail.com](mailto:autowp@gmail.com).</target>
       </trans-unit>
+      <trans-unit id="5490315184415589290" datatype="html">
+        <source>Blocked until</source>
+      <target state="translated">Bloccato fino al</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

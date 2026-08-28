@@ -15263,6 +15263,10 @@ Podemos atualizar esta Política periodicamente. A versão vigente está sempre 
 
 Dúvidas sobre esta Política ou sobre seus dados pessoais: [autowp@gmail.com](mailto:autowp@gmail.com).</target>
       </trans-unit>
+      <trans-unit id="5490315184415589290" datatype="html">
+        <source>Blocked until</source>
+      <target state="translated">Bloqueado até</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

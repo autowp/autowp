@@ -1,0 +1,9 @@
+<h2 i18n>Access denied</h2>
+@if (ban(); as ban) {
+  @if (ban.reason) {
+    <p><ng-container i18n>Reason</ng-container>: {{ ban.reason }}</p>
+  }
+  @if (until(); as until) {
+    <p><ng-container i18n>Blocked until</ng-container> {{ until | date: 'medium' }}</p>
+  }
+}
