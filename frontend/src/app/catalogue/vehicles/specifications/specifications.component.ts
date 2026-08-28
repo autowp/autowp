@@ -5,10 +5,11 @@ import type {Observable} from 'rxjs';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer} from '@angular/platform-browser';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {GetSpecificationsRequest, ItemFields} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
@@ -28,7 +29,7 @@ export class CatalogueVehiclesSpecificationsComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
   readonly #catalogueService = inject(CatalogueService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #attrsClient = inject(AttrsClient);
   readonly #sanitizer = inject(DomSanitizer);
   readonly #languageService = inject(LanguageService);
@@ -119,7 +120,7 @@ export class CatalogueVehiclesSpecificationsComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.catalogueResource.error()) || isNotFoundError(this.htmlResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

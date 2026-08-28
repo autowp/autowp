@@ -11,6 +11,7 @@ import {LatLng as grpcLatLng} from '@grpc/google/type/latlng.pb';
 import {Picture, PictureListOptions, PicturesRequest, UpdatePictureRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
@@ -57,6 +58,7 @@ function normalizeLng(lng: number) {
 })
 export class ModerPicturesItemPlaceComponent implements OnInit {
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #zone = inject(NgZone);
@@ -79,9 +81,7 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
       ),
     ),
     catchError(() => {
-      void this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
+      this.#notFound.report();
       return EMPTY;
     }),
     shareReplay({bufferSize: 1, refCount: false}),

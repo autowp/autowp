@@ -4,7 +4,7 @@ import type {Observable} from 'rxjs';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {Meta} from '@angular/platform-browser';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CommentsType,
   ItemParentCacheListOptions,
@@ -17,6 +17,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError} from 'app/grpc';
@@ -39,7 +40,7 @@ export class CatalogueVehiclesPicturesPictureComponent {
   readonly #meta = inject(Meta);
   readonly #route = inject(ActivatedRoute);
   readonly #catalogueService = inject(CatalogueService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
@@ -168,7 +169,7 @@ export class CatalogueVehiclesPicturesPictureComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.catalogueResource.error()) || isNotFoundError(this.pictureResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

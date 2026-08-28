@@ -4,7 +4,7 @@ import type {Observable} from 'rxjs';
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CreatePictureItemRequest,
   CreateTrafficBlacklistItemRequest,
@@ -41,6 +41,7 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTool
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
@@ -101,7 +102,7 @@ interface LastItemInfo {
 })
 export class ModerPicturesItemComponent {
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #languageService = inject(LanguageService);
   readonly #ipService = inject(IpService);
@@ -189,9 +190,7 @@ export class ModerPicturesItemComponent {
       ),
     ),
     catchError(() => {
-      void this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
+      this.#notFound.report();
       return EMPTY;
     }),
     shareReplay({bufferSize: 1, refCount: false}),

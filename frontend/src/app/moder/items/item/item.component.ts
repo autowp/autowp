@@ -3,7 +3,7 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   GetTreeRequest,
   ItemFields,
@@ -19,6 +19,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {getItemTypeTranslation} from '@utils/translations';
@@ -72,7 +73,7 @@ interface Tab {
 export class ModerItemsItemComponent {
   readonly #auth = inject(AuthService);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #itemsClient = inject(ItemsClient);
@@ -160,9 +161,7 @@ export class ModerItemsItemComponent {
     ),
     catchError((err: unknown) => {
       this.#toastService.handleError(err);
-      void this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
+      this.#notFound.report();
       return EMPTY;
     }),
     tap((item) => {

@@ -21,6 +21,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {allowedItemTypeCombinations, ItemService} from '@services/item';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
@@ -42,6 +43,7 @@ import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../../item
 export class ModerItemsItemOrganizeComponent implements OnInit {
   readonly #itemService = inject(ItemService);
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #languageService = inject(LanguageService);
   readonly #pageEnv = inject(PageEnvService);
@@ -123,9 +125,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
           // the previous `if (!item)` check here could never actually fire.
           catchError((response: unknown) => {
             if (isNotFoundError(response)) {
-              void this.#router.navigate(['/error-404'], {
-                skipLocationChange: true,
-              });
+              this.#notFound.report();
               return EMPTY;
             }
             this.#toastService.handleError(response);

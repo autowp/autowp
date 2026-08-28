@@ -9,6 +9,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ItemFields, ItemParent, ItemRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {catchError, distinctUntilChanged, EMPTY, map, shareReplay, switchMap} from 'rxjs';
@@ -36,6 +37,7 @@ import {ModerItemsItemSelectParentTwinsComponent} from './twins/twins.component'
 })
 export class ModerItemsItemSelectParentComponent implements OnInit {
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
@@ -70,9 +72,7 @@ export class ModerItemsItemSelectParentComponent implements OnInit {
     ),
     catchError((error: unknown) => {
       if (error instanceof HttpErrorResponse && error.status === 404) {
-        void this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
+        this.#notFound.report();
         return EMPTY;
       }
       this.#toastService.handleError(error);

@@ -22,6 +22,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
@@ -44,6 +45,7 @@ import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../../item
 export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemService = inject(ItemService);
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
@@ -142,7 +144,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
   }

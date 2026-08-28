@@ -18,6 +18,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
@@ -49,6 +50,7 @@ export class CatalogueRecentComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #catalogue = inject(CatalogueService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
@@ -107,7 +109,7 @@ export class CatalogueRecentComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

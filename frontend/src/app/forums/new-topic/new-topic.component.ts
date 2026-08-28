@@ -12,6 +12,7 @@ import {CreateTopicRequest, GetThemeRequest, Topic} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
@@ -35,6 +36,7 @@ import {map} from 'rxjs';
 })
 export class ForumsNewTopicComponent implements OnInit {
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   protected readonly auth = inject(AuthService);
   readonly #pageEnv = inject(PageEnvService);
@@ -76,7 +78,7 @@ export class ForumsNewTopicComponent implements OnInit {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.themeResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
   }

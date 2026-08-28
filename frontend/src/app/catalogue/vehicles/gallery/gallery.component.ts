@@ -3,7 +3,8 @@ import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError} from 'app/grpc';
@@ -25,7 +26,7 @@ export class CatalogueVehiclesGalleryComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
   readonly #catalogueService = inject(CatalogueService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
 
   protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
     requireSync: true,
@@ -99,7 +100,7 @@ export class CatalogueVehiclesGalleryComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.catalogueResource.error()) || !this.identity()) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       }
     });
   }

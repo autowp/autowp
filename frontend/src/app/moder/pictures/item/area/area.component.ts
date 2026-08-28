@@ -15,6 +15,7 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
@@ -32,6 +33,7 @@ import {ToastsService} from '../../../../toasts/toasts.service';
 })
 export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #picturesClient = inject(PicturesClient);
@@ -106,9 +108,7 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
       )
       .subscribe({
         error: () => {
-          void this.#router.navigate(['/error-404'], {
-            skipLocationChange: true,
-          });
+          this.#notFound.report();
         },
         next: (pictureItem) => {
           if (!this.picture) {

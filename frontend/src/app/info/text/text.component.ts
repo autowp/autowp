@@ -5,9 +5,10 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {GetTextRequest} from '@grpc/spec.pb';
 import {TextClient} from '@grpc/spec.pbsc';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
@@ -44,7 +45,7 @@ interface InfoText {
 export class InfoTextComponent implements OnInit {
   readonly #userService = inject(UserService);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #textClient = inject(TextClient);
@@ -60,9 +61,7 @@ export class InfoTextComponent implements OnInit {
     distinctUntilChanged(),
     switchMap((id) => {
       if (!id) {
-        void this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
+        this.#notFound.report();
         return EMPTY;
       }
       return of(id);

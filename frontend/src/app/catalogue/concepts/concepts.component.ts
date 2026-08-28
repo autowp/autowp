@@ -4,7 +4,7 @@ import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
   ItemListOptions,
@@ -19,6 +19,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
@@ -36,7 +37,7 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
 export class CatalogueConceptsComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
@@ -100,7 +101,7 @@ export class CatalogueConceptsComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

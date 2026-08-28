@@ -8,6 +8,7 @@ import {ItemFields, ItemRequest, ItemType, RefreshInheritanceRequest} from '@grp
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {isNotFoundError} from 'app/grpc';
@@ -34,6 +35,7 @@ import {CarsSpecificationsEditorSpecComponent} from './spec/spec.component';
 })
 export class CarsSpecificationsEditorComponent {
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
@@ -69,7 +71,7 @@ export class CarsSpecificationsEditorComponent {
     ),
     catchError((response: unknown) => {
       if (isNotFoundError(response)) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
       } else {
         this.#toastService.handleError(response);
       }

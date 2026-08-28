@@ -3,9 +3,10 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {AttrZoneAttributesRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {distinctUntilChanged, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
@@ -26,7 +27,7 @@ export class ModerAttrsZoneComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #attrsClient = inject(AttrsClient);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
 
   readonly #zoneID$ = this.#route.paramMap.pipe(
     map((params) => params.get('id')),
@@ -38,9 +39,7 @@ export class ModerAttrsZoneComponent {
     switchMap((id) => (id ? this.#attrsService.getZone$(id) : of(null))),
     switchMap((zone) => {
       if (!zone) {
-        void this.#router.navigate(['/error-404'], {
-          skipLocationChange: true,
-        });
+        this.#notFound.report();
         return EMPTY;
       }
       return of(zone);

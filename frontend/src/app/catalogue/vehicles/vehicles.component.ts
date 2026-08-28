@@ -5,7 +5,7 @@ import type {Observable} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
   ItemListOptions,
@@ -26,6 +26,7 @@ import {
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
@@ -60,7 +61,7 @@ export class CatalogueVehiclesComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #auth = inject(AuthService);
   readonly #catalogueService = inject(CatalogueService);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
@@ -394,7 +395,7 @@ export class CatalogueVehiclesComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.catalogueResource.error()) || isNotFoundError(this.itemResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 

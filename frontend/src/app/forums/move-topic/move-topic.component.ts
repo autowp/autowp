@@ -8,6 +8,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {GetThemeRequest, GetTopicRequest, ListThemesRequest, Topic, UpdateTopicRequest} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {getForumsThemeTranslation} from '@utils/translations';
@@ -23,6 +24,7 @@ import {ToastsService} from '../../toasts/toasts.service';
 })
 export class ForumsMoveTopicComponent implements OnInit {
   readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
@@ -41,9 +43,7 @@ export class ForumsMoveTopicComponent implements OnInit {
     distinctUntilChanged(),
     switchMap((topicID) => (topicID ? this.#grpc.getTopic(new GetTopicRequest({id: topicID})) : of(null))),
     catchError(() => {
-      void this.#router.navigate(['/error-404'], {
-        skipLocationChange: true,
-      });
+      this.#notFound.report();
       return EMPTY;
     }),
     shareReplay({bufferSize: 1, refCount: false}),

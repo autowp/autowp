@@ -1,10 +1,11 @@
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer} from '@angular/platform-browser';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {GetSpecificationsRequest, ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {requireRouteParent} from '@utils/require-route-parent';
@@ -19,7 +20,7 @@ import {map, of} from 'rxjs';
 })
 export class TwinsGroupSpecificationsComponent {
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
+  readonly #notFound = inject(NotFoundService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
@@ -77,7 +78,7 @@ export class TwinsGroupSpecificationsComponent {
   constructor() {
     effect(() => {
       if (isNotFoundError(this.groupResource.error())) {
-        void this.#router.navigate(['/error-404'], {skipLocationChange: true});
+        this.#notFound.report();
         return;
       }
 
