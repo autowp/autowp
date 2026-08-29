@@ -104,7 +104,9 @@
     ) {
       <span>
         <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
-        <a [routerLink]="item.route"><ng-container i18n>details</ng-container> ({{ item.acceptedPicturesCount }})</a>
+        <a [routerLink]="item.route.concat(['pictures'])"
+          ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
+        >
       </span>
     }
     @if (
@@ -116,7 +118,7 @@
     ) {
       <span>
         <span class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></span>
-        <a [routerLink]="item.route"
+        <a [routerLink]="item.route.concat(['pictures'])"
           ><ng-container i18n>all pictures</ng-container> ({{ item.acceptedPicturesCount }})</a
         >
       </span>
