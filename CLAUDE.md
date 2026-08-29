@@ -156,6 +156,16 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   refers to. Use `PageId.*` in `pageEnv.set({pageId})`, the account sidebar, and route `data`, never
   a bare number. `src/app/services/pages.ts` is the trimmed page hierarchy (only `PageId` members,
   used for menu active-state via `PageService.isDescendant$`).
+- **`ItemRequest`/`GetTreeRequest` need `language`** — any call requesting localized `ItemFields`
+  (`nameHtml`, `nameText`, `nameDefault`, `fullName`, ...) or `GetTreeRequest` must pass
+  `language: this.#languageService.language`, otherwise the response falls back to a
+  non-localized/default-language rendering (e.g. an unlocalized "pr." instead of "н.в." in a
+  title). Copy an existing sibling call in the same file rather than constructing the request
+  from scratch.
+- **int64 proto fields arrive as strings** — grpc-web via `ngx-grpc` renders proto `int64` as a TS
+  `string`, so an "unset" id is the literal string `"0"`, which is truthy in JS. Guard with an
+  explicit `!== '0'` check, not a bare truthiness check, when treating such a field as
+  present/selected.
 
 ## Cross-cutting notes
 

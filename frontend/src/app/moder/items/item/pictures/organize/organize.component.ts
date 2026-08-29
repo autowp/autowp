@@ -22,6 +22,7 @@ import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {ItemService} from '@services/item';
+import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
@@ -44,6 +45,7 @@ import {ItemMetaFormComponent, itemMetaFormResultsToAPIItem} from '../../../item
 })
 export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
   readonly #itemService = inject(ItemService);
+  readonly #languageService = inject(LanguageService);
   readonly #router = inject(Router);
   readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
@@ -100,6 +102,7 @@ export class ModerItemsItemPicturesOrganizeComponent implements OnInit {
             nameText: true,
           }),
           id: itemID,
+          language: this.#languageService.language,
         }),
       );
     },

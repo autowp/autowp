@@ -118,6 +118,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
               nameText: true,
             }),
             id,
+            language: this.#languageService.language,
           }),
         )
         .pipe(
