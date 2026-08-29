@@ -156,6 +156,7 @@ export class ModerItemsItemComponent {
             subscription: true,
           }),
           id,
+          language: this.#languageService.language,
         }),
       ),
     ),
