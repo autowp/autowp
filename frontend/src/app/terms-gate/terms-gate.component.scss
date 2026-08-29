@@ -47,10 +47,10 @@
     justify-content: flex-end;
     background: transparent;
     pointer-events: none;
+  }
 
-    .terms-gate__card {
-      max-width: 22rem;
-      pointer-events: auto;
-    }
+  &--compact &__card {
+    max-width: 22rem;
+    pointer-events: auto;
   }
 }
