@@ -86,6 +86,8 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'info/**', renderMode: RenderMode.Server},
   {path: 'info/text/**', renderMode: RenderMode.Client},
 
+  {path: 'licenses', renderMode: RenderMode.Prerender}, // static text, no per-request data
+
   // Requires RoleModer server-side (LogGRPCServer.GetEvents) - an anonymous SSR pass would only
   // ever render its permission-denied state.
   {path: 'log/**', renderMode: RenderMode.Client},

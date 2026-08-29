@@ -446,6 +446,10 @@
           <context context-type="linenumber">4,10</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses.component.html</context>
+          <context context-type="linenumber">4,10</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/log/log.component.html</context>
           <context context-type="linenumber">4,10</context>
         </context-group>
@@ -2460,14 +2464,29 @@ All images are posted for educational purposes.
         <source>Copyright</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">255,256</context>
+          <context context-type="linenumber">255,257</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3906086328287885567" datatype="html">
+        <source>Licenses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">256,257</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses-routing.module.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses.component.html</context>
+          <context context-type="linenumber">10,14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3340358994057820932" datatype="html">
         <source>Cookie settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">256,262</context>
+          <context context-type="linenumber">257,263</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5539833462297888878" datatype="html">
@@ -2640,7 +2659,7 @@ All images are posted for educational purposes.
         <source>Editor</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/cars/attrs-change-log/attrs-change-log.component.html</context>
-          <context context-type="linenumber">53,56</context>
+          <context context-type="linenumber">53,57</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2537072705308750839" datatype="html">
@@ -2972,7 +2991,7 @@ All images are posted for educational purposes.
         <source>Save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/cars/specifications-editor/spec/spec.component.html</context>
-          <context context-type="linenumber">146,150</context>
+          <context context-type="linenumber">147,151</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
@@ -5369,6 +5388,30 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/item-of-day/item-of-day/item-of-day.component.html</context>
           <context context-type="linenumber">144,148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="licenses-body" datatype="html">
+        <source>This Site is built on open source software.
+
+## Frontend
+
+Everything that runs in your browser, and the server that renders pages for you, bundles
+third-party components under permissive licences (MIT, Apache-2.0, BSD, and similar). The full
+list of components and their licence texts: [frontend-third-party-licenses.txt](/frontend-third-party-licenses.txt).
+
+## Backend
+
+The server that answers the Site&apos;s requests is built from open source components under the same
+kinds of licences. The full list: [backend-third-party-licenses.txt](/backend-third-party-licenses.txt).
+
+## Our own code
+
+The Site&apos;s own source code is published on [GitHub](https://github.com/autowp/autowp) under the
+licence stated there.
+</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses.component.ts</context>
+          <context context-type="linenumber">15,32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6184765090227385698" datatype="html">

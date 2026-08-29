@@ -15690,6 +15690,59 @@ Estas Condiciones, junto con la Política de privacidad y las Reglas, constituye
 Preguntas sobre estas Condiciones: [autowp@gmail.com](mailto:autowp@gmail.com).
 </target>
       </trans-unit>
+      <trans-unit id="3906086328287885567" datatype="html">
+        <source>Licenses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">256,257</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses-routing.module.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+        <target state="translated">Licencias</target>
+      </trans-unit>
+      <trans-unit id="licenses-body" datatype="html">
+        <source>This Site is built on open source software.
+
+## Frontend
+
+Everything that runs in your browser, and the server that renders pages for you, bundles
+third-party components under permissive licences (MIT, Apache-2.0, BSD, and similar). The full
+list of components and their licence texts: [frontend-third-party-licenses.txt](/frontend-third-party-licenses.txt).
+
+## Backend
+
+The server that answers the Site&apos;s requests is built from open source components under the same
+kinds of licences. The full list: [backend-third-party-licenses.txt](/backend-third-party-licenses.txt).
+
+## Our own code
+
+The Site&apos;s own source code is published on [GitHub](https://github.com/autowp/autowp) under the
+licence stated there.
+</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses.component.ts</context>
+          <context context-type="linenumber">15,32</context>
+        </context-group>
+        <target state="translated">Este sitio está construido con software de código abierto.
+
+## Frontend
+
+Todo lo que se ejecuta en su navegador, y el servidor que renderiza las páginas para usted, incluye componentes de terceros bajo licencias permisivas (MIT, Apache-2.0, BSD y similares). La lista completa de componentes y los textos de sus licencias: [frontend-third-party-licenses.txt](/frontend-third-party-licenses.txt).
+
+## Backend
+
+El servidor que responde a las solicitudes del sitio está construido con componentes de código abierto bajo el mismo tipo de licencias. La lista completa: [backend-third-party-licenses.txt](/backend-third-party-licenses.txt).
+
+## Nuestro propio código
+
+El código fuente del propio sitio está publicado en [GitHub](https://github.com/autowp/autowp) bajo la licencia indicada allí.</target>
+      </trans-unit>
       <trans-unit id="2029980907058777630" datatype="html">
         <source>Terms of Service</source>
       <target state="translated">Condiciones del servicio</target>

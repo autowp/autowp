@@ -29,19 +29,26 @@ spec:
           emptyDir: {}
         - name: frontend-assets-nginx-tmp
           emptyDir: {}
+        - name: licenses
+          emptyDir: {}
         - name: frontend-assets-config
           configMap:
             name: {{ printf "%s-frontend-assets" (include "autowp.goautowp.serve.fullname" .) | quote }}
       initContainers:
         # The bundle lives in the frontend image; nginx serves it from a volume the two containers
-        # share, so it has to be copied out once at startup.
+        # share, so it has to be copied out once at startup. The frontend's own third-party
+        # license notice sits alongside it (dist root, not under browser/) and gets copied to the
+        # shared licenses volume at the same time - see the nginx location blocks in
+        # frontend-assets-cm.yaml.
         - name: frontend-assets-copy
           image: {{ include "autowp.frontend.image" . }}
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy | quote }}
-          command: ["sh", "-c", "cp -a /app/browser/. /srv/browser/"]
+          command: ["sh", "-c", "cp -a /app/browser/. /srv/browser/ && cp /app/3rdpartylicenses.txt /srv/licenses/frontend-third-party-licenses.txt"]
           volumeMounts:
             - mountPath: /srv/browser
               name: frontend-assets
+            - mountPath: /srv/licenses
+              name: licenses
           securityContext:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
@@ -54,6 +61,29 @@ spec:
             limits:
               memory: 500M
               cpu: 1000m
+            requests:
+              memory: 10M
+              cpu: 50m
+        # Same idea for the backend image's own third-party license notice.
+        - name: goautowp-licenses-copy
+          image: {{ include "autowp.goautowp.image" . }}
+          imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
+          command: ["sh", "-c", "cp /THIRD_PARTY_LICENSES.txt /srv/licenses/backend-third-party-licenses.txt"]
+          volumeMounts:
+            - mountPath: /srv/licenses
+              name: licenses
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              memory: 100M
+              cpu: 500m
             requests:
               memory: 10M
               cpu: 50m
@@ -86,6 +116,9 @@ spec:
           volumeMounts:
             - mountPath: /srv/browser
               name: frontend-assets
+              readOnly: true
+            - mountPath: /srv/licenses
+              name: licenses
               readOnly: true
             - mountPath: /etc/nginx/nginx.conf
               name: frontend-assets-config

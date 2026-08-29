@@ -59,3 +59,4 @@ USER 10001:10001
 COPY goautowp /goautowp
 COPY migrations /migrations
 COPY defaults.yaml /defaults.yaml
+COPY THIRD_PARTY_LICENSES.txt /THIRD_PARTY_LICENSES.txt

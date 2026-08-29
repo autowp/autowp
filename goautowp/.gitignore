@@ -1,5 +1,6 @@
 /cmd/goautowp/debug
 /goautowp
+/THIRD_PARTY_LICENSES.txt
 /build/package/goautowp
 /build/package/migrations
 /vendor

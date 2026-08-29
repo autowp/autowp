@@ -15684,6 +15684,59 @@ Questions about these Terms: [autowp@gmail.com](mailto:autowp@gmail.com).
 关于本条款的问题：[autowp@gmail.com](mailto:autowp@gmail.com)。
 </target>
       </trans-unit>
+      <trans-unit id="3906086328287885567" datatype="html">
+        <source>Licenses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">256,257</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses-routing.module.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+        <target state="translated">许可证</target>
+      </trans-unit>
+      <trans-unit id="licenses-body" datatype="html">
+        <source>This Site is built on open source software.
+
+## Frontend
+
+Everything that runs in your browser, and the server that renders pages for you, bundles
+third-party components under permissive licences (MIT, Apache-2.0, BSD, and similar). The full
+list of components and their licence texts: [frontend-third-party-licenses.txt](/frontend-third-party-licenses.txt).
+
+## Backend
+
+The server that answers the Site&apos;s requests is built from open source components under the same
+kinds of licences. The full list: [backend-third-party-licenses.txt](/backend-third-party-licenses.txt).
+
+## Our own code
+
+The Site&apos;s own source code is published on [GitHub](https://github.com/autowp/autowp) under the
+licence stated there.
+</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/licenses/licenses.component.ts</context>
+          <context context-type="linenumber">15,32</context>
+        </context-group>
+        <target state="translated">本网站基于开源软件构建。
+
+## 前端
+
+在您浏览器中运行的一切，以及为您渲染页面的服务器，都包含以宽松许可证（MIT、Apache-2.0、BSD 等）授权的第三方组件。完整的组件列表及其许可证文本：[frontend-third-party-licenses.txt](/frontend-third-party-licenses.txt)。
+
+## 后端
+
+响应本网站请求的服务器由采用相同类型许可证的开源组件构建而成。完整列表：[backend-third-party-licenses.txt](/backend-third-party-licenses.txt)。
+
+## 我们自己的代码
+
+本网站自身的源代码发布在 [GitHub](https://github.com/autowp/autowp) 上，遵循其中说明的许可证。</target>
+      </trans-unit>
       <trans-unit id="2029980907058777630" datatype="html">
         <source>Terms of Service</source>
       <target state="translated">服务条款</target>

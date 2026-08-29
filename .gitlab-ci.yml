@@ -221,6 +221,23 @@ publish-goautowp:
     - go mod verify
     - CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o goautowp cmd/goautowp/goautowp.go
 
+    # One flat file with the full license text of every dependency actually linked into the
+    # binary - not just a name/type table - since the image below is published on Docker Hub,
+    # which counts as distribution and triggers real attribution obligations.
+    - |
+      rm -rf licenses-raw
+      go-licenses save ./cmd/goautowp --save_path=licenses-raw --force --ignore github.com/autowp/goautowp
+      find licenses-raw -type f -print0 | sort -z | while IFS= read -r -d '' f; do
+        pkg="${f#licenses-raw/}"
+        pkg="${pkg%/LICENSE*}"
+        pkg="${pkg%/COPYING*}"
+        pkg="${pkg%/NOTICE*}"
+        printf '%s\n%s\n%s\n\n' "================================================================================" "$pkg" "================================================================================"
+        cat "$f"
+        printf '\n\n'
+      done > THIRD_PARTY_LICENSES.txt
+      rm -rf licenses-raw
+
     - buildah build --layers --cache-from "$IMAGE-cache" --cache-to "$IMAGE-cache" -f build/package/Dockerfile -t "$IMAGE:$CI_COMMIT_TAG" -t autowp/goautowp:$CI_COMMIT_TAG .
     - buildah push "$IMAGE:$CI_COMMIT_TAG"
     - buildah push autowp/goautowp:$CI_COMMIT_TAG

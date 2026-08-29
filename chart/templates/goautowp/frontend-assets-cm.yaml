@@ -71,6 +71,20 @@ data:
         listen {{ .Values.frontend.assets.port }};
         root $frontend_root;
 
+        # Third-party license notices for the frontend and backend images - not locale-scoped
+        # like everything else here, so they're served from their own shared volume instead of
+        # $frontend_root. Published on Docker Hub counts as distribution, which is what makes
+        # these worth serving at all.
+        location = /frontend-third-party-licenses.txt {
+          root /srv/licenses;
+          default_type text/plain;
+        }
+
+        location = /backend-third-party-licenses.txt {
+          root /srv/licenses;
+          default_type text/plain;
+        }
+
         # A missing asset is a 404, not a reason to render a page. Without this, a mistyped or
         # relatively-resolved asset URL (/mosts/.../favicons/icon.png, say) reaches the router,
         # matches a route, and costs a full server-side render to answer with HTML.
