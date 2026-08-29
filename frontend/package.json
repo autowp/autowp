@@ -18,7 +18,6 @@
     "monaco-editor": "$monaco-editor"
   },
   "dependencies": {
-    "@angular-devkit/architect": "^0.2201.4",
     "@angular/cdk": "^22",
     "@angular/common": "^22.0.8",
     "@angular/compiler": "^22.0.8",
@@ -34,16 +33,12 @@
     "@ngx-grpc/common": "^3.1.1",
     "@ngx-grpc/core": "^3.1.1",
     "@ngx-grpc/well-known-types": "^3.1.1",
-    "@popperjs/core": "^2.11.8",
-    "@types/url-parse": "^1.4.8",
     "angulartics2": "^14",
-    "base64-js": "^1.5.1",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.10.3",
     "chart.js": "^4.2.1",
     "core-js": "^3.28.0",
     "express": "^5.1.0",
-    "google-proto-files": "^5",
     "keycloak-angular": "^22",
     "keycloak-js": "^25 || ^26",
     "leaflet": "^1.9.3",
@@ -57,7 +52,6 @@
     "remark": "^15.0.1",
     "sprintf-js": "^1.1.2",
     "tslib": "^2.5.0",
-    "typescript": "6.0.3",
     "uint8array-extras": "^1.5.0",
     "url-parse": "^1.5.10",
     "zone.js": ">=0.15.0"
@@ -81,6 +75,7 @@
     "@types/leaflet": "^1.9.1",
     "@types/node": "^24",
     "@types/sprintf-js": "^1.1.4",
+    "@types/url-parse": "^1.4.8",
     "@types/vhost": "^3.0.10",
     "@typescript-eslint/eslint-plugin": "^8.44",
     "@typescript-eslint/parser": "^8.44",
@@ -102,6 +97,7 @@
     "stylelint-config-standard": "^40",
     "stylelint-config-standard-scss": "^17",
     "ts-node": "^10.9.1",
+    "typescript": "6.0.3",
     "typescript-eslint": "^8.19.1",
     "vhost": "^3.0.2"
   }
