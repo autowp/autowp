@@ -205,11 +205,6 @@
             <a href="https://twitter.com/autowp_ru" placement="top" ngbTooltip="Twitter" class="d-inline-block">
               <i class="bi bi-twitter" aria-hidden="true"></i>
             </a>
-            @if (language !== 'ru') {
-              <a href="https://www.facebook.com/WheelsAge" placement="top" ngbTooltip="Facebook" class="d-inline-block">
-                <i class="bi bi-facebook" aria-hidden="true"></i>
-              </a>
-            }
             <a href="https://github.com/autowp/autowp" placement="top" ngbTooltip="GitHub" class="d-inline-block">
               <i class="bi bi-github" aria-hidden="true"></i>
             </a>
@@ -248,9 +243,9 @@ All images are posted for educational purposes.
         @if (urlPath$ | async; as urlPath) {
           @for (lang of languages; track lang.code) {
             @if (lang.code !== language) {
-              <a [href]="'//' + lang.hostname + urlPath">
-                <i aria-hidden="true" [class]="lang.flag"></i>
-                {{ lang.name }}
+              <a placement="top" [href]="'//' + lang.hostname + urlPath" [ngbTooltip]="lang.name">
+                <i aria-hidden="true" [class]="lang.flag + ' me-1'"></i>
+                <span class="text-uppercase">{{ lang.code }}</span>
               </a>
             }
           }
