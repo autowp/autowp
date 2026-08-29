@@ -5,27 +5,16 @@
       <div id="pager" class="clearfix text-end">
         <div class="nearLinks">
           @if (paginator.previous) {
-            <a [routerLink]="prefix().concat([paginator.previous])">
-              <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>
-              <ng-container i18n>previous</ng-container>
-            </a>
+            <a class="me-1" [routerLink]="prefix().concat([paginator.previous])"
+              >←<ng-container i18n>previous</ng-container></a
+            >
           } @else {
-            <span>
-              <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>
-              <ng-container i18n>previous</ng-container>
-            </span>
+            <span class="me-1">←<ng-container i18n>previous</ng-container></span>
           }
-          &ngsp;
           @if (paginator.next) {
-            <a [routerLink]="prefix().concat([paginator.next])">
-              <ng-container i18n>next</ng-container>
-              <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
-            </a>
+            <a [routerLink]="prefix().concat([paginator.next])"><ng-container i18n>next</ng-container>→</a>
           } @else {
-            <span>
-              <ng-container i18n>next</ng-container>
-              <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
-            </span>
+            <span><ng-container i18n>next</ng-container>→</span>
           }
         </div>
         <div class="numberLinks">
