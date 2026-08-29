@@ -72,7 +72,7 @@
           @if (picture.votes; as votes) {
             <div class="picture-vote">
               @if (authenticated()) {
-                <button type="button" class="btn btn-link position-relative p-0 me-2" (click)="vote(picture, 1)">
+                <button type="button" class="btn btn-link position-relative p-0 me-3" (click)="vote(picture, 1)">
                   <i
                     class="bi fs-1 vote-up"
                     aria-hidden="true"
@@ -87,7 +87,7 @@
                   }
                 </button>
               } @else {
-                <button type="button" class="btn btn-link position-relative p-0 me-2" disabled>
+                <button type="button" class="btn btn-link position-relative p-0 me-3" disabled>
                   <i class="bi fs-1 bi-hand-thumbs-up" aria-hidden="true"></i>
                   @if (votes.positive > 0) {
                     <span
@@ -131,9 +131,9 @@
             @if (!picture.subscribed) {
               <button
                 type="button"
-                class="btn btn-link p-0"
-                i18n-title
-                title="Subscribe to new replies notifications"
+                class="btn btn-link p-0 me-3"
+                i18n-ngbTooltip
+                ngbTooltip="You are not subscribed to comments on this picture. Click to subscribe and get notified of new comments."
                 (click)="setSubscribed(picture, true)"
               >
                 <i class="bi bi-envelope-open fs-1" aria-hidden="true"></i>
@@ -141,9 +141,9 @@
             } @else {
               <button
                 type="button"
-                class="btn btn-link p-0"
-                i18n-title
-                title="Unsubscribe from notifications"
+                class="btn btn-link p-0 me-3"
+                i18n-ngbTooltip
+                ngbTooltip="You are subscribed to comments on this picture. Click to unsubscribe and stop getting notified."
                 (click)="setSubscribed(picture, false)"
               >
                 <i class="bi bi-envelope fs-1" aria-hidden="true"></i>
