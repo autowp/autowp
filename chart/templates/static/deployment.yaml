@@ -65,6 +65,8 @@ spec:
         - name: config
           configMap:
             name: {{ include "autowp.static.fullname" . | quote }}
+        - name: tmp
+          emptyDir: {}
       containers:
         - name: static
           image: {{ include "autowp.static.image" . }}
@@ -103,6 +105,8 @@ spec:
               name: "config"
               subPath: "nginx.conf"
               readOnly: true
+            - mountPath: "/tmp"
+              name: "tmp"
           resources:
             limits:
               memory: 5Gi
