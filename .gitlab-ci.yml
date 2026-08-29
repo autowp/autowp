@@ -167,7 +167,7 @@ publish-frontend:
     - "jq -n --arg release \"$CI_COMMIT_TAG\" '{release: $release}' > src/version.json"
     - NG_BUILD_OPTIMIZE_CHUNKS=1 ./node_modules/.bin/ng build --configuration production --no-progress --base-href=/
 
-    - buildah build --layers --cache-from "$IMAGE:buildcache" --cache-to "$IMAGE:buildcache" -t "$IMAGE:$CI_COMMIT_TAG" -t autowp/autowp-frontend:$CI_COMMIT_TAG .
+    - buildah build --layers --cache-from "$IMAGE-cache" --cache-to "$IMAGE-cache" -t "$IMAGE:$CI_COMMIT_TAG" -t autowp/autowp-frontend:$CI_COMMIT_TAG .
     - buildah push "$IMAGE:$CI_COMMIT_TAG"
     - buildah push autowp/autowp-frontend:$CI_COMMIT_TAG
 
@@ -199,7 +199,7 @@ publish-goautowp:
     - go mod verify
     - CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o goautowp cmd/goautowp/goautowp.go
 
-    - buildah build --layers --cache-from "$IMAGE:buildcache" --cache-to "$IMAGE:buildcache" -f build/package/Dockerfile -t "$IMAGE:$CI_COMMIT_TAG" -t autowp/goautowp:$CI_COMMIT_TAG .
+    - buildah build --layers --cache-from "$IMAGE-cache" --cache-to "$IMAGE-cache" -f build/package/Dockerfile -t "$IMAGE:$CI_COMMIT_TAG" -t autowp/goautowp:$CI_COMMIT_TAG .
     - buildah push "$IMAGE:$CI_COMMIT_TAG"
     - buildah push autowp/goautowp:$CI_COMMIT_TAG
 
