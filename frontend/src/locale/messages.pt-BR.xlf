@@ -15093,7 +15093,7 @@ Seria ótimo se você especificasse qual carro está na imagem, para facilitar s
 
 Requisitos para as imagens adicionadas:
 
-* Formato [JPEG](http://ru.wikipedia.org/wiki/JPEG) ou [PNG](http://ru.wikipedia.org/wiki/PNG). Resolução de 640×360 até 10000×10000.
+* Formato [JPEG](http://ru.wikipedia.org/wiki/JPEG), [PNG](http://ru.wikipedia.org/wiki/PNG), [WebP](http://ru.wikipedia.org/wiki/WebP) ou [AVIF](http://ru.wikipedia.org/wiki/AVIF). Resolução de 640×360 até 10000×10000.
 * A imagem deve, se possível, ter a maior qualidade disponível, e não deve conter artefatos de redimensionamento ou compressão (desfoque, falta de nitidez, sangramento de cores, serrilhado em linhas retas, etc.). Exceções são feitas para fotos raras (do fabricante) e digitalizações de catálogos. A decisão de manter tal foto no site é tomada pela equipe de moderação.
 * Ausência de inscrições ou logotipos de sites de terceiros adicionados por alguém que não seja o autor/proprietário do material.
 * O carro deve ter a aparência original, como quando saiu de fábrica. Não deve haver sinais de *modificações caseiras*, sendo preferível que não haja alterações relacionadas ao envelhecimento do carro.
