@@ -18,6 +18,7 @@ test-chart:
     key: security-scanners
     paths:
       - /root/.cache/trivy/
+    when: always
   script:
     - cd chart
     - sonar-scanner -Dsonar.login=$SONAR_TOKEN
@@ -36,6 +37,7 @@ test-root:
     paths:
       - /root/.cache/trivy/
       - /root/.cache/grype/
+    when: always
   script:
     - editorconfig-checker -v .editorconfig
     - dclint .
@@ -154,6 +156,7 @@ publish-frontend:
       paths:
         - /root/.cache/trivy/
         - /root/.cache/grype/
+      when: always
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
     - echo "$DOCKER_PASSWORD" | buildah login -u="$DOCKER_USERNAME" --password-stdin docker.io
@@ -186,6 +189,7 @@ publish-goautowp:
       paths:
         - /root/.cache/trivy/
         - /root/.cache/grype/
+      when: always
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
     - echo "$DOCKER_PASSWORD" | buildah login -u="$DOCKER_USERNAME" --password-stdin docker.io
