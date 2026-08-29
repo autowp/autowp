@@ -59,7 +59,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
             [class.active]="tab === 'engine'"
           >
             <span class="glyphicon glyphicon-align-left"></span>
-            &ngsp;<ng-container i18n>Engine</ng-container>@if (item.engineItemId) {
+            &ngsp;<ng-container i18n>Engine</ng-container>@if (item.engineItemId && item.engineItemId !== '0') {
               &ngsp;<span class="badge rounded-pill text-bg-secondary">1</span>
             }
           </a>
