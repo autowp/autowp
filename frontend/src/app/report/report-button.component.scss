@@ -1,0 +1,24 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+
+// The host is floated to the right of the comment/picture actions row it lives in - it must keep
+// its own stacking context so the expanded form below can anchor to it with position: absolute
+// instead of growing the floated box and overlapping whatever follows in the row.
+:host {
+  position: relative;
+  display: inline-block;
+}
+
+.report-form {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: $zindex-dropdown;
+  width: 20rem;
+  max-width: 90vw;
+  padding: 1rem;
+  background: $body-bg;
+  border: $border-width solid $border-color;
+  border-radius: $border-radius;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 30%);
+}

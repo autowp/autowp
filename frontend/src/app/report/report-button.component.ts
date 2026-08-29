@@ -23,6 +23,7 @@ import {ToastsService} from '../toasts/toasts.service';
   selector: 'app-report-button',
   imports: [ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, NgbTooltip],
   templateUrl: './report-button.component.html',
+  styleUrl: './report-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReportButtonComponent {
