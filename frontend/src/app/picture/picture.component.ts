@@ -21,6 +21,7 @@ import {
   CommentsSubscribeRequest,
   CommentsType,
   CommentsUnSubscribeRequest,
+  ContentReportEntityType,
   ItemFields,
   ItemLinkListOptions,
   ItemLinksRequest,
@@ -56,6 +57,7 @@ import {catchError, EMPTY, map, of} from 'rxjs';
 
 import {ModerPicturesPerspectivePickerComponent} from '../moder/pictures/perspective-picker/perspective-picker.component';
 import {PictureModerVoteComponent} from '../picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
+import {ReportButtonComponent} from '../report/report-button.component';
 import {ShareComponent} from '../share/share.component';
 import {ToastsService} from '../toasts/toasts.service';
 import {UserComponent} from '../user/user/user.component';
@@ -80,6 +82,7 @@ import {PicturePaginatorComponent} from './paginator.component';
     TimeAgoPipe,
     PicturePaginatorComponent,
     PictureModerVoteComponent,
+    ReportButtonComponent,
     RemarkModule,
   ],
   templateUrl: './picture.component.html',
@@ -550,5 +553,6 @@ export class PictureComponent implements OnInit {
 
   protected readonly PictureItemType = PictureItemType;
   protected readonly PictureStatus = PictureStatus;
+  protected readonly ContentReportEntityType = ContentReportEntityType;
   protected readonly ItemType = ItemType;
 }

@@ -15620,6 +15620,38 @@ Utilice el mismo botón o la misma dirección para denunciar material que infrin
 [autowp@gmail.com](mailto:autowp@gmail.com)
 </target>
       </trans-unit>
+      <trans-unit id="7008439939460403347" datatype="html">
+        <source>Report</source>
+      <target state="translated">Denunciar</target>
+      </trans-unit>
+      <trans-unit id="4202620594400595101" datatype="html">
+        <source>Thank you — your report has been sent.</source>
+      <target state="translated">Gracias: su denuncia se ha enviado.</target>
+      </trans-unit>
+      <trans-unit id="9134186591632250216" datatype="html">
+        <source>Copyright infringement</source>
+      <target state="translated">Infracción de derechos de autor</target>
+      </trans-unit>
+      <trans-unit id="275100644395619124" datatype="html">
+        <source>Illegal or prohibited content</source>
+      <target state="translated">Contenido ilegal o prohibido</target>
+      </trans-unit>
+      <trans-unit id="8724425157900491872" datatype="html">
+        <source>Spam or advertising</source>
+      <target state="translated">Spam o publicidad</target>
+      </trans-unit>
+      <trans-unit id="4131713015627163754" datatype="html">
+        <source>Disclosure of private information</source>
+      <target state="translated">Divulgación de información privada</target>
+      </trans-unit>
+      <trans-unit id="4706862912172458912" datatype="html">
+        <source>Send report</source>
+      <target state="translated">Enviar denuncia</target>
+      </trans-unit>
+      <trans-unit id="5028777105388019087" datatype="html">
+        <source>Details</source>
+      <target state="translated">Detalles</target>
+      </trans-unit>
       <trans-unit id="1669309075536257063" datatype="html">
         <source>Copyright and content complaints</source>
       <target state="translated">Derechos de autor y reclamaciones sobre el contenido</target>

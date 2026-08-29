@@ -21,6 +21,7 @@ import {
   CommentMessageFields,
   CommentsSetDeletedRequest,
   CommentsVoteCommentRequest,
+  ContentReportEntityType,
   GetMessageRequest,
   ModeratorAttention,
   UpdateCommentRequest,
@@ -36,6 +37,7 @@ import {timestampToDate} from '@utils/timestamp';
 import {UserTextComponent} from '@utils/user-text/user-text.component';
 import {catchError, EMPTY, map, of, switchMap} from 'rxjs';
 
+import {ReportButtonComponent} from '../../report/report-button.component';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 import {CommentsFormComponent} from '../form/form.component';
@@ -59,6 +61,7 @@ export interface CommentInList extends CommentMessage {
     DatePipe,
     TimeAgoPipe,
     FormsModule,
+    ReportButtonComponent,
   ],
   templateUrl: './list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -149,6 +152,7 @@ export class CommentsListComponent implements OnInit {
   protected readonly authenticated = toSignal(this.auth.authenticated$, {initialValue: false});
 
   protected readonly ModeratorAttention = ModeratorAttention;
+  protected readonly ContentReportEntityType = ContentReportEntityType;
 
   protected vote(message: CommentMessage, value: number) {
     this.#commentsGrpc

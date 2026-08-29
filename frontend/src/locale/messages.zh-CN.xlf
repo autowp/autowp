@@ -15614,6 +15614,38 @@ Use the same button or email address to report material that infringes a tradema
 [autowp@gmail.com](mailto:autowp@gmail.com)
 </target>
       </trans-unit>
+      <trans-unit id="7008439939460403347" datatype="html">
+        <source>Report</source>
+      <target state="translated">举报</target>
+      </trans-unit>
+      <trans-unit id="4202620594400595101" datatype="html">
+        <source>Thank you — your report has been sent.</source>
+      <target state="translated">谢谢——您的举报已发送。</target>
+      </trans-unit>
+      <trans-unit id="9134186591632250216" datatype="html">
+        <source>Copyright infringement</source>
+      <target state="translated">著作权侵权</target>
+      </trans-unit>
+      <trans-unit id="275100644395619124" datatype="html">
+        <source>Illegal or prohibited content</source>
+      <target state="translated">违法或违禁内容</target>
+      </trans-unit>
+      <trans-unit id="8724425157900491872" datatype="html">
+        <source>Spam or advertising</source>
+      <target state="translated">垃圾信息或广告</target>
+      </trans-unit>
+      <trans-unit id="4131713015627163754" datatype="html">
+        <source>Disclosure of private information</source>
+      <target state="translated">泄露私人信息</target>
+      </trans-unit>
+      <trans-unit id="4706862912172458912" datatype="html">
+        <source>Send report</source>
+      <target state="translated">发送举报</target>
+      </trans-unit>
+      <trans-unit id="5028777105388019087" datatype="html">
+        <source>Details</source>
+      <target state="translated">详情</target>
+      </trans-unit>
       <trans-unit id="1669309075536257063" datatype="html">
         <source>Copyright and content complaints</source>
       <target state="translated">版权与内容投诉</target>

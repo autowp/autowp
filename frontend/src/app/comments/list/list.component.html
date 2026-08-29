@@ -104,6 +104,12 @@
             <ng-container i18n>reply & resolve</ng-container>
           </button>
         }
+        @if (!row.message.deleted && !row.canManageOwn) {
+          <app-report-button
+            [entityType]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT"
+            [entityId]="row.message.id"
+          />
+        }
         @if (row.canManageOwn && !row.message.showEdit) {
           <button type="button" class="btn btn-sm btn-outline-secondary" (click)="startEdit(row.message)">
             <i class="bi bi-pencil me-1" aria-hidden="true"></i>

@@ -1,0 +1,56 @@
+@if (done()) {
+  <span class="text-muted small"><ng-container i18n>Thank you — your report has been sent.</ng-container></span>
+} @else {
+  <button type="button" class="btn btn-link btn-sm p-0" (click)="toggle()">
+    <i class="bi bi-flag me-1" aria-hidden="true"></i>
+    <ng-container i18n>Report</ng-container>
+  </button>
+
+  @if (open()) {
+    <form class="report-form mt-2" [formGroup]="form" (submit)="submit()">
+      <div class="mb-2">
+        <label class="form-label" for="report-reason" i18n>Reason</label>
+        <select id="report-reason" class="form-select form-select-sm" formControlName="reason">
+          @for (reason of reasons; track reason.value) {
+            <option [ngValue]="reason.value">{{ reason.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="report-message" i18n>Details</label>
+        <textarea
+          id="report-message"
+          rows="3"
+          maxlength="2000"
+          class="form-control form-control-sm"
+          formControlName="message"
+        ></textarea>
+        @for (message of invalidParams() | invalidParams: 'message'; track message) {
+          <p class="invalid-feedback d-block">{{ message }}</p>
+        }
+      </div>
+      @if (!authenticated()) {
+        <div class="mb-2">
+          @if (recaptchaKeyResource.error(); as error) {
+            <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+          } @else if (recaptchaKeyResource.isLoading()) {
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden" i18n>Loading…</span>
+            </div>
+          } @else if (recaptchaKeyResource.value(); as response) {
+            <re-captcha [siteKey]="response.publicKey" (resolved)="resolved($event)" />
+          }
+          @for (message of invalidParams() | invalidParams: 'captcha'; track message) {
+            <p class="invalid-feedback d-block">{{ message }}</p>
+          }
+        </div>
+      }
+      <button type="submit" class="btn btn-primary btn-sm" [disabled]="submitting() || !form.valid">
+        <ng-container i18n>Send report</ng-container>
+      </button>
+      <button type="button" class="btn btn-link btn-sm" (click)="toggle()">
+        <ng-container i18n>Cancel</ng-container>
+      </button>
+    </form>
+  }
+}

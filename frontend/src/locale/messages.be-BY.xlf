@@ -15612,6 +15612,38 @@ Use the same button or email address to report material that infringes a tradema
 [autowp@yandex.ru](mailto:autowp@yandex.ru)
 </target>
       </trans-unit>
+      <trans-unit id="7008439939460403347" datatype="html">
+        <source>Report</source>
+      <target state="translated">Паскардзіцца</target>
+      </trans-unit>
+      <trans-unit id="4202620594400595101" datatype="html">
+        <source>Thank you — your report has been sent.</source>
+      <target state="translated">Дзякуй — вашу скаргу адпраўлена.</target>
+      </trans-unit>
+      <trans-unit id="9134186591632250216" datatype="html">
+        <source>Copyright infringement</source>
+      <target state="translated">Парушэнне аўтарскіх правоў</target>
+      </trans-unit>
+      <trans-unit id="275100644395619124" datatype="html">
+        <source>Illegal or prohibited content</source>
+      <target state="translated">Незаконны або забаронены кантэнт</target>
+      </trans-unit>
+      <trans-unit id="8724425157900491872" datatype="html">
+        <source>Spam or advertising</source>
+      <target state="translated">Спам або рэклама</target>
+      </trans-unit>
+      <trans-unit id="4131713015627163754" datatype="html">
+        <source>Disclosure of private information</source>
+      <target state="translated">Раскрыццё асабістых даных</target>
+      </trans-unit>
+      <trans-unit id="4706862912172458912" datatype="html">
+        <source>Send report</source>
+      <target state="translated">Адправіць скаргу</target>
+      </trans-unit>
+      <trans-unit id="5028777105388019087" datatype="html">
+        <source>Details</source>
+      <target state="translated">Падрабязнасці</target>
+      </trans-unit>
       <trans-unit id="1669309075536257063" datatype="html">
         <source>Copyright and content complaints</source>
       <target state="translated">Аўтарскія правы і скаргі на кантэнт</target>
