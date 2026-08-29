@@ -86,7 +86,7 @@
         } @else if (row.message.vote !== 0) {
           <span class="vote">
             <i class="bi bi-hand-thumbs-up me-1" aria-hidden="true"></i>
-            <a href="#" class="value" (click)="showVotes(row.message)" (keyup.enter)="showVotes(row.message)">{{
+            <a href="#" class="value me-1" (click)="showVotes(row.message)" (keyup.enter)="showVotes(row.message)">{{
               row.message.vote
             }}</a>
             <i class="bi bi-hand-thumbs-down me-1" aria-hidden="true"></i>

@@ -2,7 +2,7 @@
   <h3 class="modal-title" i18n>Online</h3>
   <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
 </div>
-<div class="modal-body">
+<div class="modal-body d-flex flex-wrap gap-2">
   @for (user of users$ | async; track user.id) {
     <app-user [user]="user" />
   }

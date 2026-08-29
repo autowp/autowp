@@ -215,7 +215,8 @@
         <li>
           <ng-container i18n>Resolution</ng-container>: <strong>{{ picture.width + '×' + picture.height }}</strong>
           @if (picture.dpiX || picture.dpiY) {
-            &#64; <strong>{{ picture.dpiX + '×' + picture.dpiY }}</strong>
+            &#64; <strong>{{ picture.dpiX + '×' + picture.dpiY }}</strong
+            >&ngsp;
             <a href="https://en.wikipedia.org/wiki/Dots_per_inch"><abbr title="Dots Per Inch">DPI</abbr></a>
             @if (picture.dpiX > 0 && picture.dpiY > 0) {
               {{ (2.54 * picture.width) / picture.dpiX | number: '1.2-2' }}×{{
