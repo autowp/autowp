@@ -90,6 +90,10 @@ export const routes: Routes = [
     path: 'licenses',
   },
   {
+    loadChildren: () => import('./legal-notice/legal-notice-routing.module').then((m) => m.routes),
+    path: 'legal-notice',
+  },
+  {
     loadChildren: () => import('./telegram/telegram-routing.module').then((m) => m.routes),
     path: 'telegram',
   },

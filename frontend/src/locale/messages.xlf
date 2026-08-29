@@ -446,6 +446,10 @@
           <context context-type="linenumber">4,10</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice.component.html</context>
+          <context context-type="linenumber">4,10</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/licenses/licenses.component.html</context>
           <context context-type="linenumber">4,10</context>
         </context-group>
@@ -2409,24 +2413,22 @@ Good luck.</source>
           <context context-type="linenumber">7,13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8907255572356771385" datatype="html">
+      <trans-unit id="3937813557926167615" datatype="html">
         <source>Please note that all material on this server autowp.ru, added visitors.
 
 The site administration does not have information on the legality of the publication of these materials.
 
-All images are posted for educational purposes.
-
-[Report copyright violation](mailto:autowp@yandex.ru)</source>
+All images are posted for educational purposes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">228,238</context>
+          <context context-type="linenumber">228,236</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2029980907058777630" datatype="html">
         <source>Terms of Service</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">253,255</context>
+          <context context-type="linenumber">251,253</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/terms-gate/terms-gate.component.html</context>
@@ -2445,7 +2447,7 @@ All images are posted for educational purposes.
         <source>Privacy Policy</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">254,256</context>
+          <context context-type="linenumber">252,254</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/policy/policy-routing.module.ts</context>
@@ -2464,14 +2466,14 @@ All images are posted for educational purposes.
         <source>Copyright</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">255,257</context>
+          <context context-type="linenumber">253,255</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3906086328287885567" datatype="html">
         <source>Licenses</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">256,257</context>
+          <context context-type="linenumber">254,256</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/licenses/licenses-routing.module.ts</context>
@@ -2482,11 +2484,26 @@ All images are posted for educational purposes.
           <context context-type="linenumber">10,14</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="1368884853095124539" datatype="html">
+        <source>Legal Notice</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">255,256</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice-routing.module.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="3340358994057820932" datatype="html">
         <source>Cookie settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">257,263</context>
+          <context context-type="linenumber">256,262</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5539833462297888878" datatype="html">
@@ -5388,6 +5405,22 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/item-of-day/item-of-day/item-of-day.component.html</context>
           <context context-type="linenumber">144,148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal-notice-body" datatype="html">
+        <source>This Site is a personal, non-commercial project run by an individual, not a registered company.
+
+## Contact
+
+For any question, complaint, or legal notice concerning the Site, use the [feedback form](/feedback) or email [autowp@gmail.com](mailto:autowp@gmail.com).
+
+## Responsibility for content
+
+Decisions about content on the Site — moderation, removal, and takedown — are made through the process described in the [Terms of Service](/tos) and the [Copyright and content complaints](/copyright) page.
+</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice.component.ts</context>
+          <context context-type="linenumber">12,21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="licenses-body" datatype="html">

@@ -2583,14 +2583,12 @@ Bonne chance.</target>
         </context-group>
         <target state="translated">Faire un don</target>
       </trans-unit>
-      <trans-unit id="8907255572356771385" datatype="html">
+      <trans-unit id="3937813557926167615" datatype="html">
         <source>Please note that all material on this server autowp.ru, added visitors.
 
 The site administration does not have information on the legality of the publication of these materials.
 
-All images are posted for educational purposes.
-
-[Report copyright violation](mailto:autowp@yandex.ru)</source>
+All images are posted for educational purposes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">238,249</context>
@@ -2599,9 +2597,7 @@ All images are posted for educational purposes.
 
 L'administration du site ne dispose pas d'informations sur la légalité de la publication de ces documents.
 
-Toutes les images sont postées à des fins éducatives.
-
-[Signaler une violation des droits d'auteur](mailto:autowp@yandex.ru)</target>
+Toutes les images sont postées à des fins éducatives.</target>
       </trans-unit>
       <trans-unit id="8439955599488894226" datatype="html">
         <source>Privacy Policy</source>
@@ -15744,6 +15740,47 @@ Le serveur qui répond aux requêtes du site est construit à partir de composan
 ## Notre propre code
 
 Le code source du site lui-même est publié sur [GitHub](https://github.com/autowp/autowp) sous la licence indiquée là-bas.</target>
+      </trans-unit>
+      <trans-unit id="1368884853095124539" datatype="html">
+        <source>Legal Notice</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">255,256</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice-routing.module.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+        <target state="translated">Mentions légales</target>
+      </trans-unit>
+      <trans-unit id="legal-notice-body" datatype="html">
+        <source>This Site is a personal, non-commercial project run by an individual, not a registered company.
+
+## Contact
+
+For any question, complaint, or legal notice concerning the Site, use the [feedback form](/feedback) or email [autowp@gmail.com](mailto:autowp@gmail.com).
+
+## Responsibility for content
+
+Decisions about content on the Site — moderation, removal, and takedown — are made through the process described in the [Terms of Service](/tos) and the [Copyright and content complaints](/copyright) page.
+</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice.component.ts</context>
+          <context context-type="linenumber">12,21</context>
+        </context-group>
+        <target state="translated">Ce site est un projet personnel à but non lucratif, géré par un particulier et non par une société enregistrée.
+
+## Contact
+
+Pour toute question, plainte ou notification légale concernant le site, utilisez le [formulaire de contact](/feedback) ou envoyez un e-mail à [autowp@gmail.com](mailto:autowp@gmail.com).
+
+## Responsabilité du contenu
+
+Les décisions concernant le contenu du site — modération, suppression, retrait — sont prises selon le processus décrit dans les [Conditions d'utilisation](/tos) et sur la page [droits d'auteur et signalement de contenu](/copyright).</target>
       </trans-unit>
       <trans-unit id="2029980907058777630" datatype="html">
         <source>Terms of Service</source>
