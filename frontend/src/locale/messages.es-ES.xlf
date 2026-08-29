@@ -15908,6 +15908,18 @@ Utilice el mismo botón, formulario o la misma dirección para denunciar materia
         </context-group>
         <target state="translated">Nota de resolución</target>
       </trans-unit>
+      <trans-unit id="439130533561834924" datatype="html">
+        <source> Accept </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">102,105</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.component.html</context>
+          <context context-type="linenumber">450,453</context>
+        </context-group>
+        <target state="translated"> Aceptar </target>
+      </trans-unit>
       <trans-unit id="2008840375241350799" datatype="html">
         <source> Reject </source>
         <context-group purpose="location">
