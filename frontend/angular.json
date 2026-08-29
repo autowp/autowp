@@ -206,7 +206,10 @@
     "schematicCollections": [
       "@angular-eslint/schematics"
     ],
-    "analytics": "c1011e93-556a-4ca6-b2c1-2fdae8095785"
+    "analytics": "c1011e93-556a-4ca6-b2c1-2fdae8095785",
+    "cache": {
+      "environment": "all"
+    }
   },
   "schematics": {
     "@schematics/angular:component": {
