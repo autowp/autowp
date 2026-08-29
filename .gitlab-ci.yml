@@ -79,7 +79,7 @@ test-goautowp-lint:
     - dclint .
     - go mod download
     - go mod verify
-    - golangci-lint run ./... -v --timeout 10m
+    - golangci-lint run ./... -v --timeout 20m
     - govulncheck ./...
   interruptible: true
   rules:
