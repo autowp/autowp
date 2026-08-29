@@ -34,6 +34,7 @@ export class ReportButtonComponent {
 
   public readonly entityType = input.required<ContentReportEntityType>();
   public readonly entityId = input.required<number | string>();
+  public readonly large = input(false);
 
   protected readonly open = signal(false);
   protected readonly submitting = signal(false);

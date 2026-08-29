@@ -1,8 +1,15 @@
 @if (done()) {
   <span class="text-muted small"><ng-container i18n>Thank you — your report has been sent.</ng-container></span>
 } @else {
-  <button type="button" class="btn btn-link btn-sm p-0" i18n-ngbTooltip ngbTooltip="Report" (click)="toggle()">
-    <i class="bi bi-flag" aria-hidden="true"></i>
+  <button
+    type="button"
+    class="btn btn-link p-0"
+    i18n-ngbTooltip
+    ngbTooltip="Report"
+    [class.btn-sm]="!large()"
+    (click)="toggle()"
+  >
+    <i class="bi bi-flag" aria-hidden="true" [class.fs-1]="large()"></i>
   </button>
 
   @if (open()) {

@@ -152,7 +152,7 @@
           }
           <button
             type="button"
-            class="btn btn-link p-0 btn-share-dialog"
+            class="btn btn-link p-0 btn-share-dialog me-3"
             aria-hidden="true"
             title="Share …"
             i18n-title
@@ -160,6 +160,11 @@
           >
             <i class="bi bi-share-fill fs-1" aria-hidden="true"></i>
           </button>
+          <app-report-button
+            [large]="true"
+            [entityType]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE"
+            [entityId]="picture.id"
+          />
         </div>
       </div>
       @if (showShareDialog() && location) {
@@ -258,12 +263,6 @@
           }
         </li>
       </ul>
-      <p>
-        <app-report-button
-          [entityType]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE"
-          [entityId]="picture.id"
-        />
-      </p>
       <remark
         i18n-markdown
         markdown="All images have their owners.
