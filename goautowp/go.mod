@@ -22,7 +22,6 @@ require (
 	github.com/dsoprea/go-jpeg-image-structure/v2 v2.0.0-20221012074422-4f3f7e934102
 	github.com/dsoprea/go-png-image-structure/v2 v2.0.0-20210512210324-29b889a6093d
 	github.com/dsoprea/go-utility/v2 v2.0.0-20221003172846-a3e1774ef349
-	github.com/fiam/gounidecode v0.0.0-20150629112515-8deddbd03fec
 	github.com/gabriel-vasile/mimetype v1.4.15
 	github.com/gen2brain/avif v0.6.0
 	github.com/gin-contrib/cors v1.7.7
@@ -40,6 +39,7 @@ require (
 	github.com/paulmach/orb v0.13.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/rabbitmq/amqp091-go v1.14.0
+	github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/sirupsen/logrus v1.10.1
