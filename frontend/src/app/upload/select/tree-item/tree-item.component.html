@@ -3,16 +3,16 @@
     <div>
       <button type="button" class="btn btn-link toggle" (click)="open = !open">
         @if (!open) {
-          <i class="bi bi-folder2" aria-hidden="true"></i>
+          <i class="bi bi-folder2 me-1" aria-hidden="true"></i>
         } @else {
-          <i class="bi bi-folder2-open" aria-hidden="true"></i>
+          <i class="bi bi-folder2-open me-1" aria-hidden="true"></i>
         }
         @if (item.type === ItemParentType.ITEM_TYPE_TUNING) {
-          <span i18n>Related</span>
+          <span class="me-1" i18n>Related</span>
         } @else if (item.type === ItemParentType.ITEM_TYPE_SPORT) {
-          <span i18n>Sport</span>
+          <span class="me-1" i18n>Sport</span>
         } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
-          <span i18n>Design</span>
+          <span class="me-1" i18n>Design</span>
         }
         <span [innerHTML]="item.item?.nameHtml"></span>
       </button>
@@ -51,11 +51,11 @@
     <span>
       <a class="btn btn-link" routerLink="/upload" [queryParams]="{item_id: item.itemId, perspective_id: null}">
         @if (item.type === ItemParentType.ITEM_TYPE_TUNING) {
-          <span i18n>Related</span>
+          <span class="me-1" i18n>Related</span>
         } @else if (item.type === ItemParentType.ITEM_TYPE_SPORT) {
-          <span i18n>Sport</span>
+          <span class="me-1" i18n>Sport</span>
         } @else if (item.type === ItemParentType.ITEM_TYPE_DESIGN) {
-          <span i18n>Design</span>
+          <span class="me-1" i18n>Design</span>
         }
         <span [innerHTML]="item.item?.nameHtml"></span>
       </a>
