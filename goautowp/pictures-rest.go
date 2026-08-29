@@ -209,6 +209,8 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 	allowedMimes := []string{
 		sampler.ContentTypeImageJPEG,
 		sampler.ContentTypeImagePNG,
+		sampler.ContentTypeImageWebP,
+		sampler.ContentTypeImageAVIF,
 	}
 
 	mimeIsAllowed := false
