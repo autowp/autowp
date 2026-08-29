@@ -14888,8 +14888,8 @@ Brazilian portuguese site translation: [pt-br-translator](placeholder:pt-br-tran
 
 ### Поддержать проект
 
-You can support our project by [finances](/donate) or [moral](/feedback).
-Take part in [the translation of the site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) into other languages.</target>
+Вы можете поддержать наш проект [материально](/donate) или [морально](/feedback).
+Помогите с [переводом сайта](https://github.com/autowp/autowp-frontend/tree/master/src/locale) на другие языки.</target>
       </trans-unit>
       <trans-unit id="6061298927401023633" datatype="html">
         <source>If you have images that you haven&apos;t found on this site and they match the site&apos;s subject matter, you can add them to our catalogue using the form below.
