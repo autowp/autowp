@@ -4214,6 +4214,154 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
         </context-group>
         <target state="translated">Тып кузава</target>
       </trans-unit>
+      <trans-unit id="2438549128507176367" datatype="html">
+        <source> Submit a notice </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">21,25</context>
+        </context-group>
+        <target state="translated"> Падаць заяву </target>
+      </trans-unit>
+      <trans-unit id="9036198482715266223" datatype="html">
+        <source> Appeal a takedown </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">26,32</context>
+        </context-group>
+        <target state="translated"> Абскардзіць выдаленне </target>
+      </trans-unit>
+      <trans-unit id="7254443466072531745" datatype="html">
+        <source>Thank you — your message has been sent.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">32,34</context>
+        </context-group>
+        <target state="translated">Дзякуй — ваша паведамленне адпраўлена.</target>
+      </trans-unit>
+      <trans-unit id="2265474162175802914" datatype="html">
+        <source>What are you reporting?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+        <target state="translated">Пра што вы паведамляеце?</target>
+      </trans-unit>
+      <trans-unit id="7050125264152055103" datatype="html">
+        <source>Address (URL) of the material on the Site</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">44,45</context>
+        </context-group>
+        <target state="translated">Адрас (URL) матэрыялу на Сайце</target>
+      </trans-unit>
+      <trans-unit id="1963202495706057773" datatype="html">
+        <source>Identify the work or right, and why you believe this use isn&apos;t authorised</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">49,51</context>
+        </context-group>
+        <target state="translated">Вызначце твор або права і патлумачце, чаму вы лічыце гэтае выкарыстанне нядазволеным</target>
+      </trans-unit>
+      <trans-unit id="4356858086396146554" datatype="html">
+        <source>Your capacity</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">57,58</context>
+        </context-group>
+        <target state="translated">Ваш статус</target>
+      </trans-unit>
+      <trans-unit id="9072989865373831832" datatype="html">
+        <source>Your e-mail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">72,73</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">133,136</context>
+        </context-group>
+        <target state="translated">Ваш e-mail</target>
+      </trans-unit>
+      <trans-unit id="1832835367547359610" datatype="html">
+        <source>I believe in good faith that this use is not authorised by the rights holder, its agent, or the law</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">81,85</context>
+        </context-group>
+        <target state="translated">Я добрасумленна лічу, што выкарыстанне не дазволена праваўладальнікам, яго прадстаўніком або законам</target>
+      </trans-unit>
+      <trans-unit id="1251674927770639428" datatype="html">
+        <source>The information above is accurate, and I am the rights holder or authorised to act on their behalf</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">87,91</context>
+        </context-group>
+        <target state="translated">Пазначаныя вышэй звесткі дакладныя, і я з'яўляюся праваўладальнікам або ўпаўнаважаны дзейнічаць ад яго імя</target>
+      </trans-unit>
+      <trans-unit id="2570266153150983706" datatype="html">
+        <source> Submit notice </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">107,111</context>
+        </context-group>
+        <target state="translated"> Даслаць заяву </target>
+      </trans-unit>
+      <trans-unit id="1327309088622341019" datatype="html">
+        <source>Address (URL) or identifier of the removed material</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">114,116</context>
+        </context-group>
+        <target state="translated">Адрас (URL) або ідэнтыфікатар выдаленага матэрыялу</target>
+      </trans-unit>
+      <trans-unit id="2586764227547221078" datatype="html">
+        <source>Why you believe the removal was a mistake</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">119,120</context>
+        </context-group>
+        <target state="translated">Чаму вы лічыце выдаленне памылкай</target>
+      </trans-unit>
+      <trans-unit id="9034010875413866532" datatype="html">
+        <source>The information above is accurate</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">152,155</context>
+        </context-group>
+        <target state="translated">Пазначаныя вышэй звесткі дакладныя</target>
+      </trans-unit>
+      <trans-unit id="8683292426799163000" datatype="html">
+        <source> Submit appeal </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">171,176</context>
+        </context-group>
+        <target state="translated"> Даслаць апеляцыю </target>
+      </trans-unit>
+      <trans-unit id="3044414644948493261" datatype="html">
+        <source>Trademark infringement</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <target state="translated">Парушэнне гандлёвай маркі</target>
+      </trans-unit>
+      <trans-unit id="775922997277933285" datatype="html">
+        <source>I am the rights holder</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <target state="translated">Я праваўладальнік</target>
+      </trans-unit>
+      <trans-unit id="5224517082437279633" datatype="html">
+        <source>I am authorised to act on behalf of the rights holder</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+        <target state="translated">Я ўпаўнаважаны дзейнічаць ад імя праваўладальніка</target>
+      </trans-unit>
       <trans-unit id="4862814895511370970" datatype="html">
         <source>Cutaway</source>
         <context-group purpose="location">
@@ -8747,6 +8895,22 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="linenumber">52,54</context>
         </context-group>
         <target state="translated">На іншых мовах</target>
+      </trans-unit>
+      <trans-unit id="5905586405973983465" datatype="html">
+        <source>You are not subscribed to comments on this picture. Click to subscribe and get notified of new comments.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">136,139</context>
+        </context-group>
+        <target state="translated">Вы не падпісаны на каментары да гэтай карцінкі. Націсніце, каб падпісацца і атрымліваць апавяшчэнні пра новыя каментары.</target>
+      </trans-unit>
+      <trans-unit id="4805468007782298023" datatype="html">
+        <source>You are subscribed to comments on this picture. Click to unsubscribe and stop getting notified.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">146,149</context>
+        </context-group>
+        <target state="translated">Вы падпісаны на каментары да гэтай карцінкі. Націсніце, каб адпісацца і больш не атрымліваць апавяшчэнні.</target>
       </trans-unit>
       <trans-unit id="320365913992735230" datatype="html">
         <source>Share …</source>
@@ -14892,7 +15056,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
 Вы можаце падтрымаць наш праект [фінансамі](/donate) ці [маральна](/feedback).
 Прыміце ўдзел у [перакладзе сайта](https://github.com/autowp/autowp-frontend/tree/master/src/locale) на іншыя мовы.</target>
       </trans-unit>
-      <trans-unit id="6061298927401023633" datatype="html">
+      <trans-unit id="uploadRequirements" datatype="html">
         <source>If you have images that you haven&apos;t found on this site and they match the site&apos;s subject matter, you can add them to our catalogue using the form below.
 
 It would be great if you specified what car is shown in the picture, to make it easier to add and to avoid mistakes.
@@ -14902,7 +15066,7 @@ Requirements for added images:
 * [JPEG](http://ru.wikipedia.org/wiki/JPEG) or [PNG](http://ru.wikipedia.org/wiki/PNG) format. Resolution from  640×360 up to 10000×10000.
 * The image should, if possible, be of the highest quality available, and should not contain resizing or compression artifacts (blurring, fuzziness, color bleeding, jagged straight lines, etc.). Exceptions are made for rare photos (from the manufacturer) and scans from brochures. The decision to keep such a photo on the site is made by the moderator team.
 * No captions or logos of unrelated sites added by someone other than the author/owner of the material.
-* The car should look as it did when it left the factory. There should be no signs of &lt;em&gt;home-made tuning&lt;/em&gt;, and it is preferable that there be no changes related to the car&apos;s aging.
+* The car should look as it did when it left the factory. There should be no signs of *home-made tuning*, and it is preferable that there be no changes related to the car&apos;s aging.
 * The main and only subject of the image should be a car, an engine, a car company&apos;s logo, a car factory, or a museum. The presence of unrelated objects or people in the frame is undesirable.
 * Amateur photos of your car, your friends&apos; cars, or any other car you happened to see on the street, as well as photos from exhibitions, will almost certainly not be accepted on the site — unless you are a professional.
 * Lower requirements may apply to the first photos of a car.
@@ -14923,7 +15087,7 @@ Please note that adding pictures is moderated. That is, all pictures will be rev
 * Фармат [JPEG](http://ru.wikipedia.org/wiki/JPEG) ці [PNG](http://ru.wikipedia.org/wiki/PNG). Дазвол ад 640×360 да 10000×10000.
 * Выява павінна па магчымасці быць максімальна даступнай якасці, не змяшчаць розных артэфактаў змены памеру ці кампрэсіі (размытасці, нячоткасці, расплывання колераў, рабрыстасці прамых ліній і г.д.). Выключэнне складаюць рэдкія фота (вытворцы), сканы з праспектаў. Рашэнне аб пакіданні такога фота на сайце прымае мадэратарскі склад.
 * Адсутнасць надпісаў і лагатыпаў старонніх сайтаў, нанесеных не аўтарамі/уладальнікамі матэрыялу.
-* Аўтамабіль павінен мець першапачатковы выгляд, як пры выхадзе з завода. Не павінны прысутнічаць прыкметы &lt;em&gt;саматужнага тюнінгу&lt;/em&gt;, пажадана адсутнасць змен, звязаных са старэннем аўтамабіля.
+* Аўтамабіль павінен мець першапачатковы выгляд, як пры выхадзе з завода. Не павінны прысутнічаць прыкметы *саматужнага тюнінгу*, пажадана адсутнасць змен, звязаных са старэннем аўтамабіля.
 * Асноўнай і адзінай тэмай выявы павінен быць аўтамабіль, рухавік, лагатып аўтакампаніі, аўтамабільны завод ці музей. Наяўнасць у кадры старонніх прадметаў ці людзей - непажаданая.
 * Аматарскія фатаграфіі вашага аўтамабіля, аўтамабіля вашых сяброў ці любога іншага, які сустрэўся вам на вуліцы, а таксама фатаграфіі з выставак - амаль напэўна не будуць прыняты на сайт. Калі толькі вы не прафесіянал.
 * Для першых фатаграфій аўтамабіля магчымыя паніжаныя патрабаванні.
@@ -15577,7 +15741,7 @@ Use the same button or email address to report material that infringes a tradema
 
 Хутчэй за ўсё — кнопка **«Паскардзіцца»** побач з кожнай выявай і каментарыем: выберыце «Парушэнне аўтарскіх правоў» і, па магчымасці, дадайце звесткі ніжэй.
 
-Таксама можна напісаць нам на [autowp@yandex.ru](mailto:autowp@yandex.ru) з тэмай ліста «Скарга на парушэнне аўтарскіх правоў». Калі ласка, укажыце:
+Калі матэрыял не ахоплівае кнопка «Паскардзіцца» (паведамленне на форуме, профіль карыстальніка і інш.), скарыстайцеся формай заявы ніжэй або напішыце нам на [autowp@yandex.ru](mailto:autowp@yandex.ru) з тэмай ліста «Скарга на парушэнне аўтарскіх правоў». Калі ласка, укажыце:
 
 * ідэнтыфікацыю твора, правы на які, на вашу думку, парушаны (напрыклад, спасылку на арыгінал або апісанне);
 * адрас (URL) матэрыялу на Сайце, на які вы скардзіцеся;
@@ -15595,7 +15759,7 @@ Use the same button or email address to report material that infringes a tradema
 
 ## Калі вашу загрузку выдалілі
 
-Калі ваш матэрыял выдалены, а вы лічыце гэта памылкай — бо твор ваш, у вас ёсць дазвол на яго выкарыстанне або матэрыял пераблыталі з іншым, — вы можаце папрасіць нас яго аднавіць. Скарыстайцеся спасылкай на абскарджанне з дасланага вам паведамлення або напішыце на [autowp@yandex.ru](mailto:autowp@yandex.ru) і ўкажыце:
+Калі ваш матэрыял выдалены, а вы лічыце гэта памылкай — бо твор ваш, у вас ёсць дазвол на яго выкарыстанне або матэрыял пераблыталі з іншым, — вы можаце папрасіць нас яго аднавіць. Скарыстайцеся спасылкай на абскарджанне з дасланага вам паведамлення, формай апеляцыі ніжэй або напішыце на [autowp@yandex.ru](mailto:autowp@yandex.ru) і ўкажыце:
 
 * адрас (URL) або ідэнтыфікатар выдаленага матэрыялу;
 * прычыну, па якой вы лічыце выдаленне памылкай;
@@ -15605,7 +15769,7 @@ Use the same button or email address to report material that infringes a tradema
 
 ## Гандлёвыя маркі, прыватнасць і іншыя правы
 
-Той жа кнопкай або тым жа адрасам карыстайцеся, каб паведаміць пра матэрыял, які парушае гандлёвую марку, раскрывае прыватную інфармацыю або выкарыстоўвае чыюсьці выяву ці імя без згоды, якой патрабуе закон. Апішыце права, на якое вы спасылаецеся, і ідэнтыфікуйце матэрыял, як указана вышэй.
+Той жа кнопкай, формай або тым жа адрасам карыстайцеся, каб паведаміць пра матэрыял, які парушае гандлёвую марку, раскрывае прыватную інфармацыю або выкарыстоўвае чыюсьці выяву ці імя без згоды, якой патрабуе закон. Апішыце права, на якое вы спасылаецеся, і ідэнтыфікуйце матэрыял, як указана вышэй.
 
 ## Кантакты
 

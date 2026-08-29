@@ -4217,6 +4217,154 @@ Attribuer des valeurs
         </context-group>
         <target state="translated">Type de véhicule</target>
       </trans-unit>
+      <trans-unit id="2438549128507176367" datatype="html">
+        <source> Submit a notice </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">21,25</context>
+        </context-group>
+        <target state="translated"> Envoyer un signalement </target>
+      </trans-unit>
+      <trans-unit id="9036198482715266223" datatype="html">
+        <source> Appeal a takedown </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">26,32</context>
+        </context-group>
+        <target state="translated"> Contester un retrait </target>
+      </trans-unit>
+      <trans-unit id="7254443466072531745" datatype="html">
+        <source>Thank you — your message has been sent.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">32,34</context>
+        </context-group>
+        <target state="translated">Merci — votre message a été envoyé.</target>
+      </trans-unit>
+      <trans-unit id="2265474162175802914" datatype="html">
+        <source>What are you reporting?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+        <target state="translated">Que signalez-vous ?</target>
+      </trans-unit>
+      <trans-unit id="7050125264152055103" datatype="html">
+        <source>Address (URL) of the material on the Site</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">44,45</context>
+        </context-group>
+        <target state="translated">Adresse (URL) du contenu sur le Site</target>
+      </trans-unit>
+      <trans-unit id="1963202495706057773" datatype="html">
+        <source>Identify the work or right, and why you believe this use isn&apos;t authorised</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">49,51</context>
+        </context-group>
+        <target state="translated">Identifiez l'œuvre ou le droit, et pourquoi vous pensez que cette utilisation n'est pas autorisée</target>
+      </trans-unit>
+      <trans-unit id="4356858086396146554" datatype="html">
+        <source>Your capacity</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">57,58</context>
+        </context-group>
+        <target state="translated">Votre qualité</target>
+      </trans-unit>
+      <trans-unit id="9072989865373831832" datatype="html">
+        <source>Your e-mail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">72,73</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">133,136</context>
+        </context-group>
+        <target state="translated">Votre e-mail</target>
+      </trans-unit>
+      <trans-unit id="1832835367547359610" datatype="html">
+        <source>I believe in good faith that this use is not authorised by the rights holder, its agent, or the law</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">81,85</context>
+        </context-group>
+        <target state="translated">Je crois de bonne foi que cette utilisation n'est pas autorisée par le titulaire des droits, son représentant ou la loi</target>
+      </trans-unit>
+      <trans-unit id="1251674927770639428" datatype="html">
+        <source>The information above is accurate, and I am the rights holder or authorised to act on their behalf</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">87,91</context>
+        </context-group>
+        <target state="translated">Les informations ci-dessus sont exactes, et je suis le titulaire des droits ou autorisé à agir pour son compte</target>
+      </trans-unit>
+      <trans-unit id="2570266153150983706" datatype="html">
+        <source> Submit notice </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">107,111</context>
+        </context-group>
+        <target state="translated"> Envoyer le signalement </target>
+      </trans-unit>
+      <trans-unit id="1327309088622341019" datatype="html">
+        <source>Address (URL) or identifier of the removed material</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">114,116</context>
+        </context-group>
+        <target state="translated">Adresse (URL) ou identifiant du contenu retiré</target>
+      </trans-unit>
+      <trans-unit id="2586764227547221078" datatype="html">
+        <source>Why you believe the removal was a mistake</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">119,120</context>
+        </context-group>
+        <target state="translated">Pourquoi vous pensez que le retrait était une erreur</target>
+      </trans-unit>
+      <trans-unit id="9034010875413866532" datatype="html">
+        <source>The information above is accurate</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">152,155</context>
+        </context-group>
+        <target state="translated">Les informations ci-dessus sont exactes</target>
+      </trans-unit>
+      <trans-unit id="8683292426799163000" datatype="html">
+        <source> Submit appeal </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.html</context>
+          <context context-type="linenumber">171,176</context>
+        </context-group>
+        <target state="translated"> Envoyer la contestation </target>
+      </trans-unit>
+      <trans-unit id="3044414644948493261" datatype="html">
+        <source>Trademark infringement</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <target state="translated">Atteinte à une marque</target>
+      </trans-unit>
+      <trans-unit id="775922997277933285" datatype="html">
+        <source>I am the rights holder</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <target state="translated">Je suis le titulaire des droits</target>
+      </trans-unit>
+      <trans-unit id="5224517082437279633" datatype="html">
+        <source>I am authorised to act on behalf of the rights holder</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/copyright/copyright.component.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+        <target state="translated">Je suis autorisé à agir pour le compte du titulaire des droits</target>
+      </trans-unit>
       <trans-unit id="4862814895511370970" datatype="html">
         <source>Cutaway</source>
         <context-group purpose="location">
@@ -8759,6 +8907,22 @@ Envoyer
           <context context-type="linenumber">52,54</context>
         </context-group>
         <target state="translated">Dans d'autres langues</target>
+      </trans-unit>
+      <trans-unit id="5905586405973983465" datatype="html">
+        <source>You are not subscribed to comments on this picture. Click to subscribe and get notified of new comments.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">136,139</context>
+        </context-group>
+        <target state="translated">Vous n'êtes pas abonné aux commentaires de cette image. Cliquez pour vous abonner et être averti des nouveaux commentaires.</target>
+      </trans-unit>
+      <trans-unit id="4805468007782298023" datatype="html">
+        <source>You are subscribed to comments on this picture. Click to unsubscribe and stop getting notified.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">146,149</context>
+        </context-group>
+        <target state="translated">Vous êtes abonné aux commentaires de cette image. Cliquez pour vous désabonner et ne plus être averti.</target>
       </trans-unit>
       <trans-unit id="320365913992735230" datatype="html">
         <source>Share …</source>
@@ -14902,7 +15066,7 @@ Le code source du site est ouvert, afin que quiconque le souhaite ait la possibi
 Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback).
 Participez à [la traduction du site](https://github.com/autowp/autowp-frontend/tree/master/src/locale) dans d'autres langues.</target>
       </trans-unit>
-      <trans-unit id="6061298927401023633" datatype="html">
+      <trans-unit id="uploadRequirements" datatype="html">
         <source>If you have images that you haven&apos;t found on this site and they match the site&apos;s subject matter, you can add them to our catalogue using the form below.
 
 It would be great if you specified what car is shown in the picture, to make it easier to add and to avoid mistakes.
@@ -14912,7 +15076,7 @@ Requirements for added images:
 * [JPEG](http://ru.wikipedia.org/wiki/JPEG) or [PNG](http://ru.wikipedia.org/wiki/PNG) format. Resolution from  640×360 up to 10000×10000.
 * The image should, if possible, be of the highest quality available, and should not contain resizing or compression artifacts (blurring, fuzziness, color bleeding, jagged straight lines, etc.). Exceptions are made for rare photos (from the manufacturer) and scans from brochures. The decision to keep such a photo on the site is made by the moderator team.
 * No captions or logos of unrelated sites added by someone other than the author/owner of the material.
-* The car should look as it did when it left the factory. There should be no signs of &lt;em&gt;home-made tuning&lt;/em&gt;, and it is preferable that there be no changes related to the car&apos;s aging.
+* The car should look as it did when it left the factory. There should be no signs of *home-made tuning*, and it is preferable that there be no changes related to the car&apos;s aging.
 * The main and only subject of the image should be a car, an engine, a car company&apos;s logo, a car factory, or a museum. The presence of unrelated objects or people in the frame is undesirable.
 * Amateur photos of your car, your friends&apos; cars, or any other car you happened to see on the street, as well as photos from exhibitions, will almost certainly not be accepted on the site — unless you are a professional.
 * Lower requirements may apply to the first photos of a car.
@@ -14933,7 +15097,7 @@ Exigences pour les images ajoutées :
 * Format [JPEG](http://ru.wikipedia.org/wiki/JPEG) ou [PNG](http://ru.wikipedia.org/wiki/PNG). Résolution de 640×360 à 10000×10000.
 * L'image doit, si possible, être de la meilleure qualité disponible, et ne doit pas contenir d'artefacts de redimensionnement ou de compression (flou, manque de netteté, dégradés de couleurs, crénelage des lignes droites, etc.). Des exceptions sont faites pour les photos rares (du constructeur) et les scans de brochures. La décision de conserver une telle photo sur le site est prise par l'équipe de modération.
 * Absence d'inscriptions ou de logos de sites tiers ajoutés par une personne autre que l'auteur/propriétaire du contenu.
-* La voiture doit avoir son aspect d'origine, tel qu'à sa sortie d'usine. Il ne doit pas y avoir de signes de &lt;em&gt;tuning artisanal&lt;/em&gt;, et il est préférable qu'il n'y ait pas de modifications liées au vieillissement de la voiture.
+* La voiture doit avoir son aspect d'origine, tel qu'à sa sortie d'usine. Il ne doit pas y avoir de signes de *tuning artisanal*, et il est préférable qu'il n'y ait pas de modifications liées au vieillissement de la voiture.
 * Le sujet principal et unique de l'image doit être une voiture, un moteur, le logo d'un constructeur automobile, une usine automobile ou un musée. La présence d'objets ou de personnes non liés dans le cadre est indésirable.
 * Les photos amateurs de votre voiture, de la voiture de vos amis ou de toute autre voiture croisée dans la rue, ainsi que les photos d'expositions, ne seront presque certainement pas acceptées sur le site — sauf si vous êtes un professionnel.
 * Des exigences réduites peuvent s'appliquer aux premières photos d'une voiture.
@@ -15587,7 +15751,7 @@ Les sites **wheelsage.org** et **autowp.ru** (le « Site ») hébergent des imag
 
 Le plus rapide est le bouton **« Signaler »** affiché sur chaque image et chaque commentaire : choisissez « Atteinte au droit d’auteur » et, si possible, ajoutez les informations ci-dessous.
 
-Vous pouvez aussi nous écrire à [autowp@gmail.com](mailto:autowp@gmail.com) avec pour objet « Réclamation relative au droit d’auteur ». Veuillez indiquer :
+Pour un contenu que le bouton « Signaler » ne couvre pas (un message de forum, un profil d’utilisateur, ou autre chose), utilisez le formulaire de signalement ci-dessous, ou écrivez-nous à [autowp@gmail.com](mailto:autowp@gmail.com) avec pour objet « Réclamation relative au droit d’auteur ». Veuillez indiquer :
 
 * l’identification de l’œuvre que vous estimez contrefaite (par exemple un lien vers l’original ou une description) ;
 * l’adresse (URL) du contenu du Site que vous signalez ;
@@ -15605,7 +15769,7 @@ Les comptes des utilisateurs qui mettent en ligne de manière répétée des con
 
 ## Si votre mise en ligne a été retirée
 
-Si un contenu que vous avez mis en ligne a été retiré et que vous pensez qu’il s’agit d’une erreur — parce que l’œuvre est la vôtre, que vous avez l’autorisation de l’utiliser ou qu’il a été mal identifié —, vous pouvez nous demander de le rétablir. Utilisez le lien de contestation du message que nous vous avons envoyé, ou écrivez à [autowp@gmail.com](mailto:autowp@gmail.com), en indiquant :
+Si un contenu que vous avez mis en ligne a été retiré et que vous pensez qu’il s’agit d’une erreur — parce que l’œuvre est la vôtre, que vous avez l’autorisation de l’utiliser ou qu’il a été mal identifié —, vous pouvez nous demander de le rétablir. Utilisez le lien de contestation du message que nous vous avons envoyé, le formulaire de contestation ci-dessous, ou écrivez à [autowp@gmail.com](mailto:autowp@gmail.com), en indiquant :
 
 * l’adresse (URL) ou l’identifiant du contenu retiré ;
 * la raison pour laquelle vous estimez que le retrait est une erreur ;
@@ -15615,7 +15779,7 @@ Nous pouvons communiquer votre réponse, y compris votre identité, à l’auteu
 
 ## Marques, vie privée et autres droits
 
-Utilisez le même bouton ou la même adresse pour signaler un contenu qui porte atteinte à une marque, divulgue des informations privées ou utilise l’image ou le nom d’une personne sans le consentement exigé par la loi. Décrivez le droit que vous invoquez et identifiez le contenu comme ci-dessus.
+Utilisez le même bouton, le même formulaire ou la même adresse pour signaler un contenu qui porte atteinte à une marque, divulgue des informations privées ou utilise l’image ou le nom d’une personne sans le consentement exigé par la loi. Décrivez le droit que vous invoquez et identifiez le contenu comme ci-dessus.
 
 ## Contact
 
