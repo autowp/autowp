@@ -64,11 +64,11 @@ spec:
             claimName: img
         - name: config
           configMap:
-            name: {{ include "autowp.static.image" . }}
+            name: {{ include "autowp.static.fullname" . | quote }}
       containers:
         - name: static
           image: {{ include "autowp.static.image" . }}
-          imagePullPolicy: {{ .Values.backend.image.pullPolicy | quote }}
+          imagePullPolicy: {{ .Values.static.image.pullPolicy | quote }}
           ports:
             - name: app-port
               containerPort: 8080

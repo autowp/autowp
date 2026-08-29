@@ -20,8 +20,6 @@ hostnames:
   - he.wheelsage.org
 grpcHostname: grpc.wheelsage.org
 auth:
-  sentry:
-    dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1
   secret: 1234567890abcdef1234567890abcdef
   postgres:
     username: auth
@@ -131,24 +129,6 @@ frontend:
   ssrCache:
     ttlMs: 10000
     maxBytes: "67108864"
-backend:
-  sentry:
-    dsn: https://1234567890abcdef1234567890abcdef@sentry.example.com/1
-  image:
-    registry: registry.pereslegin.ru
-    repository: autowp/backend
-    tag: v1.14.0
-    digest: ""
-    pullPolicy: IfNotPresent
-    pullSecrets: []
-  nginx:
-    image:
-      registry: registry.pereslegin.ru
-      repository: autowp/backend
-      tag: nginx-v1.14.0
-      digest: ""
-      pullPolicy: IfNotPresent
-      pullSecrets: []
 s3:
   key: "key"
   secret: "secret"
