@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, output, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, input, output, signal} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {AcceptTermsRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
@@ -18,6 +18,10 @@ import {ToastsService} from '../toasts/toasts.service';
 export class TermsGateComponent {
   readonly #usersClient = inject(UsersClient);
   readonly #toasts = inject(ToastsService);
+
+  // True on a page the gate itself links to (ToS/Policy/Rules): drops the full-screen backdrop
+  // and shrinks to a corner card so the linked page underneath can actually be read.
+  public readonly compact = input(false);
 
   protected readonly submitting = signal(false);
 

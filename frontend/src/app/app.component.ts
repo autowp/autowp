@@ -14,7 +14,7 @@ import {
   signal,
 } from '@angular/core';
 import {rxResource, takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
-import {NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {NavigationEnd, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {environment} from '@environment/environment';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -39,7 +39,7 @@ import {isPrerendering} from '@utils/is-prerendering';
 import {Angulartics2GoogleGlobalSiteTag} from 'angulartics2';
 import Keycloak from 'keycloak-js';
 import {RemarkComponent} from 'ngx-remark';
-import {map, of, shareReplay} from 'rxjs';
+import {filter, map, of, shareReplay} from 'rxjs';
 
 import {CookieConsentComponent} from './cookie-consent/cookie-consent.component';
 import {MenuComponent} from './moder/menu/menu/menu.component';
@@ -163,9 +163,27 @@ export class AppComponent {
   // of the session once the user accepts, without waiting for a fresh Me().
   readonly #currentUser = toSignal(this.#auth.user$);
   readonly #termsAccepted = signal(false);
-  protected readonly showTermsGate = computed(
-    () => this.#isBrowser && !this.#termsAccepted() && !!this.#currentUser()?.termsAcceptanceRequired,
+  // The gate itself links to these pages so a user can read them before accepting - without this
+  // exemption the gate re-covers the very page it sent the user to.
+  readonly #currentPath = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects.split(/[?#]/)[0]),
+    ),
+    {initialValue: this.router.url.split(/[?#]/)[0]},
   );
+  readonly #termsGateExemptPaths = ['/tos', '/policy', '/rules'];
+  // 'modal' blocks the page like before; on a page the gate itself links to, 'banner' drops the
+  // backdrop so the linked page can actually be read, while still offering the same Accept
+  // action - otherwise a same-tab navigation to one of those links would strand the user with no
+  // way back to accepting.
+  protected readonly termsGateMode = computed<'banner' | 'modal' | null>(() => {
+    if (!this.#isBrowser || this.#termsAccepted() || !this.#currentUser()?.termsAcceptanceRequired) {
+      return null;
+    }
+
+    return this.#termsGateExemptPaths.includes(this.#currentPath()) ? 'banner' : 'modal';
+  });
 
   constructor() {
     const angulartics = inject(Angulartics2GoogleGlobalSiteTag);

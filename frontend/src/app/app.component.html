@@ -265,6 +265,6 @@ All images are posted for educational purposes.
   <app-cookie-consent />
 }
 
-@if (showTermsGate()) {
-  <app-terms-gate (accepted)="onTermsAccepted()" />
+@if (termsGateMode(); as termsGateMode) {
+  <app-terms-gate [compact]="termsGateMode === 'banner'" (accepted)="onTermsAccepted()" />
 }

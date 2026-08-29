@@ -1,4 +1,10 @@
-<div class="terms-gate" role="dialog" aria-modal="true" aria-labelledby="terms-gate-title">
+<div
+  class="terms-gate"
+  aria-labelledby="terms-gate-title"
+  [class.terms-gate--compact]="compact()"
+  [attr.role]="compact() ? 'region' : 'dialog'"
+  [attr.aria-modal]="compact() ? null : true"
+>
   <div class="terms-gate__card">
     <h2 id="terms-gate-title" i18n>We've updated our Terms of Service</h2>
     <p i18n>To keep using your account, please review and accept the current Terms of Service.</p>

@@ -39,4 +39,18 @@
     display: flex;
     justify-content: flex-end;
   }
+
+  // No backdrop, no centering - a small corner card that leaves the linked page underneath fully
+  // readable and scrollable.
+  &--compact {
+    align-items: flex-end;
+    justify-content: flex-end;
+    background: transparent;
+    pointer-events: none;
+
+    .terms-gate__card {
+      max-width: 22rem;
+      pointer-events: auto;
+    }
+  }
 }
