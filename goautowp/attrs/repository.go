@@ -1435,6 +1435,10 @@ func (s *Repository) Specifications( //nolint: maintidx
 		itemID := car.ID
 		values := actualValuesText[itemID]
 
+		if values == nil {
+			values = make(map[int64]string)
+		}
+
 		_, ok := values[schema.EngineNameAttr]
 
 		// append engine name
