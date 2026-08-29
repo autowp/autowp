@@ -1,4 +1,4 @@
-FROM docker.io/library/ubuntu:plucky
+FROM docker.io/library/ubuntu:26.04
 
 LABEL app-name="autowp.goautowp" \
       maintainer="dmitry@pereslegin.ru"
