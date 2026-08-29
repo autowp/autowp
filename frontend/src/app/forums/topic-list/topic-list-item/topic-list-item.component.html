@@ -7,7 +7,7 @@
   } @else {
     <span>{{ topic().name }}</span>
   }
-  <span class="badge rounded-pill text-bg-secondary">
+  <span class="badge rounded-pill text-bg-secondary ms-1">
     {{ topic().oldMessages + (topic().newMessages > 0 ? '+' + topic().newMessages : '') }}
   </span>
 </td>

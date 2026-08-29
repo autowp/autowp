@@ -30,7 +30,7 @@
         </p>
         @if (timestampToDate(user.createTime); as date) {
           <p>
-            <ng-container i18n>Registration date</ng-container>
+            <ng-container i18n>Registration date</ng-container>&ngsp;
             <strong [ngbTooltip]="date | date: 'fullDate'">{{ date | timeAgo }}</strong>
           </p>
         }

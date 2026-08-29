@@ -36,13 +36,13 @@
     @for (comment of data.items; track comment) {
       <li>
         @if (comment.vote > 0) {
-          <strong
+          <strong class="me-1"
             >+{{ comment.vote }}
             <span class="bi bi-hand-thumbs-up" aria-hidden="true"></span>
           </strong>
         }
         @if (comment.vote < 0) {
-          <strong
+          <strong class="me-1"
             >{{ comment.vote }}
             <span class="bi bi-hand-thumbs-down" aria-hidden="true"></span>
           </strong>
