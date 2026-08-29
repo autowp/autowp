@@ -14,6 +14,10 @@ stages:
 
 test-chart:
   stage: test
+  cache:
+    key: security-scanners
+    paths:
+      - /root/.cache/trivy/
   script:
     - cd chart
     - sonar-scanner -Dsonar.login=$SONAR_TOKEN
@@ -27,6 +31,11 @@ test-chart:
 
 test-root:
   stage: test
+  cache:
+    key: security-scanners
+    paths:
+      - /root/.cache/trivy/
+      - /root/.cache/grype/
   script:
     - editorconfig-checker -v .editorconfig
     - dclint .
@@ -133,11 +142,15 @@ publish-frontend:
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/frontend
   cache:
-    key:
-      files:
-        - frontend/package-lock.json
-    paths:
-      - /root/.npm/
+    - key:
+        files:
+          - frontend/package-lock.json
+      paths:
+        - /root/.npm/
+    - key: security-scanners
+      paths:
+        - /root/.cache/trivy/
+        - /root/.cache/grype/
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
     - echo "$DOCKER_PASSWORD" | buildah login -u="$DOCKER_USERNAME" --password-stdin docker.io
@@ -163,9 +176,13 @@ publish-goautowp:
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/goautowp
   cache:
-    paths:
-      - /root/go/pkg/mod/
-      - /root/.cache/go-build
+    - paths:
+        - /root/go/pkg/mod/
+        - /root/.cache/go-build
+    - key: security-scanners
+      paths:
+        - /root/.cache/trivy/
+        - /root/.cache/grype/
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
     - echo "$DOCKER_PASSWORD" | buildah login -u="$DOCKER_USERNAME" --password-stdin docker.io
