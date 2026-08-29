@@ -21,7 +21,7 @@ test-chart:
     - helm dependency update
     - helm lint .
     - kube-linter lint .
-    - trivy config --no-progress --severity MEDIUM,HIGH,CRITICAL --exit-code 1 --config-data ./trusted-registries.yaml . --report=summary
+    - trivy config --severity MEDIUM,HIGH,CRITICAL --exit-code 1 --config-data ./trusted-registries.yaml . --report=summary
   rules:
     - if: $CI_COMMIT_TAG !~ /^v\d.*/
 
