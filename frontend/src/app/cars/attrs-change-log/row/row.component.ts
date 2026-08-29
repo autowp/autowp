@@ -70,7 +70,7 @@ export class CarsAttrsChangeLogRowComponent implements OnInit {
       stream: ({params: attributeId}) =>
         this.#attrsService
           .getAttribute$(attributeId)
-          .pipe(map((attr) => (attr?.unitId ? getUnitAbbrTranslation(attr.unitId) : null))),
+          .pipe(map((attr) => (attr?.unitId && attr.unitId !== '0' ? getUnitAbbrTranslation(attr.unitId) : null))),
     });
 
     this.userResource = rxResource({
