@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/autowp/goautowp/comments"
@@ -146,7 +147,15 @@ func (s *Forums) Close(ctx context.Context, id int64) error {
 }
 
 func (s *Forums) Open(ctx context.Context, id int64) error {
-	return s.setStatus(ctx, id, string(schema.ForumsTopicStatusNormal))
+	_, err := s.db.Update(schema.ForumsTopicsTable).
+		Set(goqu.Record{
+			schema.ForumsTopicsTableStatusColName:    string(schema.ForumsTopicStatusNormal),
+			schema.ForumsTopicsTableDeletedAtColName: nil,
+		}).
+		Where(schema.ForumsTopicsTableIDCol.Eq(id)).
+		Executor().ExecContext(ctx)
+
+	return err
 }
 
 func (s *Forums) Delete(ctx context.Context, id int64) error {
@@ -184,7 +193,13 @@ func (s *Forums) Delete(ctx context.Context, id int64) error {
 
 	ctx = context.WithoutCancel(ctx)
 
-	err = s.setStatus(ctx, id, string(schema.ForumsTopicStatusDeleted))
+	_, err = s.db.Update(schema.ForumsTopicsTable).
+		Set(goqu.Record{
+			schema.ForumsTopicsTableStatusColName:    string(schema.ForumsTopicStatusDeleted),
+			schema.ForumsTopicsTableDeletedAtColName: goqu.Func("NOW"),
+		}).
+		Where(schema.ForumsTopicsTableIDCol.Eq(id)).
+		Executor().ExecContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -466,6 +481,50 @@ func (s *Forums) Topics(
 	}
 
 	return rows, pages, nil
+}
+
+const (
+	deletedTopicsRetentionDays = 30
+	deletedTopicsPurgeBatch    = 1000
+)
+
+// PurgeDeletedTopics permanently removes topics (and their comments) that have sat in the
+// soft-deleted state for longer than deletedTopicsRetentionDays. Returns how many were removed.
+func (s *Forums) PurgeDeletedTopics(ctx context.Context) (int64, error) {
+	var ids []int64
+
+	err := s.db.Select(schema.ForumsTopicsTableIDCol).
+		From(schema.ForumsTopicsTable).
+		Where(
+			schema.ForumsTopicsTableStatusCol.Eq(string(schema.ForumsTopicStatusDeleted)),
+			schema.ForumsTopicsTableDeletedAtCol.IsNotNull(),
+			schema.ForumsTopicsTableDeletedAtCol.Lt(
+				goqu.L("NOW() - INTERVAL ?", fmt.Sprintf("%d DAYS", deletedTopicsRetentionDays)),
+			),
+		).
+		Limit(deletedTopicsPurgeBatch).
+		ScanValsContext(ctx, &ids)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, id := range ids {
+		ctx := context.WithoutCancel(ctx)
+
+		err = s.commentsRepository.DeleteTopic(ctx, schema.CommentMessageTypeIDForums, id)
+		if err != nil {
+			return 0, err
+		}
+
+		_, err = s.db.Delete(schema.ForumsTopicsTable).
+			Where(schema.ForumsTopicsTableIDCol.Eq(id)).
+			Executor().ExecContext(ctx)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return int64(len(ids)), nil
 }
 
 func (s *Forums) updateThemeStat(ctx context.Context, themeID int64) error {

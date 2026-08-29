@@ -451,6 +451,18 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 
 	logrus.Infof("Comments deleted: %d", affected)
 
+	forums, err := s.container.Forums(ctx)
+	if err != nil {
+		return err
+	}
+
+	purgedTopics, err := forums.PurgeDeletedTopics(ctx)
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof("Deleted forum topics purged: %d", purgedTopics)
+
 	err = usersRep.DeleteUnused(ctx)
 	if err != nil {
 		return err

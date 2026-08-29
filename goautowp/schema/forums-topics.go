@@ -21,6 +21,7 @@ const (
 	ForumsTopicsTableAuthorIDColName  = "author_id"
 	ForumsTopicsTableAuthorIPColName  = "author_ip"
 	ForumsTopicsTableViewsColName     = "views"
+	ForumsTopicsTableDeletedAtColName = "deleted_at"
 )
 
 var (
@@ -33,4 +34,5 @@ var (
 	ForumsTopicsTableAuthorIDCol  = ForumsTopicsTable.Col(ForumsTopicsTableAuthorIDColName)
 	ForumsTopicsTableAuthorIPCol  = ForumsTopicsTable.Col(ForumsTopicsTableAuthorIPColName)
 	ForumsTopicsTableViewsCol     = ForumsTopicsTable.Col(ForumsTopicsTableViewsColName)
+	ForumsTopicsTableDeletedAtCol = ForumsTopicsTable.Col(ForumsTopicsTableDeletedAtColName)
 )
