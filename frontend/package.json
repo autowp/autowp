@@ -11,12 +11,6 @@
     "serve:ssr:wheelsage": "node dist/server/server.js"
   },
   "private": true,
-  "overrides": {
-    "@angular/common": "$@angular/common",
-    "@angular/core": "$@angular/core",
-    "rxjs": "$rxjs",
-    "monaco-editor": "$monaco-editor"
-  },
   "dependencies": {
     "@angular/cdk": "^22",
     "@angular/common": "^22.0.8",
