@@ -42,7 +42,7 @@
       </div>
     </div>
   </form>
-  <table class="specs-log table table-stripped" aria-describedby="header">
+  <table class="specs-log table table-striped" aria-describedby="header">
     <thead>
       <tr>
         <th i18n scope="col">Date</th>
@@ -53,16 +53,18 @@
         <th i18n scope="col">Editor</th>
       </tr>
     </thead>
-    @if (itemsResource.error(); as error) {
-      <tr>
-        <td colspan="6">
-          <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
-        </td>
-      </tr>
-    } @else if (itemsResource.value(); as items) {
-      @for (userValue of items; track userValue) {
-        <tr app-cars-attrs-change-log-row [userValue]="userValue"></tr>
+    <tbody>
+      @if (itemsResource.error(); as error) {
+        <tr>
+          <td colspan="6">
+            <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+          </td>
+        </tr>
+      } @else if (itemsResource.value(); as items) {
+        @for (userValue of items; track userValue) {
+          <tr app-cars-attrs-change-log-row [userValue]="userValue"></tr>
+        }
       }
-    }
+    </tbody>
   </table>
 </div>
