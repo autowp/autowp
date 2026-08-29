@@ -54,7 +54,7 @@ RUN apt-get update -qqy && \
 
 COPY etc/ImageMagick-7/policy.xml /etc/ImageMagick-7/policy.xml
 
-USER appuser:appuser
+USER 10001:10001
 
 COPY goautowp /goautowp
 COPY migrations /migrations
