@@ -11,6 +11,13 @@ export const routes: Routes = [
   },
   {
     canActivate: [moderGuard],
+    loadComponent: () =>
+      import('./content-reports/content-reports.component').then((m) => m.ModerContentReportsComponent),
+    path: 'content-reports',
+    title: $localize`Content reports`,
+  },
+  {
+    canActivate: [moderGuard],
     loadComponent: () => import('./item-parent/item-parent.component').then((m) => m.ModerItemParentComponent),
     path: 'item-parent/:item_id/:parent_id',
   },

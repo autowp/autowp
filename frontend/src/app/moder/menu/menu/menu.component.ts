@@ -9,8 +9,10 @@ import {PictureService} from '@services/picture';
 import {map} from 'rxjs';
 
 import {APICommentsService} from '../../../api/comments/comments.service';
+import {APIContentReportsService} from '../../../api/content-reports/content-reports.service';
 
 interface MenuItem {
+  badgeClass?: string;
   count$?: Observable<null | number>;
   icon: string;
   label: string;
@@ -29,6 +31,7 @@ export class MenuComponent {
   protected readonly auth = inject(AuthService);
   readonly #pictureService = inject(PictureService);
   readonly #commentService = inject(APICommentsService);
+  readonly #contentReportsService = inject(APIContentReportsService);
 
   protected readonly items$: Observable<MenuItem[] | null> = this.auth.hasRole$(Role.MODER).pipe(
     map((isModer) => {
@@ -66,6 +69,13 @@ export class MenuComponent {
           icon: 'bi bi-car-front',
           label: $localize`Items`,
           routerLink: ['/moder/items'],
+        },
+        {
+          badgeClass: 'text-bg-danger',
+          count$: this.#contentReportsService.openReportsCount$,
+          icon: 'bi bi-flag-fill',
+          label: $localize`Content reports`,
+          routerLink: ['/moder/content-reports'],
         },
       ];
     }),

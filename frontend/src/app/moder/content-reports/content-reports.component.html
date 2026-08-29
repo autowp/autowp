@@ -1,0 +1,136 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>Content reports</h1>
+</div>
+
+<form class="row row-cols-auto g-2 align-items-end mb-3">
+  <div class="col">
+    <label class="form-label" for="content-report-status" i18n>Status</label>
+    <select id="content-report-status" class="form-select" [formControl]="status" (change)="setFilter()">
+      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_OPEN">Open</option>
+      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_ACCEPTED">Accepted</option>
+      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_REJECTED">Rejected</option>
+      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_UNSPECIFIED">All</option>
+    </select>
+  </div>
+  <div class="col">
+    <label class="form-label" for="content-report-entity-type" i18n>Content type</label>
+    <select id="content-report-entity-type" class="form-select" [formControl]="entityType" (change)="setFilter()">
+      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED">All</option>
+      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE">Picture</option>
+      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT">Comment</option>
+    </select>
+  </div>
+</form>
+
+@if (data$ | async; as data) {
+  <ul class="list-group mb-3">
+    @for (row of data.reports; track row.report.id) {
+      <li class="list-group-item">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+          @if (row.report.status === ContentReportStatus.CONTENT_REPORT_STATUS_OPEN) {
+            <span class="badge text-bg-warning" i18n>Open</span>
+          } @else if (row.report.status === ContentReportStatus.CONTENT_REPORT_STATUS_ACCEPTED) {
+            <span class="badge text-bg-success" i18n>Accepted</span>
+          } @else if (row.report.status === ContentReportStatus.CONTENT_REPORT_STATUS_REJECTED) {
+            <span class="badge text-bg-danger" i18n>Rejected</span>
+          }
+          @if (row.report.entityType === ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE) {
+            <i class="bi bi-image" aria-hidden="true"></i>
+            <a [routerLink]="['/moder/pictures', row.report.entityId]">{{ '#' + row.report.entityId }}</a
+            >&ngsp;
+            <span class="text-muted" i18n>(picture)</span>
+          } @else if (row.report.entityType === ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT) {
+            <i class="bi bi-chat" aria-hidden="true"></i>
+            @if (getCommentLink$(row.report.entityId) | async; as link) {
+              <a [routerLink]="link.route">{{ link.preview }}</a>
+            } @else {
+              <span class="text-muted">{{ '#' + row.report.entityId }}</span
+              >&ngsp;
+              <span class="text-muted" i18n>(comment not found)</span>
+            }
+          }
+          <span class="text-muted small">{{ timestampToDate(row.report.createTime) | date: 'short' }}</span>
+        </div>
+
+        <p class="mb-1">
+          <strong>{{ reasons[row.report.reason] }}</strong>
+        </p>
+        @if (row.report.message) {
+          <p class="mb-1 text-break">{{ row.report.message }}</p>
+        }
+
+        <p class="mb-2 small text-muted">
+          <ng-container i18n>Reported by:</ng-container>&ngsp;
+          @if (row.reporter$ | async; as reporter) {
+            <app-user [user]="reporter" />
+          } @else {
+            <ng-container i18n>anonymous</ng-container>
+          }
+        </p>
+
+        @if (row.report.status === ContentReportStatus.CONTENT_REPORT_STATUS_OPEN) {
+          <div class="input-group input-group-sm" style="max-width: 40rem">
+            <input
+              type="text"
+              class="form-control"
+              i18n-placeholder
+              placeholder="Resolution note"
+              [formControl]="row.resolution"
+            />
+            <button
+              type="button"
+              class="btn btn-success"
+              i18n
+              [disabled]="row.submitting()"
+              (click)="resolve(row, true)"
+            >
+              Accept
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              i18n
+              [disabled]="row.submitting()"
+              (click)="resolve(row, false)"
+            >
+              Reject
+            </button>
+          </div>
+        } @else {
+          <p class="mb-0 small text-muted">
+            <ng-container i18n="@@moder-content-report-resolved-by">Resolved by</ng-container>&ngsp;
+            @if (row.resolvedBy$ | async; as resolvedBy) {
+              <app-user [user]="resolvedBy" />
+            }
+            @if (timestampToDate(row.report.resolveTime); as resolveTime) {
+              <ng-container>,&ngsp;{{ resolveTime | date: 'short' }}</ng-container>
+            }
+          </p>
+          @if (row.report.resolution) {
+            <p class="mb-0 small text-muted">
+              <ng-container i18n="@@moder-content-report-resolution-label">Resolution:</ng-container>&ngsp;{{
+                row.report.resolution
+              }}
+            </p>
+          }
+        }
+      </li>
+    } @empty {
+      <li class="list-group-item text-muted" i18n>No reports.</li>
+    }
+  </ul>
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+}

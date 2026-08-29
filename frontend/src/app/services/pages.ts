@@ -111,6 +111,7 @@ const pages: Page[] = [
           },
           {id: PageId.MODER_PICTURE_VOTE_TEMPLATES, childs: []},
           {id: PageId.MODER_COMMENTS, childs: []},
+          {id: PageId.MODER_CONTENT_REPORTS, childs: []},
         ],
       },
       {id: PageId.RULES, childs: []},

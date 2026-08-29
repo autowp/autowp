@@ -13,7 +13,7 @@
             }
             {{ item.label }}
             @if (item.count$ | async; as count) {
-              <span class="badge rounded-pill text-bg-secondary">{{ count }}</span>
+              <span [class]="'badge rounded-pill ' + (item.badgeClass ?? 'text-bg-secondary')">{{ count }}</span>
             }
           </a>
         }

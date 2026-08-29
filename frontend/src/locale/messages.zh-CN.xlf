@@ -15622,6 +15622,146 @@ Use the same button or email address to report material that infringes a tradema
         <source>Thank you — your report has been sent.</source>
       <target state="translated">谢谢——您的举报已发送。</target>
       </trans-unit>
+      <trans-unit id="467600178664060089" datatype="html">
+        <source>Content reports</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">13,17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/index/index.component.html</context>
+          <context context-type="linenumber">102,105</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/menu/menu/menu.component.ts</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <target state="translated">内容举报</target>
+      </trans-unit>
+      <trans-unit id="7593555694782789615" datatype="html">
+        <source>Open</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">20,21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">42,43</context>
+        </context-group>
+        <target state="translated">待处理</target>
+      </trans-unit>
+      <trans-unit id="4188654437346976139" datatype="html">
+        <source>Rejected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">22,23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+        <target state="translated">已拒绝</target>
+      </trans-unit>
+      <trans-unit id="3029609593829675670" datatype="html">
+        <source>Content type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+        <target state="translated">内容类型</target>
+      </trans-unit>
+      <trans-unit id="3392209594183402175" datatype="html">
+        <source>Picture</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">30,31</context>
+        </context-group>
+        <target state="translated">图片</target>
+      </trans-unit>
+      <trans-unit id="2662644497259948010" datatype="html">
+        <source>Comment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">31,37</context>
+        </context-group>
+        <target state="translated">评论</target>
+      </trans-unit>
+      <trans-unit id="5898353427603244722" datatype="html">
+        <source>(picture)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">52,53</context>
+        </context-group>
+        <target state="translated">（图片）</target>
+      </trans-unit>
+      <trans-unit id="2259143622229221736" datatype="html">
+        <source>(comment not found)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">60,63</context>
+        </context-group>
+        <target state="translated">（未找到评论）</target>
+      </trans-unit>
+      <trans-unit id="5927953600745438454" datatype="html">
+        <source>Reported by:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">74,75</context>
+        </context-group>
+        <target state="translated">举报人：</target>
+      </trans-unit>
+      <trans-unit id="7694755598986576252" datatype="html">
+        <source>anonymous</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">78,82</context>
+        </context-group>
+        <target state="translated">匿名</target>
+      </trans-unit>
+      <trans-unit id="1563370726111396790" datatype="html">
+        <source>Resolution note</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">88,91</context>
+        </context-group>
+        <target state="translated">处理说明</target>
+      </trans-unit>
+      <trans-unit id="2008840375241350799" datatype="html">
+        <source> Reject </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">107,111</context>
+        </context-group>
+        <target state="translated"> 拒绝 </target>
+      </trans-unit>
+      <trans-unit id="moder-content-report-resolved-by" datatype="html">
+        <source>Resolved by</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">112,114</context>
+        </context-group>
+        <target state="translated">处理人</target>
+      </trans-unit>
+      <trans-unit id="moder-content-report-resolution-label" datatype="html">
+        <source>Resolution:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">122,127</context>
+        </context-group>
+        <target state="translated">处理结果：</target>
+      </trans-unit>
+      <trans-unit id="1144474846898036535" datatype="html">
+        <source>No reports.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">130,134</context>
+        </context-group>
+        <target state="translated">暂无举报。</target>
+      </trans-unit>
       <trans-unit id="9134186591632250216" datatype="html">
         <source>Copyright infringement</source>
       <target state="translated">著作权侵权</target>
