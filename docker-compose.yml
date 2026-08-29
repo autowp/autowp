@@ -28,9 +28,9 @@ services:
     container_name: autowp_test_frontend
     depends_on:
       - goautowp-serve
-    network_mode: "service:goautowp-serve"
     volumes:
       - ./frontend/dist:/app
+    network_mode: "service:goautowp-serve"
     restart: always
     user: "101:101"
     read_only: true
@@ -40,9 +40,9 @@ services:
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
+      - postgres
       - rabbitmq
       - redis
-      - postgres
     volumes:
       - ./goautowp-config.yaml:/config.yaml:ro
     command: scheduler-generate-index-cache --loglevel=debug
@@ -52,9 +52,9 @@ services:
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
+      - postgres
       - rabbitmq
       - redis
-      - postgres
     volumes:
       - ./goautowp-config.yaml:/config.yaml:ro
     ports:
@@ -101,6 +101,25 @@ services:
     command: server --console-address ":9001" /data
     restart: always
 
+  postgres:
+    image: postgis/postgis:18-3.6-alpine
+    container_name: autowp_test_traffic_postgres
+    volumes:
+      - ./goautowp/test/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
+      - ./goautowp/test/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
+    environment:
+      - POSTGRES_DB=traffic
+      - POSTGRES_USER=traffic
+      - POSTGRES_PASSWORD=password
+      - KECYLOAK_DB_NAME=keycloak
+      - KECYLOAK_DB_USER=keycloak
+      - KECYLOAK_DB_PASSWORD=password
+    ports:
+      - '0.0.0.0:5432:5432'
+    restart: always
+    expose:
+      - '5432'
+
   rabbitmq:
     image: rabbitmq:management-alpine
     container_name: autowp_test_rabbitmq
@@ -135,22 +154,3 @@ services:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
     restart: always
-
-  postgres:
-    image: postgis/postgis:18-3.6-alpine
-    container_name: autowp_test_traffic_postgres
-    volumes:
-      - ./goautowp/test/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
-      - ./goautowp/test/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
-    environment:
-      - POSTGRES_DB=traffic
-      - POSTGRES_USER=traffic
-      - POSTGRES_PASSWORD=password
-      - KECYLOAK_DB_NAME=keycloak
-      - KECYLOAK_DB_USER=keycloak
-      - KECYLOAK_DB_PASSWORD=password
-    ports:
-      - '0.0.0.0:5432:5432'
-    restart: always
-    expose:
-      - '5432'
