@@ -106,6 +106,7 @@
         }
         @if (!row.message.deleted && !row.canManageOwn) {
           <app-report-button
+            class="float-end"
             [entityType]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT"
             [entityId]="row.message.id"
           />

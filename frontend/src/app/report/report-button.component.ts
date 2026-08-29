@@ -6,6 +6,7 @@ import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ContentReportReason, CreateContentReportRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {AuthService} from '@services/auth.service';
 import {ReCaptchaService} from '@services/recaptcha';
@@ -20,7 +21,7 @@ import {ToastsService} from '../toasts/toasts.service';
 // (DSA Art. 16). Once submitted it collapses to a short acknowledgement for the session.
 @Component({
   selector: 'app-report-button',
-  imports: [ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe],
+  imports: [ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, NgbTooltip],
   templateUrl: './report-button.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

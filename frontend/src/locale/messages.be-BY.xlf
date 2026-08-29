@@ -6978,6 +6978,14 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">сюды</target>
       </trans-unit>
+      <trans-unit id="8911694877027531207" datatype="html">
+        <source>(no child items)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/tree/tree.component.html</context>
+          <context context-type="linenumber">20,23</context>
+        </context-group>
+        <target state="translated">(Няма даччыных элементаў)</target>
+      </trans-unit>
       <trans-unit id="8106052715125007863" datatype="html">
         <source>Vehicles with that engine</source>
         <context-group purpose="location">

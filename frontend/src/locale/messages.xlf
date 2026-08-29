@@ -1202,7 +1202,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.html</context>
-          <context context-type="linenumber">38,40</context>
+          <context context-type="linenumber">37,39</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/top-view/top-view.component.html</context>
@@ -1859,7 +1859,7 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.ts</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
@@ -3165,7 +3165,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
-          <context context-type="linenumber">154,158</context>
+          <context context-type="linenumber">155,159</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
@@ -3836,7 +3836,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.html</context>
-          <context context-type="linenumber">52,57</context>
+          <context context-type="linenumber">51,56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1421107352955343344" datatype="html">
@@ -3847,7 +3847,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
-          <context context-type="linenumber">168,173</context>
+          <context context-type="linenumber">169,174</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forums/new-topic/new-topic.component.html</context>
@@ -3893,7 +3893,7 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Edit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
-          <context context-type="linenumber">116,119</context>
+          <context context-type="linenumber">117,120</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/markdown-edit/markdown-edit/markdown-edit.component.html</context>
@@ -3904,11 +3904,11 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
-          <context context-type="linenumber">125,129</context>
+          <context context-type="linenumber">126,130</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
-          <context context-type="linenumber">136,140</context>
+          <context context-type="linenumber">137,141</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
@@ -3923,7 +3923,7 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Restore</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/comments/list/list.component.html</context>
-          <context context-type="linenumber">144,147</context>
+          <context context-type="linenumber">145,148</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
@@ -4221,7 +4221,7 @@ Use the same button, form, or email address to report material that infringes a 
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3044414644948493261" datatype="html">
@@ -4243,7 +4243,7 @@ Use the same button, form, or email address to report material that infringes a 
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="775922997277933285" datatype="html">
@@ -4842,7 +4842,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.html</context>
-          <context context-type="linenumber">12,13</context>
+          <context context-type="linenumber">11,12</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/user/user.component.html</context>
@@ -6005,7 +6005,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8724425157900491872" datatype="html">
@@ -6016,7 +6016,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6162691442834560200" datatype="html">
@@ -6922,6 +6922,13 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/select-parent/tree-item/tree-item.component.html</context>
           <context context-type="linenumber">23,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8911694877027531207" datatype="html">
+        <source>(no child items)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/tree/tree.component.html</context>
+          <context context-type="linenumber">20,23</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8106052715125007863" datatype="html">
@@ -8948,21 +8955,21 @@ Questions about this Policy or your personal data: [autowp@gmail.com](mailto:aut
         <source>Report</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.html</context>
-          <context context-type="linenumber">6,10</context>
+          <context context-type="linenumber">4,6</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.html</context>
-          <context context-type="linenumber">20,23</context>
+          <context context-type="linenumber">19,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4706862912172458912" datatype="html">
         <source>Send report</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/report/report-button.component.html</context>
-          <context context-type="linenumber">49,51</context>
+          <context context-type="linenumber">48,50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4645345687322304891" datatype="html">
