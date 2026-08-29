@@ -41,7 +41,7 @@ test-frontend:
       files:
         - frontend/package-lock.json
     paths:
-      - frontend/node_modules/
+      - /root/.npm/
   script:
     - ./protoc.sh
     - cd frontend/
