@@ -24,6 +24,8 @@ func reportEntityTypeFromGRPC(t ContentReportEntityType) (schema.ContentReportEn
 		return schema.ContentReportEntityTypePicture, true
 	case ContentReportEntityType_CONTENT_REPORT_ENTITY_TYPE_COMMENT:
 		return schema.ContentReportEntityTypeComment, true
+	case ContentReportEntityType_CONTENT_REPORT_ENTITY_TYPE_OTHER:
+		return schema.ContentReportEntityTypeOther, true
 	case ContentReportEntityType_CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED:
 		return 0, false
 	default:
@@ -59,7 +61,11 @@ func (s *GRPCServer) CreateContentReport(
 	}
 
 	entityType, ok := reportEntityTypeFromGRPC(in.GetEntityType())
-	if !ok || in.GetEntityId() == 0 {
+	if !ok {
+		return nil, status.Error(codes.InvalidArgument, "invalid entity")
+	}
+
+	if entityType != schema.ContentReportEntityTypeOther && in.GetEntityId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "invalid entity")
 	}
 

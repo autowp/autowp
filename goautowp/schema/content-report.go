@@ -13,6 +13,7 @@ type ContentReportEntityType int16
 const (
 	ContentReportEntityTypePicture ContentReportEntityType = 1
 	ContentReportEntityTypeComment ContentReportEntityType = 2
+	ContentReportEntityTypeOther   ContentReportEntityType = 3
 )
 
 // ContentReportReason is the category the reporter picked.

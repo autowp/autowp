@@ -980,6 +980,9 @@ enum ContentReportEntityType {
   CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED = 0;
   CONTENT_REPORT_ENTITY_TYPE_PICTURE = 1;
   CONTENT_REPORT_ENTITY_TYPE_COMMENT = 2;
+  // Not tied to any single row (e.g. a /copyright web-form notice about a forum post, profile,
+  // or other content the Report button doesn't cover). entity_id is 0; details live in message.
+  CONTENT_REPORT_ENTITY_TYPE_OTHER = 3;
 }
 
 enum ContentReportReason {
