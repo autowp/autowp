@@ -125,6 +125,7 @@
                         } @else {
                           <span>{{ value.userValue.valueText }}</span>
                         }
+                        &ngsp;
                         @if (value.user$ | async; as user) {
                           <app-user [user]="user" />
                         }
