@@ -15875,6 +15875,14 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated">(коментар не знайдено)</target>
       </trans-unit>
+      <trans-unit id="440835464741256121" datatype="html">
+        <source>(other, see message below)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">65,67</context>
+        </context-group>
+        <target state="translated">(інше, див. повідомлення нижче)</target>
+      </trans-unit>
       <trans-unit id="5927953600745438454" datatype="html">
         <source>Reported by:</source>
         <context-group purpose="location">

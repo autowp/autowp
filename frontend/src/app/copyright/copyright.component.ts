@@ -5,7 +5,7 @@ import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core'
 import {rxResource} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouterLink} from '@angular/router';
-import {CreateFeedbackRequest} from '@grpc/spec.pb';
+import {ContentReportEntityType, ContentReportReason, CreateContentReportRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {PageEnvService} from '@services/page-env.service';
@@ -193,6 +193,21 @@ export class CopyrightComponent implements OnInit {
     ].join('\n');
   }
 
+  private reasonToProto(): ContentReportReason {
+    if (this.mode() !== 'report') {
+      return ContentReportReason.CONTENT_REPORT_REASON_OTHER;
+    }
+
+    switch (this.reportForm.controls.reasonType.value) {
+      case 'copyright':
+        return ContentReportReason.CONTENT_REPORT_REASON_COPYRIGHT;
+      case 'privacy':
+        return ContentReportReason.CONTENT_REPORT_REASON_PRIVACY;
+      default:
+        return ContentReportReason.CONTENT_REPORT_REASON_OTHER;
+    }
+  }
+
   protected submit(): void {
     if (this.submitting()) {
       return;
@@ -204,14 +219,13 @@ export class CopyrightComponent implements OnInit {
     this.invalidParams.set({});
 
     this.#autowpClient
-      .createFeedback(
-        new CreateFeedbackRequest({
-          feedback: {
-            captcha: form.controls.captcha.value,
-            email: form.controls.email.value,
-            message: this.buildMessage(),
-            name: form.controls.name.value,
-          },
+      .createContentReport(
+        new CreateContentReportRequest({
+          captcha: form.controls.captcha.value,
+          entityId: '0',
+          entityType: ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER,
+          message: this.buildMessage(),
+          reason: this.reasonToProto(),
         }),
       )
       .subscribe({

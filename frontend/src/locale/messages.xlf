@@ -1850,6 +1850,10 @@ Good luck.</source>
           <context context-type="linenumber">99</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">32,38</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.ts</context>
           <context context-type="linenumber">154</context>
         </context-group>
@@ -5810,7 +5814,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">44,45</context>
+          <context context-type="linenumber">45,46</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
@@ -5877,7 +5881,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">42,43</context>
+          <context context-type="linenumber">43,44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4188654437346976139" datatype="html">
@@ -5888,7 +5892,7 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">46,48</context>
+          <context context-type="linenumber">47,49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3029609593829675670" datatype="html">
@@ -5909,49 +5913,56 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <source>Comment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">31,37</context>
+          <context context-type="linenumber">31,32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5898353427603244722" datatype="html">
         <source>(picture)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">52,53</context>
+          <context context-type="linenumber">53,54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2259143622229221736" datatype="html">
         <source>(comment not found)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">60,63</context>
+          <context context-type="linenumber">61,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="440835464741256121" datatype="html">
+        <source>(other, see message below)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
+          <context context-type="linenumber">65,67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5927953600745438454" datatype="html">
         <source>Reported by:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">74,75</context>
+          <context context-type="linenumber">78,79</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7694755598986576252" datatype="html">
         <source>anonymous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">78,82</context>
+          <context context-type="linenumber">82,86</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1563370726111396790" datatype="html">
         <source>Resolution note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">88,91</context>
+          <context context-type="linenumber">92,95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="439130533561834924" datatype="html">
         <source> Accept </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">98,101</context>
+          <context context-type="linenumber">102,105</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/pictures.component.html</context>
@@ -5962,28 +5973,28 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <source> Reject </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">107,111</context>
+          <context context-type="linenumber">111,115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="moder-content-report-resolved-by" datatype="html">
         <source>Resolved by</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">112,114</context>
+          <context context-type="linenumber">116,118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="moder-content-report-resolution-label" datatype="html">
         <source>Resolution:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">122,127</context>
+          <context context-type="linenumber">126,131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1144474846898036535" datatype="html">
         <source>No reports.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/content-reports/content-reports.component.html</context>
-          <context context-type="linenumber">130,134</context>
+          <context context-type="linenumber">134,138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="275100644395619124" datatype="html">

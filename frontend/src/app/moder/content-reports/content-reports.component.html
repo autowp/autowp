@@ -29,6 +29,7 @@
       <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED">All</option>
       <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE">Picture</option>
       <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT">Comment</option>
+      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER">Other</option>
     </select>
   </div>
 </form>
@@ -59,6 +60,9 @@
               >&ngsp;
               <span class="text-muted" i18n>(comment not found)</span>
             }
+          } @else if (row.report.entityType === ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER) {
+            <i class="bi bi-globe" aria-hidden="true"></i>
+            <span class="text-muted" i18n>(other, see message below)</span>
           }
           <span class="text-muted small">{{ timestampToDate(row.report.createTime) | date: 'short' }}</span>
         </div>
