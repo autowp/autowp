@@ -201,7 +201,7 @@
           routerLink="."
           queryParamsHandling="merge"
           class="btn btn-outline-secondary"
-          [queryParams]="{list: '1', order: 'name'}"
+          [queryParams]="{list: '1', order: ItemsRequest.Order.NAME}"
           [class.active]="data.listMode"
         >
           <i class="bi bi-list me-1" aria-hidden="true"></i>
@@ -209,7 +209,7 @@
       </div>
 
       <h2>
-        <ng-container i18n>Items</ng-container>
+        <ng-container i18n>Items</ng-container>&ngsp;
         @if (data.loading) {
           <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
         }
