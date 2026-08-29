@@ -52,6 +52,7 @@ test-frontend:
         - frontend/package-lock.json
     paths:
       - /root/.npm/
+      - frontend/.angular/cache/
   script:
     - ./protoc.sh
     - cd frontend/
@@ -70,6 +71,7 @@ test-goautowp-lint:
     paths:
       - /root/go/pkg/mod/
       - /root/.cache/go-build
+      - /root/.cache/golangci-lint
   script:
     - ./protoc.sh
     - cd goautowp/
@@ -147,6 +149,7 @@ publish-frontend:
           - frontend/package-lock.json
       paths:
         - /root/.npm/
+        - frontend/.angular/cache/
     - key: security-scanners
       paths:
         - /root/.cache/trivy/
