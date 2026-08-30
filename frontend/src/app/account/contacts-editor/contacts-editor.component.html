@@ -25,9 +25,10 @@
       />
       @if (rowErrors()[i]; as message) {
         <p class="invalid-feedback d-block">{{ message }}</p>
-      }
-      @for (message of invalidParams() | invalidParams: 'contacts[' + i + ']'; track message) {
-        <p class="invalid-feedback d-block">{{ message }}</p>
+      } @else {
+        @for (message of invalidParams() | invalidParams: 'contacts[' + i + ']'; track message) {
+          <p class="invalid-feedback d-block">{{ message }}</p>
+        }
       }
     </div>
     <div class="col-sm-1">

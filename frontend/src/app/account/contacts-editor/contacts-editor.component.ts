@@ -109,6 +109,13 @@ export class AccountContactsEditorComponent {
     this.invalidParams.set({});
     this.rowErrors.set({});
 
+    for (let index = 0; index < this.rows.length; index++) {
+      this.validateRow(index);
+    }
+    if (Object.keys(this.rowErrors()).length > 0) {
+      return;
+    }
+
     const contacts: UserContact[] = [];
     for (const row of this.rows.controls) {
       const platform = row.controls.platform.value;
