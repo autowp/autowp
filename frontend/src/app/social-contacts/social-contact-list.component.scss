@@ -3,15 +3,28 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    font-size: 1.25rem;
+    width: 3rem;
+    height: 3rem;
+    font-size: 2.5rem;
+    line-height: 1;
     color: inherit;
     border-radius: 0.25rem;
 
     &:hover,
     &:focus {
       color: var(--bs-link-hover-color, #0a58ca);
+    }
+
+    .bi {
+      display: block;
+      width: 1em;
+      height: 1em;
+      line-height: 1;
+
+      &::before {
+        display: block;
+        vertical-align: top;
+      }
     }
   }
 }
