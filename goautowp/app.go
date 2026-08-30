@@ -733,6 +733,27 @@ func (s *Application) PicturesClearQueue(ctx context.Context) error {
 	return picturesRepo.ClearQueue(ctx)
 }
 
+// UsersBackfillContacts fills user_contact from the legacy users.url field for values that parse
+// as a known platform profile link. See users.Repository.BackfillUserContactsFromURL.
+func (s *Application) UsersBackfillContacts(ctx context.Context, dryRun bool) error {
+	usersRepo, err := s.container.UsersRepository(ctx)
+	if err != nil {
+		return err
+	}
+
+	res, err := usersRepo.BackfillUserContactsFromURL(ctx, dryRun)
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof(
+		"backfill-contacts: scanned=%d matched=%d inserted=%d unmatched=%d dry-run=%t",
+		res.Scanned, res.Matched, res.Inserted, res.Unmatched, dryRun,
+	)
+
+	return nil
+}
+
 func (s *Application) BuildBrandsSprite(ctx context.Context) error {
 	imageStorage, err := s.container.ImageStorage(ctx)
 	if err != nil {

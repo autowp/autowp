@@ -1,11 +1,34 @@
 package goautowp
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/usercontacts"
 	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/validation"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
+
+// contactErrorText maps a usercontacts.Parse error to a short user-facing description. The
+// Angular form gives localised instant feedback from its own mirror of the registry; this text
+// is the rare server-side fallback and follows the existing convention of English descriptions.
+func contactErrorText(err error) string {
+	switch {
+	case errors.Is(err, usercontacts.ErrWrongPlatform):
+		return "This link belongs to a different platform"
+	case errors.Is(err, usercontacts.ErrNotAProfile):
+		return "This link is not a profile page"
+	case errors.Is(err, usercontacts.ErrTooLong):
+		return "This is too long"
+	case errors.Is(err, usercontacts.ErrUnknownPlatform):
+		return "Unknown platform"
+	default:
+		return "This does not look like a valid username or profile link"
+	}
+}
 
 func (s *User) Validate( //nolint: funlen
 	languages map[string]config.LanguageConfig, maskPaths []string,
@@ -66,6 +89,54 @@ func (s *User) Validate( //nolint: funlen
 				Field:       "timezone",
 				Description: fv,
 			})
+		}
+	}
+
+	if util.Contains(maskPaths, "contacts") {
+		seen := make(map[UserContactPlatform]bool)
+
+		for i, contact := range s.GetContacts() {
+			field := fmt.Sprintf("contacts[%d]", i)
+			platform := contact.GetPlatform()
+
+			if platform == UserContactPlatform_USER_CONTACT_PLATFORM_UNSPECIFIED {
+				if contact.GetUsername() != "" {
+					result = append(result, &errdetails.BadRequest_FieldViolation{
+						Field:       field,
+						Description: "Select a platform",
+					})
+				}
+
+				continue
+			}
+
+			platformID := schema.UserContactPlatform(platform) //nolint:gosec // proto enum, small range
+
+			username, err := usercontacts.Parse(platformID, contact.GetUsername())
+			if err != nil {
+				result = append(result, &errdetails.BadRequest_FieldViolation{
+					Field:       field,
+					Description: contactErrorText(err),
+				})
+
+				continue
+			}
+
+			if username == "" {
+				continue // blank row — dropped on save
+			}
+
+			if seen[platform] {
+				result = append(result, &errdetails.BadRequest_FieldViolation{
+					Field:       field,
+					Description: "This platform is already listed",
+				})
+
+				continue
+			}
+
+			seen[platform] = true
+			contact.Username = username // normalised in place for the handler to persist
 		}
 	}
 

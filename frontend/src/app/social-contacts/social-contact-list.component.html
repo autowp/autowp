@@ -1,0 +1,20 @@
+@if (rendered().length) {
+  <p class="social-contact-list d-flex flex-wrap gap-2">
+    @for (contact of rendered(); track contact.url) {
+      <a
+        class="social-contact-list__link"
+        target="_blank"
+        rel="nofollow ugc noopener"
+        [href]="contact.url"
+        [attr.aria-label]="contact.name"
+        [title]="contact.name"
+      >
+        @if (contact.bi) {
+          <i class="bi {{ contact.bi }}" aria-hidden="true"></i>
+        } @else {
+          <span class="social-icon social-icon-{{ contact.svg }}" aria-hidden="true"></span>
+        }
+      </a>
+    }
+  </p>
+}

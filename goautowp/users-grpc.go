@@ -32,6 +32,7 @@ func convertUserFields(fields *UserFields, currentUserRoles []string) users.User
 		LastIP:        lastIP,
 		LastOnline:    fields.GetLastOnline(),
 		Login:         login,
+		Contacts:      fields.GetContacts(),
 	}
 }
 
@@ -506,9 +507,36 @@ func (s *UsersGRPCServer) UpdateUser(
 		set.Timezone = values.GetTimezone()
 	}
 
+	if util.Contains(maskPaths, "contacts_public") {
+		set.ContactsPublic = values.GetContactsPublic()
+	}
+
 	err = s.userRepository.UpdateUser(ctx, set, maskPaths)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if util.Contains(maskPaths, "contacts") {
+		contacts := make([]schema.UserContactRow, 0, len(values.GetContacts()))
+
+		for _, contact := range values.GetContacts() {
+			if contact.GetUsername() == "" {
+				continue
+			}
+
+			//nolint:gosec // platform is a proto enum with a small range
+			platformID := schema.UserContactPlatform(contact.GetPlatform())
+
+			contacts = append(contacts, schema.UserContactRow{
+				UserID:   userCtx.UserID,
+				Platform: platformID,
+				Username: contact.GetUsername(),
+			})
+		}
+
+		if err = s.userRepository.SetUserContacts(ctx, userCtx.UserID, contacts); err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 	}
 
 	return &emptypb.Empty{}, nil

@@ -44,6 +44,7 @@ const (
 	UserTableDreamCarColName          = "dream_car"
 	UserTableTermsVersionColName      = "terms_version"
 	UserTableTermsAcceptedAtColName   = "terms_accepted_at"
+	UserTableContactsPublicColName    = "contacts_public"
 )
 
 var (
@@ -74,28 +75,34 @@ var (
 	UserTablePicturesAddedCol     = UserTable.Col(UserTablePicturesAddedColName)
 	UserTableGreenCol             = UserTable.Col(UserTableGreenColName)
 	UserTableTermsVersionCol      = UserTable.Col(UserTableTermsVersionColName)
+	UserTableURLCol               = UserTable.Col(UserTableURLColName)
 )
 
 type UsersRow struct {
-	ID            int64       `db:"id"             goqu:"pk,skipinsert"`
-	Name          string      `db:"name"`
-	Deleted       bool        `db:"deleted"`
-	Identity      *string     `db:"identity"`
-	LastOnline    *time.Time  `db:"last_online"`
-	EMail         *string     `db:"email"`
-	Img           *int        `db:"img"`
-	SpecsWeight   float64     `db:"specs_weight"`
-	SpecsVolume   int64       `db:"specs_volume"`
-	PicturesTotal int64       `db:"pictures_total"`
-	VotesLeft     int64       `db:"votes_left"`
-	VotesPerDay   int64       `db:"votes_per_day"`
-	Language      string      `db:"language"`
-	Timezone      string      `db:"timezone"`
-	RegDate       *time.Time  `db:"reg_date"`
-	PicturesAdded int64       `db:"pictures_added"`
-	LastIP        pgtype.Inet `db:"last_ip"`
-	Login         *string     `db:"login"`
-	Green         bool        `db:"green"`
-	UUID          pgtype.UUID `db:"uuid"`
-	TermsVersion  *int32      `db:"terms_version"`
+	ID             int64       `db:"id"              goqu:"pk,skipinsert"`
+	Name           string      `db:"name"`
+	Deleted        bool        `db:"deleted"`
+	Identity       *string     `db:"identity"`
+	LastOnline     *time.Time  `db:"last_online"`
+	EMail          *string     `db:"email"`
+	Img            *int        `db:"img"`
+	SpecsWeight    float64     `db:"specs_weight"`
+	SpecsVolume    int64       `db:"specs_volume"`
+	PicturesTotal  int64       `db:"pictures_total"`
+	VotesLeft      int64       `db:"votes_left"`
+	VotesPerDay    int64       `db:"votes_per_day"`
+	Language       string      `db:"language"`
+	Timezone       string      `db:"timezone"`
+	RegDate        *time.Time  `db:"reg_date"`
+	PicturesAdded  int64       `db:"pictures_added"`
+	LastIP         pgtype.Inet `db:"last_ip"`
+	Login          *string     `db:"login"`
+	Green          bool        `db:"green"`
+	UUID           pgtype.UUID `db:"uuid"`
+	TermsVersion   *int32      `db:"terms_version"`
+	ContactsPublic bool        `db:"contacts_public"`
+
+	// Contacts is not a column; the users repository fills it from user_contact when
+	// UserFields.Contacts is requested.
+	Contacts []UserContactRow `db:"-"`
 }

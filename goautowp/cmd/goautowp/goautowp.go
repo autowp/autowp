@@ -470,6 +470,24 @@ func mainReturnWithCode() int { //nolint: maintidx
 				},
 			},
 			{
+				Name: "users",
+				Commands: []*cli.Command{
+					{
+						Name:  "backfill-contacts",
+						Usage: "Move social-network links out of the legacy users.url field into user_contact",
+						Flags: []cli.Flag{
+							&cli.BoolFlag{
+								Name:  "dry-run",
+								Usage: "only report what would change",
+							},
+						},
+						Action: func(ctx context.Context, cmd *cli.Command) error {
+							return autowpApp.UsersBackfillContacts(ctx, cmd.Bool("dry-run"))
+						},
+					},
+				},
+			},
+			{
 				Name: "telegram",
 				Commands: []*cli.Command{
 					{

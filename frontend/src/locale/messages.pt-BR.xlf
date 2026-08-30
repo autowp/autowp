@@ -16099,6 +16099,80 @@ Use o mesmo botão, formulário ou o mesmo endereço para denunciar material que
         <source>(edited)</source>
       <target state="translated">(editado)</target>
       </trans-unit>
+      <trans-unit id="980608646368375610" datatype="html">
+        <source> Paste a link to your profile or a username. Links to your external profiles are shown on your public profile page.
+</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated"> Cole um link para o seu perfil ou um nome de usuário. Os links para os seus perfis externos são exibidos na sua página de perfil pública.
+</target>
+      </trans-unit>
+      <trans-unit id="4521809816404920210" datatype="html">
+        <source>Add contact</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated">Adicionar contato</target>
+      </trans-unit>
+      <trans-unit id="6587585621942452305" datatype="html">
+        <source>link or username</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated">link ou nome de usuário</target>
+      </trans-unit>
+      <trans-unit id="1396973911663508431" datatype="html">
+        <source> Show my links to visitors who are not signed in </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated"> Mostrar meus links para visitantes que não iniciaram sessão </target>
+      </trans-unit>
+      <trans-unit id="3506313562555029559" datatype="html">
+        <source>— social network —</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated">— rede social —</target>
+      </trans-unit>
+      <trans-unit id="7476277899838154372" datatype="html">
+        <source>Select a social network</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated">Selecione uma rede social</target>
+      </trans-unit>
+      <trans-unit id="7649097669332888496" datatype="html">
+        <source>This link is not a profile page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated">Este link não é uma página de perfil</target>
+      </trans-unit>
+      <trans-unit id="6339862199129728972" datatype="html">
+        <source>This link belongs to a different social network</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated">Este link pertence a outra rede social</target>
+      </trans-unit>
+      <trans-unit id="5764996779569744742" datatype="html">
+        <source>This does not look like a valid username or profile link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      <target state="translated">Isto não parece um nome de usuário ou link de perfil válido</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

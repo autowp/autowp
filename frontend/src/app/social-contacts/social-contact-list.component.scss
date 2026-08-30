@@ -1,0 +1,33 @@
+.social-contact-list {
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.25rem;
+    color: inherit;
+    border-radius: 0.25rem;
+
+    &:hover,
+    &:focus {
+      color: var(--bs-link-hover-color, #0a58ca);
+    }
+  }
+}
+
+.social-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentcolor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+@each $name in (drive2, dzen, flickr, '500px', vsco, artstation, deviantart, vk) {
+  .social-icon-#{$name} {
+    mask-image: url('/assets/social/svg/#{$name}.svg');
+  }
+}

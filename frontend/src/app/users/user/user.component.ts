@@ -46,12 +46,22 @@ import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {catchError, map, of, switchMap} from 'rxjs';
 
 import {MessageDialogService} from '../../message-dialog/message-dialog.service';
+import {SocialContactListComponent} from '../../social-contacts/social-contact-list.component';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserComponent} from '../../user/user/user.component';
 
 @Component({
   selector: 'app-users-user',
-  imports: [RouterLink, NgbTooltip, UserComponent, FormsModule, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [
+    RouterLink,
+    NgbTooltip,
+    UserComponent,
+    FormsModule,
+    AsyncPipe,
+    DatePipe,
+    TimeAgoPipe,
+    SocialContactListComponent,
+  ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -106,6 +116,7 @@ export class UsersUserComponent {
         .getByIdentity$(
           identity,
           new UserFields({
+            contacts: true,
             gravatarLarge: true,
             lastIp: true,
             lastOnline: true,

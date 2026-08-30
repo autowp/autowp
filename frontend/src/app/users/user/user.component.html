@@ -41,6 +41,7 @@
           </p>
         }
         <p i18n>Database id: {{ user.id }}</p>
+        <app-social-contact-list [contacts]="user.contacts ?? []" />
         @if (user && isNotMe()) {
           <p>
             <i class="bi bi-reply me-1" aria-hidden="true"></i>

@@ -900,6 +900,40 @@ message User {
   string login = 26;
   // Set on Me() only: the signed-in user has not accepted the current Terms of Service version.
   bool terms_acceptance_required = 27;
+  // User-declared links to external profiles. Populated only when UserFields.contacts is set and
+  // (contacts_public OR the requester is authenticated).
+  repeated UserContact contacts = 28;
+  // Whether `contacts` is shown to anonymous visitors. Returned on Me() only.
+  bool contacts_public = 29;
+}
+
+// A registry of external platforms a user may link a profile on. Kept in sync with
+// usercontacts.Platforms on the server and SOCIAL_PLATFORMS on the client.
+enum UserContactPlatform {
+  USER_CONTACT_PLATFORM_UNSPECIFIED = 0;
+  USER_CONTACT_PLATFORM_DRIVE2 = 1;
+  USER_CONTACT_PLATFORM_DZEN = 2;
+  USER_CONTACT_PLATFORM_YOUTUBE = 3;
+  USER_CONTACT_PLATFORM_TELEGRAM = 4;
+  USER_CONTACT_PLATFORM_X = 5;
+  USER_CONTACT_PLATFORM_TIKTOK = 6;
+  USER_CONTACT_PLATFORM_REDDIT = 7;
+  USER_CONTACT_PLATFORM_FLICKR = 8;
+  USER_CONTACT_PLATFORM_500PX = 9;
+  USER_CONTACT_PLATFORM_BEHANCE = 10;
+  USER_CONTACT_PLATFORM_VSCO = 11;
+  USER_CONTACT_PLATFORM_ARTSTATION = 12;
+  USER_CONTACT_PLATFORM_DEVIANTART = 13;
+  USER_CONTACT_PLATFORM_LINKEDIN = 14;
+  USER_CONTACT_PLATFORM_GITHUB = 15;
+  USER_CONTACT_PLATFORM_VK = 16;
+}
+
+message UserContact {
+  UserContactPlatform platform = 1;
+  // The stored handle (a bare username, or the path segment for id-form profiles). The server
+  // extracts and normalises this from whatever the user enters (a URL or a bare handle).
+  string username = 2;
 }
 
 message Contact {
@@ -1195,6 +1229,7 @@ message UserFields {
   bool last_ip = 16 [(google.api.field_behavior) = OPTIONAL];
   bool last_online = 17 [(google.api.field_behavior) = OPTIONAL];
   bool login = 18 [(google.api.field_behavior) = OPTIONAL];
+  bool contacts = 19 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message BrandSection {

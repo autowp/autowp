@@ -24,6 +24,7 @@ import {BehaviorSubject, catchError, combineLatest, EMPTY, map, of, shareReplay,
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
+import {AccountContactsEditorComponent} from '../contacts-editor/contacts-editor.component';
 
 interface FormControls {
   language: FormControl<string>;
@@ -32,7 +33,14 @@ interface FormControls {
 
 @Component({
   selector: 'app-account-profile',
-  imports: [FormsModule, AsyncPipe, InvalidParamsPipe, ReactiveFormsModule, RemarkModule],
+  imports: [
+    FormsModule,
+    AsyncPipe,
+    InvalidParamsPipe,
+    ReactiveFormsModule,
+    RemarkModule,
+    AccountContactsEditorComponent,
+  ],
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -82,6 +90,7 @@ export class AccountProfileComponent implements OnInit {
       this.#usersClient.me(
         new MeRequest({
           fields: new UserFields({
+            contacts: true,
             img: true,
             language: true,
             timezone: true,
@@ -114,6 +123,10 @@ export class AccountProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ACCOUNT_PROFILE});
+  }
+
+  protected reload(): void {
+    this.#reload$.next(void 0);
   }
 
   private showSavedMessage() {

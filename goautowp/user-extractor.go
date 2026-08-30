@@ -59,6 +59,7 @@ func (s *UserExtractor) Extract(
 
 	if isMe {
 		user.TermsAcceptanceRequired = row.TermsVersion == nil || *row.TermsVersion < users.TermsVersion
+		user.ContactsPublic = row.ContactsPublic
 	}
 
 	if !row.Deleted || util.Contains(currentUserRoles, users.RoleAdmin) {
@@ -134,6 +135,18 @@ func (s *UserExtractor) Extract(
 
 		if fields.GetLogin() && row.Login != nil && util.Contains(currentUserRoles, users.RoleModer) {
 			user.Login = *row.Login
+		}
+
+		// Contacts go to anonymous visitors only when the owner opted in; any signed-in user
+		// (moderators included) always sees them.
+		if fields.GetContacts() && (row.ContactsPublic || currentUserID != 0) {
+			user.Contacts = make([]*UserContact, 0, len(row.Contacts))
+			for _, contact := range row.Contacts {
+				user.Contacts = append(user.Contacts, &UserContact{
+					Platform: UserContactPlatform(contact.Platform),
+					Username: contact.Username,
+				})
+			}
 		}
 	}
 

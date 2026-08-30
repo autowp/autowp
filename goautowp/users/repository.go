@@ -91,6 +91,7 @@ type UserFields struct {
 	PicturesAdded bool
 	LastIP        bool
 	Login         bool
+	Contacts      bool
 }
 
 type OrderBy int
@@ -183,6 +184,7 @@ func (s *Repository) Users(
 	valuePtrs := []interface{}{
 		&row.ID, &row.Name, &row.Deleted, &row.Identity, &row.LastOnline, &row.Green, &row.SpecsWeight, &row.Img,
 		&row.EMail, &row.PicturesTotal, &row.SpecsVolume, &row.Language, &row.UUID, &row.TermsVersion,
+		&row.ContactsPublic,
 	}
 
 	alias := query.UserTableAlias
@@ -207,6 +209,7 @@ func (s *Repository) Users(
 		), aliasTable.Col(schema.UserTableLanguageColName),
 		aliasTable.Col(schema.UserTableUUIDColName),
 		aliasTable.Col(schema.UserTableTermsVersionColName),
+		aliasTable.Col(schema.UserTableContactsPublicColName),
 	}
 
 	if fields.VotesLeft {
@@ -311,7 +314,50 @@ func (s *Repository) Users(
 		return nil, nil, err
 	}
 
+	if fields.Contacts && len(result) > 0 {
+		if err = s.fillContacts(ctx, result); err != nil {
+			return nil, nil, err
+		}
+	}
+
 	return result, pages, nil
+}
+
+// SetUserContacts replaces the whole set of a user's contacts with the given rows (already
+// validated and normalised). Rows with an empty username are dropped.
+func (s *Repository) SetUserContacts(
+	ctx context.Context, userID int64, contacts []schema.UserContactRow,
+) error {
+	ctx = context.WithoutCancel(ctx)
+
+	_, err := s.db.Delete(schema.UserContactTable).
+		Where(schema.UserContactTableUserIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	records := make([]interface{}, 0, len(contacts))
+
+	for _, contact := range contacts {
+		if contact.Username == "" {
+			continue
+		}
+
+		records = append(records, goqu.Record{
+			schema.UserContactTableUserIDColName:   userID,
+			schema.UserContactTablePlatformColName: contact.Platform,
+			schema.UserContactTableUsernameColName: contact.Username,
+		})
+	}
+
+	if len(records) == 0 {
+		return nil
+	}
+
+	_, err = s.db.Insert(schema.UserContactTable).Rows(records...).Executor().ExecContext(ctx)
+
+	return err
 }
 
 func (s *Repository) GetVotesLeft(ctx context.Context, userID int64) (int, error) {
@@ -637,7 +683,16 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 		schema.UserTableOwnCarColName:          "",
 		schema.UserTableDreamCarColName:        "",
 		schema.UserTableTermsAcceptedAtColName: nil,
+		schema.UserTableContactsPublicColName:  false,
 	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	// external-profile links the user added
+	_, err = s.db.Delete(schema.UserContactTable).
+		Where(schema.UserContactTableUserIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
 	if err != nil {
 		return false, err
 	}
@@ -1105,6 +1160,10 @@ func (s *Repository) UpdateUser(ctx context.Context, row schema.UsersRow, mask [
 		set[schema.UserTableTimezoneColName] = row.Timezone
 	}
 
+	if util.Contains(mask, "contacts_public") {
+		set[schema.UserTableContactsPublicColName] = row.ContactsPublic
+	}
+
 	if len(set) > 0 {
 		_, err := s.db.Update(schema.UserTable).
 			Set(set).
@@ -1477,4 +1536,42 @@ func (s *Repository) messagingInterval(regDate time.Time, messagingInterval int6
 	}
 
 	return util.Max(messagingInterval, s.messageInterval)
+}
+
+// fillContacts loads user_contact rows for the given users and attaches them to each row's
+// Contacts slice, ordered by platform id for a stable render.
+func (s *Repository) fillContacts(ctx context.Context, rows []schema.UsersRow) error {
+	ids := make([]int64, 0, len(rows))
+	for i := range rows {
+		ids = append(ids, rows[i].ID)
+	}
+
+	var contacts []schema.UserContactRow
+
+	err := s.db.Select(
+		schema.UserContactTableUserIDCol,
+		schema.UserContactTablePlatformCol,
+		schema.UserContactTable.Col(schema.UserContactTableUsernameColName),
+	).
+		From(schema.UserContactTable).
+		Where(schema.UserContactTableUserIDCol.In(ids)).
+		Order(
+			schema.UserContactTableUserIDCol.Asc(),
+			schema.UserContactTablePlatformCol.Asc(),
+		).
+		ScanStructsContext(ctx, &contacts)
+	if err != nil {
+		return err
+	}
+
+	byUser := make(map[int64][]schema.UserContactRow, len(rows))
+	for _, contact := range contacts {
+		byUser[contact.UserID] = append(byUser[contact.UserID], contact)
+	}
+
+	for i := range rows {
+		rows[i].Contacts = byUser[rows[i].ID]
+	}
+
+	return nil
 }
