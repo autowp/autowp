@@ -43,7 +43,7 @@
   </div>
 }
 
-@if (votes(); as votes) {
+@if (showVotes() && votes(); as votes) {
   @if (votes.length) {
     <div>
       <ng-container i18n>Already voted:</ng-container>
@@ -51,14 +51,14 @@
         @for (moder_vote of votes; track moder_vote) {
           <li>
             @if (moder_vote.vote > 0) {
-              <i class="bi bi-hand-thumbs-up-fill text-success" aria-hidden="true"></i>
+              <i class="bi bi-hand-thumbs-up-fill text-success me-1" aria-hidden="true"></i>
             } @else {
-              <i class="bi bi-hand-thumbs-down-fill text-danger" aria-hidden="true"></i>
+              <i class="bi bi-hand-thumbs-down-fill text-danger me-1" aria-hidden="true"></i>
             }
             @if (moder_vote.user; as user) {
               <app-user [user]="user" />
             }
-            <span [style.color]="moder_vote.vote > 0 ? 'green' : 'red'">{{ moder_vote.reason }}</span>
+            <span class="ms-1" [style.color]="moder_vote.vote > 0 ? 'green' : 'red'">{{ moder_vote.reason }}</span>
           </li>
         }
       </ul>

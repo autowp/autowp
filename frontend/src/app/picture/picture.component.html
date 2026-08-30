@@ -393,19 +393,19 @@
             <li>
               @if (moderVote.vote) {
                 <span>
-                  <i style="color: green" class="bi bi-hand-thumbs-up-fill" aria-hidden="true"></i>
+                  <i style="color: green" class="bi bi-hand-thumbs-up-fill me-1" aria-hidden="true"></i>
                   @if (moderVote.user; as user) {
                     <app-user [user]="user" />
                   }
-                  <span style="color: green">{{ moderVote.reason }}</span>
+                  <span class="ms-1" style="color: green">{{ moderVote.reason }}</span>
                 </span>
               } @else {
                 <span>
-                  <i style="color: red" class="bi bi-hand-thumbs-down-fill" aria-hidden="true"></i>
+                  <i style="color: red" class="bi bi-hand-thumbs-down-fill me-1" aria-hidden="true"></i>
                   @if (moderVote.user; as user) {
                     <app-user [user]="user" />
                   }
-                  <span style="color: red">{{ moderVote.reason }}</span>
+                  <span class="ms-1" style="color: red">{{ moderVote.reason }}</span>
                 </span>
               }
             </li>
@@ -447,7 +447,7 @@
                   }
                 </div>
               }
-              <app-picture-moder-vote [picture]="picture" (changed)="pictureVoted()" />
+              <app-picture-moder-vote [picture]="picture" [showVotes]="false" (changed)="pictureVoted()" />
               @if (statusLoading()) {
                 <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
               }

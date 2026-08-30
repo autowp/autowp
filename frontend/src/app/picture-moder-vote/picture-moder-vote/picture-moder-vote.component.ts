@@ -31,6 +31,10 @@ export class PictureModerVoteComponent implements OnInit {
 
   readonly picture = input.required<Picture>();
 
+  // The picture page renders its own "Moderators about this picture" list, so it hides this
+  // one to avoid showing the votes twice; the moderator page keeps it (its only such list).
+  readonly showVotes = input<boolean>(true);
+
   readonly changed = output();
 
   // Chained off the picture input signal directly rather than a raw Observable stored on an
