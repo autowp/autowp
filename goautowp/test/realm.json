@@ -230,7 +230,9 @@
         "be",
         "uk",
         "it",
-        "he"
+        "he",
+        "de",
+        "ja"
     ],
     "roles": {
         "client": {

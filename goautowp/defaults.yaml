@@ -126,6 +126,18 @@ languages:
     name    : עִברִית
     flag    : flag-icon flag-icon-he
     aliases : []
+  de:
+    hostname: de.localhost
+    timezone: Europe/Berlin
+    name    : Deutsch
+    flag    : flag-icon flag-icon-de
+    aliases : []
+  ja:
+    hostname: ja.localhost
+    timezone: Asia/Tokyo
+    name    : 日本語
+    flag    : flag-icon flag-icon-jp
+    aliases : []
 captcha: true
 mock-email-sender: true
 image-storage:
@@ -267,7 +279,7 @@ content-languages:
   - pt
   - de
   - es
-  - jp
+  - ja
   - he
 message-interval: 300
 mosts-min-cars-count: 200

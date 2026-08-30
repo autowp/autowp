@@ -79,6 +79,20 @@ export const environment = {
       locale: 'he',
       name: 'עִברִית',
     },
+    {
+      code: 'de',
+      flag: 'flag-icon flag-icon-de',
+      hostname: 'de.wheelsage.org',
+      locale: 'de',
+      name: 'Deutsch',
+    },
+    {
+      code: 'ja',
+      flag: 'flag-icon flag-icon-jp',
+      hostname: 'ja.wheelsage.org',
+      locale: 'ja',
+      name: '日本語',
+    },
   ],
   production: true,
 };

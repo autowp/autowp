@@ -14,6 +14,6 @@ const (
 	PortugueseBrazilianLanguageCode = "pt-br"
 	GermanLanguageCode              = "de"
 	ItalianLanguageCode             = "it"
-	JapaneseLanguageCode            = "jp"
+	JapaneseLanguageCode            = "ja"
 	CatnameLanguageCode             = EnglishLanguageCode
 )

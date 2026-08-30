@@ -80,6 +80,20 @@ export const environment = {
       locale: 'he',
       name: 'עִברִית',
     },
+    {
+      code: 'de',
+      flag: 'flag-icon flag-icon-de',
+      hostname: 'de.localhost',
+      locale: 'de',
+      name: 'Deutsch',
+    },
+    {
+      code: 'ja',
+      flag: 'flag-icon flag-icon-jp',
+      hostname: 'ja.localhost',
+      locale: 'ja',
+      name: '日本語',
+    },
   ],
   production: false,
 };

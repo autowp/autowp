@@ -18,6 +18,8 @@ hostnames:
   - zh.wheelsage.org
   - it.wheelsage.org
   - he.wheelsage.org
+  - de.wheelsage.org
+  - ja.wheelsage.org
 grpcHostname: grpc.wheelsage.org
 auth:
   secret: 1234567890abcdef1234567890abcdef
@@ -266,6 +268,12 @@ languages:
   - code: he
     locale: he
     hostname: he.wheelsage.org
+  - code: de
+    locale: de
+    hostname: de.wheelsage.org
+  - code: ja
+    locale: ja
+    hostname: ja.wheelsage.org
 postgres:
   hostname: 127.0.0.1
   port: 5432

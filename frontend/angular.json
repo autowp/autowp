@@ -49,6 +49,14 @@
           "he": {
             "translation": "src/locale/messages.he-IL.xlf",
             "baseHref": "/"
+          },
+          "de": {
+            "translation": "src/locale/messages.de-DE.xlf",
+            "baseHref": "/"
+          },
+          "ja": {
+            "translation": "src/locale/messages.ja-JP.xlf",
+            "baseHref": "/"
           }
         }
       },
@@ -117,7 +125,9 @@
               "zh-CN",
               "es-ES",
               "it",
-              "he"
+              "he",
+              "de",
+              "ja"
             ],
             "browser": "src/main.ts",
             "server": "src/main.server.ts",

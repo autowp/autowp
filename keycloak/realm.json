@@ -242,7 +242,9 @@
         "be",
         "uk",
         "it",
-        "he"
+        "he",
+        "de",
+        "ja"
     ],
     "defaultLocale": "en",
     "browserFlow": "browser",
