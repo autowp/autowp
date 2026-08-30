@@ -16173,6 +16173,22 @@ Use o mesmo botão, formulário ou o mesmo endereço para denunciar material que
         </context-group>
       <target state="translated">Isto não parece um nome de usuário ou link de perfil válido</target>
       </trans-unit>
+      <trans-unit id="8147146109615873185" datatype="html">
+        <source>Profiles on other sites</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/profile/profile.component.html</context>
+          <context context-type="linenumber">37,39</context>
+        </context-group>
+      <target state="translated">Perfis em outros sites</target>
+      </trans-unit>
+      <trans-unit id="5322082311999943289" datatype="html">
+        <source>Add profile</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
+          <context context-type="linenumber">42,46</context>
+        </context-group>
+      <target state="translated">Adicionar perfil</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
