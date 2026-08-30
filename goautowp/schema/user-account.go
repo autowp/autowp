@@ -11,6 +11,7 @@ var (
 	UserAccountTableIDCol        = UserAccountTable.Col("id")
 	UserAccountTableUserIDCol    = UserAccountTable.Col("user_id")
 	UserAccountTableServiceIDCol = UserAccountTable.Col("service_id")
+	UserAccountTableLinkCol      = UserAccountTable.Col("link")
 )
 
 type UserAccountRow struct {

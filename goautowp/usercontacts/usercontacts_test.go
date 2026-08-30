@@ -26,6 +26,12 @@ func TestParseAcceptsBareHandleAndURL(t *testing.T) {
 		{"x bare", schema.UserContactPlatformX, "Jack", "jack"},
 		{"x url with status", schema.UserContactPlatformX, "https://x.com/jack/status/20", "jack"},
 		{"x twitter.com host", schema.UserContactPlatformX, "twitter.com/jack", "jack"},
+		{
+			"x legacy http twitter link",
+			schema.UserContactPlatformX,
+			"http://twitter.com/microbber",
+			"microbber",
+		},
 		{"youtube handle bare", schema.UserContactPlatformYouTube, "@MrBeast", "@MrBeast"},
 		{"youtube handle url", schema.UserContactPlatformYouTube, "https://www.youtube.com/@MrBeast", "@MrBeast"},
 		{
@@ -106,6 +112,42 @@ func TestParseRejects(t *testing.T) {
 			require.ErrorIs(t, err, tc.wantErr)
 		})
 	}
+}
+
+func TestDetect(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name         string
+		input        string
+		wantPlatform schema.UserContactPlatform
+		wantUsername string
+	}{
+		{"legacy twitter", "http://twitter.com/microbber", schema.UserContactPlatformX, "microbber"},
+		{"vk id link", "https://vk.com/id12345", schema.UserContactPlatformVK, "id12345"},
+		{"github", "https://github.com/torvalds", schema.UserContactPlatformGitHub, "torvalds"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			platform, username, ok := Detect(tc.input)
+			require.True(t, ok)
+			assert.Equal(t, tc.wantPlatform, platform)
+			assert.Equal(t, tc.wantUsername, username)
+		})
+	}
+}
+
+func TestDetectIgnoresBareHandlesAndUnknownHosts(t *testing.T) {
+	t.Parallel()
+
+	_, _, ok := Detect("microbber")
+	assert.False(t, ok, "a bare handle is ambiguous and must not be attributed")
+
+	_, _, ok = Detect("https://facebook.com/someone")
+	assert.False(t, ok, "an unregistered platform must not match")
 }
 
 func TestParseEmptyIsNotAnError(t *testing.T) {
