@@ -1413,10 +1413,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
           <context context-type="linenumber">2,5</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/profile/profile.component.html</context>
-          <context context-type="linenumber">37,39</context>
-        </context-group>
-        <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">130,132</context>
         </context-group>
@@ -1675,8 +1671,8 @@ This can happen if the linked account is your only way to sign in, i.e. no e-mai
           <context context-type="linenumber">21,22</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4521809816404920210" datatype="html">
-        <source>Add contact</source>
+      <trans-unit id="5322082311999943289" datatype="html">
+        <source>Add profile</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
           <context context-type="linenumber">42,46</context>
@@ -1928,6 +1924,13 @@ Good luck.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/profile/profile.component.html</context>
           <context context-type="linenumber">30,35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8147146109615873185" datatype="html">
+        <source>Profiles on other sites</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/profile/profile.component.html</context>
+          <context context-type="linenumber">37,39</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">

@@ -48,6 +48,9 @@ func TestParseAcceptsBareHandleAndURL(t *testing.T) {
 		},
 		{"vk screen name", schema.UserContactPlatformVK, "vk.com/durov", "durov"},
 		{"vk id form", schema.UserContactPlatformVK, "https://vk.com/id1", "id1"},
+		{"vk .ru host", schema.UserContactPlatformVK, "https://vk.ru/dmitry.pereslegin", "dmitry.pereslegin"},
+		{"vk bare handle with dot", schema.UserContactPlatformVK, "dmitry.pereslegin", "dmitry.pereslegin"},
+		{"tiktok bare handle with dot", schema.UserContactPlatformTikTok, "john.doe", "john.doe"},
 		{"reddit strips u/", schema.UserContactPlatformReddit, "reddit.com/user/spez", "spez"},
 		{"reddit short u form", schema.UserContactPlatformReddit, "https://www.reddit.com/u/spez/", "spez"},
 		{
@@ -99,6 +102,7 @@ func TestParseRejects(t *testing.T) {
 		},
 		{"telegram invite link", schema.UserContactPlatformTelegram, "https://t.me/+abcdefgh", ErrNotAProfile},
 		{"telegram bad bare", schema.UserContactPlatformTelegram, "1234", ErrBadFormat},
+		{"drive2 bare handle with dot", schema.UserContactPlatformDrive2, "john.doe", ErrBadFormat},
 		{"youtube ambiguous bare word", schema.UserContactPlatformYouTube, "somechannel", ErrBadFormat},
 		{"unknown platform", schema.UserContactPlatform(999), "whatever", ErrUnknownPlatform},
 		{"too long github", schema.UserContactPlatformGitHub, "x-" + strings.Repeat("a", 80), ErrBadFormat},

@@ -291,7 +291,14 @@ func Parse(platformID schema.UserContactPlatform, raw string) (string, error) {
 
 // extract pulls the handle from a URL, or validates a bare handle, without normalising case.
 func (p Platform) extract(raw string) (string, error) {
-	parsed := parseAsURL(raw)
+	// Only treat the input as a URL when it actually carries a path (or scheme) — a "/".
+	// A bare handle never does, and some handles (VK/TikTok/Dzen "first.last") otherwise
+	// look like a bare hostname to parseAsURL and get rejected as a foreign host.
+	var parsed *url.URL
+	if strings.Contains(raw, "/") {
+		parsed = parseAsURL(raw)
+	}
+
 	if parsed == nil {
 		handle := raw
 		if p.stripAt {

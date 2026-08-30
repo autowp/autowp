@@ -1,6 +1,7 @@
 import type {UserContact} from '@grpc/spec.pb';
 
 import {ChangeDetectionStrategy, Component, computed, input} from '@angular/core';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {socialContactUrl, socialPlatform} from '@services/user-contact';
 
 interface RenderedContact {
@@ -12,7 +13,7 @@ interface RenderedContact {
 
 @Component({
   selector: 'app-social-contact-list',
-  imports: [],
+  imports: [NgbTooltip],
   templateUrl: './social-contact-list.component.html',
   styleUrl: './social-contact-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

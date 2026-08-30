@@ -25,9 +25,10 @@
       />
       @if (rowErrors()[i]; as message) {
         <p class="invalid-feedback d-block">{{ message }}</p>
-      }
-      @for (message of invalidParams() | invalidParams: 'contacts[' + i + ']'; track message) {
-        <p class="invalid-feedback d-block">{{ message }}</p>
+      } @else {
+        @for (message of invalidParams() | invalidParams: 'contacts[' + i + ']'; track message) {
+          <p class="invalid-feedback d-block">{{ message }}</p>
+        }
       }
     </div>
     <div class="col-sm-1">
@@ -39,7 +40,7 @@
 }
 
 <button type="button" class="btn btn-outline-secondary btn-sm mb-3" (click)="addRow()">
-  <i class="bi bi-plus" aria-hidden="true"></i>&ngsp;<ng-container i18n>Add contact</ng-container>
+  <i class="bi bi-plus" aria-hidden="true"></i>&ngsp;<ng-container i18n>Add profile</ng-container>
 </button>
 
 <div class="form-check mb-3">

@@ -5,9 +5,10 @@
         class="social-contact-list__link"
         target="_blank"
         rel="nofollow ugc noopener"
+        placement="top"
         [href]="contact.url"
         [attr.aria-label]="contact.name"
-        [title]="contact.name"
+        [ngbTooltip]="contact.name"
       >
         @if (contact.bi) {
           <i class="bi {{ contact.bi }}" aria-hidden="true"></i>

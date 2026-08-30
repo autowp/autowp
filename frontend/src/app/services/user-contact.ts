@@ -298,7 +298,10 @@ export function parseContact(id: UserContactPlatform, raw: string): ParseContact
     return {username: ''};
   }
 
-  const url = asUrl(trimmed);
+  // Only treat the input as a URL when it carries a path (or scheme) — a "/". A bare handle
+  // never does, and some handles (VK/TikTok/Dzen "first.last") otherwise look like a bare
+  // hostname to asUrl and get rejected as a foreign host.
+  const url = trimmed.includes('/') ? asUrl(trimmed) : null;
   const extracted = url ? extractFromUrl(platform, url) : extractFromHandle(platform, trimmed);
   if ('error' in extracted) {
     return extracted;
