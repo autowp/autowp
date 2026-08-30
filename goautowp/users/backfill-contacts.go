@@ -17,14 +17,9 @@ type BackfillContactsResult struct {
 	Unmatched int
 }
 
-// linkedAccountServiceSkip lists user_account.service_id values whose link is never a plain
-// external profile URL we want (Facebook and Google+ are excluded by policy; keycloak is the
-// SSO account, not a profile).
-var linkedAccountServiceSkip = map[string]bool{
-	"facebook":                true,
-	"google-plus":             true,
-	KeycloakExternalAccountID: true,
-}
+// linkedAccountServices lists the user_account.service_id values whose link is a usable external
+// profile URL. Others (facebook, google-plus, keycloak, …) are ignored.
+var linkedAccountServices = []string{"vk", "twitter"}
 
 // backfillCandidate is one (user, url) pair to try attributing to a platform.
 type backfillCandidate struct {
@@ -75,18 +70,13 @@ func (s *Repository) backfillCandidatesFromURL(ctx context.Context) ([]backfillC
 }
 
 func (s *Repository) backfillCandidatesFromAccounts(ctx context.Context) ([]backfillCandidate, error) {
-	skip := make([]string, 0, len(linkedAccountServiceSkip))
-	for service := range linkedAccountServiceSkip {
-		skip = append(skip, service)
-	}
-
 	var rows []backfillCandidate
 
 	err := s.db.Select(schema.UserAccountTableUserIDCol, schema.UserAccountTableLinkCol).
 		From(schema.UserAccountTable).
 		Where(
 			schema.UserAccountTableLinkCol.Neq(""),
-			schema.UserAccountTableServiceIDCol.NotIn(skip),
+			schema.UserAccountTableServiceIDCol.In(linkedAccountServices),
 		).
 		ScanStructsContext(ctx, &rows)
 
