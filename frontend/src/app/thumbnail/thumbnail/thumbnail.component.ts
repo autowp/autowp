@@ -26,8 +26,7 @@ interface ThumbnailAPIPicture extends Picture {
   imports: [RouterLink, UserComponent, FormsModule, AsyncPipe, DecimalPipe],
   templateUrl: './thumbnail.component.html',
   styleUrl: './thumbnail.component.scss',
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThumbnailComponent implements OnInit {
   readonly #perspectiveService = inject(APIPerspectiveService);

@@ -75,8 +75,7 @@ interface UploadProgress {
     InboxPicturesGridComponent,
   ],
   templateUrl: './index.component.html',
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadIndexComponent implements OnInit {
   readonly #http = inject(HttpClient);
