@@ -12,6 +12,13 @@ import (
 func TestHttpBanPost(t *testing.T) {
 	t.Parallel()
 
+	// A dedicated RFC 5737 TEST-NET-3 address, used by no other test, so that `go test ./...`
+	// running this package concurrently with the `traffic` and `ban` packages against the shared
+	// database can't add, remove, or auto-whitelist this ban out from under us mid-test. It is
+	// deliberately not a loopback/private address, which the ban interceptor and AutoWhitelist
+	// treat specially.
+	const bannedIP = "203.0.113.9"
+
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
@@ -39,13 +46,13 @@ func TestHttpBanPost(t *testing.T) {
 
 	_, err = trafficSrv.DeleteTrafficBlacklistItem(
 		ctx,
-		&DeleteTrafficBlacklistItemRequest{IpAddress: "127.0.0.1"},
+		&DeleteTrafficBlacklistItemRequest{IpAddress: bannedIP},
 	)
 	require.NoError(t, err)
 
 	_, err = trafficSrv.CreateTrafficBlacklistItem(ctx, &CreateTrafficBlacklistItemRequest{
 		Item: &TrafficBlacklistItem{
-			IpAddress: "127.0.0.1",
+			IpAddress: bannedIP,
 			Period:    3,
 			Reason:    "Test",
 		},
@@ -53,7 +60,7 @@ func TestHttpBanPost(t *testing.T) {
 	require.NoError(t, err)
 
 	ip, err := srv.GetIP(ctx, &GetIPRequest{
-		IpAddress: "127.0.0.1",
+		IpAddress: bannedIP,
 		Fields:    []string{"blacklist"},
 	})
 	require.NoError(t, err)
@@ -61,11 +68,11 @@ func TestHttpBanPost(t *testing.T) {
 
 	_, err = trafficSrv.DeleteTrafficBlacklistItem(
 		ctx,
-		&DeleteTrafficBlacklistItemRequest{IpAddress: "127.0.0.1"},
+		&DeleteTrafficBlacklistItemRequest{IpAddress: bannedIP},
 	)
 	require.NoError(t, err)
 
-	ip, err = srv.GetIP(ctx, &GetIPRequest{IpAddress: "127.0.0.1"})
+	ip, err = srv.GetIP(ctx, &GetIPRequest{IpAddress: bannedIP})
 	require.NoError(t, err)
 	require.Nil(t, ip.GetBlacklist())
 }
