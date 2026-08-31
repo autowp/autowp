@@ -17,7 +17,6 @@
   "files": [
     "main.server.ts",
     "server.ts",
-    "main.ts",
-    "polyfills.ts"
+    "main.ts"
   ]
 }

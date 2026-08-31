@@ -47,8 +47,7 @@
     "sprintf-js": "^1.1.2",
     "tslib": "^2.5.0",
     "uint8array-extras": "^1.5.0",
-    "url-parse": "^1.5.10",
-    "zone.js": ">=0.15.0"
+    "url-parse": "^1.5.10"
   },
   "devDependencies": {
     "@angular-eslint/builder": "^22.1.0",
