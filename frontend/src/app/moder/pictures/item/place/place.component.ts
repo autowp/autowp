@@ -3,7 +3,7 @@ import type {LatLng, LeafletMouseEvent, Map, Marker, TileLayer} from 'leaflet';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, NgZone} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
@@ -61,7 +61,6 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
   readonly #notFound = inject(NotFoundService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #zone = inject(NgZone);
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
 
@@ -148,15 +147,15 @@ export class ModerPicturesItemPlaceComponent implements OnInit {
 
   protected onMapReady(mapOptions: MapOptions, lmap: Map, form: FormGroup<PointForm>) {
     lmap.on('click', (event: LeafletMouseEvent) => {
-      this.#zone.run(() => {
-        const ll: LatLng = event.latlng;
-        const lat = normalizeLat(ll.lat);
-        const lng = normalizeLng(ll.lng);
-        mapOptions.markers = [createMarker(lat, lng)];
-        form.setValue({
-          lat: lat + '',
-          lng: lng + '',
-        });
+      const ll: LatLng = event.latlng;
+      const lat = normalizeLat(ll.lat);
+      const lng = normalizeLng(ll.lng);
+      mapOptions.markers = [createMarker(lat, lng)];
+      // setValue re-emits through form.valueChanges -> map$ -> the `map$ | async` binding, which
+      // is what re-renders the marker and re-centres the map (no NgZone re-entry needed).
+      form.setValue({
+        lat: lat + '',
+        lng: lng + '',
       });
     });
   }
