@@ -488,6 +488,20 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			})
 		}
 
+		if fields.GetAuthorSuggestions() &&
+			(isModer || (userCtx.UserID != 0 && row.OwnerID.Valid && row.OwnerID.Int64 == userCtx.UserID)) {
+			group.Go(func() error {
+				suggestions, err := s.extractAuthorSuggestions(groupCtx, picturesRepository, row.ID, lang, userCtx)
+				if err != nil {
+					return err
+				}
+
+				resultRow.AuthorSuggestions = suggestions
+
+				return nil
+			})
+		}
+
 		if fields.GetExif() && row.ImageID.Valid {
 			group.Go(func() error {
 				exif, err := imageStorage.ImageEXIF(groupCtx, int(row.ImageID.Int64))
@@ -973,6 +987,70 @@ func (s *PictureExtractor) preloadTopicsStat(
 	}
 
 	return stats, nil
+}
+
+// extractAuthorSuggestions loads the stored EXIF-derived author candidates for a picture and
+// resolves each to a localized Item for display in the upload grid.
+func (s *PictureExtractor) extractAuthorSuggestions(
+	ctx context.Context,
+	picturesRepository *pictures.Repository,
+	pictureID int64,
+	lang string,
+	userCtx UserContext,
+) ([]*PictureAuthorSuggestion, error) {
+	rows, err := picturesRepository.PictureAuthorSuggestions(ctx, pictureID)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(rows) == 0 {
+		return nil, nil
+	}
+
+	itemsRepository, err := s.container.ItemsRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := make([]int64, 0, len(rows))
+	for _, row := range rows {
+		ids = append(ids, row.ItemID)
+	}
+
+	itemFields := &ItemFields{NameHtml: true, NameText: true}
+
+	itemRows, _, err := itemsRepository.List(
+		ctx,
+		&query.ItemListOptions{ItemIDs: ids},
+		convertItemFields(itemFields),
+		items.OrderByNone,
+		false,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	extractedItems, err := s.container.ItemExtractor().ExtractRows(ctx, itemRows, itemFields, lang, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	itemByID := make(map[int64]*Item, len(extractedItems))
+	for _, item := range extractedItems {
+		itemByID[item.GetId()] = item
+	}
+
+	suggestions := make([]*PictureAuthorSuggestion, 0, len(rows))
+	for _, row := range rows {
+		suggestions = append(suggestions, &PictureAuthorSuggestion{
+			ItemId:   row.ItemID,
+			Item:     itemByID[row.ItemID],
+			Source:   row.Source,
+			RawValue: row.RawValue,
+		})
+	}
+
+	return suggestions, nil
 }
 
 // Item types whose parents continue a route. Anything else ends it.

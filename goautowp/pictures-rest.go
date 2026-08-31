@@ -36,6 +36,7 @@ const (
 	pictureReplacePictureIDField = "replace_picture_id"
 	picturePerspectiveID         = "perspective_id"
 	pictureNameField             = "name"
+	pictureAuthorIDField         = "author_id"
 
 	responseStatus = "status"
 )
@@ -91,6 +92,7 @@ type PicturePostForm struct {
 	ItemID           int64                 `form:"item_id"            json:"item_id"`
 	ReplacePictureID int64                 `form:"replace_picture_id" json:"replace_picture_id"`
 	PerspectiveID    int32                 `form:"perspective_id"     json:"perspective_id"`
+	AuthorID         int64                 `form:"author_id"          json:"author_id"`
 }
 
 func (s *PicturePostForm) Validate() (map[string]map[string]string, error) {
@@ -268,6 +270,7 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 		values.ItemID,
 		values.PerspectiveID,
 		values.ReplacePictureID,
+		values.AuthorID,
 	)
 	if err != nil {
 		if errors.Is(err, pictures.ErrInvalidImage) {

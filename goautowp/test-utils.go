@@ -212,6 +212,11 @@ func CreatePictureRequest(
 	_, err = part.Write([]byte(strconv.FormatInt(int64(data.PerspectiveID), 10)))
 	require.NoError(t, err)
 
+	part, err = multipartWriter.CreateFormField(pictureAuthorIDField)
+	require.NoError(t, err)
+	_, err = part.Write([]byte(strconv.FormatInt(data.AuthorID, 10)))
+	require.NoError(t, err)
+
 	err = multipartWriter.Close()
 	require.NoError(t, err)
 

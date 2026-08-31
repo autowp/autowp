@@ -175,6 +175,8 @@ const (
 	ImageMinHeight   = 360
 	ImageMaxWidth    = 10000
 	ImageMaxHeight   = 10000
+
+	authorSuggestionRawValueMaxLen = 255
 )
 
 func NewRepository(
@@ -2102,6 +2104,7 @@ func (s *Repository) AddPictureFromReader(
 	itemID int64,
 	perspectiveID int32,
 	replacePictureID int64,
+	authorID int64,
 ) (int64, error) {
 	imageConfig, imageType, err := image.DecodeConfig(handle)
 	if err != nil {
@@ -2240,6 +2243,13 @@ func (s *Repository) AddPictureFromReader(
 		}
 	}
 
+	if authorID > 0 {
+		_, err = s.CreatePictureItem(ctx, pictureID, authorID, schema.PictureItemTypeAuthor, 0)
+		if err != nil {
+			return 0, err
+		}
+	}
+
 	// rename file to new
 	pattern, err := s.FileNamePattern(ctx, pictureID)
 	if err != nil {
@@ -2258,7 +2268,7 @@ func (s *Repository) AddPictureFromReader(
 		return 0, err
 	}
 
-	err = s.processEXIF(ctx, pictureID, imageType, handle, fileSize, userID)
+	err = s.processEXIF(ctx, pictureID, imageType, handle, fileSize, userID, authorID > 0)
 	if err != nil {
 		return 0, err
 	}
@@ -2734,9 +2744,14 @@ func (s *Repository) processEXIF(
 	handle io.ReadSeeker,
 	fileSize int64,
 	userID int64,
+	authorLinked bool,
 ) error {
 	extractedEXIF, err := extractFromEXIF(imageType, handle, fileSize)
 	if err != nil {
+		return err
+	}
+
+	if err = s.processEXIFAuthor(ctx, pictureID, extractedEXIF, authorLinked); err != nil {
 		return err
 	}
 
@@ -2771,6 +2786,62 @@ func (s *Repository) processEXIF(
 			Where(schema.PictureTableIDCol.Eq(pictureID)).
 			Executor().ExecContext(ctx)
 		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// processEXIFAuthor derives author candidates from the EXIF Artist tag (falling back to Copyright
+// only when Artist is empty), stores them as advisory suggestions, and — when the uploader left
+// the author unset and there is exactly one catalogue match — links that author right away.
+func (s *Repository) processEXIFAuthor(
+	ctx context.Context, pictureID int64, extractedEXIF exifExtractedValues, authorLinked bool,
+) error {
+	source := schema.PictureAuthorSuggestionSourceEXIFArtist
+	rawValue := strings.TrimSpace(extractedEXIF.artist)
+
+	if rawValue == "" {
+		source = schema.PictureAuthorSuggestionSourceEXIFCopyright
+		rawValue = strings.TrimSpace(extractedEXIF.copyrights)
+	}
+
+	if rawValue == "" {
+		return nil
+	}
+
+	personIDs, err := s.ResolveAuthorPersons(ctx, rawValue)
+	if err != nil {
+		return err
+	}
+
+	if len(personIDs) == 0 {
+		return nil
+	}
+
+	matchedName := NormalizeAuthorName(rawValue)
+	if runes := []rune(matchedName); len(runes) > authorSuggestionRawValueMaxLen {
+		matchedName = string(runes[:authorSuggestionRawValueMaxLen])
+	}
+
+	rows := make([]schema.PictureAuthorSuggestionRow, 0, len(personIDs))
+	for _, personID := range personIDs {
+		rows = append(rows, schema.PictureAuthorSuggestionRow{
+			ItemID:   personID,
+			Source:   source,
+			RawValue: matchedName,
+		})
+	}
+
+	if err = s.SetPictureAuthorSuggestions(ctx, pictureID, rows); err != nil {
+		return err
+	}
+
+	if !authorLinked && len(personIDs) == 1 {
+		if _, err = s.CreatePictureItem(
+			ctx, pictureID, personIDs[0], schema.PictureItemTypeAuthor, 0,
+		); err != nil {
 			return err
 		}
 	}
