@@ -475,6 +475,74 @@ func TestPictureItemSetPictureItemItemID(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestCreatePictureItemAuthorByOwner(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	kc := cnt.Keycloak()
+
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+
+	testerToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, testUsername, testPassword)
+	require.NoError(t, err)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
+	personID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("person-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+	})
+	vehicleID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	// Picture owned by the tester, still in the inbox.
+	ownPictureID := CreatePicture(
+		t, cnt, "./test/test.jpg", PicturePostForm{ItemID: vehicleID}, testerToken.AccessToken,
+	)
+	// Picture owned by the admin.
+	otherPictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: vehicleID},
+		PictureStatus_PICTURE_STATUS_INBOX, adminToken.AccessToken)
+
+	client := NewPicturesClient(conn)
+	testerCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+testerToken.AccessToken)
+
+	// The owner may credit an author on their own inbox picture.
+	_, err = client.CreatePictureItem(testerCtx, &CreatePictureItemRequest{
+		PictureId: ownPictureID,
+		ItemId:    personID,
+		Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+	})
+	require.NoError(t, err)
+
+	// ... and remove it again.
+	_, err = client.DeletePictureItem(testerCtx, &DeletePictureItemRequest{
+		PictureId: ownPictureID,
+		ItemId:    personID,
+		Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+	})
+	require.NoError(t, err)
+
+	// Not a CONTENT link, though - that stays moderator-only.
+	_, err = client.CreatePictureItem(testerCtx, &CreatePictureItemRequest{
+		PictureId: ownPictureID,
+		ItemId:    vehicleID,
+		Type:      PictureItemType_PICTURE_ITEM_CONTENT,
+	})
+	require.ErrorContains(t, err, "PermissionDenied")
+
+	// ... and not an author link on someone else's picture.
+	_, err = client.CreatePictureItem(testerCtx, &CreatePictureItemRequest{
+		PictureId: otherPictureID,
+		ItemId:    personID,
+		Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+	})
+	require.ErrorContains(t, err, "PermissionDenied")
+}
+
 func TestPictureCrop(t *testing.T) {
 	t.Parallel()
 

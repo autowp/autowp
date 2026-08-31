@@ -1493,6 +1493,7 @@ message PictureFields {
   bool preview_large = 25;
   bool subscribed = 26;
   PicturesRequest paginator = 27;
+  bool author_suggestions = 30;
 }
 
 message PictureSiblings {
@@ -2128,6 +2129,14 @@ message Picture {
   bool subscribed = 44;
   PicturesPages paginator = 45;
   PictureCrop crop = 48;
+  repeated PictureAuthorSuggestion author_suggestions = 49;
+}
+
+message PictureAuthorSuggestion {
+  int64 item_id = 1;
+  Item item = 2;
+  string source = 3;
+  string raw_value = 4;
 }
 
 message PictureCrop {

@@ -282,7 +282,7 @@ func TestImageExif(t *testing.T) {
 
 	defer util.Close(handle)
 
-	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0)
+	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0, 0)
 	require.NoError(t, err)
 
 	picture, err := repo.Picture(
@@ -318,7 +318,7 @@ func TestImageExifGPS(t *testing.T) {
 
 	defer util.Close(handle)
 
-	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0)
+	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0, 0)
 	require.NoError(t, err)
 
 	picture, err := repo.Picture(
@@ -350,7 +350,7 @@ func TestImageBlackEdgeCrop(t *testing.T) {
 
 	defer util.Close(handle)
 
-	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0)
+	pictureID, err := repo.AddPictureFromReader(ctx, handle, userID, "127.0.0.1", 0, 0, 0, 0)
 	require.NoError(t, err)
 
 	cfg := config.LoadConfig("../")

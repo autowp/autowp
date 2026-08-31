@@ -63,6 +63,28 @@ Please note that image submissions are moderated. This means that all images wil
                     </div>
                   </div>
                   <div class="mb-3 row">
+                    <label class="col-md-2 col-form-label" for="author" i18n>Photo author</label>
+                    <div class="col-md-10">
+                      @if (batchAuthor(); as batchAuthor) {
+                        <div class="form-control-plaintext d-flex align-items-center gap-2">
+                          <span [innerHTML]="batchAuthor.nameHtml"></span>
+                          <button type="button" class="btn btn-link btn-sm p-0" i18n (click)="clearBatchAuthor()">
+                            change
+                          </button>
+                        </div>
+                      } @else {
+                        <app-person-search
+                          [pictureItemType]="PictureItemType.PICTURE_ITEM_AUTHOR"
+                          (selected)="onBatchAuthorSelected($event)"
+                        />
+                      }
+                      <div class="form-text" i18n>
+                        Can't find the author in the list? Leave this empty and name them in the note — a moderator will
+                        add them.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-3 row">
                     <label class="col-md-2 col-form-label" for="note" i18n>Note</label>
                     <div class="col-md-10">
                       <textarea name="note" id="note" rows="3" class="form-control" [formControl]="note"></textarea>
@@ -98,23 +120,7 @@ Please note that image submissions are moderated. This means that all images wil
               }
             </div>
           </div>
-          <div class="pictures row">
-            @for (picture of pictures; track picture) {
-              <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-                <app-thumbnail [picture]="picture.picture" [route]="['/picture', picture.picture.identity]" />
-                <p>
-                  <button type="button" class="btn btn-link btn-sm" (click)="crop(picture)">
-                    <i class="bi bi-crop me-1" aria-hidden="true"></i>
-                    @if (picture.cropTitle) {
-                      <span>{{ picture.cropTitle }}</span>
-                    } @else {
-                      <span i18n>crop</span>
-                    }
-                  </button>
-                </p>
-              </div>
-            }
-          </div>
+          <app-inbox-pictures-grid [pictures]="pictures" />
         </div>
       } @else {
         <div class="card card-body">

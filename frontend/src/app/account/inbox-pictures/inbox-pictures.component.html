@@ -2,15 +2,13 @@
   <h1 i18n>Unmoderated</h1>
 </div>
 @if (data$ | async; as data) {
-  <div class="row">
-    @for (picture of data.items || []; track picture.id) {
-      <div class="col-12 cols-sm-6 col-md-6 col-lg-4">
-        <app-thumbnail [picture]="picture" [route]="['/picture', picture.identity]" />
-      </div>
+  @if (data.items.length > 0) {
+    <app-inbox-pictures-grid [pictures]="data.items" />
+    @if (data.paginator) {
+      <app-paginator [data]="data.paginator" />
     }
-  </div>
-  @if (data.paginator) {
-    <app-paginator [data]="data.paginator" />
+  } @else {
+    <div class="alert alert-info" i18n>You have no pictures awaiting moderation.</div>
   }
 } @else {
   <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>

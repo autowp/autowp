@@ -19,10 +19,12 @@ const (
 	EXIFDateTimeOriginal  = 0x9003
 	EXIFCopyright         = 0x8298
 	EXIFDateTimeDigitized = 0x9004
+	EXIFArtist            = 0x013B
 )
 
 type exifExtractedValues struct {
 	copyrights   string
+	artist       string
 	dateTimeTake time.Time
 	gpsInfo      *exif.GpsInfo
 }
@@ -76,6 +78,24 @@ func extractFromEXIF(
 			}
 
 			copyrights = append(copyrights, phrase)
+		}
+	}
+
+	artistIfd, err := rootIfd.FindTagWithId(EXIFArtist)
+	if err != nil && !errors.Is(err, exif.ErrTagNotFound) {
+		return exifExtractedValues{}, err
+	}
+
+	artist := make([]string, 0)
+
+	if err == nil {
+		for _, line := range artistIfd {
+			phrase, err := line.FormatFirst()
+			if err != nil {
+				return exifExtractedValues{}, err
+			}
+
+			artist = append(artist, phrase)
 		}
 	}
 
@@ -136,6 +156,7 @@ func extractFromEXIF(
 
 	return exifExtractedValues{
 		copyrights:   strings.Join(copyrights, "\n"),
+		artist:       strings.Join(artist, "\n"),
 		dateTimeTake: dateTimeTake,
 		gpsInfo:      gi,
 	}, nil

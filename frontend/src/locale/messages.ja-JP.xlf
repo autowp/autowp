@@ -16568,6 +16568,58 @@ Transmission is not considered</source>
         </context-group>
       <target state="translated">プロフィールを追加</target>
       </trans-unit>
+      <trans-unit id="2768534023046143787" datatype="html">
+        <source>Photo author</source>
+      <target state="translated">写真の作者</target>
+      </trans-unit>
+      <trans-unit id="2596403754082622773" datatype="html">
+        <source> change </source>
+      <target state="translated"> 変更 </target>
+      </trans-unit>
+      <trans-unit id="5832918383447226112" datatype="html">
+        <source> Can&apos;t find the author in the list? Leave this empty and name them in the note — a moderator will add them. </source>
+      <target state="translated"> リストに作者が見つかりませんか？この欄は空のままにして、メモに作者名を記載してください。モデレーターが追加します。 </target>
+      </trans-unit>
+      <trans-unit id="1039222147773711627" datatype="html">
+        <source>applied to <x id="INTERPOLATION" equiv-text="{{ cascade.pictureIds.length }}"/> more photos with the same suggestions.</source>
+      <target state="translated">同じ候補を持つ他の <x id="INTERPOLATION" equiv-text="{{ cascade.pictureIds.length }}"/> 枚の写真にも適用しました。</target>
+      </trans-unit>
+      <trans-unit id="5775346636203685655" datatype="html">
+        <source>Undo</source>
+      <target state="translated">元に戻す</target>
+      </trans-unit>
+      <trans-unit id="3114034628735140707" datatype="html">
+        <source>Set author on every photo without one:</source>
+      <target state="translated">作者が未設定のすべての写真に作者を設定:</target>
+      </trans-unit>
+      <trans-unit id="2079197940611265513" datatype="html">
+        <source> Apply to all </source>
+      <target state="translated"> すべてに適用 </target>
+      </trans-unit>
+      <trans-unit id="2831702340099514806" datatype="html">
+        <source> remove </source>
+      <target state="translated"> 削除 </target>
+      </trans-unit>
+      <trans-unit id="6385847151383097856" datatype="html">
+        <source>Possible author:</source>
+      <target state="translated">作者の候補:</target>
+      </trans-unit>
+      <trans-unit id="6683818478828024043" datatype="html">
+        <source> pick another </source>
+      <target state="translated"> 別の作者を選ぶ </target>
+      </trans-unit>
+      <trans-unit id="8367012880598490136" datatype="html">
+        <source> set </source>
+      <target state="translated"> 設定 </target>
+      </trans-unit>
+      <trans-unit id="5118258460735275925" datatype="html">
+        <source>You have no pictures awaiting moderation.</source>
+      <target state="translated">モデレーション待ちの写真はありません。</target>
+      </trans-unit>
+      <trans-unit id="7233713600443564600" datatype="html">
+        <source>Perspective:</source>
+      <target state="translated">アングル:</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

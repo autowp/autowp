@@ -674,7 +674,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/inbox-pictures/inbox-pictures.component.html</context>
-          <context context-type="linenumber">16,18</context>
+          <context context-type="linenumber">14,16</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/messages/messages.component.html</context>
@@ -1462,7 +1462,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/inbox-pictures/inbox-pictures.component.html</context>
-          <context context-type="linenumber">2,6</context>
+          <context context-type="linenumber">2,5</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4915431133669985304" datatype="html">
@@ -1626,7 +1626,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp-fron
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
-          <context context-type="linenumber">34,35</context>
+          <context context-type="linenumber">35,36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6709402656112567179" datatype="html">
@@ -1675,21 +1675,21 @@ This can happen if the linked account is your only way to sign in, i.e. no e-mai
         <source>Add profile</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
-          <context context-type="linenumber">42,46</context>
+          <context context-type="linenumber">43,47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1396973911663508431" datatype="html">
         <source> Show my links to visitors who are not signed in </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
-          <context context-type="linenumber">47,50</context>
+          <context context-type="linenumber">48,51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4904034081851745592" datatype="html">
         <source>send</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.html</context>
-          <context context-type="linenumber">50,51</context>
+          <context context-type="linenumber">51,52</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/delete/delete.component.html</context>
@@ -1709,7 +1709,7 @@ This can happen if the linked account is your only way to sign in, i.e. no e-mai
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
-          <context context-type="linenumber">73,76</context>
+          <context context-type="linenumber">95,98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7476277899838154372" datatype="html">
@@ -1723,7 +1723,7 @@ This can happen if the linked account is your only way to sign in, i.e. no e-mai
         <source>Data saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.ts</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/profile/profile.component.ts</context>
@@ -1734,21 +1734,21 @@ This can happen if the linked account is your only way to sign in, i.e. no e-mai
         <source>This link is not a profile page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">164</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6339862199129728972" datatype="html">
         <source>This link belongs to a different social network</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">166</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5764996779569744742" datatype="html">
         <source>This does not look like a valid username or profile link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/contacts-editor/contacts-editor.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8038216499934620399" datatype="html">
@@ -1832,6 +1832,13 @@ Good luck.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/profile/profile.component.html</context>
           <context context-type="linenumber">8,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5118258460735275925" datatype="html">
+        <source>You have no pictures awaiting moderation.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/account/inbox-pictures/inbox-pictures.component.html</context>
+          <context context-type="linenumber">11,14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7308508897775085064" datatype="html">
@@ -2350,7 +2357,7 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
-          <context context-type="linenumber">154,157</context>
+          <context context-type="linenumber">160,163</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5937251202465808296" datatype="html">
@@ -2384,7 +2391,7 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
-          <context context-type="linenumber">144,149</context>
+          <context context-type="linenumber">150,155</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/upload-routing.module.ts</context>
@@ -4075,6 +4082,10 @@ All values entered here are displayed on the site, in the specifications, are us
           <context context-type="linenumber">52,54</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">15,18</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/area/area.component.html</context>
           <context context-type="linenumber">42,43</context>
         </context-group>
@@ -5113,6 +5124,10 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="sourcefile">src/app/forums/topic-list/topic-list.component.html</context>
           <context context-type="linenumber">5,7</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="4582943253260659127" datatype="html">
         <source>Last message</source>
@@ -5154,6 +5169,109 @@ If you are not registered yet, please do so now [on the registration page](/sign
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grpc.ts</context>
           <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1039222147773711627" datatype="html">
+        <source>applied to <x id="INTERPOLATION" equiv-text="{{ cascade.pictureIds.length }}"/> more photos with the same suggestions.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">7,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5775346636203685655" datatype="html">
+        <source>Undo</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">10,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3114034628735140707" datatype="html">
+        <source>Set author on every photo without one:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">22,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2079197940611265513" datatype="html">
+        <source> Apply to all </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">34,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5196921190999660342" datatype="html">
+        <source>crop</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">48,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="305142716106924307" datatype="html">
+        <source>Author:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">76,79</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">177,178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2596403754082622773" datatype="html">
+        <source> change </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">57,59</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
+          <context context-type="linenumber">72,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2831702340099514806" datatype="html">
+        <source> remove </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">60,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6385847151383097856" datatype="html">
+        <source>Possible author:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">63,64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6683818478828024043" datatype="html">
+        <source> pick another </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">73,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8367012880598490136" datatype="html">
+        <source> set </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">83,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7233713600443564600" datatype="html">
+        <source>Perspective:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">96,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5867807574919375898" datatype="html">
+        <source>cropped to <x id="PH" equiv-text="cropSize"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.ts</context>
+          <context context-type="linenumber">64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="n-pictures" datatype="html">
@@ -8878,13 +8996,6 @@ licence stated there.
           <context context-type="linenumber">158,160</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="305142716106924307" datatype="html">
-        <source>Author:</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
-          <context context-type="linenumber">177,178</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="9171050839862843613" datatype="html">
         <source>Picture suggested to replace</source>
         <context-group purpose="location">
@@ -9535,18 +9646,25 @@ Please note that image submissions are moderated. This means that all images wil
           <context context-type="linenumber">44,46</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4388879716045736175" datatype="html">
-        <source>Note</source>
+      <trans-unit id="2768534023046143787" datatype="html">
+        <source>Photo author</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
           <context context-type="linenumber">66,68</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5196921190999660342" datatype="html">
-        <source>crop</source>
+      <trans-unit id="5832918383447226112" datatype="html">
+        <source> Can&apos;t find the author in the list? Leave this empty and name them in the note — a moderator will add them. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
-          <context context-type="linenumber">111,114</context>
+          <context context-type="linenumber">82,84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4388879716045736175" datatype="html">
+        <source>Note</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
+          <context context-type="linenumber">88,90</context>
         </context-group>
       </trans-unit>
       <trans-unit id="uploadRequirements" datatype="html">
@@ -9569,21 +9687,14 @@ Requirements for added images:
 Please note that adding pictures is moderated. That is, all pictures will be reviewed by the site&apos;s leading members before being added to the catalogue.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
-          <context context-type="linenumber">123,142</context>
+          <context context-type="linenumber">129,148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8872921071143397020" datatype="html">
         <source>Only registered users can upload pictures</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
-          <context context-type="linenumber">153,154</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5867807574919375898" datatype="html">
-        <source>cropped to <x id="PH" equiv-text="cropSize"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/upload/index/index.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">159,160</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3548523280588304213" datatype="html">

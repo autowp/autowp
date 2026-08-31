@@ -1,0 +1,11 @@
+<input
+  type="text"
+  class="form-control"
+  [formControl]="query"
+  [ngbTypeahead]="dataSource"
+  [inputFormatter]="formatter"
+  [resultFormatter]="formatter"
+  [editable]="false"
+  [placeholder]="placeholder()"
+  (selectItem)="onSelect($event)"
+/>

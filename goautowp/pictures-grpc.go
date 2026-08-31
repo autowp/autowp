@@ -746,7 +746,12 @@ func (s *PicturesGRPCServer) DeletePictureItem(
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
+	allowed, err := s.canManagePictureItem(ctx, userCtx, in.GetType(), in.GetPictureId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if !allowed {
 		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
@@ -797,7 +802,12 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
+	allowed, err := s.canManagePictureItem(ctx, userCtx, in.GetType(), in.GetPictureId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if !allowed {
 		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
@@ -1868,6 +1878,29 @@ func (s *PicturesGRPCServer) GetPerspectivePages(
 	return &PerspectivePagesItems{ //nolint:exhaustruct
 		Items: res,
 	}, nil
+}
+
+// canManagePictureItem reports whether the caller may create/delete the given picture-item.
+// Picture moderators may manage any of them; a regular signed-in user may manage only the AUTHOR
+// link of their own picture while it is still in the inbox (so they can credit a photographer on
+// upload and fix our EXIF auto-detection).
+func (s *PicturesGRPCServer) canManagePictureItem(
+	ctx context.Context, userCtx UserContext, pictureItemType PictureItemType, pictureID int64,
+) (bool, error) {
+	if util.Contains(userCtx.Roles, users.RolePicturesModer) {
+		return true, nil
+	}
+
+	if pictureItemType != PictureItemType_PICTURE_ITEM_AUTHOR || userCtx.UserID == 0 || pictureID == 0 {
+		return false, nil
+	}
+
+	ownerID, pictureStatus, found, err := s.repository.PictureOwnerAndStatus(ctx, pictureID)
+	if err != nil || !found {
+		return false, err
+	}
+
+	return ownerID == userCtx.UserID && pictureStatus == schema.PictureStatusInbox, nil
 }
 
 func (s *PicturesGRPCServer) setPictureStatus(
