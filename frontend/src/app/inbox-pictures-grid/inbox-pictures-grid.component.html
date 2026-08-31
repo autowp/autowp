@@ -1,0 +1,105 @@
+@if (cascade(); as cascade) {
+  <div class="alert alert-info d-flex flex-wrap align-items-center gap-2" [class.alert-warning]="cascadeSticky()">
+    <span>
+      <ng-container i18n>Author</ng-container>
+      <strong class="mx-1" [innerHTML]="cascade.authorName"></strong>
+      <ng-container i18n
+        >applied to {{ cascade.pictureIds.length }} more photos with the same suggestions.</ng-container
+      >
+    </span>
+    <button type="button" class="btn btn-sm btn-outline-secondary" i18n (click)="undoCascade()">Undo</button>
+    <button
+      type="button"
+      class="btn-close ms-auto"
+      aria-label="Close"
+      i18n-aria-label
+      (click)="dismissCascade()"
+    ></button>
+  </div>
+}
+@if (pictures().length > 1) {
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+    <span class="text-muted" i18n>Set author on every photo without one:</span>
+    <app-person-search
+      [pictureItemType]="PictureItemType.PICTURE_ITEM_AUTHOR"
+      (selected)="onBatchAuthorSelected($event)"
+    />
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      i18n
+      [disabled]="!batchAuthor()"
+      (click)="applyAuthorToAll()"
+    >
+      Apply to all
+    </button>
+  </div>
+}
+<div class="row">
+  @for (picture of pictures(); track picture.picture.id) {
+    <div class="col-6 col-md-4 col-lg-3">
+      <app-thumbnail [picture]="picture.picture" [route]="['/picture', picture.picture.identity]" />
+      <p class="mb-1">
+        <button type="button" class="btn btn-link btn-sm p-0" (click)="crop(picture)">
+          <i class="bi bi-crop me-1" aria-hidden="true"></i>
+          @if (picture.cropTitle) {
+            <span>{{ picture.cropTitle }}</span>
+          } @else {
+            <span i18n>crop</span>
+          }
+        </button>
+      </p>
+      <div class="small">
+        @if (picture.author; as author) {
+          <span class="text-muted" i18n>Author:</span>
+          <span class="mx-1" [innerHTML]="author.nameHtml"></span>
+          <button type="button" class="btn btn-link btn-sm p-0" i18n (click)="toggleEditAuthor(picture.picture.id)">
+            change
+          </button>
+          <button type="button" class="btn btn-link btn-sm p-0 ms-1 text-danger" i18n (click)="clearAuthor(picture)">
+            remove
+          </button>
+        } @else if (picture.authorSuggestions.length > 0) {
+          <span class="text-muted" i18n>Possible author:</span>
+          @for (suggestion of picture.authorSuggestions; track suggestion.itemId) {
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm py-0 px-1 mx-1"
+              [innerHTML]="suggestion.item?.nameHtml"
+              (click)="pickSuggestion(picture, suggestion)"
+            ></button>
+          }
+          <button type="button" class="btn btn-link btn-sm p-0" i18n (click)="toggleEditAuthor(picture.picture.id)">
+            pick another
+          </button>
+        } @else {
+          <span class="text-muted" i18n>Author:</span>
+          <button
+            type="button"
+            class="btn btn-link btn-sm p-0 ms-1"
+            i18n
+            (click)="toggleEditAuthor(picture.picture.id)"
+          >
+            set
+          </button>
+        }
+        @if (editingAuthor() === picture.picture.id) {
+          <app-person-search
+            class="d-block mt-1"
+            [pictureItemType]="PictureItemType.PICTURE_ITEM_AUTHOR"
+            (selected)="chooseAuthor(picture, $event)"
+          />
+        }
+      </div>
+      @if (picture.contentItemId) {
+        <div class="small mt-1">
+          <span class="text-muted me-1" i18n>Perspective:</span>
+          <app-moder-pictures-perspective-picker
+            [perspectiveID]="picture.perspectiveId"
+            (perspectiveChanged)="setPerspective(picture, $event)"
+          />
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -16180,6 +16180,58 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
       <target state="translated">Дадаць профіль</target>
       </trans-unit>
+      <trans-unit id="2768534023046143787" datatype="html">
+        <source>Photo author</source>
+      <target state="translated">Аўтар фатаграфіі</target>
+      </trans-unit>
+      <trans-unit id="2596403754082622773" datatype="html">
+        <source> change </source>
+      <target state="translated"> змяніць </target>
+      </trans-unit>
+      <trans-unit id="5832918383447226112" datatype="html">
+        <source> Can&apos;t find the author in the list? Leave this empty and name them in the note — a moderator will add them. </source>
+      <target state="translated"> Не знайшлі аўтара ў спісе? Пакіньце поле пустым і пазначце яго ў нататцы — мадэратар дадасць. </target>
+      </trans-unit>
+      <trans-unit id="1039222147773711627" datatype="html">
+        <source>applied to <x id="INTERPOLATION" equiv-text="{{ cascade.pictureIds.length }}"/> more photos with the same suggestions.</source>
+      <target state="translated">ужыта яшчэ да <x id="INTERPOLATION" equiv-text="{{ cascade.pictureIds.length }}"/> фота з такімі ж падказкамі.</target>
+      </trans-unit>
+      <trans-unit id="5775346636203685655" datatype="html">
+        <source>Undo</source>
+      <target state="translated">Адрабіць</target>
+      </trans-unit>
+      <trans-unit id="3114034628735140707" datatype="html">
+        <source>Set author on every photo without one:</source>
+      <target state="translated">Пазначыць аўтара для ўсіх фатаграфій без яго:</target>
+      </trans-unit>
+      <trans-unit id="2079197940611265513" datatype="html">
+        <source> Apply to all </source>
+      <target state="translated"> Ужыць да ўсіх </target>
+      </trans-unit>
+      <trans-unit id="2831702340099514806" datatype="html">
+        <source> remove </source>
+      <target state="translated"> выдаліць </target>
+      </trans-unit>
+      <trans-unit id="6385847151383097856" datatype="html">
+        <source>Possible author:</source>
+      <target state="translated">Магчымы аўтар:</target>
+      </trans-unit>
+      <trans-unit id="6683818478828024043" datatype="html">
+        <source> pick another </source>
+      <target state="translated"> выбраць іншага </target>
+      </trans-unit>
+      <trans-unit id="8367012880598490136" datatype="html">
+        <source> set </source>
+      <target state="translated"> пазначыць </target>
+      </trans-unit>
+      <trans-unit id="5118258460735275925" datatype="html">
+        <source>You have no pictures awaiting moderation.</source>
+      <target state="translated">У вас няма фатаграфій, якія чакаюць мадэрацыі.</target>
+      </trans-unit>
+      <trans-unit id="7233713600443564600" datatype="html">
+        <source>Perspective:</source>
+      <target state="translated">Ракурс:</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

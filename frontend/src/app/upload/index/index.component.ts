@@ -1,6 +1,8 @@
 import type {ElementRef, OnInit} from '@angular/core';
-import type {Image, Item} from '@grpc/spec.pb';
+import type {Item, Picture} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {PersonSearchSelection} from '@utils/person-search/person-search.component';
+import type {InboxPicture} from 'app/inbox-pictures-grid/inbox-pictures-grid.component';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
@@ -10,30 +12,30 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
-  ItemListOptions,
   ItemRequest,
-  ItemType,
-  Picture,
-  PictureCrop,
+  ItemsRequest,
   PictureFields,
+  PictureItemFields,
   PictureItemListOptions,
   PictureItemsRequest,
   PictureItemType,
   PictureListOptions,
   PicturesRequest,
-  UpdatePictureRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
-import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
-import {FieldMask} from '@ngx-grpc/well-known-types';
+import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {getModalComponentRef} from '@utils/modal-component-ref';
-import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
+import {PersonSearchComponent} from '@utils/person-search/person-search.component';
+import {
+  inboxCropTitle,
+  InboxPicturesGridComponent,
+  inboxSuggestionKey,
+} from 'app/inbox-pictures-grid/inbox-pictures-grid.component';
 import {ToastsService} from 'app/toasts/toasts.service';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
@@ -51,13 +53,6 @@ import {
   throwError,
 } from 'rxjs';
 
-import {UploadCropComponent} from '../crop/crop.component';
-
-interface APIPictureUpload {
-  cropTitle: string;
-  picture: Picture;
-}
-
 interface UploadProgress {
   failed: boolean;
   filename: string;
@@ -65,14 +60,6 @@ interface UploadProgress {
   percentage: number;
   success: boolean;
 }
-
-const cropTitle = (image: Image | undefined): string => {
-  if (!(image?.cropWidth && image.cropHeight)) {
-    return '';
-  }
-  const cropSize = `${image.cropWidth}×${image.cropHeight}+${image.cropLeft}+${image.cropTop}`;
-  return $localize`cropped to ${cropSize}`;
-};
 
 @Component({
   selector: 'app-upload-index',
@@ -82,9 +69,10 @@ const cropTitle = (image: Image | undefined): string => {
     NgbProgressbar,
     AsyncPipe,
     InvalidParamsPipe,
-    ThumbnailComponent,
     ReactiveFormsModule,
     RemarkModule,
+    PersonSearchComponent,
+    InboxPicturesGridComponent,
   ],
   templateUrl: './index.component.html',
   // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
@@ -95,7 +83,6 @@ export class UploadIndexComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   protected readonly auth = inject(AuthService);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #modalService = inject(NgbModal);
   readonly #toastService = inject(ToastsService);
   readonly #keycloak = inject(Keycloak);
   readonly #picturesClient = inject(PicturesClient);
@@ -107,9 +94,14 @@ export class UploadIndexComponent implements OnInit {
   protected files: File[] | undefined;
   protected readonly note = new FormControl<string>('', {nonNullable: true});
   protected progress: UploadProgress[] = [];
-  protected readonly pictures: APIPictureUpload[] = [];
+  protected readonly pictures: InboxPicture[] = [];
   protected readonly formHidden = signal(false);
   protected readonly authenticated$ = this.auth.authenticated$;
+
+  protected readonly PictureItemType = PictureItemType;
+
+  // Batch author picked in the form and sent as author_id with every uploaded file.
+  protected readonly batchAuthor = signal<null | PersonSearchSelection>(null);
 
   public readonly input = viewChild<ElementRef<HTMLInputElement>>('input');
 
@@ -254,6 +246,10 @@ export class UploadIndexComponent implements OnInit {
         if (perspectiveID) {
           formData.append('perspective_id', perspectiveID + '');
         }
+        const batchAuthor = this.batchAuthor();
+        if (batchAuthor) {
+          formData.append('author_id', batchAuthor.id);
+        }
 
         return formData;
       }),
@@ -312,6 +308,7 @@ export class UploadIndexComponent implements OnInit {
             .getPicture(
               new PicturesRequest({
                 fields: new PictureFields({
+                  authorSuggestions: true,
                   commentsCount: true,
                   image: true,
                   imageGalleryFull: true,
@@ -319,12 +316,8 @@ export class UploadIndexComponent implements OnInit {
                   nameHtml: true,
                   nameText: true,
                   pictureItem: new PictureItemsRequest({
-                    options: new PictureItemListOptions({
-                      item: new ItemListOptions({
-                        typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_BRAND, ItemType.ITEM_TYPE_PERSON],
-                      }),
-                      typeId: PictureItemType.PICTURE_ITEM_CONTENT,
-                    }),
+                    fields: new PictureItemFields({item: new ItemsRequest({fields: new ItemFields({nameHtml: true})})}),
+                    options: new PictureItemListOptions(),
                   }),
                   thumbMedium: true,
                   views: true,
@@ -337,9 +330,24 @@ export class UploadIndexComponent implements OnInit {
             .pipe(
               tap((picture) => {
                 progress.percentage = 100;
+
+                const pictureItems = picture.pictureItems?.items ?? [];
+                const authorItem = pictureItems.find(
+                  (pictureItem) => pictureItem.type === PictureItemType.PICTURE_ITEM_AUTHOR,
+                );
+                const contentItem = pictureItems.find(
+                  (pictureItem) => pictureItem.type === PictureItemType.PICTURE_ITEM_CONTENT,
+                );
+                const suggestions = picture.authorSuggestions ?? [];
+
                 this.pictures.push({
-                  cropTitle: cropTitle(picture.image),
+                  author: authorItem?.item ? {id: authorItem.itemId, nameHtml: authorItem.item.nameHtml} : null,
+                  authorSuggestions: suggestions,
+                  contentItemId: contentItem ? contentItem.itemId : null,
+                  cropTitle: inboxCropTitle(picture.image),
+                  perspectiveId: contentItem?.perspectiveId ?? 0,
                   picture,
+                  suggestionKey: inboxSuggestionKey(suggestions),
                 });
                 this.#cdr.markForCheck();
               }),
@@ -357,62 +365,11 @@ export class UploadIndexComponent implements OnInit {
     );
   }
 
-  protected crop(picture: APIPictureUpload) {
-    const modalRef = this.#modalService.open(UploadCropComponent, {
-      centered: true,
-      size: 'lg',
-    });
+  protected onBatchAuthorSelected(selection: PersonSearchSelection): void {
+    this.batchAuthor.set(selection);
+  }
 
-    const componentRef = getModalComponentRef<UploadCropComponent>(modalRef);
-    componentRef.setInput('picture', picture.picture);
-
-    componentRef.instance.changed.subscribe(() => {
-      this.#picturesClient
-        .updatePicture(
-          new UpdatePictureRequest({
-            picture: new Picture({
-              crop: new PictureCrop({
-                height: picture.picture.image?.cropHeight ? Math.round(picture.picture.image.cropHeight) : undefined,
-                left: picture.picture.image?.cropLeft ? Math.round(picture.picture.image.cropLeft) : undefined,
-                top: picture.picture.image?.cropTop ? Math.round(picture.picture.image.cropTop) : undefined,
-                width: picture.picture.image?.cropWidth ? Math.round(picture.picture.image.cropWidth) : undefined,
-              }),
-              id: picture.picture.id,
-            }),
-            updateMask: new FieldMask({paths: ['crop']}),
-          }),
-        )
-        .pipe(
-          catchError((response: unknown) => {
-            this.#toastService.handleError(response);
-            return EMPTY;
-          }),
-          switchMap(() =>
-            this.#picturesClient.getPicture(
-              new PicturesRequest({
-                fields: new PictureFields({
-                  image: true,
-                  thumbMedium: true,
-                }),
-                language: this.#languageService.language,
-                options: new PictureListOptions({id: picture.picture.id}),
-              }),
-            ),
-          ),
-          catchError((response: unknown) => {
-            this.#toastService.handleError(response);
-            return EMPTY;
-          }),
-          tap((response: Picture) => {
-            picture.picture.image = response.image;
-            picture.cropTitle = cropTitle(response.image);
-            picture.picture.thumbMedium = response.thumbMedium;
-            this.#cdr.markForCheck();
-          }),
-        )
-        .subscribe();
-    });
-
-    return false;
+  protected clearBatchAuthor(): void {
+    this.batchAuthor.set(null);
   }
 }
