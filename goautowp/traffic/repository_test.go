@@ -161,10 +161,10 @@ func TestTop(t *testing.T) {
 
 	ctx := t.Context()
 
-	err := svc.Ban.Clear(ctx)
-	require.NoError(t, err)
-
-	err = svc.Monitoring.Clear(ctx)
+	// Only Monitoring is exercised here - don't wipe ip_ban. `go test ./...` runs this package
+	// concurrently with `goautowp`'s TestHttpBanPost against the shared database, and an
+	// unconditional `DELETE FROM ip_ban` races that test regardless of which IP it bans.
+	err := svc.Monitoring.Clear(ctx)
 	require.NoError(t, err)
 
 	err = svc.Monitoring.Add(ctx, net.IPv4(192, 168, 0, 1), time.Now())
