@@ -2746,9 +2746,14 @@ func (s *Repository) processEXIF(
 	userID int64,
 	authorLinked bool,
 ) error {
+	// EXIF is best-effort metadata (date, GPS, author hint). A missing or malformed EXIF block
+	// must never fail the upload - the dsoprea parser reports several "no data" / partial-parse
+	// conditions as errors that are not exif.ErrNoExif, and some real-world files hit them.
 	extractedEXIF, err := extractFromEXIF(imageType, handle, fileSize)
 	if err != nil {
-		return err
+		logrus.Warnf("processEXIF: skipping EXIF for picture %d: %s", pictureID, err)
+
+		extractedEXIF = exifExtractedValues{}
 	}
 
 	if err = s.processEXIFAuthor(ctx, pictureID, extractedEXIF, authorLinked); err != nil {
