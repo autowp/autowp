@@ -112,7 +112,15 @@ export class ModerItemsItemLinksComponent implements OnInit {
             ),
         );
       } else {
-        promises.push(this.#itemsClient.deleteItemLink(new ItemLinkRequest({id: link.id})).pipe(map(() => null)));
+        promises.push(
+          this.#itemsClient.deleteItemLink(new ItemLinkRequest({id: link.id})).pipe(
+            catchError((response: unknown) => {
+              this.#toastService.handleError(response);
+              return of(null);
+            }),
+            map(() => null),
+          ),
+        );
       }
     }
 

@@ -28,6 +28,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   EMPTY,
+  finalize,
   forkJoin,
   map,
   of,
@@ -96,16 +97,20 @@ export class UploadSelectComponent implements OnInit {
       return forkJoin([
         brandId ? this.brandObservable$(brandId) : of(undefined),
         brandId ? of(undefined) : this.brandsObservable$(page, params.search),
-      ]);
+        // finalize here, not a trailing tap: brandObservable$/brandsObservable$ catch their
+        // errors into EMPTY, which makes forkJoin complete without emitting - the tap after this
+        // switchMap would then never run and the spinner would stay forever.
+      ]).pipe(
+        finalize(() => {
+          this.loading.set(false);
+        }),
+      );
     }),
     map(([brand, brands]) => ({
       brand,
       brands: chunk(brands?.items ?? [], 6),
       paginator: brands?.paginator,
     })),
-    tap(() => {
-      this.loading.set(false);
-    }),
   );
 
   ngOnInit(): void {
