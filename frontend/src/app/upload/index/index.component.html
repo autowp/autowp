@@ -98,29 +98,33 @@ Please note that image submissions are moderated. This means that all images wil
                 </form>
               }
             </div>
-            <div class="progress-area">
-              @for (p of progress; track p) {
-                @if (!p.success) {
-                  <ngb-progressbar
-                    class="mb-2"
-                    [type]="p.success ? 'success' : p.failed ? 'danger' : 'info'"
-                    [value]="p.percentage"
-                  >
-                    <div>
-                      <span class="d-inline file-name">{{ p.filename }}: </span>
-                      @if (p.percentage < 100) {
-                        <span class="d-inline percentage">{{ p.percentage }}%</span>
-                      }
-                      @for (message of p.invalidParams | invalidParams: 'file'; track message) {
-                        <span class="d-inline">{{ message }} </span>
-                      }
-                    </div>
-                  </ngb-progressbar>
+            @if (progress.length) {
+              <div class="progress-area mt-4">
+                @for (p of progress; track p) {
+                  @if (!p.success) {
+                    <ngb-progressbar
+                      class="mb-2"
+                      [type]="p.success ? 'success' : p.failed ? 'danger' : 'info'"
+                      [value]="p.percentage"
+                    >
+                      <div>
+                        <span class="d-inline file-name">{{ p.filename }}: </span>
+                        @if (p.percentage < 100) {
+                          <span class="d-inline percentage">{{ p.percentage }}%</span>
+                        }
+                        @for (message of p.invalidParams | invalidParams: 'file'; track message) {
+                          <span class="d-inline">{{ message }} </span>
+                        }
+                      </div>
+                    </ngb-progressbar>
+                  }
                 }
-              }
-            </div>
+              </div>
+            }
           </div>
-          <app-inbox-pictures-grid [pictures]="pictures" />
+          @if (pictures.length) {
+            <app-inbox-pictures-grid class="d-block mt-4" [pictures]="pictures" />
+          }
         </div>
       } @else {
         <div class="card card-body">

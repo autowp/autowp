@@ -96,12 +96,21 @@ export class InboxPicturesGridComponent implements DoCheck {
   readonly #seen = new Set<string>();
 
   ngDoCheck(): void {
+    let added = false;
+
     for (const upload of this.pictures()) {
       if (this.#seen.has(upload.picture.id)) {
         continue;
       }
       this.#seen.add(upload.picture.id);
       this.#applyBatchChoice(upload);
+      added = true;
+    }
+
+    if (added) {
+      // The upload page grows the same `pictures` array in place, so its reference never changes
+      // and this OnPush view would otherwise never re-render the new cards.
+      this.#cdr.markForCheck();
     }
   }
 
