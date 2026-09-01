@@ -107,9 +107,14 @@ export class UsersUserComponent {
     requireSync: true,
   });
 
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+
   protected readonly userResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: `users-user-${this.#identity()}`,
+    // The `-auth` suffix - read once at construction, same reasoning as inContactsResource below -
+    // keeps a signed-in visitor off the server's anonymous snapshot: this request asks for
+    // moderator-only fields (lastIp), which SSR (always signed out) renders empty.
+    id: `users-user-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => this.#identity(),
     stream: ({params: identity}) =>
       this.#userService
@@ -189,7 +194,6 @@ export class UsersUserComponent {
         .pipe(map((response) => ({items: response.items ?? [], progress: response.progress ?? []}))),
   });
 
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
   readonly #currentUser = toSignal(this.#auth.user$, {initialValue: null});
 
   protected readonly authenticated$ = this.#auth.authenticated$;
@@ -343,7 +347,7 @@ export class UsersUserComponent {
         this.#toastService.handleError(response);
       },
       next: () => {
-        user.photo = undefined;
+        this.userResource.reload();
       },
     });
   }
@@ -363,7 +367,7 @@ export class UsersUserComponent {
           this.#toastService.handleError(response);
         },
         next: () => {
-          user.deleted = true;
+          this.userResource.reload();
         },
       });
   }
