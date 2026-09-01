@@ -393,6 +393,11 @@ func (s *Repository) ValuesPaginated(
 		return nil, nil, err
 	}
 
+	sqSelect, err = paginator.GetItemsByPage(ctx, page)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	res := make([]schema.AttrsValueRow, 0)
 	err = sqSelect.ScanStructsContext(ctx, &res)
 
