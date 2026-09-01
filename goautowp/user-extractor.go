@@ -2,6 +2,8 @@ package goautowp
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/autowp/goautowp/frontend"
@@ -13,8 +15,17 @@ import (
 	"github.com/autowp/goautowp/util"
 	"github.com/drexedam/gravatar"
 	"github.com/jackc/pgtype"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+// imageGone reports whether err means the user's `img` points at an image row that no longer
+// exists (a stale reference, or one deleted concurrently — e.g. account anonymisation racing a
+// user list). Such a user should still be returned, just without an avatar, rather than failing
+// the whole call with codes.Internal.
+func imageGone(err error) bool {
+	return errors.Is(err, sql.ErrNoRows) || errors.Is(err, storage.ErrImageNotFound)
+}
 
 const (
 	avatarSize      = 70
@@ -95,15 +106,19 @@ func (s *UserExtractor) Extract(
 
 		if row.Img != nil {
 			avatar, err := s.imageStorage.FormattedImage(ctx, *row.Img, "avatar")
-			if err != nil {
+			if err != nil && !imageGone(err) {
 				return nil, err
+			}
+
+			if imageGone(err) {
+				logrus.Warnf("user %d references missing image %d, skipping avatar: %v", row.ID, *row.Img, err)
 			}
 
 			user.Avatar = APIImageToGRPC(avatar)
 
-			if fields.GetPhoto() {
+			if avatar != nil && fields.GetPhoto() {
 				photo, err := s.imageStorage.FormattedImage(ctx, *row.Img, "photo")
-				if err != nil {
+				if err != nil && !imageGone(err) {
 					return nil, err
 				}
 
@@ -169,8 +184,12 @@ func (s *UserExtractor) Extract(
 
 		if fields.GetImg() && row.Img != nil {
 			img, err := s.imageStorage.Image(ctx, *row.Img)
-			if err != nil {
+			if err != nil && !imageGone(err) {
 				return nil, err
+			}
+
+			if imageGone(err) {
+				logrus.Warnf("user %d references missing image %d, skipping img: %v", row.ID, *row.Img, err)
 			}
 
 			user.Img = APIImageToGRPC(img)
