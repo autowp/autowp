@@ -18,51 +18,55 @@
   <a class="nav-link" routerLink="/moder/traffic/whitelist">Whitelist</a>
 </div>
 
-@for (item of items$ | async; track item) {
-  <div class="row">
-    <div class="col-sm-2">
-      <h3>{{ item.item.count }}</h3>
-    </div>
-    <div class="col-sm-4">
-      <h3>
-        {{ item.item.ipAddress }}
-        <a [href]="item.item.whoisUrl">whois</a>
-      </h3>
-      <p>{{ item.hostname$ | async }}</p>
-    </div>
-    <div class="col-sm-6">
-      @if (item.item.ban) {
+@if (items$ | async; as items) {
+  @for (item of items; track item) {
+    <div class="row">
+      <div class="col-sm-2">
+        <h3>{{ item.item.count }}</h3>
+      </div>
+      <div class="col-sm-4">
+        <h3>
+          {{ item.item.ipAddress }}
+          <a [href]="item.item.whoisUrl">whois</a>
+        </h3>
+        <p>{{ item.hostname$ | async }}</p>
+      </div>
+      <div class="col-sm-6">
+        @if (item.item.ban) {
+          <div>
+            @if (item.item.ban.until; as date) {
+              <ng-container i18n>until</ng-container> {{ date.toDate() | date: 'fullDate' }}
+            }
+            @if (item.item.ban.byUser) {
+              <span>
+                by
+                <app-user [user]="item.item.ban.byUser" />
+                @if (item.item.ban.reason) {
+                  <span> <ng-container i18n>Reason</ng-container> {{ item.item.ban.reason }} </span>
+                }
+              </span>
+            }
+          </div>
+        }
         <div>
-          @if (item.item.ban.until; as date) {
-            <ng-container i18n>until</ng-container> {{ date.toDate() | date: 'fullDate' }}
+          @if (item.item.ban) {
+            <button type="button" class="btn btn-secondary" (click)="removeFromBlacklist(item.item.ipAddress)">
+              <ng-container i18n>unban</ng-container>
+            </button>
+          } @else {
+            <button type="button" class="btn btn-danger" (click)="addToBlacklist(item.item.ipAddress)">
+              <ng-container i18n>Ban</ng-container>
+            </button>
           }
-          @if (item.item.ban.byUser) {
-            <span>
-              by
-              <app-user [user]="item.item.ban.byUser" />
-              @if (item.item.ban.reason) {
-                <span> <ng-container i18n>Reason</ng-container> {{ item.item.ban.reason }} </span>
-              }
-            </span>
+          @if (!item.item.inWhitelist) {
+            <button type="button" class="btn btn-success" (click)="addToWhitelist(item.item.ipAddress)">
+              <ng-container i18n>Whitelist</ng-container>
+            </button>
           }
         </div>
-      }
-      <div>
-        @if (item.item.ban) {
-          <button type="button" class="btn btn-secondary" (click)="removeFromBlacklist(item.item.ipAddress)">
-            <ng-container i18n>unban</ng-container>
-          </button>
-        } @else {
-          <button type="button" class="btn btn-danger" (click)="addToBlacklist(item.item.ipAddress)">
-            <ng-container i18n>Ban</ng-container>
-          </button>
-        }
-        @if (!item.item.inWhitelist) {
-          <button type="button" class="btn btn-success" (click)="addToWhitelist(item.item.ipAddress)">
-            <ng-container i18n>Whitelist</ng-container>
-          </button>
-        }
       </div>
     </div>
-  </div>
+  } @empty {
+    <p class="text-muted" i18n>Nothing found</p>
+  }
 }

@@ -87,6 +87,8 @@
           </div>
         }
       </div>
+    } @empty {
+      <p class="text-muted" i18n>Nothing found</p>
     }
     @if (pictures.paginator) {
       <app-paginator [data]="pictures.paginator" />
