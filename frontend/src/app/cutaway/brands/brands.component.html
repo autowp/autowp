@@ -29,6 +29,8 @@
 } @else if (queryResource.value(); as response) {
   @for (item of response.items; track item.id) {
     <app-catalogue-list-item [item]="item" />
+  } @empty {
+    <p class="text-muted" i18n>Nothing found</p>
   }
   @if (response.paginator) {
     <app-paginator [data]="response.paginator" />

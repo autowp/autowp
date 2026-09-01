@@ -44,6 +44,8 @@
 } @else if (dataResource.value(); as data) {
   @for (item of data.items; track item.id) {
     <app-catalogue-list-item [item]="item" />
+  } @empty {
+    <p class="text-muted" i18n>Nothing found</p>
   }
   @if (data.paginator) {
     <app-paginator [data]="data.paginator" />

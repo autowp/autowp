@@ -516,6 +516,8 @@
             </div>
           }
         </div>
+      } @empty {
+        <p class="text-muted" i18n>Nothing found</p>
       }
       @if (data.paginator) {
         <app-paginator [data]="data.paginator" />

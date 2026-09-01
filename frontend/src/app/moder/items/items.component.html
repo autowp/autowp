@@ -230,6 +230,8 @@
           } @else {
             <app-catalogue-list-item [item]="item" />
           }
+        } @empty {
+          <p class="text-muted" i18n>Nothing found</p>
         }
       </div>
 
