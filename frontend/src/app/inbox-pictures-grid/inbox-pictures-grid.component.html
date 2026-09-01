@@ -50,39 +50,56 @@
         </button>
       </p>
       <div class="small">
-        @if (picture.author; as author) {
-          <span class="text-muted" i18n>Author:</span>
-          <span class="mx-1" [innerHTML]="author.nameHtml"></span>
-          <button type="button" class="btn btn-link btn-sm p-0" i18n (click)="toggleEditAuthor(picture.picture.id)">
-            change
-          </button>
-          <button type="button" class="btn btn-link btn-sm p-0 ms-1 text-danger" i18n (click)="clearAuthor(picture)">
-            remove
-          </button>
-        } @else if (picture.authorSuggestions.length > 0) {
-          <span class="text-muted" i18n>Possible author:</span>
-          @for (suggestion of picture.authorSuggestions; track suggestion.itemId) {
+        <div class="d-flex flex-wrap align-items-baseline gap-1">
+          @if (picture.author; as author) {
+            <span class="text-muted" i18n>Author:</span>
+            <span [innerHTML]="author.nameHtml"></span>
             <button
               type="button"
-              class="btn btn-outline-secondary btn-sm py-0 px-1 mx-1"
-              [innerHTML]="suggestion.item?.nameHtml"
-              (click)="pickSuggestion(picture, suggestion)"
-            ></button>
+              class="btn btn-link btn-sm p-0 align-baseline"
+              i18n
+              (click)="toggleEditAuthor(picture.picture.id)"
+            >
+              change
+            </button>
+            <button
+              type="button"
+              class="btn btn-link btn-sm p-0 align-baseline text-danger"
+              i18n
+              (click)="clearAuthor(picture)"
+            >
+              remove
+            </button>
+          } @else if (picture.authorSuggestions.length > 0) {
+            <span class="text-muted" i18n>Possible author:</span>
+            @for (suggestion of picture.authorSuggestions; track suggestion.itemId) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm py-0 px-1 align-baseline"
+                [innerHTML]="suggestion.item?.nameHtml"
+                (click)="pickSuggestion(picture, suggestion)"
+              ></button>
+            }
+            <button
+              type="button"
+              class="btn btn-link btn-sm p-0 align-baseline"
+              i18n
+              (click)="toggleEditAuthor(picture.picture.id)"
+            >
+              pick another
+            </button>
+          } @else {
+            <span class="text-muted" i18n>Author:</span>
+            <button
+              type="button"
+              class="btn btn-link btn-sm p-0 align-baseline"
+              i18n
+              (click)="toggleEditAuthor(picture.picture.id)"
+            >
+              set
+            </button>
           }
-          <button type="button" class="btn btn-link btn-sm p-0" i18n (click)="toggleEditAuthor(picture.picture.id)">
-            pick another
-          </button>
-        } @else {
-          <span class="text-muted" i18n>Author:</span>
-          <button
-            type="button"
-            class="btn btn-link btn-sm p-0 ms-1"
-            i18n
-            (click)="toggleEditAuthor(picture.picture.id)"
-          >
-            set
-          </button>
-        }
+        </div>
         @if (editingAuthor() === picture.picture.id) {
           <app-person-search
             class="d-block mt-1"
