@@ -93,13 +93,13 @@
           </span>
         }
         @if (authenticated() && deep() < 21 && !row.message.deleted) {
-          <button type="button" class="btn btn-sm btn-primary reply" (click)="reply(row.message, false)">
+          <button type="button" class="btn btn-sm btn-primary reply me-1" (click)="reply(row.message, false)">
             <i class="bi bi-reply me-1" aria-hidden="true"></i>
             <span class="d-none d-md-inline" i18n>reply</span>
           </button>
         }
         @if (row.message.moderatorAttention === ModeratorAttention.REQUIRED && isModer()) {
-          <button type="button" class="btn btn-sm btn-success resolve" (click)="reply(row.message, true)">
+          <button type="button" class="btn btn-sm btn-success resolve me-1" (click)="reply(row.message, true)">
             <i class="bi bi-reply me-1" aria-hidden="true"></i>
             <ng-container i18n>reply & resolve</ng-container>
           </button>
@@ -112,7 +112,7 @@
           />
         }
         @if (row.canManageOwn && !row.message.showEdit) {
-          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="startEdit(row.message)">
+          <button type="button" class="btn btn-sm btn-outline-secondary me-1" (click)="startEdit(row.message)">
             <i class="bi bi-pencil me-1" aria-hidden="true"></i>
             <span class="d-none d-md-inline" i18n>Edit</span>
           </button>
