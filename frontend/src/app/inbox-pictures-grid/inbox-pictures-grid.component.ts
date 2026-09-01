@@ -10,11 +10,9 @@ import {
   Picture,
   PictureCrop,
   PictureFields,
-  PictureItem,
   PictureItemType,
   PictureListOptions,
   PicturesRequest,
-  UpdatePictureItemRequest,
   UpdatePictureRequest,
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
@@ -27,7 +25,6 @@ import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {catchError, EMPTY, merge, switchMap, tap, toArray} from 'rxjs';
 
-import {ModerPicturesPerspectivePickerComponent} from '../moder/pictures/perspective-picker/perspective-picker.component';
 import {UploadCropComponent} from '../upload/crop/crop.component';
 
 export interface InboxPicture {
@@ -70,7 +67,7 @@ const cascadeStickyThreshold = 20;
 
 @Component({
   selector: 'app-inbox-pictures-grid',
-  imports: [ThumbnailComponent, PersonSearchComponent, ModerPicturesPerspectivePickerComponent],
+  imports: [ThumbnailComponent, PersonSearchComponent],
   templateUrl: './inbox-pictures-grid.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -282,35 +279,6 @@ export class InboxPicturesGridComponent implements DoCheck {
 
   protected toggleEditAuthor(pictureId: string): void {
     this.editingAuthor.update((current) => (current === pictureId ? null : pictureId));
-  }
-
-  protected setPerspective(upload: InboxPicture, perspectiveId: number): void {
-    if (!upload.contentItemId) {
-      return;
-    }
-
-    this.#picturesClient
-      .updatePictureItem(
-        new UpdatePictureItemRequest({
-          pictureItem: new PictureItem({
-            itemId: upload.contentItemId,
-            perspectiveId: perspectiveId || undefined,
-            pictureId: upload.picture.id,
-            type: PictureItemType.PICTURE_ITEM_CONTENT,
-          }),
-          updateMask: new FieldMask({paths: ['perspective_id']}),
-        }),
-      )
-      .pipe(
-        catchError((response: unknown) => {
-          this.#toastService.handleError(response);
-          return EMPTY;
-        }),
-      )
-      .subscribe(() => {
-        upload.perspectiveId = perspectiveId;
-        this.#cdr.markForCheck();
-      });
   }
 
   protected crop(upload: InboxPicture): void {

@@ -6,7 +6,7 @@ import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, o
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
-import {PictureItem, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
+import {PictureItem, PictureItemType, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
@@ -56,6 +56,14 @@ export class ThumbnailComponent implements OnInit {
   );
   protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER));
   protected readonly isAuthenticated = toSignal(this.#auth.authenticated$);
+
+  // Perspective is a property of what the picture *depicts*, so only CONTENT picture-items get a
+  // picker - offering one for an author (or any other non-content link) makes no sense.
+  protected readonly contentPictureItems = computed(() =>
+    (this.picture().pictureItems?.items ?? []).filter(
+      (pictureItem) => pictureItem.type === PictureItemType.PICTURE_ITEM_CONTENT,
+    ),
+  );
 
   // Built in ngOnInit() (with an explicit injector) rather than as a field initializer, like
   // CommentsComponent's: its TransferState `id` has to be derived from `picture`, a *required*

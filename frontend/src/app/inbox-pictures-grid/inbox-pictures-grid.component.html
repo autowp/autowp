@@ -108,15 +108,6 @@
           />
         }
       </div>
-      @if (picture.contentItemId) {
-        <div class="small mt-1">
-          <span class="text-muted me-1" i18n>Perspective:</span>
-          <app-moder-pictures-perspective-picker
-            [perspectiveID]="picture.perspectiveId"
-            (perspectiveChanged)="setPerspective(picture, $event)"
-          />
-        </div>
-      }
     </div>
   }
 </div>
