@@ -1639,11 +1639,28 @@ func (s *PicturesGRPCServer) GetCanonicalRoute(
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	picture, err := s.repository.Picture(ctx, &query.PictureListOptions{
 		Identity: identity,
 	}, nil, pictures.OrderByNone)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+
 		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// Don't hand out the canonical (public) URL of a picture the caller can't view: for a
+	// removing/removed picture an anonymous caller - which every SSR render is - would be
+	// redirected to a catalogue path that then 404s, leaving a blank page. Fall through to a
+	// plain NOT_FOUND instead; the frontend guard turns that into the normal 404.
+	if !canViewPictureStatus(picture, util.Contains(userCtx.Roles, users.RoleModer), userCtx.UserID) {
+		return nil, status.Error(codes.NotFound, sql.ErrNoRows.Error())
 	}
 
 	var route []string

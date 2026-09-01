@@ -2473,3 +2473,52 @@ func TestGetPersonPictures(t *testing.T) {
 	})
 	require.NoError(t, err)
 }
+
+func TestGetCanonicalRouteHidesRemovingFromAnonymous(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	kc := cnt.Keycloak()
+
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+
+	goquDB, err := cnt.GoquDB(ctx)
+	require.NoError(t, err)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	itemID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
+		PictureStatus_PICTURE_STATUS_INBOX, adminToken.AccessToken)
+
+	var identity string
+
+	_, err = goquDB.Select(schema.PictureTableIdentityCol).
+		From(schema.PictureTable).Where(schema.PictureTableIDCol.Eq(pictureID)).
+		ScanValContext(ctx, &identity)
+	require.NoError(t, err)
+
+	_, err = goquDB.Update(schema.PictureTable).
+		Set(goqu.Record{schema.PictureTableStatusColName: schema.PictureStatusRemoving}).
+		Where(schema.PictureTableIDCol.Eq(pictureID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	client := NewPicturesClient(conn)
+
+	// Anonymous (every SSR render) must get NOT_FOUND, not a redirect to a URL that then 404s.
+	_, err = client.GetCanonicalRoute(ctx, &CanonicalRouteRequest{Identity: identity})
+	require.ErrorContains(t, err, "NotFound")
+
+	// A moderator still gets the route.
+	_, err = client.GetCanonicalRoute(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken),
+		&CanonicalRouteRequest{Identity: identity},
+	)
+	require.NoError(t, err)
+}
