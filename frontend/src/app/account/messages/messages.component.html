@@ -58,7 +58,7 @@
             </div>
             <div>
               @if (message.message.isNew) {
-                <span class="badge text-bg-info text-dark" i18n>new</span>
+                <span class="badge text-bg-info text-dark me-2" i18n>new</span>
               }
               @if (message.message.canDelete) {
                 <a href="#" class="float-end" (click)="deleteMessage(message.message.id)">
