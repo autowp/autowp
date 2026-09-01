@@ -60,6 +60,7 @@ import {
   combineLatest,
   distinctUntilChanged,
   EMPTY,
+  finalize,
   map,
   of,
   shareReplay,
@@ -458,15 +459,14 @@ export class ModerPicturesItemComponent {
           this.#toastService.handleError(err);
           return EMPTY;
         }),
+        // finalize, not error/next: catchError turns a failed call into a completion, so a
+        // subscribe without a `complete` handler would otherwise leave the spinner stuck.
+        finalize(() => {
+          this.statusLoading.set(false);
+        }),
       )
-      .subscribe({
-        error: () => {
-          this.statusLoading.set(false);
-        },
-        next: () => {
-          this.#change$.next();
-          this.statusLoading.set(false);
-        },
+      .subscribe(() => {
+        this.#change$.next();
       });
   }
 

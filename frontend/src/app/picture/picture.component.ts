@@ -53,7 +53,7 @@ import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, map, of} from 'rxjs';
+import {catchError, EMPTY, finalize, map, of} from 'rxjs';
 
 import {ModerPicturesPerspectivePickerComponent} from '../moder/pictures/perspective-picker/perspective-picker.component';
 import {PictureModerVoteComponent} from '../picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
@@ -466,14 +466,14 @@ export class PictureComponent implements OnInit {
           this.#toastService.handleError(err);
           return EMPTY;
         }),
-      )
-      .subscribe({
-        complete: () => {
+        // finalize, not the subscribe `complete` callback: on an error catchError swaps in EMPTY,
+        // and the spinner must clear on that path too (and on unsubscribe).
+        finalize(() => {
           this.statusLoading.set(false);
-        },
-        next: () => {
-          this.changed.emit(true);
-        },
+        }),
+      )
+      .subscribe(() => {
+        this.changed.emit(true);
       });
   }
 
