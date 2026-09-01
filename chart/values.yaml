@@ -165,12 +165,12 @@ goautowp:
   ## Set to 0s to turn it off.
   slowCallThreshold: 1s
   ## Bounds of the postgres connection pool held by *each* goautowp process, and every process
-  ## gets its own: the 3 serve replicas (4 while a rollout surges), plus one per scheduler job pod
+  ## gets its own: the 4 serve replicas (5 while a rollout surges), plus one per scheduler job pod
   ## that happens to be running - up to 3 of those overlap at midnight (hourly + daily + midnight).
-  ## So the worst case this chart asks of the server is roughly maxOpenConns x 7, plus a connection
+  ## So the worst case this chart asks of the server is roughly maxOpenConns x 8, plus a connection
   ## per starting pod for the migrations.
   ##
-  ## Sized for max_connections = 300 (3 of them superuser-reserved): 30 x 7 = 210, leaving ~85 for
+  ## Sized for max_connections = 300 (3 of them superuser-reserved): 30 x 8 = 240, leaving ~57 for
   ## psql sessions and anything else sharing the server. Raise this only together with the server's
   ## max_connections - a pool that cannot *open* a connection is what surfaces as "remaining
   ## connection slots are reserved for roles with the SUPERUSER attribute", and more connections

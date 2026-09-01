@@ -6,7 +6,9 @@ spec:
   selector:
     matchLabels: {{ include "common.labels.matchLabels" . | nindent 6 }}
       app.kubernetes.io/component: goautowp-serve
-  replicas: 3
+  # 4 so the pods land 2-per-node on the two-node cluster (the podAntiAffinity below spreads
+  # them); an odd count leaves one node carrying the extra SSR/backend pair.
+  replicas: 4
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
