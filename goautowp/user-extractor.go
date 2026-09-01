@@ -2,7 +2,6 @@ package goautowp
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
@@ -18,14 +17,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-// imageGone reports whether err means the user's `img` points at an image row that no longer
-// exists (a stale reference, or one deleted concurrently — e.g. account anonymisation racing a
-// user list). Such a user should still be returned, just without an avatar, rather than failing
-// the whole call with codes.Internal.
-func imageGone(err error) bool {
-	return errors.Is(err, sql.ErrNoRows) || errors.Is(err, storage.ErrImageNotFound)
-}
 
 const (
 	avatarSize      = 70
@@ -106,19 +97,22 @@ func (s *UserExtractor) Extract(
 
 		if row.Img != nil {
 			avatar, err := s.imageStorage.FormattedImage(ctx, *row.Img, "avatar")
-			if err != nil && !imageGone(err) {
-				return nil, err
-			}
-
-			if imageGone(err) {
+			// A missing image row (a stale users.img, or one deleted concurrently - e.g. account
+			// anonymisation racing this list) must not fail the whole call: return the user
+			// without an avatar.
+			if errors.Is(err, storage.ErrImageNotFound) {
 				logrus.Warnf("user %d references missing image %d, skipping avatar: %v", row.ID, *row.Img, err)
+			} else if err != nil {
+				return nil, err
 			}
 
 			user.Avatar = APIImageToGRPC(avatar)
 
 			if avatar != nil && fields.GetPhoto() {
 				photo, err := s.imageStorage.FormattedImage(ctx, *row.Img, "photo")
-				if err != nil && !imageGone(err) {
+				if errors.Is(err, storage.ErrImageNotFound) {
+					logrus.Warnf("user %d references missing image %d, skipping photo: %v", row.ID, *row.Img, err)
+				} else if err != nil {
 					return nil, err
 				}
 
@@ -184,12 +178,10 @@ func (s *UserExtractor) Extract(
 
 		if fields.GetImg() && row.Img != nil {
 			img, err := s.imageStorage.Image(ctx, *row.Img)
-			if err != nil && !imageGone(err) {
-				return nil, err
-			}
-
-			if imageGone(err) {
+			if errors.Is(err, storage.ErrImageNotFound) {
 				logrus.Warnf("user %d references missing image %d, skipping img: %v", row.ID, *row.Img, err)
+			} else if err != nil {
+				return nil, err
 			}
 
 			user.Img = APIImageToGRPC(img)

@@ -52,6 +52,10 @@ const (
 )
 
 var (
+	// ErrImageNotFound is returned by every Storage method that looks a row up by image id
+	// (Image, ImageBlob, FormattedImage, RemoveImage, ChangeImageName, ...) when that row is
+	// absent. Callers should test for it with errors.Is rather than for sql.ErrNoRows, which is
+	// kept as an internal detail of the package.
 	ErrImageNotFound           = errors.New("image not found")
 	errDirNotFound             = errors.New("dir not defined")
 	errFormatNotFound          = errors.New("format not found")
@@ -241,7 +245,7 @@ func (s *Storage) ImageBlob(ctx context.Context, imageID int) (io.ReadCloser, er
 	}
 
 	if !success {
-		return nil, sql.ErrNoRows
+		return nil, ErrImageNotFound
 	}
 
 	dir := s.dir(iRow.Dir)
@@ -374,7 +378,7 @@ func (s *Storage) RemoveImage(ctx context.Context, imageID int) error {
 	}
 
 	if !success {
-		return sql.ErrNoRows
+		return ErrImageNotFound
 	}
 
 	logrus.Infof("removing image `%s/%s`", row.Dir, row.Filepath)
@@ -507,7 +511,7 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 	}
 
 	if !success {
-		return sql.ErrNoRows
+		return ErrImageNotFound
 	}
 
 	if strings.Contains(img.Filepath, "(") || strings.Contains(img.Filepath, ")") {
@@ -1372,7 +1376,7 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 	}
 
 	if !success {
-		return 0, sql.ErrNoRows
+		return 0, ErrImageNotFound
 	}
 
 	dir := s.dir(iRow.Dir)
@@ -1447,7 +1451,7 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 			}
 
 			if !success {
-				return 0, sql.ErrNoRows
+				return 0, ErrImageNotFound
 			}
 
 			done = fiRow.Status != StatusProcessing
@@ -1741,7 +1745,7 @@ func (s *Storage) doImagickOperation(
 	}
 
 	if !success {
-		return sql.ErrNoRows
+		return ErrImageNotFound
 	}
 
 	dir := s.dir(img.Dir)
