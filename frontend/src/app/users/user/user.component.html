@@ -267,7 +267,9 @@
                 }
               }
               <p><ng-container i18n>Last visit fom IP-address:</ng-container> {{ user.lastIp }}</p>
-              @if (ipResource.value(); as ip) {
+              @if (ipResource.isLoading()) {
+                <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+              } @else if (ipResource.value(); as ip) {
                 @if (ip && ip.blacklist) {
                   <div>
                     <p>
@@ -312,8 +314,6 @@
                     </button>
                   </form>
                 }
-              } @else {
-                <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
               }
             </div>
           </div>
