@@ -3,15 +3,7 @@ import type {MapPictureCluster, MapPicturePoint, MapPoint, MapSinglePicture} fro
 import type {LatLng, LatLngBounds, Map, MapOptions, Marker} from 'leaflet';
 
 import {DOCUMENT} from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  NgZone,
-  signal,
-  ViewContainerRef,
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal, ViewContainerRef} from '@angular/core';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
@@ -112,7 +104,6 @@ export class MapComponent implements OnDestroy, OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
-  readonly #zone = inject(NgZone);
   readonly #viewContainerRef = inject(ViewContainerRef);
   readonly #toastService = inject(ToastsService);
   readonly #mapClient = inject(MapClient);
@@ -122,14 +113,12 @@ export class MapComponent implements OnDestroy, OnInit {
   #compRef?: ComponentRef<MapPopupComponent>;
   #map?: Map;
   readonly #onFullscreenChange = () => {
-    this.#zone.run(() => {
-      // eslint-disable-next-line sonarjs/different-types-comparison -- both sides are DOM Elements
-      this.isFullscreen.set(this.#document.fullscreenElement === this.#map?.getContainer());
-      // The map container's size changes with the fullscreen transition, but Leaflet has no way
-      // to know that on its own - without this, tiles stay laid out for the old (small) size
-      // until the next pan/zoom.
-      this.#map?.invalidateSize();
-    });
+    // eslint-disable-next-line sonarjs/different-types-comparison -- both sides are DOM Elements
+    this.isFullscreen.set(this.#document.fullscreenElement === this.#map?.getContainer());
+    // The map container's size changes with the fullscreen transition, but Leaflet has no way
+    // to know that on its own - without this, tiles stay laid out for the old (small) size
+    // until the next pan/zoom.
+    this.#map?.invalidateSize();
   };
 
   protected markers: Marker[] = [];
@@ -237,17 +226,13 @@ export class MapComponent implements OnDestroy, OnInit {
     this.#map = lmap;
 
     lmap.on('moveend', () => {
-      this.#zone.run(() => {
-        this.#bounds$.next(lmap.getBounds());
-        this.updateUrlFromMap(lmap);
-      });
+      this.#bounds$.next(lmap.getBounds());
+      this.updateUrlFromMap(lmap);
     });
 
     this.#document.addEventListener('fullscreenchange', this.#onFullscreenChange);
 
-    this.#zone.run(() => {
-      this.#bounds$.next(lmap.getBounds());
-    });
+    this.#bounds$.next(lmap.getBounds());
   }
 
   ngOnDestroy(): void {
@@ -284,19 +269,21 @@ export class MapComponent implements OnDestroy, OnInit {
 
         const popup = new Popup();
         m.on('click', () => {
-          this.#zone.run(() => {
-            if (this.#compRef) {
-              this.#compRef.destroy();
-            }
+          if (this.#compRef) {
+            this.#compRef.destroy();
+          }
 
-            this.#compRef = this.#viewContainerRef.createComponent(MapPopupComponent);
-            this.#compRef.setInput('item', item);
+          this.#compRef = this.#viewContainerRef.createComponent(MapPopupComponent);
+          this.#compRef.setInput('item', item);
+          // Render it now, synchronously: its markup is about to be moved into a detached Leaflet
+          // popup container, so waiting for a scheduled change-detection pass would set empty
+          // content.
+          this.#compRef.changeDetectorRef.detectChanges();
 
-            const div = this.#document.createElement('div');
-            div.appendChild(this.#compRef.location.nativeElement);
+          const div = this.#document.createElement('div');
+          div.appendChild(this.#compRef.location.nativeElement);
 
-            popup.setContent(div);
-          });
+          popup.setContent(div);
         });
 
         m.bindPopup(popup);
@@ -319,26 +306,24 @@ export class MapComponent implements OnDestroy, OnInit {
 
         this.markers.push(
           createClusterMarker(cluster, () => {
-            this.#zone.run(() => {
-              if (!this.#map || !cluster.location) {
-                return;
-              }
+            if (!this.#map || !cluster.location) {
+              return;
+            }
 
-              // Already as zoomed in as the tile layer allows: setView below would be a no-op
-              // and leave the cluster's pictures permanently unreachable, since the viewport
-              // (and so the backend's grid cell size, which is derived from it) can't shrink any
-              // further. Fall back to explicitly resolving the cluster instead of zooming.
-              if (this.#map.getZoom() >= this.#map.getMaxZoom()) {
-                this.resolveStuckCluster(cluster);
+            // Already as zoomed in as the tile layer allows: setView below would be a no-op
+            // and leave the cluster's pictures permanently unreachable, since the viewport
+            // (and so the backend's grid cell size, which is derived from it) can't shrink any
+            // further. Fall back to explicitly resolving the cluster instead of zooming.
+            if (this.#map.getZoom() >= this.#map.getMaxZoom()) {
+              this.resolveStuckCluster(cluster);
 
-                return;
-              }
+              return;
+            }
 
-              this.#map.setView(
-                [cluster.location.latitude, cluster.location.longitude],
-                Math.min(this.#map.getZoom() + CLUSTER_ZOOM_STEP, this.#map.getMaxZoom()),
-              );
-            });
+            this.#map.setView(
+              [cluster.location.latitude, cluster.location.longitude],
+              Math.min(this.#map.getZoom() + CLUSTER_ZOOM_STEP, this.#map.getMaxZoom()),
+            );
           }),
         );
       }
@@ -369,9 +354,7 @@ export class MapComponent implements OnDestroy, OnInit {
         this.#toastService.handleError(response);
       },
       next: (response) => {
-        this.#zone.run(() => {
-          this.showClusterResolutionPopup(cluster, response.points ?? []);
-        });
+        this.showClusterResolutionPopup(cluster, response.points ?? []);
       },
     });
   }
@@ -424,9 +407,7 @@ export class MapComponent implements OnDestroy, OnInit {
       }
 
       event.preventDefault();
-      this.#zone.run(() => {
-        void this.#router.navigate(commands);
-      });
+      void this.#router.navigate(commands);
     });
   }
 

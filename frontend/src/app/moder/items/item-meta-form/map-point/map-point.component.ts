@@ -1,7 +1,7 @@
 import type {ControlValueAccessor} from '@angular/forms';
 import type {LatLng, Layer, LeafletMouseEvent, Map, MapOptions} from 'leaflet';
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, NgZone} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
 import {FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
@@ -53,7 +53,6 @@ const center = (lat: null | number | string, lng: null | number | string): LatLn
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapPointComponent implements ControlValueAccessor {
-  readonly #zone = inject(NgZone);
   readonly #cdr = inject(ChangeDetectorRef);
 
   /*protected readonly center$ = this.point$.pipe(
@@ -133,21 +132,19 @@ export class MapPointComponent implements ControlValueAccessor {
 
   protected onMapReady(lmap: Map) {
     lmap.on('click', (event: LeafletMouseEvent) => {
-      this.#zone.run(() => {
-        this.center = event.latlng;
-        this.mapOptions.center = event.latlng;
-        this.setMarker(event.latlng);
+      this.center = event.latlng;
+      this.mapOptions.center = event.latlng;
+      this.setMarker(event.latlng);
 
-        this.lat = event.latlng.lat;
-        this.lng = event.latlng.lng;
+      this.lat = event.latlng.lat;
+      this.lng = event.latlng.lng;
 
-        this.markAsTouched();
-        if (this.onChange) {
-          this.onChange({lat: event.latlng.lat, lng: event.latlng.lng});
-        }
+      this.markAsTouched();
+      if (this.onChange) {
+        this.onChange({lat: event.latlng.lat, lng: event.latlng.lng});
+      }
 
-        this.#cdr.markForCheck();
-      });
+      this.#cdr.markForCheck();
     });
   }
 

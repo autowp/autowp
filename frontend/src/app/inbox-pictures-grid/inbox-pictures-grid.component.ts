@@ -321,8 +321,13 @@ export class InboxPicturesGridComponent implements DoCheck {
             return EMPTY;
           }),
           tap((response: Picture) => {
-            upload.picture.image = response.image;
-            upload.picture.thumbMedium = response.thumbMedium;
+            // Reassign the whole object rather than mutating .image/.thumbMedium in place: the
+            // OnPush <app-thumbnail> only re-renders when its `picture` input reference changes.
+            upload.picture = new Picture({
+              ...upload.picture.toObject(),
+              image: response.image?.toObject(),
+              thumbMedium: response.thumbMedium?.toObject(),
+            });
             upload.cropTitle = inboxCropTitle(response.image);
             this.#cdr.markForCheck();
           }),

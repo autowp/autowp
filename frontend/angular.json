@@ -69,10 +69,7 @@
             },
             "index": "src/index.html",
             "tsConfig": "src/tsconfig.app.json",
-            "polyfills": [
-              "src/polyfills.ts",
-              "@angular/localize/init"
-            ],
+            "polyfills": ["@angular/localize/init"],
             "allowedCommonJsDependencies": [
               "jquery",
               "sprintf-js",
