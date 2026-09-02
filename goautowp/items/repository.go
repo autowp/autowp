@@ -43,7 +43,7 @@ var (
 	errInvalidItemParentCombination    = errors.New(
 		"that type of parent is not allowed for this type",
 	)
-	errGroupRequired  = errors.New("only groups can have childs")
+	errGroupRequired  = errors.New("only groups can have children")
 	errSelfParent     = errors.New("self parent forbidden")
 	errNoRowsReturned = errors.New("no rows returned")
 

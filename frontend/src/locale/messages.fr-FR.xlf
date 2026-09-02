@@ -6014,8 +6014,8 @@ A cause des restriction financières et des difficultés économiques des régio
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, one {<x id="INTERPOLATION"/> commentaire} other {<x id="INTERPOLATION"/> commentaires}}</target>
       </trans-unit>
-      <trans-unit id="7223161227254108615" datatype="html">
-        <source>not readed</source>
+      <trans-unit id="3723015871976827820" datatype="html">
+        <source>not read</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/comments/comments.component.html</context>
           <context context-type="linenumber">103,105</context>
@@ -6914,11 +6914,11 @@ Liens
 Liens
       </target>
       </trans-unit>
-      <trans-unit id="511784553268006518" datatype="html">
+      <trans-unit id="5504215712938414294" datatype="html">
         <source>* Logotypes must be in PNG format.
 * All transparent regions must be transparent but not white!
 * Logotype must be close to edges. Margin not required
-* Upload images in maximum resolution - thats give quality and ability to use it in future. On website logo scaled automatically</source>
+* Upload images in maximum resolution - that gives quality and ability to use it in future. On website logo scaled automatically</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/logo/logo.component.html</context>
           <context context-type="linenumber">7,14</context>
@@ -7192,8 +7192,8 @@ Liens
         </context-group>
         <target state="translated">Vide</target>
       </trans-unit>
-      <trans-unit id="2218403326029447633" datatype="html">
-        <source>Have childs with type</source>
+      <trans-unit id="1509188941568909893" datatype="html">
+        <source>Have children with type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">92,95</context>
@@ -7256,8 +7256,8 @@ Liens
         </context-group>
         <target state="translated">id asc</target>
       </trans-unit>
-      <trans-unit id="3993088652640492669" datatype="html">
-        <source>childs count</source>
+      <trans-unit id="2143716099362647800" datatype="html">
+        <source>children count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">176,177</context>
@@ -7754,9 +7754,21 @@ Les hyperlinks internes doivent être relatifs: ~~http://autowp.ru/bmw/~~ */bmw/
         </context-group>
         <target state="translated">Accepter</target>
       </trans-unit>
+      <trans-unit id="4033236376450021507" datatype="html">
+        <source> Revoke acceptance </source>
+        <target state="translated"> Retirer l'acceptation </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">444,447</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">437,440</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="7769297402531588594" datatype="html">
         <source>
-                  Unaccept
+                  Revoke acceptance
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
@@ -9062,7 +9074,7 @@ Vous pouvez discuter de tout et juste parler de voitures sur [le forum](/forums/
       </trans-unit>
       <trans-unit id="6840875943701166998" datatype="html">
         <source>
-                      Unaccept
+                      Revoke acceptance
                     </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
@@ -9196,7 +9208,7 @@ Vous pouvez discuter de tout et juste parler de voitures sur [le forum](/forums/
         </context-group>
         <target state="translated">Telegram</target>
       </trans-unit>
-      <trans-unit id="4596029437425873992" datatype="html">
+      <trans-unit id="5222437664095346882" datatype="html">
         <source>[Telegram](https://telegram.org/) - is primarily a system of instant messaging, like WhatsApp or Viber.
 
 In addition to the messaging and file transfer, there are many other possibilities, which will go to the description of a lot of time.
@@ -9260,7 +9272,7 @@ This command allows you to associate themselves (telegram user) with an account 
 
 Send `/me` to receive instructions for authorization.
 
-Send `/me 123456789` to recevice confirmation code.
+Send `/me 123456789` to receive confirmation code.
 
 Where 123456789 - is your account number, which you can find on your profile page. For example, [Juliano Scotini](/users/juliano-scotini) has number 17322
 
@@ -9831,8 +9843,8 @@ Supprimer la photo de l'utilisateur
 Supprimer l'utilisateur
                     </target>
       </trans-unit>
-      <trans-unit id="2659444899366045181" datatype="html">
-        <source>Last visit fom IP-address:</source>
+      <trans-unit id="6900442375109868348" datatype="html">
+        <source>Last visit from IP-address:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/user/user.component.html</context>
           <context context-type="linenumber">204,205</context>

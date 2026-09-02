@@ -100,7 +100,7 @@
         @for (comment of data.comments; track comment.comment.id) {
           <li>
             @if (comment.comment.isNew) {
-              <span class="badge text-bg-warning text-dark me-1" i18n>not readed</span>
+              <span class="badge text-bg-warning text-dark me-1" i18n>not read</span>
             }
             @if (comment.comment.pictureStatus; as s) {
               @if (s === PictureStatus.PICTURE_STATUS_ACCEPTED) {

@@ -6425,8 +6425,8 @@ licence stated there.
           <context context-type="linenumber">75,77</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7223161227254108615" datatype="html">
-        <source>not readed</source>
+      <trans-unit id="3723015871976827820" datatype="html">
+        <source>not read</source>
         <target state="translated">未読</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/comments/comments.component.html</context>
@@ -7593,11 +7593,11 @@ licence stated there.
           <context context-type="linenumber">50,54</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="511784553268006518" datatype="html">
+      <trans-unit id="5504215712938414294" datatype="html">
         <source>* Logotypes must be in PNG format.
 * All transparent regions must be transparent but not white!
 * Logotype must be close to edges. Margin not required
-* Upload images in maximum resolution - thats give quality and ability to use it in future. On website logo scaled automatically</source>
+* Upload images in maximum resolution - that gives quality and ability to use it in future. On website logo scaled automatically</source>
         <target state="translated">* ロゴは PNG 形式である必要があります。
 * 透明な部分はすべて透明にし、白にしないでください！
 * ロゴは端に近づけてください。余白は不要です
@@ -7867,8 +7867,8 @@ licence stated there.
           <context context-type="linenumber">85,86</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="2218403326029447633" datatype="html">
-        <source>Have childs with type</source>
+      <trans-unit id="1509188941568909893" datatype="html">
+        <source>Have children with type</source>
         <target state="translated">次のタイプの子を持つ</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
@@ -7931,8 +7931,8 @@ licence stated there.
           <context context-type="linenumber">181,182</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3993088652640492669" datatype="html">
-        <source>childs count</source>
+      <trans-unit id="2143716099362647800" datatype="html">
+        <source>children count</source>
         <target state="translated">子の数</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
@@ -8453,8 +8453,8 @@ licence stated there.
           <context context-type="linenumber">427,429</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="804774362397387101" datatype="html">
-        <source> Unaccept </source>
+      <trans-unit id="4033236376450021507" datatype="html">
+        <source> Revoke acceptance </source>
         <target state="translated"> 承認を取り消す </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
@@ -10123,7 +10123,7 @@ GDPR のもとで、あなたには、自分のデータにアクセスする権
           <context context-type="linenumber">10,15</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4596029437425873992" datatype="html">
+      <trans-unit id="5222437664095346882" datatype="html">
         <source>[Telegram](https://telegram.org/) - is primarily a system of instant messaging, like WhatsApp or Viber.
 
 In addition to the messaging and file transfer, there are many other possibilities, which will go to the description of a lot of time.
@@ -10187,7 +10187,7 @@ This command allows you to associate themselves (telegram user) with an account 
 
 Send `/me` to receive instructions for authorization.
 
-Send `/me 123456789` to recevice confirmation code.
+Send `/me 123456789` to receive confirmation code.
 
 Where 123456789 - is your account number, which you can find on your profile page. For example, [Juliano Scotini](/users/juliano-scotini) has number 17322
 
@@ -11053,8 +11053,8 @@ Please note that adding pictures is moderated. That is, all pictures will be rev
           <context context-type="linenumber">263,265</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="2659444899366045181" datatype="html">
-        <source>Last visit fom IP-address:</source>
+      <trans-unit id="6900442375109868348" datatype="html">
+        <source>Last visit from IP-address:</source>
         <target state="translated">最終訪問時の IP アドレス:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/users/user/user.component.html</context>
