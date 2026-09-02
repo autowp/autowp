@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 
@@ -81,119 +82,67 @@ func (s *Application) ServeGRPC(ctx context.Context, quit chan bool) error {
 	return nil
 }
 
+// runWorker starts fn on its own goroutine, tracked by wg. A returned error is logged; a panic is
+// recovered and logged with its stack. One failing worker must not take the whole process down
+// with it - the others keep running and graceful shutdown still works.
+func runWorker(wg *sync.WaitGroup, name string, fn func() error) {
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		defer func() {
+			panicValue := recover()
+			if panicValue == nil {
+				return
+			}
+
+			stack := make([]byte, panicStackBufSize)
+			stack = stack[:runtime.Stack(stack, false)]
+
+			logrus.WithFields(logrus.Fields{
+				"worker": name,
+				"panic":  panicValue,
+				"stack":  string(stack),
+			}).Error("recovered from panic in worker")
+		}()
+
+		if err := fn(); err != nil {
+			logrus.WithField("worker", name).Error(err.Error())
+		}
+	}()
+}
+
 func (s *Application) Serve(ctx context.Context, options ServeOptions, quit chan bool) error {
 	wg := sync.WaitGroup{}
 
 	if options.DuplicateFinderAMQP {
-		wg.Add(1)
-
-		go func() {
-			err := s.ListenDuplicateFinderAMQP(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
+		runWorker(&wg, "duplicate-finder-amqp", func() error { return s.ListenDuplicateFinderAMQP(ctx, quit) })
 	}
 
 	if options.MonitoringAMQP {
-		wg.Add(1)
-
-		go func() {
-			err := s.ListenMonitoringAMQP(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
+		runWorker(&wg, "monitoring-amqp", func() error { return s.ListenMonitoringAMQP(ctx, quit) })
 	}
 
 	if options.GRPC {
-		wg.Add(1)
-
-		go func() {
-			err := s.ServeGRPC(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
+		runWorker(&wg, "grpc", func() error { return s.ServeGRPC(ctx, quit) })
 	}
 
 	if options.Public {
-		wg.Add(1)
-
-		go func() {
-			err := s.ServePublic(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
-
-		wg.Add(1)
-
-		go func() {
-			err := s.ListenMessagingWSEvents(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
-
-		wg.Add(1)
-
-		go func() {
-			err := s.ListenPicturesWSEvents(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
+		runWorker(&wg, "public-http", func() error { return s.ServePublic(ctx, quit) })
+		runWorker(&wg, "messaging-ws-events", func() error { return s.ListenMessagingWSEvents(ctx, quit) })
+		runWorker(&wg, "pictures-ws-events", func() error { return s.ListenPicturesWSEvents(ctx, quit) })
 	}
 
 	if options.Autoban {
-		wg.Add(1)
-
-		go func() {
-			err := s.Autoban(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
+		runWorker(&wg, "autoban", func() error { return s.Autoban(ctx, quit) })
 	}
 
 	if options.AttrsUpdateValuesAMQP {
-		wg.Add(1)
-
-		go func() {
-			err := s.AttrsUpdateValuesAMQP(ctx, quit)
-			if err != nil {
-				logrus.Errorln(err.Error())
-			}
-
-			wg.Done()
-		}()
+		runWorker(&wg, "attrs-update-values-amqp", func() error { return s.AttrsUpdateValuesAMQP(ctx, quit) })
 	}
 
-	wg.Add(1)
-
-	go func() {
-		err := s.ServeMetrics(ctx, quit)
-		if err != nil {
-			logrus.Errorln(err.Error())
-		}
-
-		wg.Done()
-	}()
+	runWorker(&wg, "metrics-http", func() error { return s.ServeMetrics(ctx, quit) })
 
 	wg.Wait()
 
