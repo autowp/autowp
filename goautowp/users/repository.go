@@ -529,6 +529,34 @@ func (s *Repository) EnsureUserImported(
 
 	ctx = context.WithoutCancel(ctx)
 
+	green := util.Contains(claims.ResourceAccess.Autowp.Roles, RoleGreenUser)
+
+	// Common path: the user was already imported. Update the mutable fields with a
+	// plain UPDATE, which does not touch the `id` identity sequence. An
+	// `INSERT ... ON CONFLICT DO UPDATE` would advance the sequence on every call
+	// (Postgres evaluates the identity default before detecting the conflict).
+	var userID int64
+
+	found, err := s.db.Update(schema.UserTable).
+		Set(goqu.Record{
+			schema.UserTableEmailColName:  emailAddr,
+			schema.UserTableNameColName:   name,
+			schema.UserTableLastIPColName: goqu.Func("INET", ip.String()),
+			schema.UserTableGreenColName:  green,
+		}).
+		Where(schema.UserTableUUIDCol.Eq(guid)).
+		Returning(schema.UserTableIDColName).
+		Executor().ScanValContext(ctx, &userID)
+	if err != nil {
+		return 0, err
+	}
+
+	if found {
+		return userID, nil
+	}
+
+	// First login for this guid: insert the user, tolerating a concurrent first
+	// login via ON CONFLICT.
 	st := struct {
 		UserID     int64 `db:"id"`
 		IsInserted bool  `db:"is_inserted"`
@@ -548,11 +576,8 @@ func (s *Repository) EnsureUserImported(
 			schema.UserTableTimezoneColName:       language.Timezone,
 			schema.UserTableLastIPColName:         goqu.Func("INET", ip.String()),
 			schema.UserTableLanguageColName:       locale,
-			schema.UserTableGreenColName: util.Contains(
-				claims.ResourceAccess.Autowp.Roles,
-				RoleGreenUser,
-			),
-			schema.UserTableUUIDColName: guid,
+			schema.UserTableGreenColName:          green,
+			schema.UserTableUUIDColName:           guid,
 		}).
 		OnConflict(goqu.DoUpdate(schema.UserTableUUIDColName, goqu.Record{
 			schema.UserTableEmailColName:  schema.Excluded(schema.UserTableEmailColName),
@@ -566,23 +591,15 @@ func (s *Repository) EnsureUserImported(
 		return 0, err
 	}
 
-	if success && st.IsInserted { // row just inserted
+	if !success {
+		return 0, ErrUserNotFound
+	}
+
+	if st.IsInserted { // row just inserted
 		err = s.AfterUserCreated(ctx, st.UserID)
 		if err != nil {
 			return 0, err
 		}
-	}
-
-	success, err = s.db.Select(schema.UserTableIDCol).
-		From(schema.UserTable).
-		Where(schema.UserTableUUIDCol.Eq(guid)).
-		ScanValContext(ctx, &st.UserID)
-	if err != nil {
-		return 0, err
-	}
-
-	if !success {
-		return 0, ErrUserNotFound
 	}
 
 	return st.UserID, nil
