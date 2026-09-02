@@ -40,6 +40,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
@@ -1414,11 +1415,15 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 			logging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.UnaryServerInterceptorOpts(opts...),
 			BanUnaryServerInterceptor(banChecker),
+			// Innermost, so it wraps the handler itself: a panic that escapes becomes a logged
+			// codes.Internal for that one call instead of unwinding the serving goroutine.
+			recovery.UnaryServerInterceptor(recoveryOpts()...),
 		),
 		grpc.ChainStreamInterceptor(
 			logging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.StreamServerInterceptorOpts(opts...),
 			BanStreamServerInterceptor(banChecker), //nolint: contextcheck
+			recovery.StreamServerInterceptor(recoveryOpts()...),
 		),
 	)
 	RegisterArticlesServer(grpcServer, articlesSrv)
