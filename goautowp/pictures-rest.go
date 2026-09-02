@@ -142,7 +142,7 @@ func (s *PicturesREST) SetupRouter(router *gin.Engine) {
 func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 	userCtx, err := s.auth.ValidateREST(ctx)
 	if err != nil {
-		ctx.String(http.StatusInternalServerError, err.Error())
+		s.auth.RESTError(ctx, err)
 
 		return
 	}

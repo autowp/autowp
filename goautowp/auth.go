@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 
 	"github.com/Nerzal/gocloak/v13"
@@ -154,4 +155,16 @@ func (s *Auth) GRPCError(err error) error {
 	}
 
 	return status.Error(codes.Internal, err.Error())
+}
+
+// RESTError writes the HTTP response for an error from ValidateREST, mirroring GRPCError: a
+// missing or unverifiable token is 401, anything else is 500.
+func (s *Auth) RESTError(ctx *gin.Context, err error) {
+	if errors.Is(err, errMissingMetadata) || errors.Is(err, errAuthTokenIsInvalid) {
+		ctx.String(http.StatusUnauthorized, "invalid or missing authentication token")
+
+		return
+	}
+
+	ctx.String(http.StatusInternalServerError, err.Error())
 }
