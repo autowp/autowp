@@ -98,7 +98,7 @@ func (s *AttrsGRPCServer) GetAttribute(
 ) (*AttrAttribute, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -122,7 +122,7 @@ func (s *AttrsGRPCServer) ListAttributes(
 ) (*ListAttributesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -174,7 +174,7 @@ func (s *AttrsGRPCServer) GetListOptions(
 ) (*AttrListOptionsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -279,7 +279,7 @@ func (s *AttrsGRPCServer) GetValues(
 ) (*AttrValuesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -330,7 +330,7 @@ func (s *AttrsGRPCServer) GetUserValues(
 ) (*AttrUserValuesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -408,7 +408,7 @@ func (s *AttrsGRPCServer) GetConflicts(
 ) (*AttrConflictsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -479,7 +479,7 @@ func (s *AttrsGRPCServer) DeleteUserValues(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
@@ -503,7 +503,7 @@ func (s *AttrsGRPCServer) SetUserValues(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -545,7 +545,7 @@ func (s *AttrsGRPCServer) MoveUserValues(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleAdmin) {

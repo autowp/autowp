@@ -130,7 +130,7 @@ func (s *PicturesGRPCServer) Vote(
 ) (*PicturesVoteSummary, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -193,7 +193,7 @@ func (s *PicturesGRPCServer) CreateModerVoteTemplate(
 ) (*ModerVoteTemplate, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -233,7 +233,7 @@ func (s *PicturesGRPCServer) DeleteModerVoteTemplate(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -258,7 +258,7 @@ func (s *PicturesGRPCServer) GetModerVoteTemplates(
 ) (*ModerVoteTemplates, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -290,7 +290,7 @@ func (s *PicturesGRPCServer) DeleteModerVote(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -330,7 +330,7 @@ func (s *PicturesGRPCServer) UpdateModerVote(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -490,7 +490,7 @@ func (s *PicturesGRPCServer) GetUserSummary(
 ) (*PicturesUserSummary, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -585,7 +585,7 @@ func (s *PicturesGRPCServer) DeleteSimilar(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -624,7 +624,7 @@ func (s *PicturesGRPCServer) Repair(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -653,7 +653,7 @@ func (s *PicturesGRPCServer) UpdatePictureItem(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -687,7 +687,7 @@ func (s *PicturesGRPCServer) SetPictureItemItemID(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -739,7 +739,7 @@ func (s *PicturesGRPCServer) DeletePictureItem(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -795,7 +795,7 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -850,7 +850,7 @@ func (s *PicturesGRPCServer) ClearReplacePicture(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -888,7 +888,7 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -1040,7 +1040,7 @@ func (s *PicturesGRPCServer) UpdatePicture(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -1153,7 +1153,7 @@ func (s *PicturesGRPCServer) GetPictureItem(
 ) (*PictureItem, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -1195,7 +1195,7 @@ func (s *PicturesGRPCServer) GetPictureItems(
 ) (*PictureItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	inOptions := in.GetOptions()
@@ -1238,7 +1238,7 @@ func (s *PicturesGRPCServer) GetPicture(
 ) (*Picture, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -1320,7 +1320,7 @@ func (s *PicturesGRPCServer) GetPictures(
 ) (*PicturesList, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	inOptions := in.GetOptions()
@@ -1397,7 +1397,7 @@ func (s *PicturesGRPCServer) GetPicturesPaginator(
 ) (*Pages, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	inOptions := in.GetOptions()
@@ -1449,7 +1449,7 @@ func (s *PicturesGRPCServer) GetPicturesPaginator(
 func (s *PicturesGRPCServer) GetInbox(ctx context.Context, in *InboxRequest) (*Inbox, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -1536,7 +1536,7 @@ func (s *PicturesGRPCServer) GetInbox(ctx context.Context, in *InboxRequest) (*I
 func (s *PicturesGRPCServer) GetNewbox(ctx context.Context, in *NewboxRequest) (*Newbox, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	listOptions := query.PictureListOptions{
@@ -1641,7 +1641,7 @@ func (s *PicturesGRPCServer) GetCanonicalRoute(
 
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	picture, err := s.repository.Picture(ctx, &query.PictureListOptions{
@@ -1748,7 +1748,7 @@ func (s *PicturesGRPCServer) CorrectFileNames(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -1779,7 +1779,7 @@ func (s *PicturesGRPCServer) GetGallery(
 ) (*GalleryResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -2359,7 +2359,7 @@ func (s *PicturesGRPCServer) enforcePictureImageOperation(
 
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return 0, status.Error(codes.Internal, err.Error())
+		return 0, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {

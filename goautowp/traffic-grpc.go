@@ -52,7 +52,7 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -135,7 +135,7 @@ func (s *TrafficGRPCServer) DeleteTrafficBlacklistItem(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleUsersModer) {
@@ -161,7 +161,7 @@ func (s *TrafficGRPCServer) DeleteTrafficWhitelistItem(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -187,7 +187,7 @@ func (s *TrafficGRPCServer) CreateTrafficBlacklistItem(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleUsersModer) {
@@ -217,7 +217,7 @@ func (s *TrafficGRPCServer) CreateTrafficWhitelistItem(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -252,7 +252,7 @@ func (s *TrafficGRPCServer) GetTrafficWhitelistItems(
 ) (*TrafficWhitelistItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {

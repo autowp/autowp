@@ -3,6 +3,7 @@ package goautowp
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"strings"
 
@@ -12,7 +13,9 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -122,7 +125,7 @@ func (s *Auth) ValidateToken(
 		&claims,
 	)
 	if err != nil {
-		return res, err
+		return res, fmt.Errorf("%w: %w", errAuthTokenIsInvalid, err)
 	}
 
 	id, err := s.repository.EnsureUserImported(ctx, claims, ip)
@@ -140,4 +143,15 @@ func (s *Auth) ValidateToken(
 		Roles:  claims.ResourceAccess.Autowp.Roles,
 		IP:     ip,
 	}, nil
+}
+
+// GRPCError maps an error from ValidateGRPC to a gRPC status. A missing or unverifiable token is
+// the caller's problem (codes.Unauthenticated); anything else that fails while resolving the user
+// - a database round-trip in EnsureUserImported or RegisterVisit - is ours (codes.Internal).
+func (s *Auth) GRPCError(err error) error {
+	if errors.Is(err, errMissingMetadata) || errors.Is(err, errAuthTokenIsInvalid) {
+		return status.Error(codes.Unauthenticated, "invalid or missing authentication token")
+	}
+
+	return status.Error(codes.Internal, err.Error())
 }

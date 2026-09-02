@@ -57,7 +57,7 @@ func (s *GRPCServer) CreateContentReport(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	entityType, ok := reportEntityTypeFromGRPC(in.GetEntityType())
@@ -145,7 +145,7 @@ func (s *GRPCServer) GetContentReports(
 ) (*ContentReportsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -195,7 +195,7 @@ func (s *GRPCServer) ResolveContentReport(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {

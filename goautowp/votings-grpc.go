@@ -33,7 +33,7 @@ func NewVotingsGRPCServer(
 func (s *VotingsGRPCServer) GetVoting(ctx context.Context, in *VotingRequest) (*Voting, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	id := in.GetId()
@@ -88,7 +88,7 @@ func (s *VotingsGRPCServer) GetVotingVariantVotes(
 func (s *VotingsGRPCServer) Vote(ctx context.Context, in *CreateVoteRequest) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	vote := in.GetVote()

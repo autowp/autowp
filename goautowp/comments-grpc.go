@@ -313,7 +313,7 @@ func (s *CommentsGRPCServer) GetCommentVotes(
 ) (*CommentVoteItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	votes, err := s.repository.GetVotes(ctx, in.GetCommentId())
@@ -374,7 +374,7 @@ func (s *CommentsGRPCServer) Subscribe(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	commentsType, err := convertCommentsType(in.GetTypeId())
@@ -396,7 +396,7 @@ func (s *CommentsGRPCServer) UnSubscribe(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	commentsType, err := convertCommentsType(in.GetTypeId())
@@ -418,7 +418,7 @@ func (s *CommentsGRPCServer) View(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	commentsType, err := convertCommentsType(in.GetTypeId())
@@ -440,7 +440,7 @@ func (s *CommentsGRPCServer) SetDeleted(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -478,7 +478,7 @@ func (s *CommentsGRPCServer) UpdateComment(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -539,7 +539,7 @@ func (s *CommentsGRPCServer) MoveComment(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -578,7 +578,7 @@ func (s *CommentsGRPCServer) VoteComment(
 ) (*CommentsVoteCommentResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -665,7 +665,7 @@ func (s *CommentsGRPCServer) Add(
 ) (*AddCommentResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -773,7 +773,7 @@ func (s *CommentsGRPCServer) GetMessage(
 ) (*CommentMessage, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	canViewIP := util.Contains(userCtx.Roles, users.RoleModer)
@@ -816,7 +816,7 @@ func (s *CommentsGRPCServer) GetMessages(
 ) (*CommentMessages, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)

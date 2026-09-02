@@ -428,7 +428,7 @@ func requestsModeratorOnlyListFilter(inOptions *ItemListOptions) bool {
 func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*Item, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -457,7 +457,7 @@ func (s *ItemsGRPCServer) Item(ctx context.Context, in *ItemRequest) (*Item, err
 func (s *ItemsGRPCServer) List(ctx context.Context, in *ItemsRequest) (*ItemList, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -537,7 +537,7 @@ func (s *ItemsGRPCServer) GetItemsFirstChars(
 ) (*AlphaResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -625,7 +625,7 @@ func (s *ItemsGRPCServer) DeleteItemLink(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -648,7 +648,7 @@ func (s *ItemsGRPCServer) CreateItemLink(
 ) (*CreateItemLinkResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -691,7 +691,7 @@ func (s *ItemsGRPCServer) UpdateItemLink(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -805,7 +805,7 @@ func (s *ItemsGRPCServer) GetItemVehicleTypes(
 ) (*GetItemVehicleTypesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -865,7 +865,7 @@ func (s *ItemsGRPCServer) GetItemVehicleType(
 ) (*ItemVehicleType, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -907,7 +907,7 @@ func (s *ItemsGRPCServer) CreateItemVehicleType(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -942,7 +942,7 @@ func (s *ItemsGRPCServer) DeleteItemVehicleType(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -962,7 +962,7 @@ func (s *ItemsGRPCServer) GetItemLanguages(
 ) (*ItemLanguages, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -1015,7 +1015,7 @@ func (s *ItemsGRPCServer) UpdateItemLanguage(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -1156,7 +1156,7 @@ func (s *ItemsGRPCServer) GetItemParentLanguages(
 ) (*ItemParentLanguages, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -1186,7 +1186,7 @@ func (s *ItemsGRPCServer) GetItemParentLanguages(
 func (s *ItemsGRPCServer) GetStats(ctx context.Context, _ *emptypb.Empty) (*StatsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -1416,7 +1416,7 @@ func (s *ItemsGRPCServer) SetItemParentLanguage(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -1458,7 +1458,7 @@ func (s *ItemsGRPCServer) GetBrandNewItems(
 ) (*NewItemsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	const (
@@ -1538,7 +1538,7 @@ func (s *ItemsGRPCServer) GetNewItems(
 ) (*NewItemsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	const (
@@ -1621,7 +1621,7 @@ func (s *ItemsGRPCServer) CreateItemParent(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -1733,7 +1733,7 @@ func (s *ItemsGRPCServer) UpdateItemParent(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -1770,7 +1770,7 @@ func (s *ItemsGRPCServer) DeleteItemParent(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -1856,7 +1856,7 @@ func (s *ItemsGRPCServer) MoveItemParent(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -1949,7 +1949,7 @@ func (s *ItemsGRPCServer) RefreshInheritance(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
@@ -1976,7 +1976,7 @@ func (s *ItemsGRPCServer) SetUserItemSubscription(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -2031,7 +2031,7 @@ func (s *ItemsGRPCServer) GetItemParent(
 ) (*ItemParent, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -2083,7 +2083,7 @@ func (s *ItemsGRPCServer) GetItemParents(
 ) (*ItemParents, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -2160,7 +2160,7 @@ func (s *ItemsGRPCServer) GetTopSpecsContributions(
 ) (*TopSpecsContributions, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	lang := in.GetLanguage()
@@ -2250,7 +2250,7 @@ func (s *ItemsGRPCServer) GetTopSpecsContributions(
 func (s *ItemsGRPCServer) GetPath(ctx context.Context, in *PathRequest) (*PathResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	lang := in.GetLanguage()
@@ -2395,7 +2395,7 @@ func (s *ItemsGRPCServer) GetPath(ctx context.Context, in *PathRequest) (*PathRe
 func (s *ItemsGRPCServer) GetAlpha(ctx context.Context, _ *emptypb.Empty) (*AlphaResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
@@ -2450,7 +2450,7 @@ func categorizeFirstChars(chars []string) *AlphaResponse {
 func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *Item) (*ItemID, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -2598,7 +2598,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleCarsModer) {
@@ -2918,7 +2918,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*TreeItem, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
@@ -2952,7 +2952,7 @@ func (s *ItemsGRPCServer) GetVehicleTypes(
 ) (*VehicleTypeItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {

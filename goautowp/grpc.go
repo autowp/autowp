@@ -86,7 +86,7 @@ func (s *GRPCServer) GetReCaptchaConfig(context.Context, *emptypb.Empty) (*ReCap
 func (s *GRPCServer) GetIP(ctx context.Context, in *GetIPRequest) (*IP, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	// An empty address means "my own IP" - what the Access denied page asks for to show a banned
@@ -119,7 +119,7 @@ func (s *GRPCServer) CreateFeedback(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	fb := in.GetFeedback()

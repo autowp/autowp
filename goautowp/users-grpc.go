@@ -71,7 +71,7 @@ func NewUsersGRPCServer(
 func (s *UsersGRPCServer) Me(ctx context.Context, in *MeRequest) (*User, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	return s.GetUser(ctx, &GetUserRequest{
@@ -83,7 +83,7 @@ func (s *UsersGRPCServer) Me(ctx context.Context, in *MeRequest) (*User, error) 
 func (s *UsersGRPCServer) GetUser(ctx context.Context, in *GetUserRequest) (*User, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	dbUser, err := s.userRepository.User(ctx, &query.UserListOptions{
@@ -118,7 +118,7 @@ func (s *UsersGRPCServer) DeleteUser(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -175,7 +175,7 @@ func (s *UsersGRPCServer) DisableUserCommentsNotifications(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -205,7 +205,7 @@ func (s *UsersGRPCServer) EnableUserCommentsNotifications(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -235,7 +235,7 @@ func (s *UsersGRPCServer) GetUserPreferences(
 ) (*UserPreferencesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -262,7 +262,7 @@ func (s *UsersGRPCServer) GetUsers(
 ) (*UsersResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	rows, pages, err := s.userRepository.Users(ctx, &query.UserListOptions{
@@ -314,7 +314,7 @@ func (s *UsersGRPCServer) GetAccounts(
 ) (*AccountsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -360,7 +360,7 @@ func (s *UsersGRPCServer) DeleteUserAccount(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -390,7 +390,7 @@ func (s *UsersGRPCServer) DeleteUserPhoto(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleUsersModer) {
@@ -426,7 +426,7 @@ func (s *UsersGRPCServer) RecordConsent(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -447,7 +447,7 @@ func (s *UsersGRPCServer) AcceptTerms(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -467,7 +467,7 @@ func (s *UsersGRPCServer) UpdateUser(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	values := in.GetUser()

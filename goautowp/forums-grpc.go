@@ -51,7 +51,7 @@ func (s *ForumsGRPCServer) GetUserSummary(
 ) (*ForumsUserSummary, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -74,7 +74,7 @@ func (s *ForumsGRPCServer) CreateTopic(
 ) (*CreateTopicResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -215,7 +215,7 @@ func (s *ForumsGRPCServer) UpdateTopic(
 ) (*emptypb.Empty, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if userCtx.UserID == 0 {
@@ -288,7 +288,7 @@ func (s *ForumsGRPCServer) GetTheme(
 ) (*Theme, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModerator := util.Contains(userCtx.Roles, users.RoleForumsModer)
@@ -311,7 +311,7 @@ func (s *ForumsGRPCServer) ListThemes(
 ) (*ListThemesResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModerator := util.Contains(userCtx.Roles, users.RoleForumsModer)
@@ -337,7 +337,7 @@ func (s *ForumsGRPCServer) GetLastTopic(
 ) (*Topic, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModerator := util.Contains(userCtx.Roles, users.RoleForumsModer)
@@ -360,7 +360,7 @@ func (s *ForumsGRPCServer) GetLastMessage(
 ) (*CommentMessage, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModerator := util.Contains(userCtx.Roles, users.RoleForumsModer)
@@ -393,7 +393,7 @@ func (s *ForumsGRPCServer) ListTopics(
 ) (*ListTopicsResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModerator := util.Contains(userCtx.Roles, users.RoleForumsModer)
@@ -431,7 +431,7 @@ func (s *ForumsGRPCServer) GetTopic(
 ) (*Topic, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	isModerator := util.Contains(userCtx.Roles, users.RoleForumsModer)

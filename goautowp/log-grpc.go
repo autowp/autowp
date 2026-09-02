@@ -28,7 +28,7 @@ func NewLogGRPCServer(repository *log.Repository, auth *Auth) *LogGRPCServer {
 func (s *LogGRPCServer) GetEvents(ctx context.Context, in *LogEventsRequest) (*LogEvents, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	if !util.Contains(userCtx.Roles, users.RoleModer) {

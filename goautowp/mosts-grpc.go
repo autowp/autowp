@@ -35,7 +35,7 @@ func (s *MostsGRPCServer) GetItems(
 ) (*MostsItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, s.auth.GRPCError(err)
 	}
 
 	var (
