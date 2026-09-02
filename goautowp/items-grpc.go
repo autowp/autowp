@@ -2005,6 +2005,10 @@ func (s *ItemsGRPCServer) GetBrandSections(
 		Language: in.GetLanguage(),
 	}, nil)
 	if err != nil {
+		if errors.Is(err, items.ErrItemNotFound) {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
