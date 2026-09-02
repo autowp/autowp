@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/dlclark/regexp2"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/sirupsen/logrus"
 )
 
 type ItemParentLanguageRepository struct {
@@ -62,7 +62,7 @@ func NewItemParentLanguageRepository(
 func (s *ItemParentLanguageRepository) RefreshItemParentLanguage(
 	ctx context.Context, parentItemTypeID schema.ItemTableItemTypeID, limit uint,
 ) error {
-	logrus.Infof("RefreshItemParentLanguage(%d, %d)", parentItemTypeID, limit)
+	logging.Infof("RefreshItemParentLanguage(%d, %d)", parentItemTypeID, limit)
 
 	var res []struct {
 		ItemID   int64 `db:"item_id"`
@@ -245,7 +245,7 @@ func (s *ItemParentLanguageRepository) SetItemParentLanguage(
 }
 
 func (s *ItemParentLanguageRepository) RefreshItemParentLanguage2(ctx context.Context, parentID, itemID int64) error {
-	logrus.Infof("RefreshItemParentLanguage2(%d, %d)", parentID, itemID)
+	logging.Infof("RefreshItemParentLanguage2(%d, %d)", parentID, itemID)
 
 	var rows []schema.ItemParentLanguageRow
 
@@ -443,7 +443,7 @@ func (s *ItemParentLanguageRepository) updateAutoName(
 		return err
 	}
 
-	logrus.Infof("Update automatically item_parent_language.name to `%s` (%s)", newName, lang)
+	logging.Infof("Update automatically item_parent_language.name to `%s` (%s)", newName, lang)
 
 	_, err = s.db.Insert(schema.ItemParentLanguageTable).Rows(goqu.Record{
 		schema.ItemParentLanguageTableItemIDColName:   itemID,

@@ -10,10 +10,10 @@ import (
 	"github.com/autowp/goautowp"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/storage"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
@@ -41,7 +41,7 @@ func captureOsInterrupt() chan bool {
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 		for sig := range c {
-			logrus.Infof("captured %v, stopping and exiting.", sig)
+			logging.Infof("captured %v, stopping and exiting.", sig)
 
 			close(quit)
 
@@ -55,7 +55,9 @@ func captureOsInterrupt() chan bool {
 func main() { os.Exit(mainReturnWithCode()) }
 
 func mainReturnWithCode() int { //nolint: maintidx
-	logrus.SetLevel(logrus.WarnLevel)
+	if err := logging.SetLevel("warn"); err != nil {
+		panic(err)
+	}
 
 	imagick.Initialize()
 
@@ -84,18 +86,13 @@ func mainReturnWithCode() int { //nolint: maintidx
 				Usage:    "trace|debug|info|warn|error|fatal|panic",
 				Required: false,
 				Action: func(_ context.Context, _ *cli.Command, value string) error {
-					level := logrus.InfoLevel
-
-					var err error
-
-					if len(value) > 0 {
-						level, err = logrus.ParseLevel(value)
-						if err != nil {
-							logrus.Fatal(err)
-						}
+					if value == "" {
+						return nil
 					}
 
-					logrus.SetLevel(level)
+					if err := logging.SetLevel(value); err != nil {
+						logging.Fatal(err)
+					}
 
 					return nil
 				},
@@ -135,7 +132,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 								return err
 							}
 
-							logrus.Printf("%v", i)
+							logging.Printf("%v", i)
 
 							return nil
 						},
@@ -164,7 +161,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 								return err
 							}
 
-							logrus.Printf("%v", img)
+							logging.Printf("%v", img)
 
 							return nil
 						},
@@ -508,7 +505,7 @@ func mainReturnWithCode() int { //nolint: maintidx
 	}
 
 	if err := app.Run(context.Background(), os.Args); err != nil {
-		logrus.Fatal(err)
+		logging.Fatal(err)
 
 		return 1
 	}

@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -115,7 +115,7 @@ func (s *StatisticsGRPCServer) GetAboutData(
 
 		response.TotalUsers, err = s.totalUsers(ctx)
 		if err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 
 		wg.Done()
@@ -128,7 +128,7 @@ func (s *StatisticsGRPCServer) GetAboutData(
 
 		response.Contributors, err = s.contributors(ctx)
 		if err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 
 		wg.Done()
@@ -141,7 +141,7 @@ func (s *StatisticsGRPCServer) GetAboutData(
 
 		response.TotalPictures, response.PicturesSize, err = s.picturesStat(ctx)
 		if err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 
 		wg.Done()
@@ -154,7 +154,7 @@ func (s *StatisticsGRPCServer) GetAboutData(
 
 		response.TotalItems, err = s.totalItems(ctx)
 		if err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 
 		wg.Done()
@@ -167,7 +167,7 @@ func (s *StatisticsGRPCServer) GetAboutData(
 
 		response.TotalComments, err = s.totalComments(ctx)
 		if err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 
 		wg.Done()

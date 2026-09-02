@@ -23,6 +23,7 @@ import (
 
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/sampler"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -32,9 +33,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/gen2brain/avif" // AVIF support
-	"github.com/sirupsen/logrus"
-	_ "golang.org/x/image/bmp"  // BMP support
-	_ "golang.org/x/image/webp" // WEBP support
+	_ "golang.org/x/image/bmp"    // BMP support
+	_ "golang.org/x/image/webp"   // WEBP support
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
 
@@ -381,7 +381,7 @@ func (s *Storage) RemoveImage(ctx context.Context, imageID int) error {
 		return ErrImageNotFound
 	}
 
-	logrus.Infof("removing image `%s/%s`", row.Dir, row.Filepath)
+	logging.Infof("removing image `%s/%s`", row.Dir, row.Filepath)
 
 	ctx = context.WithoutCancel(ctx)
 
@@ -469,7 +469,7 @@ func (s *Storage) Flush(ctx context.Context, options FlushOptions) error {
 	ctx = context.WithoutCancel(ctx)
 
 	for _, row := range rows {
-		logrus.Infof("flushing image `%d/%s`", row.ImageID, row.Format)
+		logging.Infof("flushing image `%d/%s`", row.ImageID, row.Format)
 
 		if row.ImageFormattedID.Valid && row.ImageFormattedID.Int32 > 0 {
 			err = s.RemoveImage(ctx, int(row.ImageFormattedID.Int32))
@@ -571,7 +571,7 @@ func (s *Storage) ChangeImageName(ctx context.Context, imageID int, options Gene
 				ACL:        types.ObjectCannedACLPublicRead,
 			})
 			if err != nil {
-				logrus.Errorf(
+				logging.Errorf(
 					"CopyObject from `%s` to `%s` failed: %s",
 					sourceURL.EscapedPath(),
 					escapedDestURL,
@@ -1024,7 +1024,7 @@ PAGINATION:
 				).
 				ScanValContext(ctx, &id)
 			if err != nil {
-				logrus.Error(err.Error())
+				logging.Error(err.Error())
 
 				break PAGINATION
 			}
@@ -1054,7 +1054,7 @@ PAGINATION:
 					Limit(maxSameSizeObjectsToFetch).
 					ScanValsContext(ctx, &sameSizeKeys)
 				if err != nil {
-					logrus.Error(err.Error())
+					logging.Error(err.Error())
 
 					break PAGINATION
 				}
@@ -1210,7 +1210,7 @@ func (s *Storage) ImageEXIF(
 
 	err = json.Unmarshal([]byte(exifStr.String), &exif)
 	if err != nil {
-		logrus.Warnf("failed to unmarshal exif json of `%d`: %s", id, err.Error())
+		logging.Warnf("failed to unmarshal exif json of `%d`: %s", id, err.Error())
 
 		return nil, nil //nolint: nilnil
 	}
@@ -1432,7 +1432,7 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 		}
 
 		// wait until done
-		logrus.Debug("Wait until image processing done")
+		logging.Debug("Wait until image processing done")
 
 		var (
 			done  = false

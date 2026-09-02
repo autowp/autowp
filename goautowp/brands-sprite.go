@@ -16,6 +16,7 @@ import (
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
@@ -25,7 +26,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	transport "github.com/aws/smithy-go/endpoints"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
 
@@ -137,7 +137,7 @@ func createIconsSprite(
 	}
 
 	for _, brand := range list {
-		logrus.Infof("Processing `%s`", brand.Catname.String)
+		logging.Infof("Processing `%s`", brand.Catname.String)
 
 		if !brand.LogoID.Valid {
 			continue
@@ -187,7 +187,7 @@ func createIconsSprite(
 
 	destImg := tmpDir + "/" + brandsSpriteImageFilename
 
-	logrus.Info("Montage ...")
+	logging.Info("Montage ...")
 
 	dw := imagick.NewDrawingWand()
 	defer dw.Destroy()
@@ -208,7 +208,7 @@ func createIconsSprite(
 		return err
 	}
 
-	logrus.Info("Upload results ...")
+	logging.Info("Upload results ...")
 
 	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(fileStorageConfig.S3.Region))
 	if err != nil {
@@ -274,7 +274,7 @@ func createIconsSprite(
 		return err
 	}
 
-	logrus.Info("Brands sprite uploaded")
+	logging.Info("Brands sprite uploaded")
 
 	return nil
 }

@@ -2,9 +2,9 @@ package goautowp
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -35,13 +35,13 @@ func SlowCallUnaryServerInterceptor(threshold time.Duration) grpc.UnaryServerInt
 
 		elapsed := time.Since(start)
 		if elapsed >= threshold {
-			logrus.WithFields(logrus.Fields{
-				"grpc.duration_ms": elapsed.Milliseconds(),
-				"grpc.method":      info.FullMethod,
+			slog.WarnContext(ctx, "slow call",
+				"grpc.duration_ms", elapsed.Milliseconds(),
+				"grpc.method", info.FullMethod,
 				// Distinguishes "slow, and the caller was still there" from "slow, and it was
 				// abandoned" without needing the error itself.
-				"grpc.failed": err != nil,
-			}).Warn("slow call")
+				"grpc.failed", err != nil,
+			)
 		}
 
 		return resp, err

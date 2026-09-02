@@ -3,10 +3,10 @@ package users
 import (
 	"context"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/usercontacts"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/sirupsen/logrus"
 )
 
 // BackfillContactsResult is the summary of a BackfillUserContacts run.
@@ -99,7 +99,7 @@ func (s *Repository) backfillContacts(
 
 		res.Matched++
 
-		logrus.Infof(
+		logging.Infof(
 			"user %d: %s %q -> platform %d, username %q%s",
 			candidate.UserID, source, candidate.Link, platform, username, dryRunSuffix(dryRun),
 		)

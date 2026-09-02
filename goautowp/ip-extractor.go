@@ -6,10 +6,10 @@ import (
 	"net"
 
 	"github.com/autowp/goautowp/ban"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -42,7 +42,7 @@ func (s *IPExtractor) Extract(
 	if ok {
 		host, err := net.DefaultResolver.LookupAddr(ctx, ip.String())
 		if err != nil {
-			logrus.Errorf("LookupAddr error: %v", err.Error())
+			logging.Errorf("LookupAddr error: %v", err.Error())
 		}
 
 		if len(host) > 0 {

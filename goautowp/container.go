@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/netip"
 	"sync"
@@ -25,6 +26,7 @@ import (
 	"github.com/autowp/goautowp/itemofday"
 	"github.com/autowp/goautowp/items"
 	"github.com/autowp/goautowp/log"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/mosts"
 	"github.com/autowp/goautowp/pictures"
@@ -38,12 +40,11 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	grpclogging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/redis/go-redis/v9"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -654,7 +655,7 @@ func (s *Container) closeLocked() error {
 	if s.autowpDB != nil {
 		err := s.autowpDB.Close()
 		if err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 
 		s.autowpDB = nil
@@ -680,7 +681,7 @@ func (s *Container) goquDBLocked(ctx context.Context) (*goqu.Database, error) {
 		reconnectDelay    = 100 * time.Millisecond
 	)
 
-	logrus.Info("Waiting for postgres (goqu)")
+	logging.Info("Waiting for postgres (goqu)")
 
 	var (
 		db  *sql.DB
@@ -695,7 +696,7 @@ func (s *Container) goquDBLocked(ctx context.Context) (*goqu.Database, error) {
 
 		err = db.PingContext(ctx)
 		if err == nil {
-			logrus.Info("Started.")
+			logging.Info("Started.")
 
 			break
 		}
@@ -704,7 +705,7 @@ func (s *Container) goquDBLocked(ctx context.Context) (*goqu.Database, error) {
 			return nil, err
 		}
 
-		logrus.Info(".")
+		logging.Info(".")
 		time.Sleep(reconnectDelay)
 	}
 
@@ -1014,7 +1015,7 @@ func (s *Container) picturesRepositoryLocked(ctx context.Context) (*pictures.Rep
 			func(ctx context.Context) error {
 				// Best-effort: a missed live-reload ping isn't worth failing the accept.
 				if err := pictures.PublishAccepted(ctx, redisClient); err != nil {
-					logrus.Error(err.Error())
+					logging.Error(err.Error())
 				}
 
 				return nil
@@ -1397,9 +1398,9 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 		realip.WithHeaders([]string{realip.XForwardedFor}),
 	}
 
-	logger := logrus.StandardLogger()
-	loggerOpts := []logging.Option{
-		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+	logger := slog.Default()
+	loggerOpts := []grpclogging.Option{
+		grpclogging.WithLogOnEvents(grpclogging.StartCall, grpclogging.FinishCall),
 	}
 
 	banChecker, err := s.banCheckerLocked(ctx)
@@ -1412,7 +1413,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 			// Outermost, so what it times is the whole call - ban check and all - the same span the
 			// caller waits on.
 			SlowCallUnaryServerInterceptor(s.config.GRPC.SlowCallThreshold),
-			logging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
+			grpclogging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.UnaryServerInterceptorOpts(opts...),
 			BanUnaryServerInterceptor(banChecker),
 			// Innermost, so it wraps the handler itself: a panic that escapes becomes a logged
@@ -1420,7 +1421,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 			recovery.UnaryServerInterceptor(recoveryOpts()...),
 		),
 		grpc.ChainStreamInterceptor(
-			logging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
+			grpclogging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.StreamServerInterceptorOpts(opts...),
 			BanStreamServerInterceptor(banChecker), //nolint: contextcheck
 			recovery.StreamServerInterceptor(recoveryOpts()...),
@@ -1509,7 +1510,7 @@ func (s *Container) trafficLocked(ctx context.Context) (*traffic.Repository, err
 
 		traf, err := traffic.NewRepository(db, banRepository)
 		if err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 
 			return nil, err
 		}
@@ -2378,7 +2379,7 @@ func (s *Container) messagingRepositoryLocked(ctx context.Context) (*messaging.R
 				// Best-effort: a missed live-reload ping isn't worth failing the
 				// underlying message operation over.
 				if err := messaging.PublishEvent(ctx, redisClient, userIDs); err != nil {
-					logrus.Error(err.Error())
+					logging.Error(err.Error())
 				}
 
 				return nil

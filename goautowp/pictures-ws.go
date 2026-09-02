@@ -3,11 +3,11 @@ package goautowp
 import (
 	"net/http"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/util"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 )
 
 // PicturesWS exposes the /ws/pictures endpoint: an unauthenticated, content-free
@@ -40,7 +40,7 @@ func (s *PicturesWS) SetupRouter(router *gin.Engine) {
 func (s *PicturesWS) serveWS(ctx *gin.Context) {
 	conn, err := s.upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		logrus.Error(err.Error())
+		logging.Error(err.Error())
 
 		return
 	}

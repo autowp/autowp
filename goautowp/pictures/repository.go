@@ -24,6 +24,7 @@ import (
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/textstorage"
@@ -34,7 +35,6 @@ import (
 	_ "github.com/gen2brain/avif" // AVIF support
 	"github.com/paulmach/orb"
 	"github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
 	_ "golang.org/x/image/bmp"  // BMP support
 	_ "golang.org/x/image/webp" // WEBP support
 )
@@ -1679,7 +1679,7 @@ func (s *Repository) DfIndex(ctx context.Context) error {
 	defer util.Close(ch)
 
 	for _, st := range sts {
-		logrus.Infof("%d / %d", st.ID, st.ImageID)
+		logging.Infof("%d / %d", st.ID, st.ImageID)
 
 		img, err := s.imageStorage.Image(ctx, int(st.ImageID))
 		if err != nil {
@@ -1774,7 +1774,7 @@ func (s *Repository) CorrectAllFileNames(ctx context.Context) error {
 	const perPage = 100
 
 	for i := 0; ; i++ {
-		logrus.Infof("Page %d", i)
+		logging.Infof("Page %d", i)
 
 		var sts []struct {
 			ID       int64  `db:"id"`
@@ -1803,9 +1803,9 @@ func (s *Repository) CorrectAllFileNames(ctx context.Context) error {
 
 			match := strings.Contains(row.Filepath, pattern)
 			if match {
-				logrus.Infof("%d# %s is ok", row.ID, row.Filepath)
+				logging.Infof("%d# %s is ok", row.ID, row.Filepath)
 			} else {
-				logrus.Infof("%d# %s not match pattern %s", row.ID, row.Filepath, pattern)
+				logging.Infof("%d# %s not match pattern %s", row.ID, row.Filepath, pattern)
 
 				err = s.CorrectFileNames(ctx, row.ID)
 				if err != nil {
@@ -2051,12 +2051,12 @@ func (s *Repository) ClearQueue(ctx context.Context) error {
 	count := len(pictures)
 
 	if count == 0 {
-		logrus.Info("Nothing to clear")
+		logging.Info("Nothing to clear")
 
 		return nil
 	}
 
-	logrus.Warnf("Removing %d pictures", count)
+	logging.Warnf("Removing %d pictures", count)
 
 	for _, picture := range pictures {
 		iCtx := context.WithoutCancel(ctx)
@@ -2080,16 +2080,16 @@ func (s *Repository) ClearQueue(ctx context.Context) error {
 				return err
 			}
 
-			logrus.Warnf("Picture %d removed", picture.ID)
+			logging.Warnf("Picture %d removed", picture.ID)
 
 			err = s.imageStorage.RemoveImage(iCtx, int(imageID.Int64))
 			if err != nil {
 				return err
 			}
 
-			logrus.Warnf("Image %d removed", imageID.Int64)
+			logging.Warnf("Image %d removed", imageID.Int64)
 		} else {
-			logrus.Warnf("Broken picture `%d`. Skip", picture.ID)
+			logging.Warnf("Broken picture `%d`. Skip", picture.ID)
 		}
 	}
 
@@ -2751,7 +2751,7 @@ func (s *Repository) processEXIF(
 	// conditions as errors that are not exif.ErrNoExif, and some real-world files hit them.
 	extractedEXIF, err := extractFromEXIF(imageType, handle, fileSize)
 	if err != nil {
-		logrus.Warnf("processEXIF: skipping EXIF for picture %d: %s", pictureID, err)
+		logging.Warnf("processEXIF: skipping EXIF for picture %d: %s", pictureID, err)
 
 		extractedEXIF = exifExtractedValues{}
 	}

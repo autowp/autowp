@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/autowp/goautowp/attrsamqp"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/storage"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/schema"
@@ -24,7 +26,6 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"       // enable file migration source
 	_ "github.com/lib/pq"                                      // enable postgres driver
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sirupsen/logrus"
 )
 
 type ServeOptions struct {
@@ -69,15 +70,15 @@ func (s *Application) ServeGRPC(ctx context.Context, quit chan bool) error {
 		grpcServer.GracefulStop()
 	}()
 
-	logrus.Println("gRPC listener started")
+	logging.Println("gRPC listener started")
 
 	err = grpcServer.Serve(lis)
 	if err != nil {
 		// cannot panic, because this probably is an intentional close
-		logrus.Printf("gRPC: Serve() error: %s", err)
+		logging.Printf("gRPC: Serve() error: %s", err)
 	}
 
-	logrus.Println("gRPC listener stopped")
+	logging.Println("gRPC listener stopped")
 
 	return nil
 }
@@ -100,15 +101,15 @@ func runWorker(wg *sync.WaitGroup, name string, fn func() error) {
 			stack := make([]byte, panicStackBufSize)
 			stack = stack[:runtime.Stack(stack, false)]
 
-			logrus.WithFields(logrus.Fields{
-				"worker": name,
-				"panic":  panicValue,
-				"stack":  string(stack),
-			}).Error("recovered from panic in worker")
+			slog.Error("recovered from panic in worker",
+				"worker", name,
+				"panic", panicValue,
+				"stack", string(stack),
+			)
 		}()
 
 		if err := fn(); err != nil {
-			logrus.WithField("worker", name).Error(err.Error())
+			slog.With("worker", name).Error(err.Error())
 		}
 	}()
 }
@@ -162,11 +163,11 @@ func (s *Application) ServeMetrics(ctx context.Context, quit chan bool) error {
 		<-quit
 
 		if err := httpServer.Shutdown(ctx); err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 	}(ctx)
 
-	logrus.Infoln("metrics HTTP listener started")
+	logging.Infoln("metrics HTTP listener started")
 
 	err := httpServer.ListenAndServe()
 	if err != nil {
@@ -175,7 +176,7 @@ func (s *Application) ServeMetrics(ctx context.Context, quit chan bool) error {
 		}
 	}
 
-	logrus.Infoln("metrics HTTP listener stopped")
+	logging.Infoln("metrics HTTP listener stopped")
 
 	return nil
 }
@@ -190,11 +191,11 @@ func (s *Application) ServePublic(ctx context.Context, quit chan bool) error {
 		<-quit
 
 		if err := httpServer.Shutdown(ctx); err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 	}(ctx)
 
-	logrus.Infoln("public HTTP listener started")
+	logging.Infoln("public HTTP listener started")
 
 	err = httpServer.ListenAndServe()
 	if err != nil {
@@ -203,7 +204,7 @@ func (s *Application) ServePublic(ctx context.Context, quit chan bool) error {
 		}
 	}
 
-	logrus.Infoln("public HTTP listener stopped")
+	logging.Infoln("public HTTP listener stopped")
 
 	return nil
 }
@@ -219,14 +220,14 @@ func (s *Application) ListenMessagingWSEvents(ctx context.Context, quit chan boo
 
 	hub := s.container.MessagingHub()
 
-	logrus.Info("Messaging WS listener started")
+	logging.Info("Messaging WS listener started")
 
 	err = messaging.Subscribe(ctx, redisClient, hub, quit)
 	if err != nil {
 		return err
 	}
 
-	logrus.Info("Messaging WS listener stopped")
+	logging.Info("Messaging WS listener stopped")
 
 	return nil
 }
@@ -242,14 +243,14 @@ func (s *Application) ListenPicturesWSEvents(ctx context.Context, quit chan bool
 
 	hub := s.container.PicturesHub()
 
-	logrus.Info("Pictures WS listener started")
+	logging.Info("Pictures WS listener started")
 
 	err = pictures.Subscribe(ctx, redisClient, hub, quit)
 	if err != nil {
 		return err
 	}
 
-	logrus.Info("Pictures WS listener stopped")
+	logging.Info("Pictures WS listener stopped")
 
 	return nil
 }
@@ -260,33 +261,33 @@ func (s *Application) ListenDuplicateFinderAMQP(ctx context.Context, quit chan b
 		return err
 	}
 
-	logrus.Println("DuplicateFinder listener started")
+	logging.Println("DuplicateFinder listener started")
 
 	err = df.ListenAMQP(ctx, quit)
 	if err != nil {
 		return err
 	}
 
-	logrus.Println("DuplicateFinder listener stopped")
+	logging.Println("DuplicateFinder listener stopped")
 
 	return nil
 }
 
 // Close Destructor.
 func (s *Application) Close() error {
-	logrus.Println("Closing service")
+	logging.Println("Closing service")
 
 	if err := s.container.Close(); err != nil {
 		return err
 	}
 
-	logrus.Println("Service closed")
+	logging.Println("Service closed")
 
 	return nil
 }
 
 func applyMigrations(config config.MigrationsConfig) error {
-	logrus.Info("Apply migrations")
+	logging.Info("Apply migrations")
 
 	dir := config.Dir
 	if dir == "" {
@@ -309,7 +310,7 @@ func applyMigrations(config config.MigrationsConfig) error {
 		return err
 	}
 
-	logrus.Info("Migrations applied")
+	logging.Info("Migrations applied")
 
 	return nil
 }
@@ -341,14 +342,14 @@ func (s *Application) SchedulerHourly(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("`%v` items of monitoring deleted", deleted)
+	logging.Infof("`%v` items of monitoring deleted", deleted)
 
 	deleted, err = traffic.Ban.GC(ctx)
 	if err != nil {
 		return err
 	}
 
-	logrus.Infof("`%v` items of ban deleted", deleted)
+	logging.Infof("`%v` items of ban deleted", deleted)
 
 	err = traffic.AutoWhitelist(ctx)
 	if err != nil {
@@ -398,7 +399,7 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("Comments deleted: %d", affected)
+	logging.Infof("Comments deleted: %d", affected)
 
 	forums, err := s.container.Forums(ctx)
 	if err != nil {
@@ -410,7 +411,7 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("Deleted forum topics purged: %d", purgedTopics)
+	logging.Infof("Deleted forum topics purged: %d", purgedTopics)
 
 	err = usersRep.DeleteUnused(ctx)
 	if err != nil {
@@ -422,14 +423,14 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("Content IPs anonymized: %d", anonymizedIPs)
+	logging.Infof("Content IPs anonymized: %d", anonymizedIPs)
 
 	purgedConsent, err := usersRep.PurgeOldConsentLog(ctx)
 	if err != nil {
 		return err
 	}
 
-	logrus.Infof("Consent log rows purged: %d", purgedConsent)
+	logging.Infof("Consent log rows purged: %d", purgedConsent)
 
 	messRepo, err := s.container.MessagingRepository(ctx)
 	if err != nil {
@@ -441,41 +442,41 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("%d messages was deleted", deleted)
+	logging.Infof("%d messages was deleted", deleted)
 
 	deleted, err = messRepo.RecycleSystem(ctx)
 	if err != nil {
 		return err
 	}
 
-	logrus.Infof("%d messages was deleted", deleted)
+	logging.Infof("%d messages was deleted", deleted)
 
 	// affected, err = commentsRep.RefreshRepliesCount(ctx)
 	// if err != nil {
-	//	logrus.Error(err.Error())
+	//	logging.Error(err.Error())
 	//
 	//	return err
 	// }
 	//
-	// logrus.Infof("Replies refreshed: %d", affected)
+	// logging.Infof("Replies refreshed: %d", affected)
 
 	// affected, err = commentsRep.CleanBrokenMessages(ctx)
 	// if err != nil {
-	//	logrus.Error(err.Error())
+	//	logging.Error(err.Error())
 	//
 	//	return err
 	// }
 	//
-	// logrus.Infof("Clean broken: %d", affected)
+	// logging.Infof("Clean broken: %d", affected)
 
 	// affected, err = commentsRep.CleanTopics(ctx)
 	// if err != nil {
-	//	logrus.Error(err.Error())
+	//	logging.Error(err.Error())
 	//
 	//	return err
 	// }
 	//
-	// logrus.Infof("Clean topics: %d", affected)
+	// logging.Infof("Clean topics: %d", affected)
 
 	achievementsRep, err := s.container.AchievementsRepository(ctx)
 	if err != nil {
@@ -487,14 +488,14 @@ func (s *Application) SchedulerDaily(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("Top pictures contributor achievement newly granted to %d users", achievementsGranted)
+	logging.Infof("Top pictures contributor achievement newly granted to %d users", achievementsGranted)
 
 	veteransGranted, err := achievementsRep.RecomputeVeteranBadges(ctx)
 	if err != nil {
 		return err
 	}
 
-	logrus.Infof("Veteran achievement newly granted to %d users", veteransGranted)
+	logging.Infof("Veteran achievement newly granted to %d users", veteransGranted)
 
 	return nil
 }
@@ -515,7 +516,7 @@ func (s *Application) SchedulerMidnight(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("Updated %d users vote limits", affected)
+	logging.Infof("Updated %d users vote limits", affected)
 
 	idr, err := s.container.ItemOfDayRepository(ctx)
 	if err != nil {
@@ -527,7 +528,7 @@ func (s *Application) SchedulerMidnight(ctx context.Context) error {
 		return err
 	}
 
-	logrus.Infof("item of day status: `%v`", success)
+	logging.Infof("item of day status: `%v`", success)
 
 	return nil
 }
@@ -540,7 +541,7 @@ func (s *Application) Autoban(ctx context.Context, quit chan bool) error {
 
 	banTicker := time.NewTicker(time.Minute)
 
-	logrus.Info("AutoBan scheduler started")
+	logging.Info("AutoBan scheduler started")
 
 loop:
 	for {
@@ -548,7 +549,7 @@ loop:
 		case <-banTicker.C:
 			err := traffic.AutoBan(ctx)
 			if err != nil {
-				logrus.Error(err.Error())
+				logging.Error(err.Error())
 			}
 		case <-quit:
 			banTicker.Stop()
@@ -557,7 +558,7 @@ loop:
 		}
 	}
 
-	logrus.Info("AutoBan scheduler stopped")
+	logging.Info("AutoBan scheduler stopped")
 
 	return nil
 }
@@ -696,7 +697,7 @@ func (s *Application) UsersBackfillContacts(ctx context.Context, dryRun bool) er
 		return err
 	}
 
-	logrus.Infof(
+	logging.Infof(
 		"backfill-contacts: scanned=%d matched=%d inserted=%d unmatched=%d dry-run=%t",
 		res.Scanned, res.Matched, res.Inserted, res.Unmatched, dryRun,
 	)
@@ -782,14 +783,14 @@ func (s *Application) ListenMonitoringAMQP(ctx context.Context, quit chan bool) 
 
 	cfg := s.container.Config()
 
-	logrus.Info("Monitoring listener started")
+	logging.Info("Monitoring listener started")
 
 	err = traffic.Monitoring.Listen(ctx, cfg.RabbitMQ, cfg.MonitoringQueue, quit)
 	if err != nil {
 		return err
 	}
 
-	logrus.Info("Monitoring listener stopped")
+	logging.Info("Monitoring listener stopped")
 
 	return nil
 }
@@ -804,14 +805,14 @@ func (s *Application) AttrsUpdateValuesAMQP(ctx context.Context, quit chan bool)
 
 	cfg := s.container.Config()
 
-	logrus.Info("AttrsUpdateValuesAMQP listener started")
+	logging.Info("AttrsUpdateValuesAMQP listener started")
 
 	err = listener.ListenUpdateValues(ctx, cfg.RabbitMQ, cfg.Attrs.AttrsUpdateValuesQueue, quit)
 	if err != nil {
 		return err
 	}
 
-	logrus.Info("AttrsUpdateValuesAMQP listener stopped")
+	logging.Info("AttrsUpdateValuesAMQP listener stopped")
 
 	return nil
 }

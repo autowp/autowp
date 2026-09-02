@@ -7,9 +7,9 @@ import (
 	"net"
 	"strings"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/sirupsen/logrus"
 )
 
 var ErrWhitelistItemNotFound = errors.New("whitelist item not found")
@@ -56,7 +56,7 @@ func (s *Whitelist) MatchAuto(ctx context.Context, ip net.IP) (bool, string) {
 	}
 
 	for _, host := range hosts {
-		logrus.Info(host + " ")
+		logging.Info(host + " ")
 
 		if host == msnHost {
 			return true, "msnbot autodetect"

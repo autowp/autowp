@@ -16,6 +16,7 @@ import (
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/image/storage"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
@@ -24,7 +25,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgtype"
 	_ "github.com/lib/pq" // enable postgres driver
-	"github.com/sirupsen/logrus"
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
 
@@ -525,7 +525,7 @@ func (s *Repository) EnsureUserImported(
 	emailAddr := claims.Email
 	name := fullName(claims.GivenName, claims.FamilyName, claims.PreferredUsername)
 
-	logrus.Debugf("Ensure user `%s` imported", guid)
+	logging.Debugf("Ensure user `%s` imported", guid)
 
 	ctx = context.WithoutCancel(ctx)
 
@@ -664,7 +664,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 			return false, err
 		}
 
-		logrus.Infof("attempt to disable user `%s` in keycloak", userGUID.String())
+		logging.Infof("attempt to disable user `%s` in keycloak", userGUID.String())
 
 		err = s.keycloak.DeleteUser(
 			ctx,
@@ -903,12 +903,12 @@ func (s *Repository) ExportUsersToKeycloak(ctx context.Context) error {
 	for _, userID := range ids {
 		guid, err := s.ensureUserExportedToKeycloak(ctx, userID)
 		if err != nil {
-			logrus.Debugf("Error exporting user %d", userID)
+			logging.Debugf("Error exporting user %d", userID)
 
 			return err
 		}
 
-		logrus.Debugf("User %d exported to keycloak as %s", userID, guid)
+		logging.Debugf("User %d exported to keycloak as %s", userID, guid)
 	}
 
 	return nil
@@ -1307,7 +1307,7 @@ func (s *Repository) DeleteUnused(ctx context.Context) error {
 	}
 
 	for _, id := range ids {
-		logrus.Warnf("Delete user %d", id)
+		logging.Warnf("Delete user %d", id)
 
 		_, err = s.DeleteUser(ctx, id)
 		if err != nil {
@@ -1420,7 +1420,7 @@ func (s *Repository) ensureUserExportedToKeycloak(
 	ctx context.Context,
 	userID int64,
 ) (string, error) {
-	logrus.Debugf("Ensure user `%d` exported to Keycloak", userID)
+	logging.Debugf("Ensure user `%d` exported to Keycloak", userID)
 
 	st := struct {
 		Deleted      bool           `db:"deleted"`

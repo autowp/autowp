@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/redis/go-redis/v9"
-	"github.com/sirupsen/logrus"
 )
 
 // PubSubChannel is the single Redis Pub/Sub channel every server instance subscribes to
@@ -48,7 +48,7 @@ func Subscribe(ctx context.Context, redisClient *redis.Client, hub *Hub, quit ch
 		}
 
 		if err := subscribeOnce(ctx, redisClient, hub, quit); err != nil {
-			logrus.Error(err.Error())
+			logging.Error(err.Error())
 		}
 
 		select {
@@ -77,7 +77,7 @@ func subscribeOnce(ctx context.Context, redisClient *redis.Client, hub *Hub, qui
 			var event wsEvent
 
 			if err := json.Unmarshal([]byte(msg.Payload), &event); err != nil {
-				logrus.Error(err.Error())
+				logging.Error(err.Error())
 
 				continue
 			}

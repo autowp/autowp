@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/autowp/goautowp/logging"
 )
 
 const usrShareZoneinfo = "/usr/share/zoneinfo/"
@@ -29,7 +29,7 @@ var TimeZones = sync.OnceValue(func() []string {
 	// Reads the Directory corresponding to the OS
 	dirFile, err := os.ReadDir(zoneDirs[runtime.GOOS])
 	if err != nil {
-		logrus.Error(err)
+		logging.Error(err)
 	}
 
 	for _, i := range dirFile {
@@ -39,7 +39,7 @@ var TimeZones = sync.OnceValue(func() []string {
 				// Recursive read if directory
 				subFiles, err := os.ReadDir(zoneDirs[runtime.GOOS] + i.Name())
 				if err != nil {
-					logrus.Fatal(err)
+					logging.Fatal(err)
 				}
 
 				for _, s := range subFiles {

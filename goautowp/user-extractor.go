@@ -7,6 +7,7 @@ import (
 
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/image/storage"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
@@ -14,7 +15,6 @@ import (
 	"github.com/autowp/goautowp/util"
 	"github.com/drexedam/gravatar"
 	"github.com/jackc/pgtype"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -101,7 +101,7 @@ func (s *UserExtractor) Extract(
 			// anonymisation racing this list) must not fail the whole call: return the user
 			// without an avatar.
 			if errors.Is(err, storage.ErrImageNotFound) {
-				logrus.Warnf("user %d references missing image %d, skipping avatar: %v", row.ID, *row.Img, err)
+				logging.Warnf("user %d references missing image %d, skipping avatar: %v", row.ID, *row.Img, err)
 			} else if err != nil {
 				return nil, err
 			}
@@ -111,7 +111,7 @@ func (s *UserExtractor) Extract(
 			if avatar != nil && fields.GetPhoto() {
 				photo, err := s.imageStorage.FormattedImage(ctx, *row.Img, "photo")
 				if errors.Is(err, storage.ErrImageNotFound) {
-					logrus.Warnf("user %d references missing image %d, skipping photo: %v", row.ID, *row.Img, err)
+					logging.Warnf("user %d references missing image %d, skipping photo: %v", row.ID, *row.Img, err)
 				} else if err != nil {
 					return nil, err
 				}
@@ -179,7 +179,7 @@ func (s *UserExtractor) Extract(
 		if fields.GetImg() && row.Img != nil {
 			img, err := s.imageStorage.Image(ctx, *row.Img)
 			if errors.Is(err, storage.ErrImageNotFound) {
-				logrus.Warnf("user %d references missing image %d, skipping img: %v", row.ID, *row.Img, err)
+				logging.Warnf("user %d references missing image %d, skipping img: %v", row.ID, *row.Img, err)
 			} else if err != nil {
 				return nil, err
 			}

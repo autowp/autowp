@@ -6,9 +6,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/sirupsen/logrus"
 )
 
 var errItemIDMustBeDefined = errors.New("itemID must be defined")
@@ -98,12 +98,12 @@ func (s *Repository) Pick(ctx context.Context) (bool, error) {
 	}
 
 	if itemID <= 0 {
-		logrus.Warning("ItemOfDay: candidate not found")
+		logging.Warning("ItemOfDay: candidate not found")
 
 		return false, nil
 	}
 
-	logrus.Infof("ItemOfDay: candidate is `%d`", itemID)
+	logging.Infof("ItemOfDay: candidate is `%d`", itemID)
 
 	return s.SetItemOfDay(ctx, time.Now(), itemID, 0)
 }

@@ -42,7 +42,6 @@ require (
 	github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/shopspring/decimal v1.4.0
-	github.com/sirupsen/logrus v1.10.1
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
 	github.com/twpayne/go-geom v1.6.1

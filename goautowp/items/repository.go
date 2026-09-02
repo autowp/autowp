@@ -18,6 +18,7 @@ import (
 	"github.com/autowp/goautowp/filter"
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/image/storage"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/textstorage"
@@ -25,7 +26,6 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/mozillazg/go-unidecode"
-	"github.com/sirupsen/logrus"
 	"github.com/twpayne/go-geom"
 	"github.com/twpayne/go-geom/encoding/wkt"
 	"golang.org/x/text/collate"
@@ -2263,7 +2263,7 @@ func (s *Repository) ItemsFirstChars(ctx context.Context, options *query.ItemLis
 }
 
 func (s *Repository) RefreshItemParentAllAuto(ctx context.Context) error {
-	logrus.Infof("RefreshItemParentAllAuto()")
+	logging.Infof("RefreshItemParentAllAuto()")
 
 	itemParentRows, _, err := s.ItemParents(ctx, &query.ItemParentListOptions{
 		NotManualCatname: true,
@@ -2946,7 +2946,7 @@ func fractionToMonth(fraction sql.NullString) time.Month {
 }
 
 func (s *Repository) RebuildItemOrderCache(ctx context.Context) error {
-	logrus.Infoln("RebuildItemOrderCache()")
+	logging.Infoln("RebuildItemOrderCache()")
 
 	const batchSize = 100
 
@@ -2960,7 +2960,7 @@ func (s *Repository) RebuildItemOrderCache(ctx context.Context) error {
 		}
 
 		for _, i := range list {
-			logrus.Infof("UpdateOrderCache(%d)", i.ID)
+			logging.Infof("UpdateOrderCache(%d)", i.ID)
 
 			_, err = s.UpdateOrderCache(ctx, i.ID)
 			if err != nil {

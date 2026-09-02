@@ -17,6 +17,7 @@ import (
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/query"
@@ -25,7 +26,6 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gin-gonic/gin"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -212,14 +212,14 @@ func (s *Service) WebhookInfo() error {
 		return err
 	}
 
-	logrus.Info("URL: " + wh.URL)
-	logrus.Info("LastErrorMessage: " + wh.LastErrorMessage)
-	logrus.Infof("LastErrorDate: %d", wh.LastErrorDate)
-	logrus.Info("IPAddress: " + wh.IPAddress)
-	logrus.Infof("AllowedUpdates: %v", wh.AllowedUpdates)
-	logrus.Infof("HasCustomCertificate: %v", wh.HasCustomCertificate)
-	logrus.Infof("PendingUpdateCount: %d", wh.PendingUpdateCount)
-	logrus.Infof("MaxConnections: %d", wh.MaxConnections)
+	logging.Info("URL: " + wh.URL)
+	logging.Info("LastErrorMessage: " + wh.LastErrorMessage)
+	logging.Infof("LastErrorDate: %d", wh.LastErrorDate)
+	logging.Info("IPAddress: " + wh.IPAddress)
+	logging.Infof("AllowedUpdates: %v", wh.AllowedUpdates)
+	logging.Infof("HasCustomCertificate: %v", wh.HasCustomCertificate)
+	logging.Infof("PendingUpdateCount: %d", wh.PendingUpdateCount)
+	logging.Infof("MaxConnections: %d", wh.MaxConnections)
 
 	return nil
 }
@@ -241,9 +241,9 @@ func (s *Service) RegisterWebhook() error {
 	}
 
 	if res.Ok {
-		logrus.Infof("Webhook successfully registered: %s", res.Description)
+		logging.Infof("Webhook successfully registered: %s", res.Description)
 	} else {
-		logrus.Errorf("Failed to register webhook: %d: %s", res.ErrorCode, res.Description)
+		logging.Errorf("Failed to register webhook: %d: %s", res.ErrorCode, res.Description)
 	}
 
 	return nil
@@ -294,7 +294,7 @@ func (s *Service) SetupRouter(router *gin.Engine) {
 
 		err = s.handleUpdate(ctx, update)
 		if err != nil {
-			logrus.Errorf("telegram webhook error: %s", err.Error())
+			logging.Errorf("telegram webhook error: %s", err.Error())
 			ctx.String(http.StatusInternalServerError, err.Error())
 
 			return
@@ -449,7 +449,7 @@ func (s *Service) unsubscribeChat(ctx context.Context, chatID int64) error {
 
 func (s *Service) replyWithMessage(update *tgbotapi.Update, text string) error {
 	if s.mockModeEnabled {
-		logrus.Debugf("Mock reply: `%s`", text)
+		logging.Debugf("Mock reply: `%s`", text)
 
 		return nil
 	}

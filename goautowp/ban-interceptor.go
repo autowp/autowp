@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -91,7 +91,7 @@ func (s *BanChecker) IsBanned(ctx context.Context, ip net.IP) bool {
 		// A canceled context means the caller already walked away (SSR gave up, browser navigated
 		// on) - that's a normal outcome under load, not a fault worth a line in the log each time.
 		if !errors.Is(err, context.Canceled) {
-			logrus.Errorf("ban check failed: %s", err.Error())
+			logging.Errorf("ban check failed: %s", err.Error())
 		}
 
 		// Deliberately not cached: a failed lookup says nothing about this address.

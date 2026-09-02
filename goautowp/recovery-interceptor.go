@@ -2,10 +2,10 @@ package goautowp
 
 import (
 	"context"
+	"log/slog"
 	"runtime"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -24,11 +24,11 @@ func recoveryHandler(ctx context.Context, panicValue any) error {
 
 	method, _ := grpc.Method(ctx)
 
-	logrus.WithFields(logrus.Fields{
-		"panic":       panicValue,
-		"grpc.method": method,
-		"stack":       string(stack),
-	}).Error("recovered from panic in gRPC handler")
+	slog.ErrorContext(ctx, "recovered from panic in gRPC handler",
+		"panic", panicValue,
+		"grpc.method", method,
+		"stack", string(stack),
+	)
 
 	return status.Error(codes.Internal, "internal error")
 }

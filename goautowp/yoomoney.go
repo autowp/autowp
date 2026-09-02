@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/itemofday"
+	"github.com/autowp/goautowp/logging"
 	"github.com/gin-gonic/gin"
 	decimal2 "github.com/shopspring/decimal"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -178,20 +178,20 @@ func (s *YoomoneyHandler) SetupRouter(_ context.Context, r *gin.Engine) {
 		var fields YoomoneyWebhook
 
 		if err := ctx.ShouldBind(&fields); err != nil {
-			logrus.Warnf("yoomoney bad request: %s", err.Error())
+			logging.Warnf("yoomoney bad request: %s", err.Error())
 			ctx.Status(http.StatusBadRequest)
 
 			return
 		}
 
 		if err := s.Handle(ctx, fields); err != nil {
-			logrus.Warnf("yoomoney: %s", err.Error())
+			logging.Warnf("yoomoney: %s", err.Error())
 			ctx.String(http.StatusInternalServerError, err.Error())
 
 			return
 		}
 
-		logrus.Info("yoomoney: success")
+		logging.Info("yoomoney: success")
 		ctx.Status(http.StatusOK)
 	})
 }

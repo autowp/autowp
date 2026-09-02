@@ -17,14 +17,14 @@ import (
 	"github.com/ajdnik/imghash/v2"
 	"github.com/ajdnik/imghash/v2/hashtype"
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/gen2brain/avif" // AVIF support
-	"github.com/sirupsen/logrus"
-	_ "golang.org/x/image/bmp"  // BMP support
-	_ "golang.org/x/image/webp" // WEBP support
+	_ "golang.org/x/image/bmp"    // BMP support
+	_ "golang.org/x/image/webp"   // WEBP support
 )
 
 var (
@@ -109,14 +109,14 @@ func (s *DuplicateFinder) ListenAMQP(ctx context.Context, quitChan chan bool) er
 	for !done {
 		select {
 		case <-quitChan:
-			logrus.Info("DuplicateFinder got quit signal")
+			logging.Info("DuplicateFinder got quit signal")
 
 			done = true
 
 			break
 		case msg := <-msgs:
 			if msg.ContentType != "application/json" {
-				logrus.Errorf("unexpected mime `%v`", msg.ContentType)
+				logging.Errorf("unexpected mime `%v`", msg.ContentType)
 
 				continue
 			}
@@ -125,21 +125,21 @@ func (s *DuplicateFinder) ListenAMQP(ctx context.Context, quitChan chan bool) er
 
 			err := json.Unmarshal(msg.Body, &message)
 			if err != nil {
-				logrus.Errorf("failed to parse json `%s`: %s", err.Error(), msg.Body)
+				logging.Errorf("failed to parse json `%s`: %s", err.Error(), msg.Body)
 
 				continue
 			}
 
 			err = s.Index(ctx, message.PictureID, message.URL)
 			if err != nil {
-				logrus.Errorf("error indexing image `%d`/`%s`: %v", message.PictureID, message.URL, err)
+				logging.Errorf("error indexing image `%d`/`%s`: %v", message.PictureID, message.URL, err)
 			}
 
 			time.Sleep(indexDelay)
 		}
 	}
 
-	logrus.Info("Disconnecting RabbitMQ")
+	logging.Info("Disconnecting RabbitMQ")
 
 	return rabbitMQ.Close()
 }
@@ -147,7 +147,7 @@ func (s *DuplicateFinder) ListenAMQP(ctx context.Context, quitChan chan bool) er
 // Index picture image
 // #nosec G107
 func (s *DuplicateFinder) Index(ctx context.Context, id int64, url string) error {
-	logrus.Infof("Indexing picture %v", id)
+	logging.Infof("Indexing picture %v", id)
 
 	fetchCtx, cancel := context.WithTimeout(ctx, fetchImageTimeout)
 	defer cancel()
@@ -163,7 +163,7 @@ func (s *DuplicateFinder) Index(ctx context.Context, id int64, url string) error
 	}
 	defer util.Close(resp.Body)
 
-	logrus.Infof("Calculate hash for %v", url)
+	logging.Infof("Calculate hash for %v", url)
 
 	hash, err := getFileHash(resp.Body)
 	if err != nil {

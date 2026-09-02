@@ -4,11 +4,11 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/util"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 )
 
 const wsAccessTokenParam = "access_token"
@@ -62,7 +62,7 @@ func (s *MessagingWS) serveWS(ctx *gin.Context) {
 
 	conn, err := s.upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		logrus.Error(err.Error())
+		logging.Error(err.Error())
 
 		return
 	}

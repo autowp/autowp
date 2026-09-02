@@ -6,11 +6,11 @@ import (
 	"net"
 	"time"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/jackc/pgtype"
-	"github.com/sirupsen/logrus"
 )
 
 // Monitoring Main Object.
@@ -87,7 +87,7 @@ func (s *Monitoring) Listen(
 		select {
 		case msg := <-msgs:
 			if msg.ContentType != "application/json" {
-				logrus.Errorf("unexpected mime `%s`", msg.ContentType)
+				logging.Errorf("unexpected mime `%s`", msg.ContentType)
 
 				continue
 			}
@@ -96,14 +96,14 @@ func (s *Monitoring) Listen(
 
 			err = json.Unmarshal(msg.Body, &message)
 			if err != nil {
-				logrus.Errorf("failed to parse json `%v`: %s", err, msg.Body)
+				logging.Errorf("failed to parse json `%v`: %s", err, msg.Body)
 
 				continue
 			}
 
 			err = s.Add(ctx, message.IP, message.Timestamp)
 			if err != nil {
-				logrus.Error(err.Error())
+				logging.Error(err.Error())
 			}
 
 		case <-quitChan:
@@ -111,7 +111,7 @@ func (s *Monitoring) Listen(
 		}
 	}
 
-	logrus.Info("Disconnecting RabbitMQ")
+	logging.Info("Disconnecting RabbitMQ")
 
 	return conn.Close()
 }
@@ -174,7 +174,7 @@ func (s *Monitoring) Clear(ctx context.Context) error {
 
 // ClearIP removes all data collected for IP.
 func (s *Monitoring) ClearIP(ctx context.Context, ip net.IP) error {
-	logrus.Info(ip.String() + ": clear monitoring")
+	logging.Info(ip.String() + ": clear monitoring")
 	_, err := s.db.Delete(schema.IPMonitoringTable).
 		Where(schema.IPMonitoringTableIPCol.Eq(ip.String())).
 		Executor().ExecContext(ctx)

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/ban"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -92,14 +92,14 @@ func NewRepository(
 ) (*Repository, error) {
 	monitoring, err := NewMonitoring(pool)
 	if err != nil {
-		logrus.Error(err)
+		logging.Error(err)
 
 		return nil, err
 	}
 
 	whitelist, err := NewWhitelist(pool)
 	if err != nil {
-		logrus.Error(err)
+		logging.Error(err)
 
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (s *Repository) AutoBanByProfile(ctx context.Context, profile AutobanProfil
 			continue
 		}
 
-		logrus.Infof("%s %v", profile.Reason, ip)
+		logging.Infof("%s %v", profile.Reason, ip)
 
 		if err := s.Ban.Add(ctx, ip, profile.Time, banByUserID, profile.Reason); err != nil {
 			return err
@@ -154,7 +154,7 @@ func (s *Repository) AutoWhitelist(ctx context.Context) error {
 	}
 
 	for _, item := range items {
-		logrus.Infof("Check IP %v", item.IP.String())
+		logging.Infof("Check IP %v", item.IP.String())
 
 		if err = s.AutoWhitelistIP(ctx, item.IP); err != nil {
 			return err
@@ -179,7 +179,7 @@ func (s *Repository) AutoWhitelistIP(ctx context.Context, ip net.IP) error {
 	}
 
 	if inWhitelist {
-		logrus.Info(ipText + ": already in whitelist, skip")
+		logging.Info(ipText + ": already in whitelist, skip")
 	} else {
 		if err = s.Whitelist.Add(ctx, ip, desc); err != nil {
 			return err
@@ -194,7 +194,7 @@ func (s *Repository) AutoWhitelistIP(ctx context.Context, ip net.IP) error {
 		return err
 	}
 
-	logrus.Info(ipText + ": whitelisted")
+	logging.Info(ipText + ": whitelisted")
 
 	return nil
 }

@@ -13,11 +13,11 @@ import (
 	"unicode/utf8"
 
 	"cloud.google.com/go/civil"
+	"github.com/autowp/goautowp/logging"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exec"
 	"github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/constraints"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -51,7 +51,7 @@ func DateToGrpcDate(value civil.Date) *date.Date {
 // Close resource and prints error.
 func Close(c io.Closer) {
 	if err := c.Close(); err != nil {
-		logrus.Error(err)
+		logging.Error(err)
 	}
 }
 
@@ -81,7 +81,7 @@ func ConnectRabbitMQ(config string) (*amqp.Connection, error) {
 		reconnectDelay    = 100 * time.Millisecond
 	)
 
-	logrus.Info("Waiting for rabbitMQ")
+	logging.Info("Waiting for rabbitMQ")
 
 	var (
 		rabbitMQ *amqp.Connection
@@ -92,7 +92,7 @@ func ConnectRabbitMQ(config string) (*amqp.Connection, error) {
 	for {
 		rabbitMQ, err = amqp.Dial(config)
 		if err == nil {
-			logrus.Info("Started.")
+			logging.Info("Started.")
 
 			break
 		}
@@ -101,7 +101,7 @@ func ConnectRabbitMQ(config string) (*amqp.Connection, error) {
 			return nil, err
 		}
 
-		logrus.Info(".")
+		logging.Info(".")
 		time.Sleep(reconnectDelay)
 	}
 
@@ -294,7 +294,7 @@ func ScanValContextAndRetryOnDeadlock(
 				return res, err
 			}
 
-			logrus.Warn("Deadlock detected. Retrying")
+			logging.Warn("Deadlock detected. Retrying")
 			time.Sleep(time.Millisecond)
 
 			retriesLeft--
@@ -321,7 +321,7 @@ func ExecAndRetryOnDeadlock(ctx context.Context, executor exec.QueryExecutor) (s
 				return res, err
 			}
 
-			logrus.Warn("Deadlock detected. Retrying")
+			logging.Warn("Deadlock detected. Retrying")
 			time.Sleep(time.Millisecond)
 
 			retriesLeft--

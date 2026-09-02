@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/util"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/test/bufconn"
@@ -29,7 +29,9 @@ func TestMain(m *testing.M) {
 
 	cnt = NewContainer(cfg)
 
-	logrus.SetLevel(logrus.DebugLevel)
+	if err := logging.SetLevel("debug"); err != nil {
+		panic(err)
+	}
 
 	grpcServer, err := cnt.GRPCServerWithServices(context.TODO())
 	if err != nil {
@@ -44,7 +46,7 @@ func TestMain(m *testing.M) {
 
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
-			logrus.Errorf("Server exited with error: %v", err)
+			logging.Errorf("Server exited with error: %v", err)
 		}
 	}()
 
@@ -54,7 +56,7 @@ func TestMain(m *testing.M) {
 
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
-			logrus.Errorf("Server exited with error: %v", err)
+			logging.Errorf("Server exited with error: %v", err)
 		}
 	}()
 

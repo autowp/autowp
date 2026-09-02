@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/redis/go-redis/v9"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -50,7 +50,7 @@ func NewCache(redis *redis.Client, repository *items.Repository) *Cache {
 }
 
 func (s *Cache) GenerateBrandsCache(ctx context.Context, lang string) error {
-	logrus.Infof("generate brands cache for `%s`", lang)
+	logging.Infof("generate brands cache for `%s`", lang)
 
 	resultArray, err := s.repository.Brands(ctx, lang)
 	if err != nil {
@@ -79,7 +79,7 @@ func (s *Cache) BrandsCache(ctx context.Context, lang string) ([]*items.BrandsLi
 }
 
 func (s *Cache) GenerateTopBrandsCache(ctx context.Context, lang string) error {
-	logrus.Infof("generate index brands cache for `%s`", lang)
+	logging.Infof("generate index brands cache for `%s`", lang)
 
 	var cache TopBrandsCache
 
@@ -129,7 +129,7 @@ func (s *Cache) TopBrandsCache(ctx context.Context, lang string) (TopBrandsCache
 }
 
 func (s *Cache) GenerateTwinsCache(ctx context.Context, lang string) error {
-	logrus.Infof("generate index twins cache for `%s`", lang)
+	logging.Infof("generate index twins cache for `%s`", lang)
 
 	var (
 		err       error
@@ -192,7 +192,7 @@ func (s *Cache) TwinsCache(ctx context.Context, lang string) (TwinsCache, error)
 }
 
 func (s *Cache) GenerateCategoriesCache(ctx context.Context, lang string) error {
-	logrus.Infof("generate index categories cache for `%s`", lang)
+	logging.Infof("generate index categories cache for `%s`", lang)
 
 	var (
 		err error
@@ -237,7 +237,7 @@ func (s *Cache) CategoriesCache(ctx context.Context, lang string) ([]items.Item,
 func (s *Cache) GeneratePersonsCache(
 	ctx context.Context, pictureItemType schema.PictureItemType, lang string,
 ) error {
-	logrus.Infof("generate index persons cache for `%s`", lang)
+	logging.Infof("generate index persons cache for `%s`", lang)
 
 	var res []*items.Item
 
@@ -284,7 +284,7 @@ func (s *Cache) PersonsCache(
 }
 
 func (s *Cache) GenerateFactoriesCache(ctx context.Context, lang string) error {
-	logrus.Infof("generate index factories cache for `%s`", lang)
+	logging.Infof("generate index factories cache for `%s`", lang)
 
 	var (
 		res []*items.Item

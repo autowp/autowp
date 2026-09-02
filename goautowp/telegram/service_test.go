@@ -15,6 +15,7 @@ import (
 	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/schema"
@@ -25,14 +26,15 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // enable postgres migrations
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
 func TestInboxCommand(t *testing.T) {
 	t.Parallel()
 
-	logrus.SetLevel(logrus.DebugLevel)
+	if err := logging.SetLevel("debug"); err != nil {
+		t.Fatal(err)
+	}
 
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)

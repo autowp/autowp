@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -75,7 +75,7 @@ func (s *Repository) Add(
 	}
 
 	if affected == 1 {
-		logrus.Infof("%v was banned. Reason: %s", ip.String(), reason)
+		logging.Infof("%v was banned. Reason: %s", ip.String(), reason)
 	}
 
 	return nil
@@ -83,7 +83,7 @@ func (s *Repository) Add(
 
 // Remove IP from list of banned.
 func (s *Repository) Remove(ctx context.Context, ip net.IP) error {
-	logrus.Info(ip.String() + ": unban")
+	logging.Info(ip.String() + ": unban")
 	_, err := s.db.Delete(schema.IPBanTable).
 		Where(schema.IPBanTableIPCol.Eq(ip.String())).
 		Executor().

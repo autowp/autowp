@@ -3,7 +3,7 @@ package goautowp
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log/slog"
 	"net"
 
 	"github.com/autowp/goautowp/comments"
@@ -12,8 +12,7 @@ import (
 	"github.com/autowp/goautowp/feedback"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/validation"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/sirupsen/logrus"
+	grpclogging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -165,31 +164,27 @@ func (s *GRPCServer) GetTimezones(context.Context, *emptypb.Empty) (*Timezones, 
 	return &Timezones{Timezones: TimeZones()}, nil
 }
 
-func InterceptorLogger(fieldLogger logrus.FieldLogger) logging.Logger {
-	return logging.LoggerFunc(
-		func(_ context.Context, lvl logging.Level, msg string, fields ...any) {
-			fieldsMap := make(map[string]any, len(fields)/2)
-			i := logging.Fields(fields).Iterator()
-
-			for i.Next() {
-				k, v := i.At()
-				fieldsMap[k] = v
-			}
-
-			entry := fieldLogger.WithFields(fieldsMap)
+func InterceptorLogger(logger *slog.Logger) grpclogging.Logger {
+	return grpclogging.LoggerFunc(
+		func(ctx context.Context, lvl grpclogging.Level, msg string, fields ...any) {
+			var level slog.Level
 
 			switch lvl {
-			case logging.LevelDebug:
-				entry.Debug(msg)
-			case logging.LevelInfo:
-				entry.Info(msg)
-			case logging.LevelWarn:
-				entry.Warn(msg)
-			case logging.LevelError:
-				entry.Error(msg)
+			case grpclogging.LevelDebug:
+				level = slog.LevelDebug
+			case grpclogging.LevelInfo:
+				level = slog.LevelInfo
+			case grpclogging.LevelWarn:
+				level = slog.LevelWarn
+			case grpclogging.LevelError:
+				level = slog.LevelError
 			default:
-				panic(fmt.Sprintf("unknown level %v", lvl))
+				level = slog.LevelInfo
 			}
+
+			// grpc-middleware hands fields as alternating key/value pairs, which is exactly what
+			// slog.Log accepts as its trailing args.
+			logger.Log(ctx, level, msg, fields...)
 		},
 	)
 }

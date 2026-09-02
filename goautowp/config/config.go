@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/autowp/goautowp/logging"
 	"github.com/spf13/viper"
 )
 
@@ -211,18 +211,18 @@ func LoadConfig(path string) Config {
 // ValidateConfig ValidateConfig.
 func ValidateConfig(config Config) {
 	if config.DuplicateFinder.RabbitMQ == "" {
-		logrus.Error("Address not provided")
+		logging.Error("Address not provided")
 	}
 
 	if config.DuplicateFinder.Queue == "" {
-		logrus.Error("DuplicateFinderQueue not provided")
+		logging.Error("DuplicateFinderQueue not provided")
 	}
 
 	if config.RabbitMQ == "" {
-		logrus.Error("Address not provided")
+		logging.Error("Address not provided")
 	}
 
 	if config.MonitoringQueue == "" {
-		logrus.Error("MonitoringQueue not provided")
+		logging.Error("MonitoringQueue not provided")
 	}
 }

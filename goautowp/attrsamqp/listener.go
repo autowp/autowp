@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 
 	"github.com/autowp/goautowp/attrs"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/util"
-	"github.com/sirupsen/logrus"
 )
 
 type UpdateValuesMessage struct {
@@ -72,7 +72,7 @@ func (s *AttrsAMQP) ListenUpdateValues(
 		select {
 		case msg := <-msgs:
 			if msg.ContentType != "application/json" {
-				logrus.Errorf("unexpected mime `%s`", msg.ContentType)
+				logging.Errorf("unexpected mime `%s`", msg.ContentType)
 
 				continue
 			}
@@ -81,28 +81,28 @@ func (s *AttrsAMQP) ListenUpdateValues(
 
 			err = json.Unmarshal(msg.Body, &message)
 			if err != nil {
-				logrus.Errorf("failed to parse json `%v`: %s", err, msg.Body)
+				logging.Errorf("failed to parse json `%v`: %s", err, msg.Body)
 
 				continue
 			}
 
 			switch message.Type {
 			case "actual":
-				logrus.Infof("UpdateActualValues(%d)", message.ItemID)
+				logging.Infof("UpdateActualValues(%d)", message.ItemID)
 
 				err = s.repository.UpdateActualValues(ctx, message.ItemID)
 				if err != nil {
-					logrus.Error(err.Error())
+					logging.Error(err.Error())
 				}
 			case "inherited":
-				logrus.Infof("UpdateInheritedValues(%d)", message.ItemID)
+				logging.Infof("UpdateInheritedValues(%d)", message.ItemID)
 
 				err = s.repository.UpdateInheritedValues(ctx, message.ItemID)
 				if err != nil {
-					logrus.Error(err.Error())
+					logging.Error(err.Error())
 				}
 			default:
-				logrus.Warnf("unknown UpdateValuesMessage.Type = `%s`", message.Type)
+				logging.Warnf("unknown UpdateValuesMessage.Type = `%s`", message.Type)
 			}
 
 		case <-quitChan:
@@ -110,7 +110,7 @@ func (s *AttrsAMQP) ListenUpdateValues(
 		}
 	}
 
-	logrus.Info("Disconnecting RabbitMQ")
+	logging.Info("Disconnecting RabbitMQ")
 
 	return conn.Close()
 }
