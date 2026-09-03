@@ -183,6 +183,59 @@
       <p>
         <app-license-badge [license]="picture.license" [sourceUrl]="picture.sourceUrl" />
       </p>
+      @if (isOwner()) {
+        @if (!picture.license) {
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <span class="text-muted" i18n>Missing licence? Add one:</span>
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="fillLicense">
+              @for (option of licenseOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              title="What do these mean?"
+              i18n-title
+              (click)="showLicenseHelp()"
+            >
+              <i class="bi bi-question-circle" aria-hidden="true"></i>
+            </button>
+            <input
+              type="url"
+              class="form-control form-control-sm w-auto"
+              placeholder="Source URL"
+              i18n-placeholder
+              maxlength="500"
+              [(ngModel)]="fillSourceUrl"
+            />
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              i18n
+              [disabled]="licenseNeedsSource(fillLicense(), fillSourceUrl())"
+              (click)="saveFillLicense(picture)"
+            >
+              Save
+            </button>
+          </div>
+        } @else if (!picture.sourceUrl) {
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="text-muted" i18n>Missing source? Add one:</span>
+            <input
+              type="url"
+              class="form-control form-control-sm w-auto"
+              placeholder="Source URL"
+              i18n-placeholder
+              maxlength="500"
+              [(ngModel)]="fillSourceUrl"
+            />
+            <button type="button" class="btn btn-sm btn-outline-primary" i18n (click)="saveFillSourceUrl(picture)">
+              Save
+            </button>
+          </div>
+        }
+      }
       @if (picture.copyrights) {
         <div>
           <remark [markdown]="picture.copyrights" />

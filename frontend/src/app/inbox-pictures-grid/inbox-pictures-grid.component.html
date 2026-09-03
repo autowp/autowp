@@ -41,6 +41,15 @@
         <option [ngValue]="option.value">{{ option.label }}</option>
       }
     </select>
+    <button
+      type="button"
+      class="btn btn-outline-secondary btn-sm"
+      title="What do these mean?"
+      i18n-title
+      (click)="showLicenseHelp()"
+    >
+      <i class="bi bi-question-circle" aria-hidden="true"></i>
+    </button>
     <input
       type="url"
       class="form-control form-control-sm w-auto"
@@ -49,9 +58,18 @@
       maxlength="500"
       [(ngModel)]="batchSourceUrl"
     />
-    <button type="button" class="btn btn-sm btn-outline-primary" i18n (click)="applyLicenseToAll()">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      i18n
+      [disabled]="licenseNeedsSource(batchLicense(), batchSourceUrl())"
+      (click)="applyLicenseToAll()"
+    >
       Apply to all
     </button>
+    @if (licenseNeedsSource(batchLicense(), batchSourceUrl())) {
+      <span class="text-danger small" i18n>A source URL is required for this licence.</span>
+    }
   </div>
 }
 <div class="row">
@@ -146,6 +164,15 @@
                 <option [ngValue]="option.value">{{ option.label }}</option>
               }
             </select>
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              title="What do these mean?"
+              i18n-title
+              (click)="showLicenseHelp()"
+            >
+              <i class="bi bi-question-circle" aria-hidden="true"></i>
+            </button>
             <input
               type="url"
               class="form-control form-control-sm w-auto"
@@ -158,10 +185,14 @@
               type="button"
               class="btn btn-sm btn-outline-primary"
               i18n
+              [disabled]="licenseNeedsSource(picture.picture.license, picture.picture.sourceUrl)"
               (click)="chooseLicense(picture, picture.picture.license, picture.picture.sourceUrl)"
             >
               save
             </button>
+            @if (licenseNeedsSource(picture.picture.license, picture.picture.sourceUrl)) {
+              <span class="text-danger small" i18n>A source URL is required for this licence.</span>
+            }
           </div>
         }
       </div>

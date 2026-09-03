@@ -1119,15 +1119,18 @@ func (s *PicturesGRPCServer) UpdatePicture(
 		}
 	}
 
-	if util.Contains(maskPaths, "license") {
-		err = s.setPictureLicense(ctx, pictureID, values.GetLicense(), userCtx)
+	// source_url before license: a claimed CC/PD license requires a source URL (see
+	// pictureLicenseRequiresSourceURL), and setPictureLicense checks the picture's current
+	// (post-update) source URL - so a source_url set in the same request must land first.
+	if util.Contains(maskPaths, "source_url") {
+		err = s.setPictureSourceURL(ctx, pictureID, values.GetSourceUrl(), userCtx)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if util.Contains(maskPaths, "source_url") {
-		err = s.setPictureSourceURL(ctx, pictureID, values.GetSourceUrl(), userCtx)
+	if util.Contains(maskPaths, "license") {
+		err = s.setPictureLicense(ctx, pictureID, values.GetLicense(), userCtx)
 		if err != nil {
 			return nil, err
 		}
@@ -2115,8 +2118,13 @@ func (s *PicturesGRPCServer) setPicturePoint(
 // RolePicturesModer, or is the picture's owner while it's still in their inbox. Used by edits an
 // uploader is allowed to make before moderation (crop, licence, source URL), but a moderator may
 // always make.
+//
+// When allowAcceptedIfEmpty is true, an owner is also let through on an already-accepted picture
+// (in addition to inbox) - callers that pass true are expected to separately check that the
+// specific field being set is still empty, since this only gates ownership/status, not per-field
+// state (see setPictureLicense/setPictureSourceURL).
 func (s *PicturesGRPCServer) requirePictureOwnerOrModer(
-	ctx context.Context, pictureID int64, userCtx UserContext,
+	ctx context.Context, pictureID int64, userCtx UserContext, allowAcceptedIfEmpty bool,
 ) (*schema.PictureRow, error) {
 	pic, err := s.repository.Picture(
 		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
@@ -2130,8 +2138,11 @@ func (s *PicturesGRPCServer) requirePictureOwnerOrModer(
 	}
 
 	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
-			pic.Status != schema.PictureStatusInbox {
+		isOwner := pic.OwnerID.Valid && pic.OwnerID.Int64 == userCtx.UserID
+		statusOK := pic.Status == schema.PictureStatusInbox ||
+			(allowAcceptedIfEmpty && pic.Status == schema.PictureStatusAccepted)
+
+		if !isOwner || !statusOK {
 			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 		}
 	}
@@ -2142,7 +2153,7 @@ func (s *PicturesGRPCServer) requirePictureOwnerOrModer(
 func (s *PicturesGRPCServer) setPictureCrop(
 	ctx context.Context, pictureID int64, crop *PictureCrop, userCtx UserContext,
 ) error {
-	_, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx)
+	_, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx, false)
 	if err != nil {
 		return err
 	}
@@ -2171,12 +2182,34 @@ func (s *PicturesGRPCServer) setPictureCrop(
 	return nil
 }
 
+// pictureLicenseRequiresSourceURL reports whether a licence is a public/open claim (CC family,
+// public domain) rather than the default "unset" or "all rights reserved" - such a claim needs a
+// source URL a moderator or reuser can check, unlike "all rights reserved" which grants no reuse
+// rights to verify in the first place.
+func pictureLicenseRequiresSourceURL(license PictureLicense) bool {
+	return license != PictureLicense_PICTURE_LICENSE_UNKNOWN &&
+		license != PictureLicense_PICTURE_LICENSE_ALL_RIGHTS_RESERVED
+}
+
 func (s *PicturesGRPCServer) setPictureLicense(
 	ctx context.Context, pictureID int64, license PictureLicense, userCtx UserContext,
 ) error {
-	pic, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx)
+	pic, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx, true)
 	if err != nil {
 		return err
+	}
+
+	isModer := util.Contains(userCtx.Roles, users.RolePicturesModer)
+
+	if !isModer && pic.Status == schema.PictureStatusAccepted && pic.LicenseID != schema.PictureLicenseUnknown {
+		return status.Errorf(codes.PermissionDenied, "licence is already set")
+	}
+
+	if pictureLicenseRequiresSourceURL(license) && pic.SourceURL.String == "" {
+		return status.Errorf(
+			codes.InvalidArgument,
+			"source_url is required for a %s licence claim", license.String(),
+		)
 	}
 
 	newLicense := convertPictureLicense(license)
@@ -2204,9 +2237,14 @@ func (s *PicturesGRPCServer) setPictureLicense(
 func (s *PicturesGRPCServer) setPictureSourceURL(
 	ctx context.Context, pictureID int64, sourceURL string, userCtx UserContext,
 ) error {
-	pic, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx)
+	pic, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx, true)
 	if err != nil {
 		return err
+	}
+
+	if !util.Contains(userCtx.Roles, users.RolePicturesModer) &&
+		pic.Status == schema.PictureStatusAccepted && pic.SourceURL.String != "" {
+		return status.Errorf(codes.PermissionDenied, "source_url is already set")
 	}
 
 	sourceURL, problems, err := validatePictureSourceURL(sourceURL)

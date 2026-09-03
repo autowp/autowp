@@ -135,6 +135,12 @@ func (s *PicturePostForm) Validate() (map[string]map[string]string, error) {
 		result[pictureSourceURLField] = map[string]string{invalidFieldKey: fv}
 	}
 
+	if pictureLicenseRequiresSourceURL(PictureLicense(s.LicenseID)) && sourceURL == "" {
+		result[pictureSourceURLField] = map[string]string{
+			invalidFieldKey: "source_url is required for this licence",
+		}
+	}
+
 	return result, nil
 }
 

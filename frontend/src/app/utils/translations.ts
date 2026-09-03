@@ -907,6 +907,29 @@ export function getPictureLicenseTranslation(id: string): string {
   return pictureLicenses[id] ?? id;
 }
 
+const pictureLicenseDescriptions: Record<string, string> = {
+  '1': $localize`You (or whoever gave you the photo) own the copyright and are not granting anyone else the right to reuse it. Use this by default, and for photos from a manufacturer's press kit or media site — a permission to publish is not a public licence.`,
+  '2': $localize`You are the copyright holder and give up all rights: anyone may use the photo for any purpose, without asking or crediting you.`,
+  '3': $localize`You are the copyright holder and allow anyone to use the photo for any purpose, including commercially, as long as they credit you.`,
+  '4': $localize`Like "CC BY", but anyone who modifies or builds on the photo must share their version under the same licence.`,
+  '5': $localize`You allow reuse with credit, but only for non-commercial purposes.`,
+  '6': $localize`Non-commercial reuse with credit; modified versions must be shared under the same licence.`,
+  '7': $localize`Reuse with credit is allowed, but the photo itself may not be modified.`,
+  '8': $localize`The most restrictive Creative Commons licence: non-commercial reuse with credit, no modifications.`,
+  '9': $localize`The photo's copyright has expired or never applied (e.g. an old archival photo) — this is a fact about the photo's age or origin, not a choice made by the uploader.`,
+};
+
+export function getPictureLicenseDescriptionTranslation(id: string): string {
+  return pictureLicenseDescriptions[id] ?? '';
+}
+
+// Licence ids 0 (unset) and 1 (all rights reserved) grant no reuse rights to verify; every other
+// (CC family, public domain) is a public claim that needs a source URL a moderator or reuser can
+// check. Mirrors pictureLicenseRequiresSourceURL in goautowp/pictures-grpc.go.
+export function pictureLicenseRequiresSourceUrl(id: string): boolean {
+  return id !== '0' && id !== '1';
+}
+
 export function getPerspectiveTranslation(id: string): string {
   return prespectives[id] ?? id;
 }

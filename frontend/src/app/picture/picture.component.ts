@@ -16,6 +16,7 @@ import {
   signal,
 } from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {FormsModule} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {
   CommentsSubscribeRequest,
@@ -36,6 +37,7 @@ import {
   PictureItemListOptions,
   PictureItemsRequest,
   PictureItemType,
+  PictureLicense,
   PictureStatus,
   PicturesViewRequest,
   PicturesVoteRequest,
@@ -43,15 +45,24 @@ import {
   UpdatePictureRequest,
 } from '@grpc/spec.pb';
 import {CommentsClient, ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
-import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdown,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+  NgbModal,
+  NgbProgressbar,
+  NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
-import {LicenseBadgeComponent} from '@utils/license-badge/license-badge.component';
+import {LicenseBadgeComponent, pictureLicenseOptions} from '@utils/license-badge/license-badge.component';
+import {LicenseHelpModalComponent} from '@utils/license-help-modal/license-help-modal.component';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
+import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, finalize, map, of} from 'rxjs';
@@ -86,6 +97,7 @@ import {PicturePaginatorComponent} from './paginator.component';
     ReportButtonComponent,
     RemarkModule,
     LicenseBadgeComponent,
+    FormsModule,
   ],
   templateUrl: './picture.component.html',
   styleUrl: './picture.component.scss',
@@ -102,6 +114,7 @@ export class PictureComponent implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #cdr = inject(ChangeDetectorRef);
   readonly #injector = inject(Injector);
+  readonly #modalService = inject(NgbModal);
   readonly #window = browserWindow();
 
   readonly prefix = input.required<string[]>();
@@ -177,6 +190,21 @@ export class PictureComponent implements OnInit {
   protected readonly showShareDialog = signal(false);
   protected readonly location = this.#window?.location;
   protected readonly statusLoading = signal(false);
+
+  protected readonly currentUser = toSignal(this.#auth.user$, {initialValue: null});
+  protected readonly isOwner = computed(() => {
+    const uid = this.currentUser()?.id;
+    const p = this.picture();
+
+    return !!uid && uid !== '0' && uid === p.ownerId && p.status === PictureStatus.PICTURE_STATUS_ACCEPTED;
+  });
+
+  protected readonly licenseOptions: {label: string; value: PictureLicense}[] = pictureLicenseOptions.map((value) => ({
+    label: getPictureLicenseTranslation(value.toString()),
+    value,
+  }));
+  protected readonly fillLicense = signal<PictureLicense>(PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED);
+  protected readonly fillSourceUrl = signal('');
 
   constructor() {
     effect(() => {
@@ -493,6 +521,64 @@ export class PictureComponent implements OnInit {
 
   protected restorePicture(picture: Picture) {
     this.setPictureStatus(picture, PictureStatus.PICTURE_STATUS_INBOX);
+  }
+
+  protected licenseNeedsSource(license: PictureLicense, sourceUrl: string): boolean {
+    return pictureLicenseRequiresSourceUrl(license.toString()) && sourceUrl.trim() === '';
+  }
+
+  protected showLicenseHelp(): void {
+    this.#modalService.open(LicenseHelpModalComponent, {centered: true, size: 'lg'});
+  }
+
+  protected saveFillLicense(picture: Picture): void {
+    const license = this.fillLicense();
+    const sourceUrl = this.fillSourceUrl();
+
+    if (this.licenseNeedsSource(license, sourceUrl)) {
+      return;
+    }
+
+    this.#picturesClient
+      .updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({id: picture.id, license, sourceUrl}),
+          updateMask: new FieldMask({paths: ['license', 'source_url']}),
+        }),
+      )
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+      )
+      .subscribe(() => {
+        picture.license = license;
+        picture.sourceUrl = sourceUrl;
+        this.#cdr.markForCheck();
+      });
+  }
+
+  protected saveFillSourceUrl(picture: Picture): void {
+    const sourceUrl = this.fillSourceUrl();
+
+    this.#picturesClient
+      .updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({id: picture.id, sourceUrl}),
+          updateMask: new FieldMask({paths: ['source_url']}),
+        }),
+      )
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+      )
+      .subscribe(() => {
+        picture.sourceUrl = sourceUrl;
+        this.#cdr.markForCheck();
+      });
   }
 
   protected factoriesResource!: ResourceRef<Item[] | undefined>;

@@ -1,0 +1,15 @@
+<div class="modal-header">
+  <h3 class="modal-title" i18n>Picture licences</h3>
+  <button class="btn-close" type="button" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  @for (license of licenses; track license.value) {
+    <div class="mb-3">
+      <app-license-badge [license]="license.value" />
+      <p class="mb-0 text-body-secondary">{{ license.description }}</p>
+    </div>
+  }
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" i18n (click)="activeModal.close()">Close</button>
+</div>

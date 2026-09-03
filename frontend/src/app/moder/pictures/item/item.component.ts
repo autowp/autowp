@@ -1,4 +1,4 @@
-import type {DfDistance, IP, Item, User} from '@grpc/spec.pb';
+import type {DfDistance, IP, Item, PictureLicense, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
@@ -28,7 +28,6 @@ import {
   PictureItemFields,
   PictureItemsRequest,
   PictureItemType,
-  PictureLicense,
   PictureListOptions,
   PictureModerVoteRequest,
   PicturesRequest,
@@ -38,7 +37,14 @@ import {
   UpdatePictureRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, TrafficClient} from '@grpc/spec.pbsc';
-import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbProgressbar, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdown,
+  NgbDropdownMenu,
+  NgbDropdownToggle,
+  NgbModal,
+  NgbProgressbar,
+  NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';
@@ -47,8 +53,10 @@ import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
+import {pictureLicenseOptions} from '@utils/license-badge/license-badge.component';
+import {LicenseHelpModalComponent} from '@utils/license-help-modal/license-help-modal.component';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
-import {getPictureLicenseTranslation} from '@utils/translations';
+import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {MarkdownEditComponent} from 'app/markdown-edit/markdown-edit/markdown-edit.component';
 import {PictureModerVoteComponent} from 'app/picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
@@ -114,6 +122,7 @@ export class ModerPicturesItemComponent {
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
   readonly #trafficClient = inject(TrafficClient);
+  readonly #modalService = inject(NgbModal);
   readonly #window = browserWindow();
 
   protected readonly replaceLoading = signal(false);
@@ -266,17 +275,10 @@ export class ModerPicturesItemComponent {
   protected banPeriod = 1;
   protected banReason: null | string = null;
 
-  protected readonly licenseOptions: {label: string; value: PictureLicense}[] = [
-    PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED,
-    PictureLicense.PICTURE_LICENSE_CC0,
-    PictureLicense.PICTURE_LICENSE_CC_BY,
-    PictureLicense.PICTURE_LICENSE_CC_BY_SA,
-    PictureLicense.PICTURE_LICENSE_CC_BY_NC,
-    PictureLicense.PICTURE_LICENSE_CC_BY_NC_SA,
-    PictureLicense.PICTURE_LICENSE_CC_BY_ND,
-    PictureLicense.PICTURE_LICENSE_CC_BY_NC_ND,
-    PictureLicense.PICTURE_LICENSE_PUBLIC_DOMAIN,
-  ].map((value) => ({label: getPictureLicenseTranslation(value.toString()), value}));
+  protected readonly licenseOptions: {label: string; value: PictureLicense}[] = pictureLicenseOptions.map((value) => ({
+    label: getPictureLicenseTranslation(value.toString()),
+    value,
+  }));
 
   protected readonly monthOptions: {
     name: string;
@@ -463,7 +465,19 @@ export class ModerPicturesItemComponent {
       });
   }
 
+  protected licenseNeedsSource(license: PictureLicense, sourceUrl: string): boolean {
+    return pictureLicenseRequiresSourceUrl(license.toString()) && sourceUrl.trim() === '';
+  }
+
+  protected showLicenseHelp(): void {
+    this.#modalService.open(LicenseHelpModalComponent, {centered: true, size: 'lg'});
+  }
+
   protected saveLicense(picture: Picture) {
+    if (this.licenseNeedsSource(picture.license, picture.sourceUrl)) {
+      return;
+    }
+
     this.licenseLoading.set(true);
 
     this.#picturesClient

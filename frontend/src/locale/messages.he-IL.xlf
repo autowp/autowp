@@ -16363,6 +16363,146 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
       <target state="translated">CC BY-NC-SA</target>
       </trans-unit>
+      <trans-unit id="3438502504787200542" datatype="html">
+        <source>A source URL is required for this licence.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">62,67</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">176,182</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">416,419</context>
+        </context-group>
+      <target state="translated">עבור רישיון זה נדרשת כתובת מקור.</target>
+      </trans-unit>
+      <trans-unit id="6089763455615998826" datatype="html">
+        <source>What do these mean?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">47,51</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">170,173</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">399,402</context>
+        </context-group>
+      <target state="translated">מה זה אומר?</target>
+      </trans-unit>
+      <trans-unit id="1618173538017304402" datatype="html">
+        <source>Picture licences</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/license-help-modal/license-help-modal.component.html</context>
+          <context context-type="linenumber">2,3</context>
+        </context-group>
+      <target state="translated">רישיונות תמונה</target>
+      </trans-unit>
+      <trans-unit id="3902795889827872152" datatype="html">
+        <source>You (or whoever gave you the photo) own the copyright and are not granting anyone else the right to reuse it. Use this by default, and for photos from a manufacturer&apos;s press kit or media site — a permission to publish is not a public licence.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">911</context>
+        </context-group>
+      <target state="translated">אתה (או מי שנתן לך את התמונה) הוא בעל זכויות היוצרים ואינך מעניק לאף אחד אחר את הזכות לעשות בה שימוש חוזר. השתמש באפשרות זו כברירת מחדל, וכן עבור תמונות מערכת עיתונות או אתר מדיה של יצרן — היתר לפרסום אינו רישיון פומבי.</target>
+      </trans-unit>
+      <trans-unit id="7518959687310089819" datatype="html">
+        <source>You are the copyright holder and give up all rights: anyone may use the photo for any purpose, without asking or crediting you.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">912</context>
+        </context-group>
+      <target state="translated">אתה בעל זכויות היוצרים ומוותר על כל הזכויות: כל אחד יכול להשתמש בתמונה לכל מטרה, ללא צורך לבקש רשות או לתת קרדיט.</target>
+      </trans-unit>
+      <trans-unit id="4880204016702976622" datatype="html">
+        <source>You are the copyright holder and allow anyone to use the photo for any purpose, including commercially, as long as they credit you.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">913</context>
+        </context-group>
+      <target state="translated">אתה בעל זכויות היוצרים ומאפשר לכל אחד להשתמש בתמונה לכל מטרה, כולל מסחרית, כל עוד ניתן לך קרדיט.</target>
+      </trans-unit>
+      <trans-unit id="833497886409609475" datatype="html">
+        <source>Like &quot;CC BY&quot;, but anyone who modifies or builds on the photo must share their version under the same licence.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">914</context>
+        </context-group>
+      <target state="translated">כמו „CC BY”, אך כל מי שמשנה את התמונה או יוצר ממנה יצירה נגזרת חייב לשתף את הגרסה שלו תחת אותו רישיון.</target>
+      </trans-unit>
+      <trans-unit id="2724679015403994796" datatype="html">
+        <source>You allow reuse with credit, but only for non-commercial purposes.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">915</context>
+        </context-group>
+      <target state="translated">אתה מתיר שימוש חוזר עם קרדיט, אך רק למטרות שאינן מסחריות.</target>
+      </trans-unit>
+      <trans-unit id="5064437870772591096" datatype="html">
+        <source>Non-commercial reuse with credit; modified versions must be shared under the same licence.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">916</context>
+        </context-group>
+      <target state="translated">שימוש חוזר שאינו מסחרי עם קרדיט; גרסאות ששונו חייבות להיות משותפות תחת אותו רישיון.</target>
+      </trans-unit>
+      <trans-unit id="1893128979286323704" datatype="html">
+        <source>Reuse with credit is allowed, but the photo itself may not be modified.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">917</context>
+        </context-group>
+      <target state="translated">שימוש חוזר עם קרדיט מותר, אך אסור לשנות את התמונה עצמה.</target>
+      </trans-unit>
+      <trans-unit id="4449247766150638340" datatype="html">
+        <source>The most restrictive Creative Commons licence: non-commercial reuse with credit, no modifications.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">918</context>
+        </context-group>
+      <target state="translated">הרישיון המגביל ביותר מבין רישיונות Creative Commons: שימוש חוזר שאינו מסחרי עם קרדיט, ללא שינויים.</target>
+      </trans-unit>
+      <trans-unit id="5498353295147007087" datatype="html">
+        <source>The photo&apos;s copyright has expired or never applied (e.g. an old archival photo) — this is a fact about the photo&apos;s age or origin, not a choice made by the uploader.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">919</context>
+        </context-group>
+      <target state="translated">זכויות היוצרים על התמונה פגו או שמעולם לא חלו (למשל תמונת ארכיון ישנה) — זוהי עובדה לגבי גילה או מקורה של התמונה, לא בחירה של מי שהעלה אותה.</target>
+      </trans-unit>
+      <trans-unit id="2890612551607426747" datatype="html">
+        <source>Missing licence? Add one:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">198,199</context>
+        </context-group>
+      <target state="translated">חסר רישיון? הוסף אחד:</target>
+      </trans-unit>
+      <trans-unit id="5815506912090715099" datatype="html">
+        <source>Missing source? Add one:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">233,236</context>
+        </context-group>
+      <target state="translated">חסר מקור? הוסף אחד:</target>
+      </trans-unit>
+      <trans-unit id="3620188369327429839" datatype="html">
+        <source> Save </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">228,231</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">243,248</context>
+        </context-group>
+      <target state="translated"> שמור </target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

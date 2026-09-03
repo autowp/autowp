@@ -387,11 +387,22 @@
         <div class="card card-body mb-4">
           <div class="mb-3">
             <label i18n for="picture_license">Licence</label>
-            <select id="picture_license" class="form-select" name="license" [(ngModel)]="picture.license">
-              @for (option of licenseOptions; track option.value) {
-                <option [ngValue]="option.value">{{ option.label }}</option>
-              }
-            </select>
+            <div class="d-flex align-items-center gap-2">
+              <select id="picture_license" class="form-select" name="license" [(ngModel)]="picture.license">
+                @for (option of licenseOptions; track option.value) {
+                  <option [ngValue]="option.value">{{ option.label }}</option>
+                }
+              </select>
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm"
+                title="What do these mean?"
+                i18n-title
+                (click)="showLicenseHelp()"
+              >
+                <i class="bi bi-question-circle" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
           <div class="mb-3">
             <label i18n for="picture_source_url">Source</label>
@@ -404,7 +415,17 @@
               [(ngModel)]="picture.sourceUrl"
             />
           </div>
-          <button type="button" class="btn btn-primary" i18n (click)="saveLicense(picture)">Submit</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="licenseNeedsSource(picture.license, picture.sourceUrl)"
+            (click)="saveLicense(picture)"
+          >
+            <ng-container i18n>Submit</ng-container>
+          </button>
+          @if (licenseNeedsSource(picture.license, picture.sourceUrl)) {
+            <p class="text-danger small mb-0" i18n>A source URL is required for this licence.</p>
+          }
           @if (licenseLoading()) {
             <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
           }

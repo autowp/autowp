@@ -21,10 +21,11 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
-import {LicenseBadgeComponent} from '@utils/license-badge/license-badge.component';
+import {LicenseBadgeComponent, pictureLicenseOptions} from '@utils/license-badge/license-badge.component';
+import {LicenseHelpModalComponent} from '@utils/license-help-modal/license-help-modal.component';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {PersonSearchComponent} from '@utils/person-search/person-search.component';
-import {getPictureLicenseTranslation} from '@utils/translations';
+import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {catchError, EMPTY, merge, switchMap, tap, toArray} from 'rxjs';
@@ -86,17 +87,10 @@ export class InboxPicturesGridComponent implements DoCheck {
 
   protected readonly PictureItemType = PictureItemType;
 
-  protected readonly licenseOptions: {label: string; value: PictureLicense}[] = [
-    PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED,
-    PictureLicense.PICTURE_LICENSE_CC0,
-    PictureLicense.PICTURE_LICENSE_CC_BY,
-    PictureLicense.PICTURE_LICENSE_CC_BY_SA,
-    PictureLicense.PICTURE_LICENSE_CC_BY_NC,
-    PictureLicense.PICTURE_LICENSE_CC_BY_NC_SA,
-    PictureLicense.PICTURE_LICENSE_CC_BY_ND,
-    PictureLicense.PICTURE_LICENSE_CC_BY_NC_ND,
-    PictureLicense.PICTURE_LICENSE_PUBLIC_DOMAIN,
-  ].map((value) => ({label: getPictureLicenseTranslation(value.toString()), value}));
+  protected readonly licenseOptions: {label: string; value: PictureLicense}[] = pictureLicenseOptions.map((value) => ({
+    label: getPictureLicenseTranslation(value.toString()),
+    value,
+  }));
 
   protected readonly batchAuthor = signal<null | PersonSearchSelection>(null);
   protected readonly cascade = signal<CascadeState | null>(null);
@@ -301,6 +295,14 @@ export class InboxPicturesGridComponent implements DoCheck {
     this.editingAuthor.update((current) => (current === pictureId ? null : pictureId));
   }
 
+  protected licenseNeedsSource(license: PictureLicense, sourceUrl: string): boolean {
+    return pictureLicenseRequiresSourceUrl(license.toString()) && sourceUrl.trim() === '';
+  }
+
+  protected showLicenseHelp(): void {
+    this.#modalService.open(LicenseHelpModalComponent, {centered: true, size: 'lg'});
+  }
+
   #updateLicense$(pictureId: string, license: PictureLicense, sourceUrl: string): Observable<unknown> {
     return this.#picturesClient
       .updatePicture(
@@ -318,6 +320,10 @@ export class InboxPicturesGridComponent implements DoCheck {
   }
 
   protected chooseLicense(upload: InboxPicture, license: PictureLicense, sourceUrl: string): void {
+    if (this.licenseNeedsSource(license, sourceUrl)) {
+      return;
+    }
+
     this.editingLicense.set(null);
 
     this.#updateLicense$(upload.picture.id, license, sourceUrl).subscribe(() => {
@@ -330,6 +336,10 @@ export class InboxPicturesGridComponent implements DoCheck {
   protected applyLicenseToAll(): void {
     const license = this.batchLicense();
     const sourceUrl = this.batchSourceUrl();
+
+    if (this.licenseNeedsSource(license, sourceUrl)) {
+      return;
+    }
 
     for (const upload of this.pictures()) {
       this.#updateLicense$(upload.picture.id, license, sourceUrl).subscribe(() => {
