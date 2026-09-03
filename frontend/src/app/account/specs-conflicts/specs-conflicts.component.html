@@ -68,17 +68,17 @@
         <tr>
           <td>
             @if (conflict.item$ | async; as item) {
-              {{ item.nameHtml }}
+              <span [innerHTML]="item.nameHtml"></span>
             }
           </td>
           <td>
             @if (conflict.attribute$ | async; as attribute) {
-              {{ attribute.name }}
+              {{ getAttrsTranslation(attribute.name) }}
             }
           </td>
           <td>
             @for (value of conflict.values; track value) {
-              @if (!value.user$) {
+              @if (value.own) {
                 <div>
                   @if (value.value.valueIsEmpty) {
                     <em i18n>none</em>
@@ -99,12 +99,12 @@
           </td>
           <td>
             @for (value of conflict.values; track value) {
-              @if (value.user$) {
+              @if (!value.own) {
                 <div>
                   @if (value.value.valueIsEmpty) {
                     <em i18n>none</em>
                   } @else {
-                    <span>
+                    <span class="me-2">
                       {{ value.value.value }}
                       @if (conflict.unitName$ | async; as unitName) {
                         <span>{{ unitName }}</span>

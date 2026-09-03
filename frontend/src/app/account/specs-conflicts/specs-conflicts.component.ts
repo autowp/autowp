@@ -12,8 +12,8 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
-import {getUnitAbbrTranslation} from '@utils/translations';
-import {combineLatest, distinctUntilChanged, map, of, shareReplay, switchMap} from 'rxjs';
+import {getAttrsTranslation, getUnitAbbrTranslation} from '@utils/translations';
+import {combineLatest, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
@@ -28,7 +28,8 @@ interface APIAttrConflictInList {
 }
 
 interface APIAttrConflictValueInList {
-  user$: Observable<null | User>;
+  own: boolean;
+  user$: null | Observable<null | User>;
   value: AttrConflictValue;
 }
 
@@ -113,10 +114,14 @@ export class AccountSpecsConflictsComponent implements OnInit {
             unitName$: attribute$.pipe(
               map((attr) => (attr?.unitId && attr.unitId !== '0' ? getUnitAbbrTranslation(attr.unitId) : null)),
             ),
-            values: (conflict.values ?? []).map((value) => ({
-              user$: user?.id === value.userId ? of(null) : this.#userService.getUser$(value.userId),
-              value,
-            })),
+            values: (conflict.values ?? []).map((value) => {
+              const own = user?.id === value.userId;
+              return {
+                own,
+                user$: own ? null : this.#userService.getUser$(value.userId),
+                value,
+              };
+            }),
           };
         }),
         paginator: data.paginator,
@@ -124,6 +129,10 @@ export class AccountSpecsConflictsComponent implements OnInit {
     );
 
   protected readonly AttrConflictsRequest = AttrConflictsRequest;
+
+  protected getAttrsTranslation(id: string): string {
+    return getAttrsTranslation(id);
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ACCOUNT_SPECS_CONFLICTS});
