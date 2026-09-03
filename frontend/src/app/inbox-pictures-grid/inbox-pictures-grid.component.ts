@@ -4,6 +4,7 @@ import type {PersonSearchSelection} from '@utils/person-search/person-search.com
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, signal} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {
   CreatePictureItemRequest,
   DeletePictureItemRequest,
@@ -11,6 +12,7 @@ import {
   PictureCrop,
   PictureFields,
   PictureItemType,
+  PictureLicense,
   PictureListOptions,
   PicturesRequest,
   UpdatePictureRequest,
@@ -19,8 +21,10 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
+import {LicenseBadgeComponent} from '@utils/license-badge/license-badge.component';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {PersonSearchComponent} from '@utils/person-search/person-search.component';
+import {getPictureLicenseTranslation} from '@utils/translations';
 import {ThumbnailComponent} from 'app/thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {catchError, EMPTY, merge, switchMap, tap, toArray} from 'rxjs';
@@ -67,7 +71,7 @@ const cascadeStickyThreshold = 20;
 
 @Component({
   selector: 'app-inbox-pictures-grid',
-  imports: [ThumbnailComponent, PersonSearchComponent],
+  imports: [ThumbnailComponent, PersonSearchComponent, LicenseBadgeComponent, FormsModule],
   templateUrl: './inbox-pictures-grid.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -82,10 +86,26 @@ export class InboxPicturesGridComponent implements DoCheck {
 
   protected readonly PictureItemType = PictureItemType;
 
+  protected readonly licenseOptions: {label: string; value: PictureLicense}[] = [
+    PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED,
+    PictureLicense.PICTURE_LICENSE_CC0,
+    PictureLicense.PICTURE_LICENSE_CC_BY,
+    PictureLicense.PICTURE_LICENSE_CC_BY_SA,
+    PictureLicense.PICTURE_LICENSE_CC_BY_NC,
+    PictureLicense.PICTURE_LICENSE_CC_BY_NC_SA,
+    PictureLicense.PICTURE_LICENSE_CC_BY_ND,
+    PictureLicense.PICTURE_LICENSE_CC_BY_NC_ND,
+    PictureLicense.PICTURE_LICENSE_PUBLIC_DOMAIN,
+  ].map((value) => ({label: getPictureLicenseTranslation(value.toString()), value}));
+
   protected readonly batchAuthor = signal<null | PersonSearchSelection>(null);
   protected readonly cascade = signal<CascadeState | null>(null);
   protected readonly cascadeSticky = signal(false);
   protected readonly editingAuthor = signal<null | string>(null);
+
+  protected readonly batchLicense = signal<PictureLicense>(PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED);
+  protected readonly batchSourceUrl = signal('');
+  protected readonly editingLicense = signal<null | string>(null);
 
   // suggestionKey → chosen person: once a suggestion is accepted on one photo, every later photo
   // with the identical candidate set gets the same author without asking again.
@@ -279,6 +299,49 @@ export class InboxPicturesGridComponent implements DoCheck {
 
   protected toggleEditAuthor(pictureId: string): void {
     this.editingAuthor.update((current) => (current === pictureId ? null : pictureId));
+  }
+
+  #updateLicense$(pictureId: string, license: PictureLicense, sourceUrl: string): Observable<unknown> {
+    return this.#picturesClient
+      .updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({id: pictureId, license, sourceUrl}),
+          updateMask: new FieldMask({paths: ['license', 'source_url']}),
+        }),
+      )
+      .pipe(
+        catchError((response: unknown) => {
+          this.#toastService.handleError(response);
+          return EMPTY;
+        }),
+      );
+  }
+
+  protected chooseLicense(upload: InboxPicture, license: PictureLicense, sourceUrl: string): void {
+    this.editingLicense.set(null);
+
+    this.#updateLicense$(upload.picture.id, license, sourceUrl).subscribe(() => {
+      upload.picture.license = license;
+      upload.picture.sourceUrl = sourceUrl;
+      this.#cdr.markForCheck();
+    });
+  }
+
+  protected applyLicenseToAll(): void {
+    const license = this.batchLicense();
+    const sourceUrl = this.batchSourceUrl();
+
+    for (const upload of this.pictures()) {
+      this.#updateLicense$(upload.picture.id, license, sourceUrl).subscribe(() => {
+        upload.picture.license = license;
+        upload.picture.sourceUrl = sourceUrl;
+        this.#cdr.markForCheck();
+      });
+    }
+  }
+
+  protected toggleEditLicense(pictureId: string): void {
+    this.editingLicense.update((current) => (current === pictureId ? null : pictureId));
   }
 
   protected crop(upload: InboxPicture): void {

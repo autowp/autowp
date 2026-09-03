@@ -42,6 +42,8 @@ const (
 
 	galleryItemsPerPage = 10
 
+	pictureSourceURLMaxLength = 500
+
 	acceptReplaceMessageModeratorURL          = "ModeratorURL"
 	messagePictureURL                         = "PictureURL"
 	acceptReplaceMessageReplacementPictureURL = "ReplacementPictureURL"
@@ -1117,6 +1119,20 @@ func (s *PicturesGRPCServer) UpdatePicture(
 		}
 	}
 
+	if util.Contains(maskPaths, "license") {
+		err = s.setPictureLicense(ctx, pictureID, values.GetLicense(), userCtx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if util.Contains(maskPaths, "source_url") {
+		err = s.setPictureSourceURL(ctx, pictureID, values.GetSourceUrl(), userCtx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pictureID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -2095,28 +2111,43 @@ func (s *PicturesGRPCServer) setPicturePoint(
 	return nil
 }
 
-func (s *PicturesGRPCServer) setPictureCrop(
-	ctx context.Context, pictureID int64, crop *PictureCrop, userCtx UserContext,
-) error {
-	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
-		pic, err := s.repository.Picture(
-			ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
-		)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return status.Errorf(codes.NotFound, "not found")
-			}
-
-			return status.Error(codes.Internal, err.Error())
+// requirePictureOwnerOrModer fetches the picture and allows the call through when the caller has
+// RolePicturesModer, or is the picture's owner while it's still in their inbox. Used by edits an
+// uploader is allowed to make before moderation (crop, licence, source URL), but a moderator may
+// always make.
+func (s *PicturesGRPCServer) requirePictureOwnerOrModer(
+	ctx context.Context, pictureID int64, userCtx UserContext,
+) (*schema.PictureRow, error) {
+	pic, err := s.repository.Picture(
+		ctx, &query.PictureListOptions{ID: pictureID}, nil, pictures.OrderByNone,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.NotFound, "not found")
 		}
 
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if !util.Contains(userCtx.Roles, users.RolePicturesModer) {
 		if !pic.OwnerID.Valid || pic.OwnerID.Int64 != userCtx.UserID ||
 			pic.Status != schema.PictureStatusInbox {
-			return status.Errorf(codes.PermissionDenied, "permission denied")
+			return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 		}
 	}
 
-	err := s.repository.SetPictureCrop(
+	return pic, nil
+}
+
+func (s *PicturesGRPCServer) setPictureCrop(
+	ctx context.Context, pictureID int64, crop *PictureCrop, userCtx UserContext,
+) error {
+	_, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx)
+	if err != nil {
+		return err
+	}
+
+	err = s.repository.SetPictureCrop(
 		ctx, pictureID, sampler.Crop{
 			Left:   int(crop.GetLeft()),
 			Top:    int(crop.GetTop()),
@@ -2138,6 +2169,101 @@ func (s *PicturesGRPCServer) setPictureCrop(
 	}
 
 	return nil
+}
+
+func (s *PicturesGRPCServer) setPictureLicense(
+	ctx context.Context, pictureID int64, license PictureLicense, userCtx UserContext,
+) error {
+	pic, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx)
+	if err != nil {
+		return err
+	}
+
+	newLicense := convertPictureLicense(license)
+
+	err = s.repository.SetPictureLicense(ctx, pictureID, newLicense)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID: userCtx.UserID,
+		Message: fmt.Sprintf(
+			"Изменение лицензии изображения: %s → %s",
+			extractPictureLicense(pic.LicenseID).String(), license.String(),
+		),
+		Pictures: []int64{pictureID},
+	})
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
+}
+
+func (s *PicturesGRPCServer) setPictureSourceURL(
+	ctx context.Context, pictureID int64, sourceURL string, userCtx UserContext,
+) error {
+	pic, err := s.requirePictureOwnerOrModer(ctx, pictureID, userCtx)
+	if err != nil {
+		return err
+	}
+
+	sourceURL, problems, err := validatePictureSourceURL(sourceURL)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	if len(problems) > 0 {
+		return status.Errorf(codes.InvalidArgument, "%s", strings.Join(problems, ", "))
+	}
+
+	err = s.repository.SetPictureSourceURL(ctx, pictureID, sourceURL)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID: userCtx.UserID,
+		Message: fmt.Sprintf(
+			"Изменение источника изображения: %q → %q",
+			pic.SourceURL.String, sourceURL,
+		),
+		Pictures: []int64{pictureID},
+	})
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
+}
+
+// validatePictureSourceURL trims and validates an optional absolute http(s) source URL. An empty
+// string is valid and clears the field. The returned problems (if any) are human-readable and
+// caller-formatted (gRPC status vs. REST field-violation map).
+func validatePictureSourceURL(raw string) (string, []string, error) {
+	urlInputFilter := validation.InputFilter{
+		Filters: []validation.FilterInterface{&validation.StringTrimFilter{}},
+		Validators: []validation.ValidatorInterface{
+			&validation.StringLength{Max: pictureSourceURLMaxLength},
+		},
+	}
+
+	trimmed, problems, err := urlInputFilter.IsValidString(raw)
+	if err != nil {
+		return "", nil, err
+	}
+
+	if trimmed != "" {
+		urlProblems, err := (&validation.URL{}).IsValidString(trimmed)
+		if err != nil {
+			return "", nil, err
+		}
+
+		problems = append(problems, urlProblems...)
+	}
+
+	return trimmed, problems, nil
 }
 
 func (s *PicturesGRPCServer) setPictureItemArea(

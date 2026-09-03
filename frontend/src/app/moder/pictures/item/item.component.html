@@ -383,6 +383,32 @@
             <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
           }
         </div>
+        <h3 i18n>Licence</h3>
+        <div class="card card-body mb-4">
+          <div class="mb-3">
+            <label i18n for="picture_license">Licence</label>
+            <select id="picture_license" class="form-select" name="license" [(ngModel)]="picture.license">
+              @for (option of licenseOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="mb-3">
+            <label i18n for="picture_source_url">Source</label>
+            <input
+              type="url"
+              class="form-control"
+              id="picture_source_url"
+              name="sourceUrl"
+              maxlength="500"
+              [(ngModel)]="picture.sourceUrl"
+            />
+          </div>
+          <button type="button" class="btn btn-primary" i18n (click)="saveLicense(picture)">Submit</button>
+          @if (licenseLoading()) {
+            <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+          }
+        </div>
         @if (picture.exif) {
           <h3>EXIF</h3>
           <div class="card card-body small mb-4" style="overflow: auto" [innerHTML]="picture.exif"></div>

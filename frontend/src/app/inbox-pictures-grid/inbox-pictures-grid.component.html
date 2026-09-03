@@ -34,6 +34,25 @@
       Apply to all
     </button>
   </div>
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+    <span class="text-muted" i18n>Set licence on every photo:</span>
+    <select class="form-select form-select-sm w-auto" [(ngModel)]="batchLicense">
+      @for (option of licenseOptions; track option.value) {
+        <option [ngValue]="option.value">{{ option.label }}</option>
+      }
+    </select>
+    <input
+      type="url"
+      class="form-control form-control-sm w-auto"
+      placeholder="Source URL"
+      i18n-placeholder
+      maxlength="500"
+      [(ngModel)]="batchSourceUrl"
+    />
+    <button type="button" class="btn btn-sm btn-outline-primary" i18n (click)="applyLicenseToAll()">
+      Apply to all
+    </button>
+  </div>
 }
 <div class="row">
   @for (picture of pictures(); track picture.picture.id) {
@@ -106,6 +125,44 @@
             [pictureItemType]="PictureItemType.PICTURE_ITEM_AUTHOR"
             (selected)="chooseAuthor(picture, $event)"
           />
+        }
+      </div>
+      <div class="small mt-1">
+        <div class="d-flex flex-wrap align-items-baseline gap-1">
+          <app-license-badge [license]="picture.picture.license" [sourceUrl]="picture.picture.sourceUrl" />
+          <button
+            type="button"
+            class="btn btn-link btn-sm p-0 align-baseline"
+            i18n
+            (click)="toggleEditLicense(picture.picture.id)"
+          >
+            change
+          </button>
+        </div>
+        @if (editingLicense() === picture.picture.id) {
+          <div class="d-flex flex-wrap align-items-center gap-1 mt-1">
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="picture.picture.license">
+              @for (option of licenseOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+            <input
+              type="url"
+              class="form-control form-control-sm w-auto"
+              placeholder="Source URL"
+              i18n-placeholder
+              maxlength="500"
+              [(ngModel)]="picture.picture.sourceUrl"
+            />
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              i18n
+              (click)="chooseLicense(picture, picture.picture.license, picture.picture.sourceUrl)"
+            >
+              save
+            </button>
+          </div>
         }
       </div>
     </div>

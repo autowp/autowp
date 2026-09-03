@@ -890,6 +890,23 @@ export function getMostsRatingsTranslation(id: string): string {
   return mostsRatings[id] ?? id;
 }
 
+const pictureLicenses: Record<string, string> = {
+  '0': $localize`All rights reserved`,
+  '1': $localize`All rights reserved`,
+  '2': $localize`CC0 (public domain dedication)`,
+  '3': $localize`CC BY`,
+  '4': $localize`CC BY-SA`,
+  '5': $localize`CC BY-NC`,
+  '6': $localize`CC BY-NC-SA`,
+  '7': $localize`CC BY-ND`,
+  '8': $localize`CC BY-NC-ND`,
+  '9': $localize`Public domain`,
+};
+
+export function getPictureLicenseTranslation(id: string): string {
+  return pictureLicenses[id] ?? id;
+}
+
 export function getPerspectiveTranslation(id: string): string {
   return prespectives[id] ?? id;
 }

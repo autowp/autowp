@@ -1010,6 +1010,21 @@ message Feedback {
   string captcha = 4;
 }
 
+enum PictureLicense {
+  PICTURE_LICENSE_UNKNOWN = 0;
+  PICTURE_LICENSE_ALL_RIGHTS_RESERVED = 1;
+  PICTURE_LICENSE_CC0 = 2;
+  PICTURE_LICENSE_CC_BY = 3;
+  PICTURE_LICENSE_CC_BY_SA = 4;
+  PICTURE_LICENSE_CC_BY_NC = 5;
+  PICTURE_LICENSE_CC_BY_NC_SA = 6;
+  PICTURE_LICENSE_CC_BY_ND = 7;
+  PICTURE_LICENSE_CC_BY_NC_ND = 8;
+  // Copyright expired or never applied (e.g. archival/old car photos) - legally distinct from
+  // CC0, which is the author actively waiving their rights.
+  PICTURE_LICENSE_PUBLIC_DOMAIN = 9;
+}
+
 enum ContentReportEntityType {
   CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED = 0;
   CONTENT_REPORT_ENTITY_TYPE_PICTURE = 1;
@@ -2130,6 +2145,8 @@ message Picture {
   PicturesPages paginator = 45;
   PictureCrop crop = 48;
   repeated PictureAuthorSuggestion author_suggestions = 49;
+  PictureLicense license = 50;
+  string source_url = 51;
 }
 
 message PictureAuthorSuggestion {

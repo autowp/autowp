@@ -16620,6 +16620,134 @@ Transmission is not considered</source>
         <source>Perspective:</source>
       <target state="translated">アングル:</target>
       </trans-unit>
+      <trans-unit id="9065795501872450602" datatype="html">
+        <source>Licence</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">386,388</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">389,390</context>
+        </context-group>
+      <target state="translated">ライセンス</target>
+      </trans-unit>
+      <trans-unit id="2149105376848169272" datatype="html">
+        <source>Public domain</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">903</context>
+        </context-group>
+      <target state="translated">パブリックドメイン</target>
+      </trans-unit>
+      <trans-unit id="2349605973473776251" datatype="html">
+        <source>CC0 (public domain dedication)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">896</context>
+        </context-group>
+      <target state="translated">CC0（パブリックドメイン提供）</target>
+      </trans-unit>
+      <trans-unit id="8313247265793612506" datatype="html">
+        <source>CC BY</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">897</context>
+        </context-group>
+      <target state="translated">CC BY</target>
+      </trans-unit>
+      <trans-unit id="7404330126089455897" datatype="html">
+        <source> save </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">163,167</context>
+        </context-group>
+      <target state="translated"> 保存 </target>
+      </trans-unit>
+      <trans-unit id="1966873143244283483" datatype="html">
+        <source>CC BY-ND</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">901</context>
+        </context-group>
+      <target state="translated">CC BY-ND</target>
+      </trans-unit>
+      <trans-unit id="520620307843550782" datatype="html">
+        <source>CC BY-NC</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">899</context>
+        </context-group>
+      <target state="translated">CC BY-NC</target>
+      </trans-unit>
+      <trans-unit id="1797627227464086718" datatype="html">
+        <source>Set licence on every photo:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">38,39</context>
+        </context-group>
+      <target state="translated">すべての写真にライセンスを設定:</target>
+      </trans-unit>
+      <trans-unit id="4322997393782646924" datatype="html">
+        <source>CC BY-NC-ND</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">902</context>
+        </context-group>
+      <target state="translated">CC BY-NC-ND</target>
+      </trans-unit>
+      <trans-unit id="4294757251055762634" datatype="html">
+        <source>Source URL</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">47,50</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/inbox-pictures-grid/inbox-pictures-grid.component.html</context>
+          <context context-type="linenumber">152,155</context>
+        </context-group>
+      <target state="translated">ソースURL</target>
+      </trans-unit>
+      <trans-unit id="6380088636507660575" datatype="html">
+        <source>CC BY-SA</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">898</context>
+        </context-group>
+      <target state="translated">CC BY-SA</target>
+      </trans-unit>
+      <trans-unit id="9155608366859514313" datatype="html">
+        <source>Source</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
+          <context context-type="linenumber">397,400</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/license-badge/license-badge.component.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      <target state="translated">出典</target>
+      </trans-unit>
+      <trans-unit id="5033376682160766085" datatype="html">
+        <source>All rights reserved</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">894</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">895</context>
+        </context-group>
+      <target state="translated">全著作権所有</target>
+      </trans-unit>
+      <trans-unit id="223914151883129902" datatype="html">
+        <source>CC BY-NC-SA</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/utils/translations.ts</context>
+          <context context-type="linenumber">900</context>
+        </context-group>
+      <target state="translated">CC BY-NC-SA</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -37,6 +37,10 @@ const (
 	picturePerspectiveID         = "perspective_id"
 	pictureNameField             = "name"
 	pictureAuthorIDField         = "author_id"
+	pictureLicenseIDField        = "license_id"
+	pictureSourceURLField        = "source_url"
+
+	invalidFieldKey = "invalid"
 
 	responseStatus = "status"
 )
@@ -93,6 +97,8 @@ type PicturePostForm struct {
 	ReplacePictureID int64                 `form:"replace_picture_id" json:"replace_picture_id"`
 	PerspectiveID    int32                 `form:"perspective_id"     json:"perspective_id"`
 	AuthorID         int64                 `form:"author_id"          json:"author_id"`
+	LicenseID        int32                 `form:"license_id"         json:"license_id"`
+	SourceURL        string                `form:"source_url"         json:"source_url"`
 }
 
 func (s *PicturePostForm) Validate() (map[string]map[string]string, error) {
@@ -116,6 +122,17 @@ func (s *PicturePostForm) Validate() (map[string]map[string]string, error) {
 
 	for _, fv := range problems {
 		result["comment"]["commentInvalid"] = fv
+	}
+
+	sourceURL, urlProblems, err := validatePictureSourceURL(s.SourceURL)
+	if err != nil {
+		return nil, err
+	}
+
+	s.SourceURL = sourceURL
+
+	for _, fv := range urlProblems {
+		result[pictureSourceURLField] = map[string]string{invalidFieldKey: fv}
 	}
 
 	return result, nil
@@ -157,7 +174,7 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 	if err := ctx.ShouldBindWith(&values, binding.FormMultipart); err != nil {
 		ctx.JSON(http.StatusBadRequest, BadRequestResponse{
 			InvalidParams: map[string]map[string]string{"comment": {
-				"invalid": err.Error(),
+				invalidFieldKey: err.Error(),
 			}},
 		})
 
@@ -167,7 +184,7 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 	if values.ItemID == 0 && values.ReplacePictureID == 0 {
 		ctx.JSON(http.StatusBadRequest, BadRequestResponse{
 			InvalidParams: map[string]map[string]string{"item_id": {
-				"invalid": "item_id or replace_picture_id is required",
+				invalidFieldKey: "item_id or replace_picture_id is required",
 			}},
 		})
 
@@ -262,6 +279,8 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 
 	ctxWithoutCancel := context.WithoutCancel(ctx)
 
+	license := schema.PictureLicense(values.LicenseID) //nolint: gosec
+
 	pictureID, err := s.picturesRepository.AddPictureFromReader(
 		ctxWithoutCancel,
 		handle,
@@ -271,6 +290,8 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 		values.PerspectiveID,
 		values.ReplacePictureID,
 		values.AuthorID,
+		license,
+		values.SourceURL,
 	)
 	if err != nil {
 		if errors.Is(err, pictures.ErrInvalidImage) {

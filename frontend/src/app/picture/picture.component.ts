@@ -49,6 +49,7 @@ import {AuthService, Role} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
+import {LicenseBadgeComponent} from '@utils/license-badge/license-badge.component';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
@@ -84,6 +85,7 @@ import {PicturePaginatorComponent} from './paginator.component';
     PictureModerVoteComponent,
     ReportButtonComponent,
     RemarkModule,
+    LicenseBadgeComponent,
   ],
   templateUrl: './picture.component.html',
   styleUrl: './picture.component.scss',

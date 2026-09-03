@@ -48,6 +48,60 @@ func convertPictureItemType(pictureItemType PictureItemType) schema.PictureItemT
 	return 0
 }
 
+func extractPictureLicense(license schema.PictureLicense) PictureLicense {
+	switch license {
+	case schema.PictureLicenseUnknown:
+		return PictureLicense_PICTURE_LICENSE_UNKNOWN
+	case schema.PictureLicenseAllRightsReserved:
+		return PictureLicense_PICTURE_LICENSE_ALL_RIGHTS_RESERVED
+	case schema.PictureLicenseCC0:
+		return PictureLicense_PICTURE_LICENSE_CC0
+	case schema.PictureLicenseCCBY:
+		return PictureLicense_PICTURE_LICENSE_CC_BY
+	case schema.PictureLicenseCCBYSA:
+		return PictureLicense_PICTURE_LICENSE_CC_BY_SA
+	case schema.PictureLicenseCCBYNC:
+		return PictureLicense_PICTURE_LICENSE_CC_BY_NC
+	case schema.PictureLicenseCCBYNCSA:
+		return PictureLicense_PICTURE_LICENSE_CC_BY_NC_SA
+	case schema.PictureLicenseCCBYND:
+		return PictureLicense_PICTURE_LICENSE_CC_BY_ND
+	case schema.PictureLicenseCCBYNCND:
+		return PictureLicense_PICTURE_LICENSE_CC_BY_NC_ND
+	case schema.PictureLicensePublicDomain:
+		return PictureLicense_PICTURE_LICENSE_PUBLIC_DOMAIN
+	}
+
+	return PictureLicense_PICTURE_LICENSE_UNKNOWN
+}
+
+func convertPictureLicense(license PictureLicense) schema.PictureLicense {
+	switch license {
+	case PictureLicense_PICTURE_LICENSE_UNKNOWN:
+		return schema.PictureLicenseUnknown
+	case PictureLicense_PICTURE_LICENSE_ALL_RIGHTS_RESERVED:
+		return schema.PictureLicenseAllRightsReserved
+	case PictureLicense_PICTURE_LICENSE_CC0:
+		return schema.PictureLicenseCC0
+	case PictureLicense_PICTURE_LICENSE_CC_BY:
+		return schema.PictureLicenseCCBY
+	case PictureLicense_PICTURE_LICENSE_CC_BY_SA:
+		return schema.PictureLicenseCCBYSA
+	case PictureLicense_PICTURE_LICENSE_CC_BY_NC:
+		return schema.PictureLicenseCCBYNC
+	case PictureLicense_PICTURE_LICENSE_CC_BY_NC_SA:
+		return schema.PictureLicenseCCBYNCSA
+	case PictureLicense_PICTURE_LICENSE_CC_BY_ND:
+		return schema.PictureLicenseCCBYND
+	case PictureLicense_PICTURE_LICENSE_CC_BY_NC_ND:
+		return schema.PictureLicenseCCBYNCND
+	case PictureLicense_PICTURE_LICENSE_PUBLIC_DOMAIN:
+		return schema.PictureLicensePublicDomain
+	}
+
+	return schema.PictureLicenseUnknown
+}
+
 func convertPictureStatus(status PictureStatus) schema.PictureStatus {
 	switch status {
 	case PictureStatus_PICTURE_STATUS_UNKNOWN:

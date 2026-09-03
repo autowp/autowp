@@ -607,6 +607,8 @@ func (s *Repository) PictureSelect(
 		aliasTable.Col(schema.PictureTableIPColName),
 		aliasTable.Col(schema.PictureTableDPIXColName),
 		aliasTable.Col(schema.PictureTableDPIYColName),
+		aliasTable.Col(schema.PictureTableLicenseIDColName),
+		aliasTable.Col(schema.PictureTableSourceURLColName),
 	)
 
 	groupBy := !options.IsIDUnique()
@@ -1101,6 +1103,30 @@ func (s *Repository) SetPicturePoint(
 	affected, err := res.RowsAffected()
 
 	return affected > 0, err
+}
+
+func (s *Repository) SetPictureLicense(ctx context.Context, pictureID int64, license schema.PictureLicense) error {
+	_, err := util.ExecAndRetryOnDeadlock(ctx,
+		s.db.Update(schema.PictureTable).
+			Set(goqu.Record{schema.PictureTableLicenseIDColName: license}).
+			Where(schema.PictureTableIDCol.Eq(pictureID)).
+			Executor(),
+	)
+
+	return err
+}
+
+func (s *Repository) SetPictureSourceURL(ctx context.Context, pictureID int64, sourceURL string) error {
+	_, err := util.ExecAndRetryOnDeadlock(ctx,
+		s.db.Update(schema.PictureTable).
+			Set(goqu.Record{
+				schema.PictureTableSourceURLColName: sql.NullString{String: sourceURL, Valid: len(sourceURL) > 0},
+			}).
+			Where(schema.PictureTableIDCol.Eq(pictureID)).
+			Executor(),
+	)
+
+	return err
 }
 
 func (s *Repository) UpdatePicture(
@@ -2105,6 +2131,8 @@ func (s *Repository) AddPictureFromReader(
 	perspectiveID int32,
 	replacePictureID int64,
 	authorID int64,
+	license schema.PictureLicense,
+	sourceURL string,
 ) (int64, error) {
 	imageConfig, imageType, err := image.DecodeConfig(handle)
 	if err != nil {
@@ -2201,6 +2229,11 @@ func (s *Repository) AddPictureFromReader(
 		schema.PictureTableReplacePictureIDColName: sql.NullInt64{
 			Int64: replacePictureID,
 			Valid: replacePictureID > 0,
+		},
+		schema.PictureTableLicenseIDColName: license,
+		schema.PictureTableSourceURLColName: sql.NullString{
+			String: sourceURL,
+			Valid:  len(sourceURL) > 0,
 		},
 	}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 	if err != nil {

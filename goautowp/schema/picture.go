@@ -41,6 +41,8 @@ const (
 	PictureTableFilesizeColName           = "filesize"
 	PictureTableDPIXColName               = "dpi_x"
 	PictureTableDPIYColName               = "dpi_y"
+	PictureTableLicenseIDColName          = "license_id"
+	PictureTableSourceURLColName          = "source_url"
 
 	PicturesTableIdentityLength = 6
 )
@@ -63,6 +65,8 @@ var (
 	PictureTableRemovingDateCol       = PictureTable.Col(PictureTableRemovingDateColName)
 	PictureTableIPCol                 = PictureTable.Col(PictureTableIPColName)
 	PictureTableCreatedAtCol          = PictureTable.Col(PictureTableCreatedAtColName)
+	PictureTableLicenseIDCol          = PictureTable.Col(PictureTableLicenseIDColName)
+	PictureTableSourceURLCol          = PictureTable.Col(PictureTableSourceURLColName)
 )
 
 type PictureRow struct {
@@ -86,4 +90,6 @@ type PictureRow struct {
 	CreatedAt          time.Time      `db:"created_at"`
 	DPIX               sql.NullInt32  `db:"dpi_x"`
 	DPIY               sql.NullInt32  `db:"dpi_y"`
+	LicenseID          PictureLicense `db:"license_id"`
+	SourceURL          sql.NullString `db:"source_url"`
 }

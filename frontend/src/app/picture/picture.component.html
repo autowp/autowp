@@ -180,6 +180,9 @@
           }
         }
       }
+      <p>
+        <app-license-badge [license]="picture.license" [sourceUrl]="picture.sourceUrl" />
+      </p>
       @if (picture.copyrights) {
         <div>
           <remark [markdown]="picture.copyrights" />

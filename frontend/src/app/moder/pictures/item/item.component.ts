@@ -28,6 +28,7 @@ import {
   PictureItemFields,
   PictureItemsRequest,
   PictureItemType,
+  PictureLicense,
   PictureListOptions,
   PictureModerVoteRequest,
   PicturesRequest,
@@ -47,6 +48,7 @@ import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {getPictureLicenseTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {MarkdownEditComponent} from 'app/markdown-edit/markdown-edit/markdown-edit.component';
 import {PictureModerVoteComponent} from 'app/picture-moder-vote/picture-moder-vote/picture-moder-vote.component';
@@ -121,6 +123,7 @@ export class ModerPicturesItemComponent {
   protected readonly statusLoading = signal(false);
   protected readonly copyrightsLoading = signal(false);
   protected readonly specialNameLoading = signal(false);
+  protected readonly licenseLoading = signal(false);
 
   readonly #change$ = new BehaviorSubject<void>(void 0);
 
@@ -262,6 +265,18 @@ export class ModerPicturesItemComponent {
   ];
   protected banPeriod = 1;
   protected banReason: null | string = null;
+
+  protected readonly licenseOptions: {label: string; value: PictureLicense}[] = [
+    PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED,
+    PictureLicense.PICTURE_LICENSE_CC0,
+    PictureLicense.PICTURE_LICENSE_CC_BY,
+    PictureLicense.PICTURE_LICENSE_CC_BY_SA,
+    PictureLicense.PICTURE_LICENSE_CC_BY_NC,
+    PictureLicense.PICTURE_LICENSE_CC_BY_NC_SA,
+    PictureLicense.PICTURE_LICENSE_CC_BY_ND,
+    PictureLicense.PICTURE_LICENSE_CC_BY_NC_ND,
+    PictureLicense.PICTURE_LICENSE_PUBLIC_DOMAIN,
+  ].map((value) => ({label: getPictureLicenseTranslation(value.toString()), value}));
 
   protected readonly monthOptions: {
     name: string;
@@ -444,6 +459,30 @@ export class ModerPicturesItemComponent {
       .subscribe({
         next: () => {
           this.copyrightsLoading.set(false);
+        },
+      });
+  }
+
+  protected saveLicense(picture: Picture) {
+    this.licenseLoading.set(true);
+
+    this.#picturesClient
+      .updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({id: picture.id, license: picture.license, sourceUrl: picture.sourceUrl}),
+          updateMask: new FieldMask({paths: ['license', 'source_url']}),
+        }),
+      )
+      .pipe(
+        catchError((error: unknown) => {
+          this.licenseLoading.set(false);
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.licenseLoading.set(false);
         },
       });
   }
