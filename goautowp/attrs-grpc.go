@@ -420,6 +420,7 @@ func (s *AttrsGRPCServer) GetConflicts(
 	data, pages, err := s.repository.ValuesPaginated(ctx, query.AttrsValueListOptions{
 		Conflict: in.GetFilter() == AttrConflictsRequest_ALL,
 		UserValues: &query.AttrsUserValueListOptions{
+			UserID:         userCtx.UserID,
 			WeightLtZero:   in.GetFilter() == AttrConflictsRequest_MINUS_WEIGHT,
 			ConflictLtZero: in.GetFilter() == AttrConflictsRequest_I_DISAGREE,
 			ConflictGtZero: in.GetFilter() == AttrConflictsRequest_DO_NOT_AGREE_WITH_ME,
