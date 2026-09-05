@@ -275,7 +275,7 @@ export class ItemMetaFormComponent {
       value: '¾',
     },
   ];
-  readonly #nameMaxlength = 100; // DbTable\Item::MAX_NAME
+  readonly #nameMaxlength = 150; // schema.ItemNameMaxLength (goautowp)
   readonly #fullnameMaxlength = 255; // BrandModel::MAX_FULLNAME
   readonly #bodyMaxlength = 20;
   readonly #modelYearMax: number = new Date().getFullYear() + 10;
