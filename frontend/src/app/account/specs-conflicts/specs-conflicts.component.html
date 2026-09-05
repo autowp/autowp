@@ -83,7 +83,7 @@
                   @if (value.value.valueIsEmpty) {
                     <em i18n>none</em>
                   } @else {
-                    <span>
+                    <span class="me-2">
                       {{ value.value.value }}
                       @if (conflict.unitName$ | async; as unitName) {
                         <span>{{ unitName }}</span>
