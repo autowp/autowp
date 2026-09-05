@@ -60,6 +60,18 @@ docker exec -t goautowp_postgres_test sh -c "psql --username=traffic traffic < /
 gotestsum --junitfile report.xml --format testname -- -coverpkg=./... -coverprofile=cov.out -covermode count ./... -timeout=20m
 ```
 
+CI's actual test job runs the suite with `-race -covermode atomic` (catches lazy-init cache races
+in the DI container and repositories). Two recurring race-detector traps in this codebase's
+parallel subtests, not real bugs in the code under test: a function-scoped `*rand.Rand` read
+inside a `t.Run(..., func(t *testing.T){ t.Parallel(); ... })` closure (not concurrency-safe —
+draw the value on the parent goroutine before `t.Run`), and a closure that assigns into the
+enclosing func's `err` variable (`_, err = ...`, not `:=`) across parallel subtests (shadow it with
+`:=` on first use inside the closure). When `-race` fails N tests, find the actual `WARNING: DATA
+RACE` stack frames rather than treating every failure as a distinct bug — one race trips the
+detector for every test running concurrently with it; `gotestsum --format testname` hides that
+block, so add `--jsonfile x.json` and grep it, or run the failing tests directly with
+`go test -race -run 'TestFoo|TestBar' ./...`.
+
 Config is loaded via `config.LoadConfig(".")` (viper), layering `goautowp/defaults.yaml` with
 `goautowp/config.yaml` (local overrides, gitignored-style test config). See `goautowp/config/` for
 the typed config structs.
@@ -144,7 +156,23 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   (Angular's SSR recommendation); no component overrides it, and none should. When a template edit
   drops an inline gap that used to come from template whitespace, restore it with `&ngsp;` (a
   single significant space between bare text and an element) or, for repeated inline lists / icon
-  rows, a Bootstrap spacing utility — never by re-adding `preserveWhitespaces: true`.
+  rows, a Bootstrap spacing utility — never by re-adding `preserveWhitespaces: true`. Common
+  trigger: a `<ng-container i18n>Label:</ng-container>` immediately followed on the next line by an
+  element or an `@if`/`@else` block collapses to no gap, and two adjacent `@if`/`@else` blocks
+  render with no gap between them either — fix with `&ngsp;`.
+- **SSR-safe not-found / redirects** — a routed component that finds its URL has no content must
+  call `inject(NotFoundService).report()` (`src/app/services/not-found.ts`), never
+  `router.navigate(['/error-404'])` from an `effect()` or lifecycle hook: an imperative navigation
+  fired mid-render is not honoured by Angular SSR (`whenStable()` can serialize the router outlet
+  mid-transition, producing a blank page instead of the 404). `report()` flips a signal
+  `AppComponent` reads to render `<app-page-not-found>` in place of `<router-outlet>` and sets
+  `RESPONSE_INIT.status = 404` under SSR, working identically client/server. Likewise a
+  **data-dependent redirect** (e.g. canonical-URL normalisation) belongs in a `CanActivateFn`
+  returning `new RedirectCommand(router.createUrlTree(route), {replaceUrl: true})`, not an
+  imperative `router.navigate()` from an `effect()` — see `pictureCanonicalGuard`
+  (`src/app/picture/picture-canonical.guard.ts`). Config-level redirects
+  (`{path: '**', redirectTo: 'error-404'}`) and guard/resolver redirects work fine under SSR since
+  they resolve before the component tree is built.
 - **Spacing** — prefer Bootstrap utility classes (`me-1`/`me-2`, `ms-1`, `gap-1`, `d-flex
   flex-wrap gap-2`) in the template over a component `styles`/`styleUrl` rule with
   `margin-inline-end` & co.
