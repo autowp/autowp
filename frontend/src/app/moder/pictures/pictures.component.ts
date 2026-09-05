@@ -25,6 +25,7 @@ import {
   PictureItemListOptions,
   PictureItemsRequest,
   PictureItemType,
+  PictureLicense,
   PictureListOptions,
   PictureModerVoteListOptions,
   PicturesRequest,
@@ -62,6 +63,31 @@ import {chunkBy} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../../toasts/toasts.service';
+
+type LicenseFilter = 'all-rights-reserved' | 'cc' | 'pd' | null;
+
+const ccLicenses: PictureLicense[] = [
+  PictureLicense.PICTURE_LICENSE_CC0,
+  PictureLicense.PICTURE_LICENSE_CC_BY,
+  PictureLicense.PICTURE_LICENSE_CC_BY_SA,
+  PictureLicense.PICTURE_LICENSE_CC_BY_NC,
+  PictureLicense.PICTURE_LICENSE_CC_BY_NC_SA,
+  PictureLicense.PICTURE_LICENSE_CC_BY_ND,
+  PictureLicense.PICTURE_LICENSE_CC_BY_NC_ND,
+];
+
+function licenseFilterToLicenses(filter: LicenseFilter): PictureLicense[] | undefined {
+  switch (filter) {
+    case 'all-rights-reserved':
+      return [PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED];
+    case 'cc':
+      return ccLicenses;
+    case 'pd':
+      return [PictureLicense.PICTURE_LICENSE_PUBLIC_DOMAIN];
+    default:
+      return undefined;
+  }
+}
 
 interface PerspectiveInList {
   name: string;
@@ -227,6 +253,26 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     },
   ];
   protected readonly copyrights = signal<boolean | null>(null);
+
+  protected readonly licenseFilterOptions: {name: string; value: LicenseFilter}[] = [
+    {
+      name: $localize`not matters`,
+      value: null,
+    },
+    {
+      name: $localize`all rights reserved`,
+      value: 'all-rights-reserved',
+    },
+    {
+      name: $localize`CC`,
+      value: 'cc',
+    },
+    {
+      name: $localize`PD`,
+      value: 'pd',
+    },
+  ];
+  protected readonly licenseFilter = signal<LicenseFilter>(null);
 
   protected readonly requestsOptions = [
     {
@@ -452,6 +498,20 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
           this.copyrights.set(null);
           break;
       }
+      switch (params.get('license')) {
+        case 'all-rights-reserved':
+          this.licenseFilter.set('all-rights-reserved');
+          break;
+        case 'cc':
+          this.licenseFilter.set('cc');
+          break;
+        case 'pd':
+          this.licenseFilter.set('pd');
+          break;
+        default:
+          this.licenseFilter.set(null);
+          break;
+      }
       this.requests.set(params.get('requests') ? parseInt(params.get('requests') ?? '', 10) : null);
       this.specialName.set(!!params.get('special_name'));
       this.lost.set(!!params.get('lost'));
@@ -509,6 +569,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
           hasNoReplacePicture: this.replace() === false,
           hasPoint: this.gps() === true,
           hasSpecialName: this.specialName(),
+          licenses: licenseFilterToLicenses(this.licenseFilter()),
           ownerId: this.ownerID(),
           pictureItem:
             vehicleTypeID || this.excludeItemID() || this.itemID() || perspectiveIDVal

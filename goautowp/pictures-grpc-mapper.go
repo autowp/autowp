@@ -223,6 +223,16 @@ func convertPictureListOptions(in *PictureListOptions) (*query.PictureListOption
 		result.Statuses = statuses
 	}
 
+	inLicenses := in.GetLicenses()
+	if len(inLicenses) > 0 {
+		licenses := make([]schema.PictureLicense, 0, len(inLicenses))
+		for _, license := range inLicenses {
+			licenses = append(licenses, convertPictureLicense(license))
+		}
+
+		result.Licenses = licenses
+	}
+
 	createDate := in.GetCreateDate()
 	if createDate != nil {
 		result.CreatedAt = &civil.Date{

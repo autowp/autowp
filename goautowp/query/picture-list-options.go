@@ -58,6 +58,7 @@ type PictureListOptions struct {
 	HasNoPictureModerVote bool
 	DfDistance            *DfDistanceListOptions
 	HasSpecialName        bool
+	Licenses              []schema.PictureLicense
 }
 
 func (s *PictureListOptions) Clone() *PictureListOptions {
@@ -185,6 +186,10 @@ func (s *PictureListOptions) apply(
 
 	if len(s.Statuses) > 0 {
 		sqSelect = sqSelect.Where(aliasTable.Col(schema.PictureTableStatusColName).In(s.Statuses))
+	}
+
+	if len(s.Licenses) > 0 {
+		sqSelect = sqSelect.Where(aliasTable.Col(schema.PictureTableLicenseIDColName).In(s.Licenses))
 	}
 
 	if s.OwnerID != 0 {

@@ -19,7 +19,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/latlng"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -1269,6 +1271,90 @@ func TestGetPicturesHasCopyrightsFilter(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.Len(t, res.GetItems(), 1)
+	})
+}
+
+func TestGetPicturesLicensesFilter(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	kc := cnt.Keycloak()
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+	require.NotNil(t, token)
+
+	testerToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, testUsername, testPassword)
+	require.NoError(t, err)
+	require.NotNil(t, testerToken)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	itemID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	pdID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
+	unlicensedID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
+
+	client := NewPicturesClient(conn)
+
+	moderCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken)
+
+	_, err = client.UpdatePicture(
+		moderCtx,
+		&UpdatePictureRequest{
+			Picture: &Picture{
+				Id:        pdID,
+				SourceUrl: "https://example.com/source",
+				License:   PictureLicense_PICTURE_LICENSE_PUBLIC_DOMAIN,
+			},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"source_url", "license"}},
+		},
+	)
+	require.NoError(t, err)
+
+	t.Run("moder: matches the picture with the filtered licence", func(t *testing.T) {
+		t.Parallel()
+
+		res, err := client.GetPictures(moderCtx, &PicturesRequest{
+			Options: &PictureListOptions{
+				Id:       pdID,
+				Licenses: []PictureLicense{PictureLicense_PICTURE_LICENSE_PUBLIC_DOMAIN},
+			},
+		})
+		require.NoError(t, err)
+		require.Len(t, res.GetItems(), 1)
+	})
+
+	t.Run("moder: excludes a picture with a different licence", func(t *testing.T) {
+		t.Parallel()
+
+		res, err := client.GetPictures(moderCtx, &PicturesRequest{
+			Options: &PictureListOptions{
+				Id:       unlicensedID,
+				Licenses: []PictureLicense{PictureLicense_PICTURE_LICENSE_PUBLIC_DOMAIN},
+			},
+		})
+		require.NoError(t, err)
+		require.Empty(t, res.GetItems())
+	})
+
+	t.Run("non-moder: forbidden", func(t *testing.T) {
+		t.Parallel()
+
+		testerCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+testerToken.AccessToken)
+
+		_, err := client.GetPictures(testerCtx, &PicturesRequest{
+			Options: &PictureListOptions{
+				Id:       pdID,
+				Licenses: []PictureLicense{PictureLicense_PICTURE_LICENSE_PUBLIC_DOMAIN},
+			},
+		})
+		require.Error(t, err)
+		require.Equal(t, codes.PermissionDenied, status.Code(err))
 	})
 }
 

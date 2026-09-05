@@ -313,6 +313,34 @@
           class="btn btn-block"
           ngbDropdownToggle
           type="button"
+          [class.btn-primary]="licenseFilter() !== null"
+          [class.btn-outline-secondary]="licenseFilter() === null"
+        >
+          <ng-container i18n>License</ng-container>:
+          @for (option of licenseFilterOptions; track option) {
+            @if (option.value === licenseFilter()) {
+              {{ option.name }}
+            }
+          }
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+          @for (option of licenseFilterOptions; track option) {
+            <a
+              class="dropdown-item"
+              routerLink="."
+              queryParamsHandling="merge"
+              [class.active]="option.value === licenseFilter()"
+              [queryParams]="{license: option.value}"
+              >{{ option.name }}</a
+            >
+          }
+        </div>
+      </div>
+      <div class="btn-group mb-3" ngbDropdown>
+        <button
+          class="btn btn-block"
+          ngbDropdownToggle
+          type="button"
           [class.btn-primary]="requests() !== null"
           [class.btn-outline-secondary]="requests() === null"
         >

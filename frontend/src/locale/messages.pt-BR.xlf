@@ -16525,6 +16525,22 @@ Use o mesmo botão, formulário ou o mesmo endereço para denunciar material que
         </context-group>
       <target state="translated"> Salvar </target>
       </trans-unit>
+      <trans-unit id="6877113876835666202" datatype="html">
+        <source>License</source>
+        <target state="translated">Licença</target>
+      </trans-unit>
+      <trans-unit id="1960098878672045705" datatype="html">
+        <source>all rights reserved</source>
+        <target state="translated">todos os direitos reservados</target>
+      </trans-unit>
+      <trans-unit id="2587240527868724590" datatype="html">
+        <source>CC</source>
+        <target state="translated">CC</target>
+      </trans-unit>
+      <trans-unit id="6403365601569177668" datatype="html">
+        <source>PD</source>
+        <target state="translated">PD</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1452,6 +1452,7 @@ message PictureListOptions {
   bool has_special_name = 21;
   bool has_copyrights = 22;
   bool has_no_copyrights = 23;
+  repeated PictureLicense licenses = 25;
 }
 
 message DfDistanceListOptions {

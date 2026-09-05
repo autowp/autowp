@@ -16518,6 +16518,22 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
       <target state="translated"> 保存 </target>
       </trans-unit>
+      <trans-unit id="6877113876835666202" datatype="html">
+        <source>License</source>
+        <target state="translated">许可证</target>
+      </trans-unit>
+      <trans-unit id="1960098878672045705" datatype="html">
+        <source>all rights reserved</source>
+        <target state="translated">保留所有权利</target>
+      </trans-unit>
+      <trans-unit id="2587240527868724590" datatype="html">
+        <source>CC</source>
+        <target state="translated">CC</target>
+      </trans-unit>
+      <trans-unit id="6403365601569177668" datatype="html">
+        <source>PD</source>
+        <target state="translated">PD</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

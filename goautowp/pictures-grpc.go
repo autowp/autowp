@@ -2945,7 +2945,8 @@ func (s *PicturesGRPCServer) isRestricted(in *PicturesRequest, isModer bool, use
 		inOptions.GetDfDistance() != nil || inOptions.GetPictureModerVote() != nil ||
 		inOptions.GetHasNoPictureModerVote() || inOptions.GetHasNoReplacePicture() ||
 		inOptions.GetReplacePicture() != nil || inOptions.GetHasNoPictureItem() || inOptions.GetHasNoPoint() ||
-		inOptions.GetAddedFrom() != nil || inOptions.GetPictureItem().GetExcludeAncestorOrSelfId() != 0)
+		inOptions.GetAddedFrom() != nil || inOptions.GetPictureItem().GetExcludeAncestorOrSelfId() != 0 ||
+		len(inOptions.GetLicenses()) > 0)
 	if restricted {
 		return status.Error(codes.PermissionDenied, "permission denied")
 	}

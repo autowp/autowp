@@ -16524,6 +16524,22 @@ Utilice el mismo botón, formulario o la misma dirección para denunciar materia
         </context-group>
       <target state="translated"> Guardar </target>
       </trans-unit>
+      <trans-unit id="6877113876835666202" datatype="html">
+        <source>License</source>
+        <target state="translated">Licencia</target>
+      </trans-unit>
+      <trans-unit id="1960098878672045705" datatype="html">
+        <source>all rights reserved</source>
+        <target state="translated">todos los derechos reservados</target>
+      </trans-unit>
+      <trans-unit id="2587240527868724590" datatype="html">
+        <source>CC</source>
+        <target state="translated">CC</target>
+      </trans-unit>
+      <trans-unit id="6403365601569177668" datatype="html">
+        <source>PD</source>
+        <target state="translated">PD</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
