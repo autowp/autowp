@@ -359,10 +359,18 @@ func (s *MapGRPCServer) pointsWithContent(
 	sqSelect *goqu.SelectDataset,
 	lang string,
 ) ([]*MapPoint, error) {
+	// Prefer the item's item_language name for the requested lang (falling back to the legacy
+	// item.name column only when the item has no item_language rows at all), same as every other
+	// name-display path in the app - see items.NameOnlyColumn.
+	nameExpr, err := (items.NameOnlyColumn{DB: s.db}).SelectExpr(schema.ItemTableName, lang)
+	if err != nil {
+		return nil, err
+	}
+
 	rows, err := sqSelect.
 		SelectAppend(
 			schema.ItemTableIDCol,
-			schema.ItemTableNameCol,
+			nameExpr,
 			schema.ItemTableBeginYearCol,
 			schema.ItemTableEndYearCol,
 			schema.ItemTableItemTypeIDCol,

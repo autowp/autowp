@@ -265,6 +265,9 @@ func (s NameOnlyColumn) SelectExpr(alias string, lang string) (AliaseableExpress
 		return nil, err
 	}
 
+	// No fallback to the legacy item.name column here: item_language is the single source of
+	// truth for display names (same as NameDefaultColumn), so a missing item_language row reads
+	// as "" rather than silently reviving a possibly stale item.name value.
 	return goqu.Func(
 			"COALESCE",
 			s.DB.Select(schema.ItemLanguageTableNameCol).
@@ -275,7 +278,7 @@ func (s NameOnlyColumn) SelectExpr(alias string, lang string) (AliaseableExpress
 				).
 				Order(orderExpr).
 				Limit(1),
-			goqu.T(alias).Col(schema.ItemTableNameColName),
+			goqu.V(""),
 		),
 		nil
 }

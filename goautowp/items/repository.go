@@ -168,13 +168,6 @@ const (
 
 var catnameBlacklist = []string{"sport", "tuning", "related", "pictures", "specifications"}
 
-type TreeItem struct {
-	ID       int64
-	Name     string
-	Childs   []TreeItem
-	ItemType schema.ItemTableItemTypeID
-}
-
 type CataloguePathOptions struct {
 	ToBrand      bool
 	ToBrandID    int64
@@ -251,7 +244,7 @@ type Repository struct {
 	createdAtColumn                  *SimpleColumn
 	beginOrderCacheColumn            *SimpleColumn
 	endOrderCacheColumn              *SimpleColumn
-	nameColumn                       *SimpleColumn
+	nameColumn                       Column
 	specNameColumn                   *SpecNameColumn
 	specShortNameColumn              *SpecShortNameColumn
 	starCountColumn                  *StarCountColumn
@@ -397,7 +390,7 @@ func NewRepository(
 		createdAtColumn:                 &SimpleColumn{col: schema.ItemTableCreatedAtColName},
 		beginOrderCacheColumn:           &SimpleColumn{col: schema.ItemTableBeginOrderCacheColName},
 		endOrderCacheColumn:             &SimpleColumn{col: schema.ItemTableEndOrderCacheColName},
-		nameColumn:                      &SimpleColumn{col: schema.ItemTableNameColName},
+		nameColumn:                      &NameOnlyColumn{DB: db},
 		producedColumn:                  &SimpleColumn{col: schema.ItemTableProducedColName},
 		producedExactlyColumn:           &SimpleColumn{col: schema.ItemTableProducedExactlyColName},
 		specNameColumn:                  &SpecNameColumn{},
@@ -963,34 +956,6 @@ func (s *Repository) List( //nolint:maintidx
 	}
 
 	return result, pages, nil
-}
-
-func (s *Repository) Tree(ctx context.Context, id string) (*TreeItem, error) {
-	type row struct {
-		ID       int64                      `db:"id"`
-		Name     string                     `db:"name"`
-		ItemType schema.ItemTableItemTypeID `db:"item_type_id"`
-	}
-
-	var item row
-
-	success, err := s.db.Select(schema.ItemTableIDCol, schema.ItemTableNameCol, schema.ItemTableItemTypeIDCol).
-		From(schema.ItemTable).
-		Where(schema.ItemTableIDCol.Eq(id)).
-		ScanStructContext(ctx, item)
-	if err != nil {
-		return nil, err
-	}
-
-	if !success {
-		return nil, nil //nolint: nilnil
-	}
-
-	return &TreeItem{
-		ID:       item.ID,
-		Name:     item.Name,
-		ItemType: item.ItemType,
-	}, nil
 }
 
 func (s *Repository) AddItemVehicleType(
@@ -1802,32 +1767,44 @@ func (s *Repository) ItemParentSelect(
 	}
 
 	joinItem := false
+	nameOnlyColumn := NameOnlyColumn{DB: s.db}
 
 	switch orderBy {
 	case ItemParentOrderByNone:
 	case ItemParentOrderByAuto:
 		joinItem = true
 
+		nameExpr, err := nameOnlyColumn.SelectExpr(itemOrderAlias, listOptions.Language)
+		if err != nil {
+			return nil, err
+		}
+
 		sqSelect = sqSelect.Order(
 			aliasTable.Col(schema.ItemParentTableTypeColName).Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-			itemOrderAliasTable.Col(schema.ItemTableNameColName).Asc(),
+			nameExpr.Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
 		)
 		if groupBy {
 			sqSelect = sqSelect.GroupByAppend(
 				aliasTable.Col(schema.ItemParentTableTypeColName),
+				itemOrderAliasTable.Col(schema.ItemTableIDColName),
 				itemOrderAliasTable.Col(schema.ItemTableBeginOrderCacheColName),
 				itemOrderAliasTable.Col(schema.ItemTableEndOrderCacheColName),
-				itemOrderAliasTable.Col(schema.ItemTableNameColName),
 				itemOrderAliasTable.Col(schema.ItemTableBodyColName),
 				itemOrderAliasTable.Col(schema.ItemTableSpecIDColName),
 			)
 		}
 	case ItemParentOrderByCategoriesFirst:
 		joinItem = true
+
+		nameExpr, err := nameOnlyColumn.SelectExpr(itemOrderAlias, listOptions.Language)
+		if err != nil {
+			return nil, err
+		}
+
 		sqSelect = sqSelect.Order(
 			aliasTable.Col(schema.ItemParentTableTypeColName).Asc(),
 			goqu.L(
@@ -1837,7 +1814,7 @@ func (s *Repository) ItemParentSelect(
 			).Desc(),
 			itemOrderAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-			itemOrderAliasTable.Col(schema.ItemTableNameColName).Asc(),
+			nameExpr.Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			itemOrderAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
 		)
@@ -1861,6 +1838,10 @@ func (s *Repository) ItemParentSelect(
 			return nil, err
 		}
 
+		// No fallback to the legacy item.name column: item_parent_language is the single source
+		// of truth for this display name (same as NameOnlyColumn/NameDefaultColumn), so a
+		// missing item_parent_language row reads as "" rather than silently reviving a possibly
+		// stale item.name value.
 		sqSelect = sqSelect.SelectAppend(
 			goqu.Func(
 				"COALESCE",
@@ -1875,10 +1856,7 @@ func (s *Repository) ItemParentSelect(
 					).
 					Order(orderExpr).
 					Limit(1),
-				// fallback
-				s.db.Select(schema.ItemTableNameCol).
-					From(schema.ItemTable).
-					Where(schema.ItemTableIDCol.Eq(aliasTable.Col(schema.ItemParentTableItemIDColName))),
+				goqu.V(""),
 			).As(itemParentLangNameAlias),
 		)
 	}

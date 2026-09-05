@@ -61,6 +61,7 @@ const (
 	itemParentNameField         = "name"
 	itemLinkNameField           = "name"
 	itemLanguageNameField       = "name"
+	itemLanguageLanguageField   = "language"
 	itemParentLanguageNameField = "name"
 )
 
@@ -1314,6 +1315,16 @@ func (s *ItemLanguage) Validate() ([]*errdetails.BadRequest_FieldViolation, erro
 		problems []string
 		err      error
 	)
+
+	// language='xx' is the non-language-specific name that lives in item.name (see
+	// items.Repository.setItemLanguageName, called only by CreateItem/UpdateItem alongside the
+	// item.name write) - editing it here would desync the two without anything else noticing.
+	if s.GetLanguage() == schema.DefaultLanguageCode {
+		result = append(result, &errdetails.BadRequest_FieldViolation{
+			Field:       itemLanguageLanguageField,
+			Description: "invalid language",
+		})
+	}
 
 	nameInputFilter := validation.InputFilter{
 		Filters: []validation.FilterInterface{

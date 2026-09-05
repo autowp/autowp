@@ -2143,12 +2143,11 @@ func TestCorrectFileNamesVote(t *testing.T) {
 		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	newName := fmt.Sprintf("Toyota %d Corolla New", randomInt)
-	_, err = itemsClient.UpdateItemLanguage(
+	_, err = itemsClient.UpdateItem(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ItemLanguage{
-			Language: schema.DefaultLanguageCode,
-			Name:     newName,
-			ItemId:   vehicleID,
+		&UpdateItemRequest{
+			Item:       &Item{Id: vehicleID, Name: newName},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"name"}},
 		},
 	)
 	require.NoError(t, err)

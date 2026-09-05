@@ -24,6 +24,15 @@ func createPerson(t *testing.T, db *goqu.Database, name string) int64 {
 	require.NoError(t, err)
 	require.True(t, success)
 
+	// Mirrors items.Repository.CreateItem's dual-write: the app never reads name display data
+	// from item.name alone, it always resolves against item_language.
+	_, err = db.Insert(schema.ItemLanguageTable).Rows(goqu.Record{
+		schema.ItemLanguageTableItemIDColName:   id,
+		schema.ItemLanguageTableLanguageColName: schema.DefaultLanguageCode,
+		schema.ItemLanguageTableNameColName:     name,
+	}).Executor().ExecContext(t.Context())
+	require.NoError(t, err)
+
 	return id
 }
 

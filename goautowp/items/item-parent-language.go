@@ -302,14 +302,12 @@ func (s *ItemParentLanguageRepository) AfterItemParentCreated(
 func (s *ItemParentLanguageRepository) ExtractName(
 	ctx context.Context, parentRow schema.ItemRow, vehicleRow schema.ItemRow, lang string,
 ) (string, error) {
-	langName, err := s.getName(ctx, vehicleRow.ID, lang)
+	// No fallback to the legacy item.name column: item_language is the single source of truth
+	// for display names (same as NameOnlyColumn/NameDefaultColumn), so a missing item_language
+	// row reads as "" rather than silently reviving a possibly stale item.name value.
+	vehicleName, err := s.getName(ctx, vehicleRow.ID, lang)
 	if err != nil {
 		return "", err
-	}
-
-	vehicleName := langName
-	if len(langName) == 0 {
-		vehicleName = vehicleRow.Name
 	}
 
 	aliases, err := s.getAliases(ctx, parentRow.ID)

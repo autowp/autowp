@@ -229,7 +229,7 @@ func (s *RatingGRPCServer) GetUserSpecsRating(
 func (s *RatingGRPCServer) GetUserSpecsRatingBrands(
 	ctx context.Context, in *UserRatingDetailsRequest,
 ) (*UserRatingBrandsResponse, error) {
-	brands, err := s.attrsRepository.TopUserBrands(ctx, in.GetUserId(), numOfItemsInDetails)
+	brands, err := s.attrsRepository.TopUserBrands(ctx, in.GetUserId(), numOfItemsInDetails, in.GetLanguage())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

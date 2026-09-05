@@ -58,16 +58,15 @@ func (s *Repository) ResolveAuthorPersons(ctx context.Context, rawName string) (
 		From(schema.ItemTable).
 		Where(
 			schema.ItemTableItemTypeIDCol.Eq(schema.ItemTableItemTypeIDPerson),
-			goqu.Or(
-				goqu.L("LOWER(?) = ?", schema.ItemTableNameCol, lowerName),
-				goqu.L("EXISTS ?",
-					s.db.From(schema.ItemLanguageTable).
-						Select(goqu.L("1")).
-						Where(
-							schema.ItemLanguageTableItemIDCol.Eq(schema.ItemTableIDCol),
-							goqu.L("LOWER(?) = ?", schema.ItemLanguageTableNameCol, lowerName),
-						),
-				),
+			// item_language is the single source of truth for display names (see
+			// items.NameOnlyColumn) - no fallback to the legacy item.name column here either.
+			goqu.L("EXISTS ?",
+				s.db.From(schema.ItemLanguageTable).
+					Select(goqu.L("1")).
+					Where(
+						schema.ItemLanguageTableItemIDCol.Eq(schema.ItemTableIDCol),
+						goqu.L("LOWER(?) = ?", schema.ItemLanguageTableNameCol, lowerName),
+					),
 			),
 			goqu.L("EXISTS ?",
 				s.db.From(schema.PictureItemTable).

@@ -312,14 +312,22 @@ func (s *Repository) TotalZoneAttrs(ctx context.Context, zoneID int64) (int32, e
 }
 
 func (s *Repository) TopUserBrands(
-	ctx context.Context, userID int64, limit uint,
+	ctx context.Context, userID int64, limit uint, lang string,
 ) ([]TopUserBrand, error) {
 	rows := make([]TopUserBrand, 0)
 
 	const volumeAlias = "volume"
 
-	err := s.db.Select(
-		schema.ItemTableIDCol, schema.ItemTableNameCol, schema.ItemTableCatnameCol,
+	// Prefer the brand's item_language name for lang (falling back to the legacy item.name
+	// column only when the item has no item_language rows at all), same as every other
+	// name-display path in the app - see items.NameOnlyColumn.
+	nameExpr, err := (items.NameOnlyColumn{DB: s.db}).SelectExpr(schema.ItemTableName, lang)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.db.Select(
+		schema.ItemTableIDCol, nameExpr.As(schema.ItemTableNameColName), schema.ItemTableCatnameCol,
 		goqu.COUNT(goqu.Star()).As(volumeAlias),
 	).
 		From(schema.ItemTable).
