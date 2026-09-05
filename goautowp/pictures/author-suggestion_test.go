@@ -16,7 +16,6 @@ func createPerson(t *testing.T, db *goqu.Database, name string) int64 {
 	var id int64
 
 	success, err := db.Insert(schema.ItemTable).Rows(goqu.Record{
-		schema.ItemTableNameColName:       name,
 		schema.ItemTableItemTypeIDColName: schema.ItemTableItemTypeIDPerson,
 		"body":                            "",
 		"produced_exactly":                false,
@@ -24,8 +23,8 @@ func createPerson(t *testing.T, db *goqu.Database, name string) int64 {
 	require.NoError(t, err)
 	require.True(t, success)
 
-	// Mirrors items.Repository.CreateItem's dual-write: the app never reads name display data
-	// from item.name alone, it always resolves against item_language.
+	// Mirrors items.Repository.CreateItem: the app never reads name display data from the
+	// legacy item.name column, it always resolves against item_language(language='xx').
 	_, err = db.Insert(schema.ItemLanguageTable).Rows(goqu.Record{
 		schema.ItemLanguageTableItemIDColName:   id,
 		schema.ItemLanguageTableLanguageColName: schema.DefaultLanguageCode,

@@ -2497,7 +2497,6 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *Item) (*ItemID, er
 			Int32: in.GetSpecId(),
 		},
 		CreatedAt: sql.NullTime{Valid: true, Time: time.Now()},
-		Name:      in.GetName(),
 		FullName: sql.NullString{
 			Valid:  in.GetFullName() != "",
 			String: in.GetFullName(),
@@ -2558,7 +2557,7 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *Item) (*ItemID, er
 
 	ctx = context.WithoutCancel(ctx)
 
-	itemID, err := s.repository.CreateItem(ctx, set, userCtx.UserID)
+	itemID, err := s.repository.CreateItem(ctx, set, in.GetName(), userCtx.UserID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -2643,6 +2642,11 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	values.ItemTypeId = extractItemTypeID(item.ItemTypeID)
 	oldData := item
 
+	oldName, err := s.repository.LanguageName(ctx, item.ID, schema.DefaultLanguageCode)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	InvalidParams, err := values.Validate(ctx, s.repository, mask.GetPaths(), userCtx.Roles)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -2655,12 +2659,8 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	set := schema.ItemRow{
 		ID: item.ID,
 	}
-	notifyMeta := false
-
-	if util.Contains(mask.GetPaths(), itemNameField) {
-		notifyMeta = true
-		set.Name = values.GetName()
-	}
+	name := values.GetName()
+	notifyMeta := util.Contains(mask.GetPaths(), itemNameField)
 
 	if util.Contains(mask.GetPaths(), "full_name") {
 		notifyMeta = true
@@ -2813,7 +2813,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 
 	ctx = context.WithoutCancel(ctx)
 
-	err = s.repository.UpdateItem(ctx, set, mask.GetPaths(), userCtx.UserID)
+	err = s.repository.UpdateItem(ctx, set, name, mask.GetPaths(), userCtx.UserID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -2848,10 +2848,17 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 		newData := item
 		htmlChanges := make([]string, 0)
 
+		newName, err := s.repository.LanguageName(ctx, item.ID, schema.DefaultLanguageCode)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
 		changes, err := s.buildChangesMessage(
 			ctx,
 			oldData.ItemRow,
 			newData.ItemRow,
+			oldName,
+			newName,
 			EventsDefaultLanguage,
 		)
 		if err != nil {
@@ -2894,7 +2901,7 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 		err = s.notifyItemSubscribers(
 			ctx, []int64{item.ID}, user.ID, "pm/user-%s-edited-vehicle-meta-data-%s-%s-%s",
 			func(uri *url.URL, lang string) (map[string]interface{}, error) {
-				changes, err := s.buildChangesMessage(ctx, oldData.ItemRow, newData.ItemRow, lang)
+				changes, err := s.buildChangesMessage(ctx, oldData.ItemRow, newData.ItemRow, oldName, newName, lang)
 				if err != nil {
 					return nil, err
 				}
@@ -3569,13 +3576,13 @@ func (s *ItemsGRPCServer) stringChange(
 }
 
 func (s *ItemsGRPCServer) buildChangesMessage( //nolint: maintidx
-	ctx context.Context, oldData schema.ItemRow, newData schema.ItemRow, lang string,
+	ctx context.Context, oldData schema.ItemRow, newData schema.ItemRow, oldName, newName, lang string,
 ) ([]string, error) {
 	changes := make([]string, 0)
 
 	change, err := s.stringChange(
-		oldData.Name,
-		newData.Name,
+		oldName,
+		newName,
 		"moder/vehicle/changes/name-%s-%s",
 		lang,
 	)

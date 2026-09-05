@@ -472,7 +472,6 @@ func (s *ItemParentLanguageRepository) extractItemParentLanguageName(
 
 	success, err := s.db.Select(
 		schema.ItemTableIDCol,
-		schema.ItemTableNameCol,
 		schema.ItemTableBodyCol,
 		schema.ItemTableSpecIDCol,
 		schema.ItemTableBeginYearCol,
@@ -493,7 +492,6 @@ func (s *ItemParentLanguageRepository) extractItemParentLanguageName(
 
 	success, err = s.db.Select(
 		schema.ItemTableIDCol,
-		schema.ItemTableNameCol,
 		schema.ItemTableBodyCol,
 		schema.ItemTableSpecIDCol,
 		schema.ItemTableBeginYearCol,

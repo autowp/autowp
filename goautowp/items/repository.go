@@ -773,8 +773,6 @@ func (s *Repository) List( //nolint:maintidx
 			switch colName {
 			case schema.ItemTableIDColName:
 				pointers[i] = &row.ID
-			case schema.ItemTableNameColName:
-				pointers[i] = &row.Name
 			case colNameOnly:
 				pointers[i] = &row.NameOnly
 			case colNameDefault:
@@ -3058,6 +3056,7 @@ func (s *Repository) FirstCharacters(ctx context.Context) ([]string, error) {
 func (s *Repository) CreateItem(
 	ctx context.Context,
 	row schema.ItemRow,
+	name string,
 	userID int64,
 ) (int64, error) {
 	var itemID int64
@@ -3075,8 +3074,8 @@ func (s *Repository) CreateItem(
 		return 0, errNoRowsReturned
 	}
 
-	if len(row.Name) > 0 {
-		err = s.setItemLanguageName(ctx, itemID, schema.DefaultLanguageCode, row.Name)
+	if len(name) > 0 {
+		err = s.setItemLanguageName(ctx, itemID, schema.DefaultLanguageCode, name)
 		if err != nil {
 			return 0, err
 		}
@@ -3124,16 +3123,12 @@ func (s *Repository) SpecExists(ctx context.Context, specID int32) (bool, error)
 func (s *Repository) UpdateItem(
 	ctx context.Context,
 	row schema.ItemRow,
+	name string,
 	mask []string,
 	userID int64,
 ) error {
 	set := goqu.Record{}
-	subscribe := false
-
-	if util.Contains(mask, "name") {
-		subscribe = true
-		set[schema.ItemTableNameColName] = row.Name
-	}
+	subscribe := util.Contains(mask, "name")
 
 	if util.Contains(mask, "full_name") {
 		subscribe = true
@@ -3254,7 +3249,7 @@ func (s *Repository) UpdateItem(
 	}
 
 	if util.Contains(mask, "name") {
-		err := s.setItemLanguageName(ctx, row.ID, schema.DefaultLanguageCode, row.Name)
+		err := s.setItemLanguageName(ctx, row.ID, schema.DefaultLanguageCode, name)
 		if err != nil {
 			return err
 		}
@@ -3374,10 +3369,6 @@ func (s *Repository) columnsByFields(fields *ItemFields) map[string]Column {
 
 	if fields.Logo {
 		columns[schema.ItemTableLogoIDColName] = s.logoColumn
-	}
-
-	if fields.Meta {
-		columns[schema.ItemTableNameColName] = s.nameColumn
 	}
 
 	if fields.NameText || fields.NameHTML || fields.Meta {

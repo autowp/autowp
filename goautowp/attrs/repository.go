@@ -316,18 +316,21 @@ func (s *Repository) TopUserBrands(
 ) ([]TopUserBrand, error) {
 	rows := make([]TopUserBrand, 0)
 
-	const volumeAlias = "volume"
+	const (
+		volumeAlias = "volume"
+		nameAlias   = "name" // matches TopUserBrand.Name's `db:"name"` tag, unrelated to item.name
+	)
 
-	// Prefer the brand's item_language name for lang (falling back to the legacy item.name
-	// column only when the item has no item_language rows at all), same as every other
-	// name-display path in the app - see items.NameOnlyColumn.
+	// Prefer the brand's item_language name for lang, falling back to "" if the item has no
+	// item_language rows at all - same as every other name-display path in the app, see
+	// items.NameOnlyColumn.
 	nameExpr, err := (items.NameOnlyColumn{DB: s.db}).SelectExpr(schema.ItemTableName, lang)
 	if err != nil {
 		return nil, err
 	}
 
 	err = s.db.Select(
-		schema.ItemTableIDCol, nameExpr.As(schema.ItemTableNameColName), schema.ItemTableCatnameCol,
+		schema.ItemTableIDCol, nameExpr.As(nameAlias), schema.ItemTableCatnameCol,
 		goqu.COUNT(goqu.Star()).As(volumeAlias),
 	).
 		From(schema.ItemTable).

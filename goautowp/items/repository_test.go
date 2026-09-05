@@ -223,19 +223,17 @@ func TestGetUserPicturesBrands(t *testing.T) {
 
 	brandID, err := repository.CreateItem(ctx, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            "",
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	}, userID)
+	}, "", userID)
 	require.NoError(t, err)
 
 	vehicleID, err := repository.CreateItem(ctx, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            "",
 		Body:            "",
 		ProducedExactly: false,
-	}, userID)
+	}, "", userID)
 	require.NoError(t, err)
 
 	success, err := repository.CreateItemParent(
@@ -316,10 +314,9 @@ func TestPaginator(t *testing.T) {
 	for i := range 10 {
 		CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-			Name:            name + "_" + strconv.Itoa(i),
 			Body:            "",
 			ProducedExactly: false,
-		})
+		}, name+"_"+strconv.Itoa(i))
 	}
 
 	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
@@ -371,20 +368,18 @@ func TestOrderByDescendantsCount(t *testing.T) {
 	name := "TestOrderByDescendantsCount" + strconv.Itoa(int(random.Uint32()%100000))
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, name)
 
 	subName := name + "sub"
 	subItemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            subName,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, subName)
 
 	success, err := repository.CreateItemParent(
 		ctx,
@@ -400,10 +395,9 @@ func TestOrderByDescendantsCount(t *testing.T) {
 		subSubName := name + "_" + strconv.Itoa(i)
 		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
-		})
+		}, subSubName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -496,20 +490,18 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	userID := createRandomUser(ctx, t, goquDB)
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, name)
 
 	subName := name + "sub"
 	subItemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            subName,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, subName)
 
 	success, err := repository.CreateItemParent(
 		ctx,
@@ -525,10 +517,9 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 		subSubName := name + "_" + strconv.Itoa(i)
 		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
-		})
+		}, subSubName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -671,22 +662,20 @@ func TestOrderByCreatedAt(t *testing.T) {
 
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
 		CreatedAt:       nextCreatedAt(),
-	})
+	}, name)
 
 	subName := name + "sub"
 	subItemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            subName,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
 		CreatedAt:       nextCreatedAt(),
-	})
+	}, subName)
 
 	success, err := repository.CreateItemParent(
 		ctx,
@@ -704,11 +693,10 @@ func TestOrderByCreatedAt(t *testing.T) {
 		subSubName := name + "_" + strconv.Itoa(i)
 		lastItemID = CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
 			CreatedAt:       nextCreatedAt(),
-		})
+		}, subSubName)
 
 		success, err = repository.CreateItemParent(
 			ctx, lastItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -775,20 +763,18 @@ func TestOrderByName(t *testing.T) {
 	name := "TestOrderByName" + strconv.Itoa(int(random.Uint32()%100000))
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            "a" + name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, "a"+name)
 
 	subName := "b" + name + "sub"
 	subItemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            subName,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, subName)
 
 	success, err := repository.CreateItemParent(
 		ctx,
@@ -804,10 +790,9 @@ func TestOrderByName(t *testing.T) {
 		subSubName := "c" + name + "_" + strconv.Itoa(i)
 		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
-		})
+		}, subSubName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -900,20 +885,18 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, name)
 
 	subName := name + "sub"
 	subItemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            subName,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, subName)
 
 	success, err := repository.CreateItemParent(
 		ctx,
@@ -929,10 +912,9 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 		subSubName := name + "_" + strconv.Itoa(i)
 		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
-		})
+		}, subSubName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -944,11 +926,10 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 		subSubParentName := name + "_" + strconv.Itoa(i) + "_parent"
 		subSubParentItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDTwins,
-			Name:            subSubParentName,
 			Body:            "",
 			ProducedExactly: false,
 			IsGroup:         true,
-		})
+		}, subSubParentName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subSubParentItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -1059,20 +1040,18 @@ func TestOrderByStarCount(t *testing.T) {
 
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, name)
 
 	subName := name + "sub"
 	subItemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            subName,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, subName)
 
 	success, err := repository.CreateItemParent(
 		ctx,
@@ -1088,10 +1067,9 @@ func TestOrderByStarCount(t *testing.T) {
 		subSubName := name + "_" + strconv.Itoa(i)
 		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
-		})
+		}, subSubName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -1153,20 +1131,18 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 	name := "TestOrderByItemParentParentTimestamp" + strconv.Itoa(int(random.Uint32()%100000))
 	itemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
-		Name:            name,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, name)
 
 	subName := name + "sub"
 	subItemID := CreateItem(t, goquDB, schema.ItemRow{
 		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-		Name:            subName,
 		Body:            "",
 		ProducedExactly: false,
 		IsGroup:         true,
-	})
+	}, subName)
 
 	success, err := repository.CreateItemParent(
 		ctx,
@@ -1182,10 +1158,9 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 		subSubName := name + "_" + strconv.Itoa(i)
 		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
-			Name:            subSubName,
 			Body:            "",
 			ProducedExactly: false,
-		})
+		}, subSubName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -1197,11 +1172,10 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 		subSubParentName := name + "_" + strconv.Itoa(i) + "_parent"
 		subSubParentItemID := CreateItem(t, goquDB, schema.ItemRow{
 			ItemTypeID:      schema.ItemTableItemTypeIDTwins,
-			Name:            subSubParentName,
 			Body:            "",
 			ProducedExactly: false,
 			IsGroup:         true,
-		})
+		}, subSubParentName)
 
 		success, err = repository.CreateItemParent(
 			ctx, subSubItemID, subSubParentItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
@@ -1237,7 +1211,7 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 	require.Nil(t, pages)
 }
 
-func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow) int64 {
+func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow, name string) int64 {
 	t.Helper()
 
 	ctx := t.Context()
@@ -1254,10 +1228,10 @@ func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow) int64 {
 		imageStorage,
 	)
 
-	itemID, err := repository.CreateItem(ctx, row, 0)
+	itemID, err := repository.CreateItem(ctx, row, name, 0)
 	require.NoError(t, err)
 
-	_, err = repository.UpdateItemLanguage(ctx, itemID, schema.EnglishLanguageCode, row.Name, "", "", 0)
+	_, err = repository.UpdateItemLanguage(ctx, itemID, schema.EnglishLanguageCode, name, "", "", 0)
 	require.NoError(t, err)
 
 	return itemID

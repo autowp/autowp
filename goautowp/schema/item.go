@@ -20,7 +20,6 @@ const (
 	ItemTableItemTypeIDCopyright ItemTableItemTypeID = 9
 
 	ItemTableName                          = "item"
-	ItemTableNameColName                   = "name"
 	ItemTableCatnameColName                = "catname"
 	ItemTableEngineItemIDColName           = "engine_item_id"
 	ItemTableEngineInheritColName          = "engine_inherit"
@@ -67,7 +66,6 @@ var (
 	ItemTableBodyCol                   = ItemTable.Col(ItemTableBodyColName)
 	ItemTableSpecIDCol                 = ItemTable.Col(ItemTableSpecIDColName)
 	ItemTableCatnameCol                = ItemTable.Col(ItemTableCatnameColName)
-	ItemTableNameCol                   = ItemTable.Col(ItemTableNameColName)
 	ItemTableBeginYearCol              = ItemTable.Col(ItemTableBeginYearColName)
 	ItemTableEndYearCol                = ItemTable.Col(ItemTableEndYearColName)
 	ItemTableBeginMonthCol             = ItemTable.Col(ItemTableBeginMonthColName)
@@ -92,7 +90,6 @@ var (
 
 type ItemRow struct {
 	ID                     int64               `db:"id"                        goqu:"pk,skipinsert"`
-	Name                   string              `db:"name"`
 	Catname                sql.NullString      `db:"catname"`
 	ItemTypeID             ItemTableItemTypeID `db:"item_type_id"`
 	Body                   string              `db:"body"`
