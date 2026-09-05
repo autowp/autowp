@@ -20,9 +20,9 @@
 } @else if (user(); as user) {
   @if (brandsResource.error(); as error) {
     <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
-  } @else {
+  } @else if (brandsData(); as brands) {
     <div class="brand-icons row">
-      @for (brand of brandsData() ?? []; track brand.id) {
+      @for (brand of brands; track brand.id) {
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
           @if (iconsData(); as icons) {
             <a
@@ -38,5 +38,9 @@
         </div>
       }
     </div>
+  } @else {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
+} @else {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
 }

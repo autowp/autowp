@@ -1,11 +1,11 @@
 <span [class]="badgeClass()">{{ label() }}</span>
 @if (deedUrl(); as url) {
-  <a target="_blank" rel="noopener" [href]="url">
+  <a class="ms-1" target="_blank" rel="noopener" [href]="url">
     <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
   </a>
 }
 @if (sourceUrl()) {
-  <a target="_blank" rel="noopener" [href]="sourceUrl()">
+  <a class="ms-1" target="_blank" rel="noopener" [href]="sourceUrl()">
     <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>
     <ng-container i18n>Source</ng-container>
   </a>
