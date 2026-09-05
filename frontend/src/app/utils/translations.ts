@@ -51,10 +51,10 @@ const translations: Record<
     'new-item': $localize`New person`,
   },
   9: {
-    'add-sub-item': $localize`Add sub copyright block`,
-    name: $localize`Copyright block`,
-    'name-plural': $localize`Copyright blocks`,
-    'new-item': $localize`New copyright block`,
+    'add-sub-item': $localize`Add sub copyright holder`,
+    name: $localize`Copyright holder`,
+    'name-plural': $localize`Copyright holders`,
+    'new-item': $localize`New copyright holder`,
   },
 };
 

@@ -6217,8 +6217,9 @@ Se você ainda não possui conta no site, você pode [criar sua conta agora](/si
         </context-group>
         <target state="translated">Nova pessoa</target>
       </trans-unit>
-      <trans-unit id="746277056637502716" datatype="html">
-        <source>New copyright block</source>
+      <trans-unit id="8625021533898269001" datatype="html">
+        <source>New copyright holder</source>
+        <target state="translated">Novo titular de direitos</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/index/index.component.html</context>
           <context context-type="linenumber">63,69</context>
@@ -7171,8 +7172,9 @@ Se você ainda não possui conta no site, você pode [criar sua conta agora](/si
         </context-group>
         <target state="translated">Pessoa</target>
       </trans-unit>
-      <trans-unit id="5860972437008129823" datatype="html">
-        <source>Copyright block</source>
+      <trans-unit id="6685810610376345335" datatype="html">
+        <source>Copyright holder</source>
+        <target state="translated">Titular de direitos</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">72,76</context>
@@ -8113,8 +8115,9 @@ Hiperlinks internos devem ser relativos: ~~http://autowp.ru/bmw/~~ */bmw/*</targ
         </context-group>
         <target state="translated">Pessoas</target>
       </trans-unit>
-      <trans-unit id="6330390902440534404" datatype="html">
-        <source>Copyright blocks</source>
+      <trans-unit id="1866602092138591997" datatype="html">
+        <source>Copyright holders</source>
+        <target state="translated">Titulares de direitos</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/move/move.component.html</context>
           <context context-type="linenumber">127,134</context>
@@ -9998,8 +10001,9 @@ Please note that image submissions are moderated. This means that all images wil
         </context-group>
         <target state="translated">Adicionar sub-pessoa</target>
       </trans-unit>
-      <trans-unit id="5645726980768164553" datatype="html">
-        <source>Add sub copyright block</source>
+      <trans-unit id="7220451610023058786" datatype="html">
+        <source>Add sub copyright holder</source>
+        <target state="translated">Adicionar sub-titular de direitos</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">52</context>

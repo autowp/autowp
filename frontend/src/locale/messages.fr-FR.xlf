@@ -6218,8 +6218,9 @@ A cause des restriction financières et des difficultés économiques des régio
         </context-group>
         <target state="translated">Nouvelle personne</target>
       </trans-unit>
-      <trans-unit id="746277056637502716" datatype="html">
-        <source>New copyright block</source>
+      <trans-unit id="8625021533898269001" datatype="html">
+        <source>New copyright holder</source>
+        <target state="translated">Nouveau titulaire de droits</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/index/index.component.html</context>
           <context context-type="linenumber">63,69</context>
@@ -7172,8 +7173,9 @@ Liens
         </context-group>
         <target state="translated">Personne</target>
       </trans-unit>
-      <trans-unit id="5860972437008129823" datatype="html">
-        <source>Copyright block</source>
+      <trans-unit id="6685810610376345335" datatype="html">
+        <source>Copyright holder</source>
+        <target state="translated">Titulaire de droits</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">72,76</context>
@@ -8114,8 +8116,9 @@ Les hyperlinks internes doivent être relatifs: ~~http://autowp.ru/bmw/~~ */bmw/
         </context-group>
         <target state="translated">Personnes</target>
       </trans-unit>
-      <trans-unit id="6330390902440534404" datatype="html">
-        <source>Copyright blocks</source>
+      <trans-unit id="1866602092138591997" datatype="html">
+        <source>Copyright holders</source>
+        <target state="translated">Titulaires de droits</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/move/move.component.html</context>
           <context context-type="linenumber">127,134</context>
@@ -9997,8 +10000,9 @@ Supprimer l'utilisateur
         </context-group>
         <target state="translated">Ajouter une sous personne</target>
       </trans-unit>
-      <trans-unit id="5645726980768164553" datatype="html">
-        <source>Add sub copyright block</source>
+      <trans-unit id="7220451610023058786" datatype="html">
+        <source>Add sub copyright holder</source>
+        <target state="translated">Ajouter un sous-titulaire de droits</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">52</context>

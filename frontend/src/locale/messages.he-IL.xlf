@@ -6216,8 +6216,9 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">אדם חדש</target>
       </trans-unit>
-      <trans-unit id="746277056637502716" datatype="html">
-        <source>New copyright block</source>
+      <trans-unit id="8625021533898269001" datatype="html">
+        <source>New copyright holder</source>
+        <target state="translated">בעל זכויות יוצרים חדש</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/index/index.component.html</context>
           <context context-type="linenumber">63,69</context>
@@ -7167,8 +7168,9 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">אדם</target>
       </trans-unit>
-      <trans-unit id="5860972437008129823" datatype="html">
-        <source>Copyright block</source>
+      <trans-unit id="6685810610376345335" datatype="html">
+        <source>Copyright holder</source>
+        <target state="translated">בעל זכויות יוצרים</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/items.component.html</context>
           <context context-type="linenumber">72,76</context>
@@ -8109,8 +8111,9 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">אנשים</target>
       </trans-unit>
-      <trans-unit id="6330390902440534404" datatype="html">
-        <source>Copyright blocks</source>
+      <trans-unit id="1866602092138591997" datatype="html">
+        <source>Copyright holders</source>
+        <target state="translated">בעלי זכויות יוצרים</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/move/move.component.html</context>
           <context context-type="linenumber">127,134</context>
@@ -9978,8 +9981,9 @@ Please note that image submissions are moderated. This means that all images wil
         </context-group>
         <target state="translated">להוסיף איש משנה</target>
       </trans-unit>
-      <trans-unit id="5645726980768164553" datatype="html">
-        <source>Add sub copyright block</source>
+      <trans-unit id="7220451610023058786" datatype="html">
+        <source>Add sub copyright holder</source>
+        <target state="translated">הוסף תת-בעל זכויות יוצרים</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
           <context context-type="linenumber">52</context>
