@@ -697,8 +697,6 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 		schema.UserTableNameColName:            "",
 		schema.UserTableTimezoneColName:        "UTC",
 		schema.UserTableURLColName:             "",
-		schema.UserTableOwnCarColName:          "",
-		schema.UserTableDreamCarColName:        "",
 		schema.UserTableTermsAcceptedAtColName: nil,
 		schema.UserTableContactsPublicColName:  false,
 	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)

@@ -40,8 +40,6 @@ const (
 	UserTableImgColName               = "img"
 	UserTableGreenColName             = "green"
 	UserTableURLColName               = "url"
-	UserTableOwnCarColName            = "own_car"
-	UserTableDreamCarColName          = "dream_car"
 	UserTableTermsVersionColName      = "terms_version"
 	UserTableTermsAcceptedAtColName   = "terms_accepted_at"
 	UserTableContactsPublicColName    = "contacts_public"
