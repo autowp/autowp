@@ -605,7 +605,10 @@ func (s *Repository) List( //nolint:maintidx
 	outAlias := query.ItemAlias
 
 	if options.Limit > 0 {
-		wrappedOrderBy := s.wrappedOrderBy(query.ItemAlias, orderBy)
+		wrappedOrderBy, err := s.wrappedOrderBy(query.ItemAlias, orderBy, options.Language)
+		if err != nil {
+			return nil, nil, err
+		}
 
 		if len(wrappedOrderBy) > 0 {
 			sqSelect = sqSelect.Order(wrappedOrderBy...)
@@ -687,7 +690,10 @@ func (s *Repository) List( //nolint:maintidx
 			GroupBy(schema.ItemTableIDCol).
 			GroupByAppend(groupByColumnsExpr...)
 
-		wrapperOrderBy, groupBy := s.wrapperOrderBy(schema.ItemTableName, wrappedAlias, orderBy)
+		wrapperOrderBy, groupBy, err := s.wrapperOrderBy(schema.ItemTableName, wrappedAlias, orderBy, options.Language)
+		if err != nil {
+			return nil, nil, err
+		}
 
 		if len(wrapperOrderBy) > 0 {
 			sqSelect = sqSelect.Order(wrapperOrderBy...)
@@ -3599,7 +3605,8 @@ func (s *Repository) wrapperOrderBy(
 	wrapperAlias string,
 	wrappedAlias string,
 	orderBy OrderBy,
-) ([]exp.OrderedExpression, []interface{}) {
+	lang string,
+) ([]exp.OrderedExpression, []interface{}, error) {
 	wrapperAliasTable := goqu.T(wrapperAlias)
 	wrappedAliasTable := goqu.T(wrappedAlias)
 
@@ -3607,67 +3614,77 @@ func (s *Repository) wrapperOrderBy(
 	case OrderByDescendantsCount:
 		col := wrappedAliasTable.Col(colDescendantsCount)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByChildsCount:
 		col := wrappedAliasTable.Col(colChildsCount)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByDescendantPicturesCount:
 		col := wrappedAliasTable.Col(colDescendantPicturesCount)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByCreatedAt:
 		return []exp.OrderedExpression{
 			wrapperAliasTable.Col(schema.ItemTableCreatedAtColName).Desc(),
 			wrapperAliasTable.Col(schema.ItemTableIDColName).Desc(),
-		}, []interface{}{}
+		}, []interface{}{}, nil
 	case OrderByName:
+		nameExpr, err := (NameOnlyColumn{DB: s.db}).SelectExpr(wrapperAlias, lang)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		return []exp.OrderedExpression{
-			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
+			nameExpr.Asc(),
 			wrapperAliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-		}, []interface{}{}
+		}, []interface{}{}, nil
 	case OrderByDescendantsParentsCount:
 		col := wrappedAliasTable.Col(colDescendantsParentsCount)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByStarCount:
 		col := wrappedAliasTable.Col(colStarCount)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByItemParentParentTimestamp:
 		col := wrappedAliasTable.Col(colItemParentParentTimestamp)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByAge:
+		nameExpr, err := (NameOnlyColumn{DB: s.db}).SelectExpr(wrapperAlias, lang)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		return []exp.OrderedExpression{
 			wrapperAliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-			wrapperAliasTable.Col(schema.ItemTableNameColName).Asc(),
+			nameExpr.Asc(),
 			wrapperAliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			wrapperAliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
-		}, []interface{}{}
+		}, []interface{}{}, nil
 	case OrderByIDDesc:
 		col := wrappedAliasTable.Col(schema.ItemTableIDColName)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByIDAsc:
 		col := wrappedAliasTable.Col(schema.ItemTableIDColName)
 
-		return []exp.OrderedExpression{col.Asc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Asc()}, []interface{}{col}, nil
 	case OrderByAttrsUserValuesUpdateDate:
 		col := wrappedAliasTable.Col(colAttrsUserValuesUpdateDate)
 
-		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}
+		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
 	case OrderByNone:
 	}
 
-	return nil, []interface{}{}
+	return nil, []interface{}{}, nil
 }
 
-func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.OrderedExpression {
+func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy, lang string) ([]exp.OrderedExpression, error) {
 	aliasTable := goqu.T(alias)
 
 	var orderByExp []exp.OrderedExpression
@@ -3685,8 +3702,13 @@ func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.Ordered
 			aliasTable.Col(schema.ItemTableIDColName).Desc(),
 		}
 	case OrderByName:
+		nameExpr, err := (NameOnlyColumn{DB: s.db}).SelectExpr(alias, lang)
+		if err != nil {
+			return nil, err
+		}
+
 		orderByExp = []exp.OrderedExpression{
-			aliasTable.Col(schema.ItemTableNameColName).Asc(),
+			nameExpr.Asc(),
 			aliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			aliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
 			aliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
@@ -3699,10 +3721,15 @@ func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.Ordered
 	case OrderByItemParentParentTimestamp:
 		orderByExp = []exp.OrderedExpression{goqu.C(colItemParentParentTimestamp).Desc()}
 	case OrderByAge:
+		nameExpr, err := (NameOnlyColumn{DB: s.db}).SelectExpr(alias, lang)
+		if err != nil {
+			return nil, err
+		}
+
 		orderByExp = []exp.OrderedExpression{
 			aliasTable.Col(schema.ItemTableBeginOrderCacheColName).Asc(),
 			aliasTable.Col(schema.ItemTableEndOrderCacheColName).Asc(),
-			aliasTable.Col(schema.ItemTableNameColName).Asc(),
+			nameExpr.Asc(),
 			aliasTable.Col(schema.ItemTableBodyColName).Asc(),
 			aliasTable.Col(schema.ItemTableSpecIDColName).Asc(),
 		}
@@ -3715,7 +3742,7 @@ func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy) []exp.Ordered
 	case OrderByNone:
 	}
 
-	return orderByExp
+	return orderByExp, nil
 }
 
 func (s *Repository) wrappedSelectColumns(orderBy OrderBy) map[string]Column {
