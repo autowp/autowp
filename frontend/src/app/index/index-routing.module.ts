@@ -5,6 +5,6 @@ export const routes: Routes = [
     loadComponent: () => import('./index.component').then((m) => m.IndexComponent),
     path: '',
     pathMatch: 'full',
-    title: $localize`Index page`,
+    title: $localize`Encyclopedia of cars in pictures. WheelsAge.org`,
   },
 ];
