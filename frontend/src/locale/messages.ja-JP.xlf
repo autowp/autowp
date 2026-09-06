@@ -2585,21 +2585,17 @@ Good luck.</source>
           <context context-type="linenumber">7,13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3937813557926167615" datatype="html">
+            <trans-unit id="2449511709964189843" datatype="html">
         <source>Please note that all material on this server autowp.ru, added visitors.
 
-The site administration does not have information on the legality of the publication of these materials.
-
 All images are posted for educational purposes.</source>
-        <target state="translated">このサーバー autowp.ru 上のすべての素材は、訪問者によって追加されたものであることにご注意ください。
-
-サイト管理者は、これらの素材の公開の適法性に関する情報を持っていません。
-
-すべての画像は教育目的で掲載されています。</target>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">228,236</context>
         </context-group>
+        <target state="translated">このサーバー autowp.ru 上のすべての素材は、訪問者によって追加されたものであることにご注意ください。
+
+すべての画像は教育目的で掲載されています。</target>
       </trans-unit>
       <trans-unit id="2029980907058777630" datatype="html">
         <source>Terms of Service</source>
@@ -9749,21 +9745,17 @@ licence stated there.
           <context context-type="linenumber">262,267</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="9107547038979295873" datatype="html">
-        <source>All images have their owners.
-
-  If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
+            <trans-unit id="4379739353357642506" datatype="html">
+        <source>If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
 
   Discuss anything and just talk about cars and not only can you on [the forum](/forums/).</source>
-        <target state="translated">すべての画像には所有者がいます。
-
-  このセクションにこの画像を掲載したのがサイトのユーザーの誤りだとお考えの場合は、コメントでその旨を書き、誤りを指摘していただけると助かります。
-
-  車について、あるいはそれ以外のことについて自由に語り合うのは [the forum](/forums/) でできます。</target>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
           <context context-type="linenumber">268,275</context>
         </context-group>
+        <target state="translated">このセクションにこの画像を掲載したのがサイトのユーザーの誤りだとお考えの場合は、コメントでその旨を書き、誤りを指摘していただけると助かります。
+
+  車について、あるいはそれ以外のことについて自由に語り合うのは [the forum](/forums/) でできます。</target>
       </trans-unit>
       <trans-unit id="picture/propose-image-replacement" datatype="html">
         <source>Propose image replacement</source>

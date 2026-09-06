@@ -2583,19 +2583,15 @@ Good luck.</source>
         </context-group>
         <target state="final">Пожертва</target>
       </trans-unit>
-      <trans-unit id="3937813557926167615" datatype="html">
+            <trans-unit id="2449511709964189843" datatype="html">
         <source>Please note that all material on this server autowp.ru, added visitors.
 
-The site administration does not have information on the legality of the publication of these materials.
-
 All images are posted for educational purposes.</source>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">238,249</context>
         </context-group>
         <target state="translated">Звертаємо вашу увагу на те, що всі матеріали, розміщені на сервері autowp.ru, додані відвідувачами сайту.
-
-Адміністрація сайту не має інформації про правомірність публікування цих матеріалів.
 
 Всі зображення розміщені в ознайомлювальних цілях.</target>
       </trans-unit>
@@ -9039,19 +9035,15 @@ If you are not registered yet, please do so now [on the registration page](/sign
         </context-group>
         <target state="translated">Поставлено в чергу на видалення</target>
       </trans-unit>
-      <trans-unit id="9107547038979295873" datatype="html">
-        <source>All images have their owners.
-
-  If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
+            <trans-unit id="4379739353357642506" datatype="html">
+        <source>If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
 
   Discuss anything and just talk about cars and not only can you on [the forum](/forums/).</source>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
           <context context-type="linenumber">263,270</context>
         </context-group>
-        <target state="translated">Усі зображення мають своїх власників.
-
-  Якщо ви вважаєте, що користувачі сайту помилилися, розмістивши це зображення в цьому розділі, було б добре, якби ви написали про це в коментарях і вказали на помилку.
+        <target state="translated">Якщо ви вважаєте, що користувачі сайту помилилися, розмістивши це зображення в цьому розділі, було б добре, якби ви написали про це в коментарях і вказали на помилку.
 
   Обговорити що завгодно і просто поговорити про автомобілі й не тільки ви можете на [форумі](/forums/).</target>
       </trans-unit>

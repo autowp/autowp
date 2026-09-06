@@ -2583,19 +2583,15 @@ Arrivederci.</target>
         </context-group>
         <target state="translated">Donare</target>
       </trans-unit>
-      <trans-unit id="3937813557926167615" datatype="html">
+            <trans-unit id="2449511709964189843" datatype="html">
         <source>Please note that all material on this server autowp.ru, added visitors.
 
-The site administration does not have information on the legality of the publication of these materials.
-
 All images are posted for educational purposes.</source>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">238,249</context>
         </context-group>
         <target state="translated">Tieni a mente che tutto il materiale sul sito wheelsage.org è aggiunto dagli utenti.
-
-L'amministrazione del sito non ha informazioni  sulla legalità della pubblicazione di tali materiale.
 
 Tutte le immagini sono pubblicate a scopo educativo.</target>
       </trans-unit>
@@ -9047,19 +9043,15 @@ Invia
         </context-group>
         <target state="translated">Rimozione in corso</target>
       </trans-unit>
-      <trans-unit id="9107547038979295873" datatype="html">
-        <source>All images have their owners.
-
-  If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
+            <trans-unit id="4379739353357642506" datatype="html">
+        <source>If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
 
   Discuss anything and just talk about cars and not only can you on [the forum](/forums/).</source>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
           <context context-type="linenumber">263,270</context>
         </context-group>
-        <target state="translated">Tutte le immagini hanno un proprietario.
-
-Se pensi che un utente abbia sbagliato a pubblicare questa immagine in questa sezione, sarebbe carino se scrivessi l'errore nei commenti.
+        <target state="translated">Se pensi che un utente abbia sbagliato a pubblicare questa immagine in questa sezione, sarebbe carino se scrivessi l'errore nei commenti.
 
 Parla di tutto, di auto e non, [sul forum](/forums/).</target>
       </trans-unit>
