@@ -60,7 +60,8 @@ export class ModerCommentsComponent implements OnInit {
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {
-        if (query === '') {
+        const trimmed = query.trim();
+        if (trimmed === '') {
           return of([] as Item[]);
         }
 
@@ -70,10 +71,10 @@ export class ModerCommentsComponent implements OnInit {
           limit: 10,
         });
         const options = new ItemListOptions();
-        if (query.startsWith('#')) {
-          options.id = query.substring(1);
+        if (trimmed.startsWith('#')) {
+          options.id = trimmed.substring(1);
         } else {
-          options.name = '%' + query + '%';
+          options.name = '%' + trimmed + '%';
         }
         params.options = options;
 

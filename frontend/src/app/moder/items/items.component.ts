@@ -133,7 +133,8 @@ export class ModerItemsComponent implements OnInit {
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {
-        if (query === '') {
+        const trimmed = query.trim();
+        if (trimmed === '') {
           return of([]);
         }
 
@@ -143,10 +144,10 @@ export class ModerItemsComponent implements OnInit {
           limit: 10,
         });
         const options = new ItemListOptions();
-        if (query.startsWith('#')) {
-          options.id = query.substring(1);
+        if (trimmed.startsWith('#')) {
+          options.id = trimmed.substring(1);
         } else {
-          options.name = '%' + query + '%';
+          options.name = '%' + trimmed + '%';
         }
         params.options = options;
 
@@ -180,8 +181,8 @@ export class ModerItemsComponent implements OnInit {
       fromYear: parseInt(params.get('from_year') ?? '', 10) || null,
       itemTypeID: parseInt(params.get('item_type_id') ?? '', 10) || ItemType.ITEM_TYPE_UNKNOWN,
       listMode: !!params.get('list'),
-      name: params.get('name') ?? '',
-      nameExclude: params.get('name_exclude') ?? '',
+      name: (params.get('name') ?? '').trim(),
+      nameExclude: (params.get('name_exclude') ?? '').trim(),
       noParent: !!params.get('no_parent'),
       order: (params.get('order') ?? defaultOrder) as ItemsRequest.Order,
       page: parseInt(params.get('page') ?? '', 10) || 1,

@@ -118,6 +118,8 @@ export class UploadSelectComponent implements OnInit {
   }
 
   private brandsObservable$(page: number, search: string): Observable<ItemList> {
+    const trimmed = search.trim();
+
     return this.#itemsClient
       .list(
         new ItemsRequest({
@@ -127,7 +129,7 @@ export class UploadSelectComponent implements OnInit {
           language: this.#languageService.language,
           limit: 500,
           options: new ItemListOptions({
-            name: search ? '%' + search + '%' : undefined,
+            name: trimmed ? '%' + trimmed + '%' : undefined,
             typeId: ItemType.ITEM_TYPE_BRAND,
           }),
           order: ItemsRequest.Order.NAME,

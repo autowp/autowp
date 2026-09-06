@@ -393,7 +393,8 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     text$.pipe(
       debounceTime(200),
       switchMap((query) => {
-        if (query === '') {
+        const trimmed = query.trim();
+        if (trimmed === '') {
           return of([]);
         }
 
@@ -406,13 +407,13 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
           limit: 10,
         });
         const options = new ItemListOptions();
-        if (query.startsWith('#')) {
-          const id = parseInt(query.substring(1), 10);
+        if (trimmed.startsWith('#')) {
+          const id = parseInt(trimmed.substring(1), 10);
           if (id) {
             options.id = '' + id;
           }
         } else {
-          options.name = '%' + query + '%';
+          options.name = '%' + trimmed + '%';
         }
         params.options = options;
 

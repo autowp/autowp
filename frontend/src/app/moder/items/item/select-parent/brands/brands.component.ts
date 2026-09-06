@@ -43,15 +43,17 @@ export class ModerItemsItemSelectParentBrandsComponent {
     // TransferState on hydration, avoiding a loading-state blink.
     id: 'moder-select-parent-brands',
     params: () => ({page: this.#page(), search: this.#search()}),
-    stream: ({params: {page, search}}) =>
-      this.#itemsClient
+    stream: ({params: {page, search}}) => {
+      const trimmed = search?.trim() ?? '';
+
+      return this.#itemsClient
         .list(
           new ItemsRequest({
             fields: new ItemFields({nameHtml: true}),
             language: this.#languageService.language,
             limit: 500,
             options: new ItemListOptions({
-              name: search ? '%' + search + '%' : undefined,
+              name: trimmed ? '%' + trimmed + '%' : undefined,
               typeId: ItemType.ITEM_TYPE_BRAND,
             }),
             page,
@@ -62,7 +64,8 @@ export class ModerItemsItemSelectParentBrandsComponent {
             items: chunk<Item>(response.items ?? [], 6),
             paginator: response.paginator,
           })),
-        ),
+        );
+    },
   });
 
   protected doSearch(search: string) {

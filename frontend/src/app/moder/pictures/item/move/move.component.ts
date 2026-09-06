@@ -266,21 +266,23 @@ export class ModerPicturesItemMoveComponent implements OnInit {
       this.#page$,
       searchControl.valueChanges.pipe(startWith(''), distinctUntilChanged(), debounceTime(30)),
     ]).pipe(
-      switchMap(([page, search]) =>
-        this.getItems$(
+      switchMap(([page, search]) => {
+        const trimmed = search?.trim() ?? '';
+
+        return this.getItems$(
           new ItemsRequest({
             fields: new ItemFields({nameHtml: true}),
             language: this.#languageService.language,
             limit: 50,
             options: new ItemListOptions({
-              name: search ? '%' + search + '%' : undefined,
+              name: trimmed ? '%' + trimmed + '%' : undefined,
               typeId: ItemType.ITEM_TYPE_PERSON,
             }),
             page,
           }),
           selectionType,
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -396,20 +398,22 @@ export class ModerPicturesItemMoveComponent implements OnInit {
     this.#page$,
     this.searchBrandControl.valueChanges.pipe(startWith(''), distinctUntilChanged(), debounceTime(30)),
   ]).pipe(
-    switchMap(([page, search]) =>
-      this.#itemsClient.list(
+    switchMap(([page, search]) => {
+      const trimmed = search?.trim() ?? '';
+
+      return this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({nameHtml: true}),
           language: this.#languageService.language,
           limit: 200,
           options: new ItemListOptions({
-            name: search ? '%' + search + '%' : undefined,
+            name: trimmed ? '%' + trimmed + '%' : undefined,
             typeId: ItemType.ITEM_TYPE_BRAND,
           }),
           page,
         }),
-      ),
-    ),
+      );
+    }),
     map((response) => ({
       items: chunk<Item>(response.items ?? [], 6),
       paginator: response.paginator,

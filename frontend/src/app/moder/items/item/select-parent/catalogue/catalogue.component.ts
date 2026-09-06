@@ -68,8 +68,10 @@ export class ModerItemsItemSelectParentCatalogueComponent {
       brandID
         ? of(null)
         : combineLatest([this.#itemTypeID$, this.#search$, this.page$]).pipe(
-            switchMap(([itemTypeID, search, page]) =>
-              this.#itemsClient.list(
+            switchMap(([itemTypeID, search, page]) => {
+              const trimmed = search?.trim() ?? '';
+
+              return this.#itemsClient.list(
                 new ItemsRequest({
                   fields: new ItemFields({nameHtml: true}),
                   language: this.#languageService.language,
@@ -82,14 +84,14 @@ export class ModerItemsItemSelectParentCatalogueComponent {
                         }),
                       }),
                     }),
-                    name: search ? '%' + search + '%' : undefined,
+                    name: trimmed ? '%' + trimmed + '%' : undefined,
                     typeId: ItemType.ITEM_TYPE_BRAND,
                   }),
                   order: ItemsRequest.Order.NAME,
                   page,
                 }),
-              ),
-            ),
+              );
+            }),
             catchError((error: unknown) => {
               this.#toastService.handleError(error);
               return EMPTY;
