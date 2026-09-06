@@ -48,6 +48,7 @@ const (
 	ItemTableVehicleTypeInheritColName     = "vehicle_type_inherit"
 	ItemTableSpecInheritColName            = "spec_inherit"
 	ItemTableProducedColName               = "produced"
+	ItemTablePositionColName               = "position"
 
 	ItemNameMinLength     = 2
 	ItemNameMaxLength     = 150

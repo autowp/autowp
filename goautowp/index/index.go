@@ -94,7 +94,7 @@ func (s *Cache) GenerateTopBrandsCache(ctx context.Context, lang string) error {
 		NameOnly:            true,
 		DescendantsCount:    true,
 		NewDescendantsCount: true,
-	}, items.OrderByDescendantsCount, false)
+	}, items.OrderByDescendantsCountBrands, false)
 	if err != nil {
 		return err
 	}

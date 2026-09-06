@@ -143,6 +143,12 @@ type OrderBy int
 const (
 	OrderByNone OrderBy = iota
 	OrderByDescendantsCount
+	// OrderByDescendantsCountBrands is OrderByDescendantsCount with item.position as a leading
+	// sort key: a brand at position=1 (the "Прочие"/misc catch-all bucket) always sorts after
+	// every position=0 brand, however many vehicles it has, and only appears in a Limit-bounded
+	// list (e.g. the home page's top-brands widget) once there are no other brands left to fill
+	// it - never by being outright excluded.
+	OrderByDescendantsCountBrands
 	OrderByDescendantPicturesCount
 	OrderByCreatedAt
 	OrderByName
@@ -3536,6 +3542,11 @@ func (s *Repository) orderBy(
 	switch orderBy {
 	case OrderByDescendantsCount:
 		columns = []columnOrder{{col: s.descendantsCountColumn, asc: false}}
+	case OrderByDescendantsCountBrands:
+		columns = []columnOrder{
+			{col: &SimpleColumn{col: schema.ItemTablePositionColName}, asc: true},
+			{col: s.descendantsCountColumn, asc: false},
+		}
 	case OrderByChildsCount:
 		columns = []columnOrder{{col: s.childsCountColumn, asc: false}}
 	case OrderByDescendantPicturesCount:
@@ -3606,6 +3617,13 @@ func (s *Repository) wrapperOrderBy(
 		col := wrappedAliasTable.Col(colDescendantsCount)
 
 		return []exp.OrderedExpression{col.Desc()}, []interface{}{col}, nil
+	case OrderByDescendantsCountBrands:
+		col := wrappedAliasTable.Col(colDescendantsCount)
+
+		return []exp.OrderedExpression{
+			wrapperAliasTable.Col(schema.ItemTablePositionColName).Asc(),
+			col.Desc(),
+		}, []interface{}{col}, nil
 	case OrderByChildsCount:
 		col := wrappedAliasTable.Col(colChildsCount)
 
@@ -3683,6 +3701,11 @@ func (s *Repository) wrappedOrderBy(alias string, orderBy OrderBy, lang string) 
 	switch orderBy {
 	case OrderByDescendantsCount:
 		orderByExp = []exp.OrderedExpression{goqu.C(colDescendantsCount).Desc()}
+	case OrderByDescendantsCountBrands:
+		orderByExp = []exp.OrderedExpression{
+			aliasTable.Col(schema.ItemTablePositionColName).Asc(),
+			goqu.C(colDescendantsCount).Desc(),
+		}
 	case OrderByChildsCount:
 		orderByExp = []exp.OrderedExpression{goqu.C(colChildsCount).Desc()}
 	case OrderByDescendantPicturesCount:
@@ -3742,7 +3765,7 @@ func (s *Repository) wrappedSelectColumns(orderBy OrderBy) map[string]Column {
 	}
 
 	switch orderBy {
-	case OrderByDescendantsCount:
+	case OrderByDescendantsCount, OrderByDescendantsCountBrands:
 		columns[colDescendantsCount] = s.descendantsCountColumn
 	case OrderByChildsCount:
 		columns[colChildsCount] = s.childsCountColumn

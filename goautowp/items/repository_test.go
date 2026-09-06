@@ -463,6 +463,98 @@ func TestOrderByDescendantsCount(t *testing.T) {
 	require.Equal(t, int32(0), list[0].DescendantsCount)
 }
 
+func TestOrderByDescendantsCountBrands(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByDescendantsCountBrands" + strconv.Itoa(int(random.Uint32()%100000))
+
+	// The "misc" brand: position=1, given more descendants than the regular brand below, so a
+	// plain descendants-count sort would incorrectly rank it first.
+	miscName := name + "_misc"
+	miscItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID: schema.ItemTableItemTypeIDBrand,
+		Body:       "",
+		IsGroup:    true,
+	}, miscName)
+
+	_, err = goquDB.Update(schema.ItemTable).
+		Set(goqu.Record{schema.ItemTablePositionColName: 1}).
+		Where(schema.ItemTableIDCol.Eq(miscItemID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	for i := range 3 {
+		childID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+		}, miscName+"_"+strconv.Itoa(i))
+
+		success, err := repository.CreateItemParent(ctx, childID, miscItemID, schema.ItemParentTypeDefault, "")
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// The regular brand: position=0 (default), fewer descendants than the misc brand.
+	regularName := name + "_regular"
+	regularItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID: schema.ItemTableItemTypeIDBrand,
+		Body:       "",
+		IsGroup:    true,
+	}, regularName)
+
+	childID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+	}, regularName+"_0")
+
+	success, err := repository.CreateItemParent(ctx, childID, regularItemID, schema.ItemParentTypeDefault, "")
+	require.NoError(t, err)
+	require.True(t, success)
+
+	// Both fit: the regular (position=0) brand still sorts first, ahead of misc's higher count.
+	list, _, err := repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%_%",
+		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+	}, &ItemFields{DescendantsCount: true}, OrderByDescendantsCountBrands, false)
+	require.NoError(t, err)
+	require.Len(t, list, 2)
+	require.Equal(t, regularItemID, list[0].ID)
+	require.Equal(t, miscItemID, list[1].ID)
+	require.Equal(t, int32(1), list[0].DescendantsCount)
+	require.Equal(t, int32(3), list[1].DescendantsCount)
+
+	// Only room for one: misc is left out entirely, despite its higher descendants count -
+	// exactly the home page top-brands widget's Limit-bounded case.
+	list, _, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%_%",
+		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+		Limit:    1,
+	}, &ItemFields{DescendantsCount: true}, OrderByDescendantsCountBrands, false)
+	require.NoError(t, err)
+	require.Len(t, list, 1)
+	require.Equal(t, regularItemID, list[0].ID)
+}
+
 func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	t.Parallel()
 
