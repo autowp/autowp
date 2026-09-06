@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"maps"
 	"math"
 	"strings"
 
@@ -113,85 +114,114 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		return nil, err
 	}
 
-	var stats map[int64]comments.TopicStat
-
-	if fields.GetCommentsCount() {
-		itemIDs := make([]int64, 0, len(rows))
-		for _, row := range rows {
-			itemIDs = append(itemIDs, row.ID)
-		}
-
-		stats, err = s.preloadTopicsStat(ctx, itemIDs, userCtx.UserID)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Votes and views are one round trip each per row; fetch them for the whole batch up front
-	// instead of a task per row inside the loop below.
+	// These preloads are independent of each other - each is its own round trip to Postgres or
+	// S3, writing its own map that the row loop below reads - so fan them out and wait once.
+	// The only ordering constraint is images -> formatted (format requests are keyed by image
+	// id), kept sequential inside a single task.
 	var (
+		stats     map[int64]comments.TopicStat
 		votesByID map[int64]*pictures.VoteSummary
 		viewsByID map[int64]int32
+		paths     map[int64][]*PathTreePictureItem
+		formatted = make(map[string]map[int]storage.Image, pictureImageFormatCount)
 	)
 
-	if fields.GetVotes() || fields.GetViews() {
-		pictureIDs := make([]int64, 0, len(rows))
-		for _, row := range rows {
-			pictureIDs = append(pictureIDs, row.ID)
-		}
+	pictureIDs := make([]int64, 0, len(rows))
+	for _, row := range rows {
+		pictureIDs = append(pictureIDs, row.ID)
+	}
 
-		if fields.GetVotes() {
-			votesByID, err = picturesRepository.GetVotesBatch(ctx, pictureIDs, userCtx.UserID)
-			if err != nil {
-				return nil, err
-			}
-		}
+	preloadGroup, preloadCtx := errgroup.WithContext(ctx)
 
-		if fields.GetViews() {
-			viewsByID, err = picturesRepository.PictureViewsBatch(ctx, pictureIDs)
-			if err != nil {
-				return nil, err
-			}
-		}
+	if fields.GetCommentsCount() {
+		preloadGroup.Go(func() error {
+			var preloadErr error
+
+			stats, preloadErr = s.preloadTopicsStat(preloadCtx, pictureIDs, userCtx.UserID)
+
+			return preloadErr
+		})
+	}
+
+	if fields.GetVotes() {
+		preloadGroup.Go(func() error {
+			var preloadErr error
+
+			votesByID, preloadErr = picturesRepository.GetVotesBatch(preloadCtx, pictureIDs, userCtx.UserID)
+
+			return preloadErr
+		})
+	}
+
+	if fields.GetViews() {
+		preloadGroup.Go(func() error {
+			var preloadErr error
+
+			viewsByID, preloadErr = picturesRepository.PictureViewsBatch(preloadCtx, pictureIDs)
+
+			return preloadErr
+		})
 	}
 
 	if fields.GetNameText() || fields.GetNameHtml() {
-		namesData, err = picturesRepository.NameData(ctx, rows, pictures.NameDataOptions{
-			Language: lang,
+		preloadGroup.Go(func() error {
+			var preloadErr error
+
+			namesData, preloadErr = picturesRepository.NameData(preloadCtx, rows, pictures.NameDataOptions{
+				Language: lang,
+			})
+
+			return preloadErr
 		})
-		if err != nil {
-			return nil, err
-		}
+	}
+
+	if pathRequest := fields.GetPath(); pathRequest != nil {
+		parentID := pathRequest.GetParentId()
+
+		preloadGroup.Go(func() error {
+			var preloadErr error
+
+			paths, preloadErr = s.preloadPaths(preloadCtx, rows, parentID)
+
+			return preloadErr
+		})
 	}
 
 	if fields.GetImage() || fields.GetImageGallery() || isModer {
-		ids := make([]int, 0, len(rows))
-
-		for _, row := range rows {
-			if row.ImageID.Valid {
-				ids = append(ids, int(row.ImageID.Int64))
+		preloadGroup.Go(func() error {
+			ids := make([]int, 0, len(rows))
+			for _, row := range rows {
+				if row.ImageID.Valid {
+					ids = append(ids, int(row.ImageID.Int64))
+				}
 			}
-		}
 
-		images, err = imageStorage.Images(ctx, ids)
-		if err != nil {
-			return nil, err
-		}
+			loadedImages, preloadErr := imageStorage.Images(preloadCtx, ids)
+			if preloadErr != nil {
+				return preloadErr
+			}
+
+			maps.Copy(images, loadedImages)
+
+			// Formatted variants for the whole batch: one query per format asked for, rather than
+			// one per format per row - a gallery of two dozen pictures used to make two dozen of
+			// them. FormattedImages looks the format up for a set of images and generates the
+			// ones that are missing, exactly as FormattedImage does for one.
+			for formatName, formatIDs := range pictureImageFormatRequests(rows, fields, images) {
+				formattedImages, preloadErr := imageStorage.FormattedImages(preloadCtx, formatIDs, formatName)
+				if preloadErr != nil {
+					return preloadErr
+				}
+
+				formatted[formatName] = formattedImages
+			}
+
+			return nil
+		})
 	}
 
-	// Formatted variants for the whole batch: one query per format asked for, rather than one per
-	// format per row - a gallery of two dozen pictures used to make two dozen of them. It is the
-	// same call the per-row code made, only plural: FormattedImages looks the format up for a set
-	// of images and generates the ones that are missing, exactly as FormattedImage does for one.
-	formatted := make(map[string]map[int]storage.Image, pictureImageFormatCount)
-
-	if formatRequests := pictureImageFormatRequests(rows, fields, images); len(formatRequests) > 0 {
-		for formatName, ids := range formatRequests {
-			formatted[formatName], err = imageStorage.FormattedImages(ctx, ids, formatName)
-			if err != nil {
-				return nil, err
-			}
-		}
+	if err = preloadGroup.Wait(); err != nil {
+		return nil, err
 	}
 
 	var pictureItemExtractor *PictureItemExtractor
@@ -208,15 +238,6 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 
 	if fields.GetSubscribed() && userCtx.UserID > 0 {
 		commentsRepository, err = s.container.CommentsRepository(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var paths map[int64][]*PathTreePictureItem
-
-	if pathRequest := fields.GetPath(); pathRequest != nil {
-		paths, err = s.preloadPaths(ctx, rows, pathRequest.GetParentId())
 		if err != nil {
 			return nil, err
 		}
