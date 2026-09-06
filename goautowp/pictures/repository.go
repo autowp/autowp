@@ -2150,6 +2150,52 @@ func (s *Repository) ClearQueue(ctx context.Context) error {
 	return nil
 }
 
+// pictureInsertParams holds the fields AddPictureFromReader needs to build the new picture row -
+// pulled out solely to keep that already-long function's insert statement from adding to its own
+// line count and Halstead volume (golangci-lint's maintidx check).
+type pictureInsertParams struct {
+	fileSize         int
+	height           int
+	identity         string
+	imageID          int
+	license          schema.PictureLicense
+	remoteAddr       string
+	replacePictureID int64
+	sourceURL        string
+	userID           int64
+	width            int
+}
+
+func newPictureRow(params pictureInsertParams) goqu.Record {
+	return goqu.Record{
+		schema.PictureTableImageIDColName:      params.imageID,
+		schema.PictureTableWidthColName:        params.width,
+		schema.PictureTableHeightColName:       params.height,
+		schema.PictureTableOwnerIDColName:      params.userID,
+		schema.PictureTableCreatedAtColName:    goqu.Func("NOW"),
+		schema.PictureTableFilesizeColName:     params.fileSize,
+		schema.PictureTableStatusColName:       schema.PictureStatusInbox,
+		schema.PictureTableRemovingDateColName: nil,
+		schema.PictureTableIPColName:           goqu.Func("INET", params.remoteAddr),
+		schema.PictureTableIdentityColName:     params.identity,
+		schema.PictureTableReplacePictureIDColName: sql.NullInt64{
+			Int64: params.replacePictureID,
+			Valid: params.replacePictureID > 0,
+		},
+		schema.PictureTableLicenseIDColName: params.license,
+		schema.PictureTableSourceURLColName: sql.NullString{
+			String: params.sourceURL,
+			Valid:  len(params.sourceURL) > 0,
+		},
+		schema.PictureTableChangeSourceURLUserIDColName: sql.NullInt64{
+			Int64: params.userID, Valid: len(params.sourceURL) > 0 && params.userID > 0,
+		},
+		schema.PictureTableChangeSourceURLDateColName: sql.NullTime{
+			Time: time.Now(), Valid: len(params.sourceURL) > 0,
+		},
+	}
+}
+
 func (s *Repository) AddPictureFromReader(
 	ctx context.Context,
 	handle io.ReadSeeker,
@@ -2243,33 +2289,20 @@ func (s *Repository) AddPictureFromReader(
 	var pictureID int64
 
 	// add record to db
-	success, err := s.db.Insert(schema.PictureTable).Rows(goqu.Record{
-		schema.PictureTableImageIDColName:      imageID,
-		schema.PictureTableWidthColName:        imageConfig.Width,
-		schema.PictureTableHeightColName:       imageConfig.Height,
-		schema.PictureTableOwnerIDColName:      userID,
-		schema.PictureTableCreatedAtColName:    goqu.Func("NOW"),
-		schema.PictureTableFilesizeColName:     img.FileSize(),
-		schema.PictureTableStatusColName:       schema.PictureStatusInbox,
-		schema.PictureTableRemovingDateColName: nil,
-		schema.PictureTableIPColName:           goqu.Func("INET", remoteAddr),
-		schema.PictureTableIdentityColName:     identity,
-		schema.PictureTableReplacePictureIDColName: sql.NullInt64{
-			Int64: replacePictureID,
-			Valid: replacePictureID > 0,
-		},
-		schema.PictureTableLicenseIDColName: license,
-		schema.PictureTableSourceURLColName: sql.NullString{
-			String: sourceURL,
-			Valid:  len(sourceURL) > 0,
-		},
-		schema.PictureTableChangeSourceURLUserIDColName: sql.NullInt64{
-			Int64: userID, Valid: len(sourceURL) > 0 && userID > 0,
-		},
-		schema.PictureTableChangeSourceURLDateColName: sql.NullTime{
-			Time: time.Now(), Valid: len(sourceURL) > 0,
-		},
-	}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
+	success, err := s.db.Insert(schema.PictureTable).
+		Rows(newPictureRow(pictureInsertParams{
+			fileSize:         img.FileSize(),
+			height:           imageConfig.Height,
+			identity:         identity,
+			imageID:          imageID,
+			license:          license,
+			remoteAddr:       remoteAddr,
+			replacePictureID: replacePictureID,
+			sourceURL:        sourceURL,
+			userID:           userID,
+			width:            imageConfig.Width,
+		})).
+		Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 	if err != nil {
 		return 0, err
 	}
