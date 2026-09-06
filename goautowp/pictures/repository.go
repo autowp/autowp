@@ -221,6 +221,35 @@ func (s *Repository) PictureViews(ctx context.Context, id int64) (int32, error) 
 	return res, nil
 }
 
+// PictureViewsBatch returns the view count for each of the given pictures in one query. Pictures
+// with no picture_view row are simply absent from the map (treat as zero).
+func (s *Repository) PictureViewsBatch(ctx context.Context, ids []int64) (map[int64]int32, error) {
+	result := make(map[int64]int32, len(ids))
+
+	if len(ids) == 0 {
+		return result, nil
+	}
+
+	var rows []struct {
+		PictureID int64 `db:"picture_id"`
+		Views     int32 `db:"views"`
+	}
+
+	err := s.db.Select(schema.PictureViewTablePictureIDCol, schema.PictureViewTableViewsCol).
+		From(schema.PictureViewTable).
+		Where(schema.PictureViewTablePictureIDCol.In(ids)).
+		ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range rows {
+		result[row.PictureID] = row.Views
+	}
+
+	return result, nil
+}
+
 func (s *Repository) IncView(ctx context.Context, id int64) error {
 	_, err := s.db.Insert(schema.PictureViewTable).
 		Rows(goqu.Record{
@@ -312,6 +341,74 @@ func (s *Repository) GetVote(ctx context.Context, id int64, userID int64) (*Vote
 		Positive: st.Positive,
 		Negative: st.Negative,
 	}, nil
+}
+
+// GetVotesBatch returns a vote summary for each of the given pictures in two queries (one for the
+// per-picture positive/negative totals, one for this user's own vote) instead of the pair GetVote
+// runs per picture. Every requested id gets an entry, zero-valued when there is no data.
+func (s *Repository) GetVotesBatch(
+	ctx context.Context, ids []int64, userID int64,
+) (map[int64]*VoteSummary, error) {
+	result := make(map[int64]*VoteSummary, len(ids))
+
+	for _, id := range ids {
+		result[id] = &VoteSummary{}
+	}
+
+	if len(ids) == 0 {
+		return result, nil
+	}
+
+	var summaryRows []struct {
+		PictureID int64 `db:"picture_id"`
+		Positive  int32 `db:"positive"`
+		Negative  int32 `db:"negative"`
+	}
+
+	err := s.db.Select(
+		schema.PictureVoteSummaryTablePictureIDCol,
+		schema.PictureVoteSummaryTablePositiveCol,
+		schema.PictureVoteSummaryTableNegativeCol,
+	).
+		From(schema.PictureVoteSummaryTable).
+		Where(schema.PictureVoteSummaryTablePictureIDCol.In(ids)).
+		ScanStructsContext(ctx, &summaryRows)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range summaryRows {
+		if summary, ok := result[row.PictureID]; ok {
+			summary.Positive = row.Positive
+			summary.Negative = row.Negative
+		}
+	}
+
+	if userID > 0 {
+		var voteRows []struct {
+			PictureID int64 `db:"picture_id"`
+			Value     int32 `db:"value"`
+		}
+
+		err = s.db.Select(schema.PictureVoteTablePictureIDCol, schema.PictureVoteTableValueCol).
+			From(schema.PictureVoteTable).
+			Where(
+				schema.PictureVoteTablePictureIDCol.In(ids),
+				schema.PictureVoteTableUserIDCol.Eq(userID),
+			).
+			ScanStructsContext(ctx, &voteRows)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, row := range voteRows {
+			if summary, ok := result[row.PictureID]; ok {
+				summary.Value = row.Value
+			}
+		}
+	}
+
+	return result, nil
 }
 
 func (s *Repository) Vote(ctx context.Context, id int64, value int32, userID int64) error {

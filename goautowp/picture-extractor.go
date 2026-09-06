@@ -127,6 +127,34 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 	}
 
+	// Votes and views are one round trip each per row; fetch them for the whole batch up front
+	// instead of a task per row inside the loop below.
+	var (
+		votesByID map[int64]*pictures.VoteSummary
+		viewsByID map[int64]int32
+	)
+
+	if fields.GetVotes() || fields.GetViews() {
+		pictureIDs := make([]int64, 0, len(rows))
+		for _, row := range rows {
+			pictureIDs = append(pictureIDs, row.ID)
+		}
+
+		if fields.GetVotes() {
+			votesByID, err = picturesRepository.GetVotesBatch(ctx, pictureIDs, userCtx.UserID)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if fields.GetViews() {
+			viewsByID, err = picturesRepository.PictureViewsBatch(ctx, pictureIDs)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	if fields.GetNameText() || fields.GetNameHtml() {
 		namesData, err = picturesRepository.NameData(ctx, rows, pictures.NameDataOptions{
 			Language: lang,
@@ -325,33 +353,17 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetViews() {
-			group.Go(func() error {
-				views, err := picturesRepository.PictureViews(groupCtx, row.ID)
-				if err != nil {
-					return err
-				}
-
-				resultRow.Views = views
-
-				return nil
-			})
+			resultRow.Views = viewsByID[row.ID]
 		}
 
 		if fields.GetVotes() {
-			group.Go(func() error {
-				vote, err := picturesRepository.GetVote(groupCtx, row.ID, userCtx.UserID)
-				if err != nil {
-					return err
-				}
-
+			if vote := votesByID[row.ID]; vote != nil {
 				resultRow.Votes = &PicturesVoteSummary{
 					Value:    vote.Value,
 					Positive: vote.Positive,
 					Negative: vote.Negative,
 				}
-
-				return nil
-			})
+			}
 		}
 
 		if fields.GetCommentsCount() {
