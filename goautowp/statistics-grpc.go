@@ -234,9 +234,11 @@ func (s *StatisticsGRPCServer) GetPulse(
 		goqu.Func("TO_CHAR", schema.LogEventTableCreatedAtCol, dateExpr).As(dateAlias),
 		goqu.COUNT(goqu.Star()).As("value"),
 	).From(schema.LogEventTable).
+		Join(schema.UserTable, goqu.On(schema.UserTableIDCol.Eq(schema.LogEventTableUserIDCol))).
 		Where(
 			schema.LogEventTableCreatedAtCol.Gte(from),
 			schema.LogEventTableCreatedAtCol.Lt(to),
+			schema.UserTableDeletedCol.IsFalse(),
 		).
 		GroupBy(schema.LogEventTableUserIDCol, goqu.C(dateAlias)).ScanStructsContext(ctx, &rows)
 	if err != nil {
