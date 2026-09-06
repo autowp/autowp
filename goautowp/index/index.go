@@ -15,7 +15,7 @@ import (
 
 const (
 	topBrandsCount      = 150
-	topPersonsCount     = 5
+	topPersonsCount     = 10
 	topFactoriesCount   = 8
 	topCategoriesCount  = 15
 	topTwinsBrandsCount = 20
