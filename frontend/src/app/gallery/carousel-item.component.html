@@ -53,6 +53,45 @@
     <i class="bi bi-card-image" aria-hidden="true"></i>
   </a>
 
+  @if (item.votes; as votes) {
+    <span
+      class="like carousel-control"
+      role="button"
+      tabindex="0"
+      [class.disabled]="!authenticated()"
+      (click)="vote(1)"
+      (keyup.enter)="vote(1)"
+    >
+      <i
+        class="bi"
+        aria-hidden="true"
+        [class.bi-hand-thumbs-up-fill]="votes.value > 0"
+        [class.bi-hand-thumbs-up]="votes.value <= 0"
+      ></i>
+      @if (votes.positive > 0) {
+        <div class="badge rounded-pill text-bg-success">{{ votes.positive }}</div>
+      }
+    </span>
+    <span
+      class="dislike carousel-control"
+      role="button"
+      tabindex="0"
+      [class.disabled]="!authenticated()"
+      (click)="vote(-1)"
+      (keyup.enter)="vote(-1)"
+    >
+      <i
+        class="bi"
+        aria-hidden="true"
+        [class.bi-hand-thumbs-down-fill]="votes.value < 0"
+        [class.bi-hand-thumbs-down]="votes.value >= 0"
+      ></i>
+      @if (votes.negative > 0) {
+        <div class="badge rounded-pill text-bg-danger">{{ votes.negative }}</div>
+      }
+    </span>
+  }
+
   @if ((item.imageGallery && cropLoading()) || (item.imageGalleryFull && fullLoading())) {
     <div class="loading-icon">
       <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>

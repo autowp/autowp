@@ -98,7 +98,9 @@ $control-width: 7.5%;
 
   &.download,
   &.details,
-  &.comments {
+  &.comments,
+  &.like,
+  &.dislike {
     top: auto;
     bottom: 20px;
     height: auto;
@@ -122,23 +124,43 @@ $control-width: 7.5%;
     }
   }
 
+  &.like,
+  &.dislike {
+    cursor: pointer;
+
+    &.disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
+
   &:visited {
     color: #fff;
   }
 
-  &.download {
+  &.like {
+    /* stylelint-disable-next-line declaration-property-value-no-unknown */
+    left: 50% - $control-width * 2.5;
+  }
+
+  &.dislike {
     /* stylelint-disable-next-line declaration-property-value-no-unknown */
     left: 50% - $control-width * 1.5;
   }
 
-  &.details {
+  &.download {
     /* stylelint-disable-next-line declaration-property-value-no-unknown */
     left: 50% - $control-width * 0.5;
   }
 
-  &.comments {
+  &.details {
     /* stylelint-disable-next-line declaration-property-value-no-unknown */
     left: 50% + $control-width * 0.5;
+  }
+
+  &.comments {
+    /* stylelint-disable-next-line declaration-property-value-no-unknown */
+    left: 50% + $control-width * 1.5;
   }
 }
 

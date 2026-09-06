@@ -2,11 +2,26 @@ import type {AfterViewInit} from '@angular/core';
 import type {Picture, PictureItem} from '@grpc/spec.pb';
 
 import {NgStyle} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, signal} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer} from '@angular/platform-browser';
 import {RouterLink} from '@angular/router';
+import {PicturesVoteRequest} from '@grpc/spec.pb';
+import {PicturesClient} from '@grpc/spec.pbsc';
+import {AuthService} from '@services/auth.service';
 import {NgMathPipesModule} from 'ngx-pipes';
+import {catchError, EMPTY} from 'rxjs';
 
+import {ToastsService} from '../toasts/toasts.service';
 import {AreaComponent} from './area.component';
 
 interface Area {
@@ -75,9 +90,15 @@ function maxBounds(bounds: Dimension, max: Dimension): Dimension {
 export class CarouselItemComponent implements AfterViewInit {
   readonly #el = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly #sanitizer = inject(DomSanitizer);
+  readonly #picturesClient = inject(PicturesClient);
+  readonly #auth = inject(AuthService);
+  readonly #toastService = inject(ToastsService);
+  readonly #cdr = inject(ChangeDetectorRef);
 
   readonly item = input.required<Picture>();
   readonly prefix = input.required<string[]>();
+
+  protected readonly authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
 
   protected readonly cropMode = signal(true);
   protected readonly cropModeAvailable = computed(() => !!this.item().imageGallery);
@@ -296,5 +317,24 @@ export class CarouselItemComponent implements AfterViewInit {
 
   protected toggleCrop() {
     this.cropMode.set(!this.cropMode());
+  }
+
+  protected vote(value: number) {
+    if (!this.authenticated()) {
+      return;
+    }
+
+    this.#picturesClient
+      .vote(new PicturesVoteRequest({pictureId: this.item().id, value}))
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+      )
+      .subscribe((votes) => {
+        this.item().votes = votes;
+        this.#cdr.markForCheck();
+      });
   }
 }

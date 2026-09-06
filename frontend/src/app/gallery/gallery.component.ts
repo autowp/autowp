@@ -38,6 +38,7 @@ const galleryFields = new PictureFields({
   imageGalleryFull: true,
   nameHtml: true,
   nameText: true,
+  votes: true,
   pictureItem: new PictureItemsRequest({
     fields: new PictureItemFields({
       item: new ItemsRequest({
