@@ -3135,41 +3135,62 @@ func (s *PicturesGRPCServer) splitPictures(
 ) ([]*NewboxGroupDraft, error) {
 	res := make([]*NewboxGroupDraft, 0)
 
+	pictureIDs := make([]int64, 0, len(pictureRows))
 	for _, pictureRow := range pictureRows {
+		pictureIDs = append(pictureIDs, pictureRow.ID)
+	}
+
+	// One query for the whole page instead of one per picture: fetch every CONTENT picture-item
+	// for these pictures and bucket them by picture id.
+	contentItemIDs := make(map[int64][]int64, len(pictureIDs))
+
+	if len(pictureIDs) > 0 {
 		pictureItems, err := s.repository.PictureItems(ctx, &query.PictureItemListOptions{
-			PictureID: pictureRow.ID,
-			TypeID:    schema.PictureItemTypeContent,
+			PictureIDs: pictureIDs,
+			TypeID:     schema.PictureItemTypeContent,
 		}, pictures.PictureItemOrderByNone, 0)
 		if err != nil {
 			return nil, err
 		}
 
-		if len(pictureItems) != 1 {
+		for _, pictureItem := range pictureItems {
+			contentItemIDs[pictureItem.PictureID] = append(
+				contentItemIDs[pictureItem.PictureID], pictureItem.ItemID,
+			)
+		}
+	}
+
+	for _, pictureRow := range pictureRows {
+		itemIDs := contentItemIDs[pictureRow.ID]
+
+		if len(itemIDs) != 1 {
 			res = append(res, &NewboxGroupDraft{
 				Type:    newboxGroupTypePicture,
 				Picture: pictureRow,
 			})
-		} else {
-			itemID := pictureItems[0].ItemID
 
-			found := false
+			continue
+		}
 
-			for idx := range res {
-				if res[idx].Type == newboxGroupTypeItem && res[idx].ItemID == itemID {
-					res[idx].Pictures = append(res[idx].Pictures, pictureRow)
-					found = true
+		itemID := itemIDs[0]
 
-					break
-				}
+		found := false
+
+		for idx := range res {
+			if res[idx].Type == newboxGroupTypeItem && res[idx].ItemID == itemID {
+				res[idx].Pictures = append(res[idx].Pictures, pictureRow)
+				found = true
+
+				break
 			}
+		}
 
-			if !found {
-				res = append(res, &NewboxGroupDraft{
-					ItemID:   itemID,
-					Type:     newboxGroupTypeItem,
-					Pictures: []*schema.PictureRow{pictureRow},
-				})
-			}
+		if !found {
+			res = append(res, &NewboxGroupDraft{
+				ItemID:   itemID,
+				Type:     newboxGroupTypeItem,
+				Pictures: []*schema.PictureRow{pictureRow},
+			})
 		}
 	}
 
