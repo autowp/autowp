@@ -43,11 +43,12 @@
     @if (isModer$ | async) {
       <p>
         <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
-        <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
+        <a class="me-1" i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
         @if (canAddItem$ | async; as canAddItem) {
           @if (canAddItem && item.isGroup) {
             <i class="bi bi-plus me-1" aria-hidden="true"></i>
             <a
+              class="me-1"
               style="text-transform: lowercase"
               routerLink="/moder/items/new"
               [queryParams]="{item_type_id: item.itemTypeId, parent_id: item.id}"
@@ -58,7 +59,7 @@
         @if (canAcceptPicture$ | async; as canAcceptPicture) {
           @if (canAcceptPicture && item.inboxPicturesCount && item.inboxPicturesCount > 0) {
             <i class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></i>
-            <a routerLink="/moder/pictures" [queryParams]="{item_id: item.id, status: 'inbox'}">
+            <a class="me-1" routerLink="/moder/pictures" [queryParams]="{item_id: item.id, status: 'inbox'}">
               <ng-container i18n>inbox</ng-container> ({{ item.inboxPicturesCount }})
             </a>
           }
