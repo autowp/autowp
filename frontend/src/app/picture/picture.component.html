@@ -6,7 +6,7 @@
         @if (pictureItemsData(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item.design; as design) {
-              <sup class="design-brand">
+              <sup class="design-brand ms-2">
                 <ng-container i18n>designed by</ng-container>&ngsp;
                 <a [routerLink]="design.route">{{ design.name }}</a>
               </sup>
@@ -20,7 +20,7 @@
         @if (pictureItemsData(); as items) {
           @if (items.length === 1 && items[0].item?.design) {
             @if (items[0].item.design; as design) {
-              <sup class="design-brand">
+              <sup class="design-brand ms-2">
                 <ng-container i18n>designed by</ng-container>&ngsp;
                 <a [routerLink]="design.route">{{ design.name }}</a>
               </sup>
