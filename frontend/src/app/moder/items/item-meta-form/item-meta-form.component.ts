@@ -186,6 +186,10 @@ export class ItemMetaFormComponent {
   readonly invalidParams = input.required<InvalidParams>();
   readonly submitted = output<ItemMetaFormResult>();
 
+  // Set by the parent while its own submit-handling observable is in flight - this component has
+  // no visibility into that (it just emits `submitted` and is done), so it can't track it itself.
+  readonly sending = input<boolean>(false);
+
   readonly disableIsGroup = input<boolean>(false);
   readonly #disableIsGroup$ = toObservable(this.disableIsGroup);
 

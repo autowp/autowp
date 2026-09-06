@@ -854,15 +854,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/vehicles.component.html</context>
-          <context context-type="linenumber">86,90</context>
+          <context context-type="linenumber">87,91</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/vehicles.component.html</context>
-          <context context-type="linenumber">98,102</context>
+          <context context-type="linenumber">99,103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/vehicles.component.html</context>
-          <context context-type="linenumber">108,112</context>
+          <context context-type="linenumber">109,113</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/categories/category/category.component.html</context>
@@ -3129,7 +3129,7 @@ All images are posted for educational purposes.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item-meta-form/item-meta-form.component.ts</context>
-          <context context-type="linenumber">297</context>
+          <context context-type="linenumber">301</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6286037250766429054" datatype="html">
@@ -3140,7 +3140,7 @@ All images are posted for educational purposes.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item-meta-form/item-meta-form.component.ts</context>
-          <context context-type="linenumber">301</context>
+          <context context-type="linenumber">305</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
@@ -3522,7 +3522,7 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>comments</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/index/index.component.html</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">77,78</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/pictures/pictures.component.html</context>
@@ -3530,7 +3530,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/vehicles.component.html</context>
-          <context context-type="linenumber">69,71</context>
+          <context context-type="linenumber">70,72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6940643892493360579" datatype="html">
@@ -3673,7 +3673,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/vehicles.component.html</context>
-          <context context-type="linenumber">62,64</context>
+          <context context-type="linenumber">63,65</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/pictures.component.ts</context>
@@ -3710,14 +3710,14 @@ All values entered here are displayed on the site, in the specifications, are us
         <source>Other pictures of</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/vehicles.component.html</context>
-          <context context-type="linenumber">115,117</context>
+          <context context-type="linenumber">116,118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2080991350146694020" datatype="html">
         <source>all pictures</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/catalogue/vehicles/vehicles.component.html</context>
-          <context context-type="linenumber">140,145</context>
+          <context context-type="linenumber">141,146</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/categories/category/category.component.html</context>
@@ -4980,7 +4980,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item-meta-form/item-meta-form.component.html</context>
-          <context context-type="linenumber">504,509</context>
+          <context context-type="linenumber">505,511</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/links/links.component.html</context>
@@ -6952,7 +6952,7 @@ licence stated there.
         <source>ended</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item-meta-form/item-meta-form.component.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">244</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/meta/meta.component.html</context>
@@ -6963,7 +6963,7 @@ licence stated there.
         <source>continue in pr.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item-meta-form/item-meta-form.component.ts</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">248</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/meta/meta.component.html</context>
@@ -6974,7 +6974,7 @@ licence stated there.
         <source>about</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item-meta-form/item-meta-form.component.ts</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/meta/meta.component.html</context>
@@ -6985,7 +6985,7 @@ licence stated there.
         <source>exactly</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item-meta-form/item-meta-form.component.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">259</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/meta/meta.component.html</context>

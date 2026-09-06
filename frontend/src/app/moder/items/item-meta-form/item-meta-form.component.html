@@ -501,7 +501,9 @@
     }
     <div class="row">
       <div class="col-md-10 offset-md-2">
-        <button type="submit" name="submit" class="btn btn-primary" i18n [disabled]="!form.valid">Submit</button>
+        <button type="submit" name="submit" class="btn btn-primary" [disabled]="!form.valid || sending()">
+          <ng-container i18n>Submit</ng-container>
+        </button>
       </div>
     </div>
   </form>

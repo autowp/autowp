@@ -32,6 +32,7 @@
     [parentIsConcept]="formParams.parentIsConcept"
     [vehicleTypeIDs]="formParams.vehicleTypeIDs"
     [invalidParams]="invalidParams()"
+    [sending]="sending()"
     (submitted)="submit(formParams.item.itemTypeId, $event)"
   />
 }

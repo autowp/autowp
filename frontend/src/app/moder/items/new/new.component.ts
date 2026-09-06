@@ -18,6 +18,7 @@ import {
   combineLatest,
   distinctUntilChanged,
   EMPTY,
+  finalize,
   forkJoin,
   map,
   of,
@@ -50,6 +51,7 @@ export class ModerItemsNewComponent {
   readonly #window = browserWindow();
 
   protected readonly invalidParams = signal<InvalidParams>({});
+  protected readonly sending = signal(false);
 
   readonly #itemTypeID$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('item_type_id') ?? '', 10)),
@@ -117,6 +119,12 @@ export class ModerItemsNewComponent {
   );
 
   protected submit(itemTypeID: number, event: ItemMetaFormResult) {
+    if (this.sending()) {
+      return;
+    }
+
+    this.sending.set(true);
+
     const newItem = itemMetaFormResultsToAPIItem(event);
     newItem.itemTypeId = itemTypeID;
 
@@ -161,6 +169,13 @@ export class ModerItemsNewComponent {
               void this.#router.navigate(['/moder/items/item', item.id]);
             }),
           );
+        }),
+        // Covers both outcomes without duplicating the reset in the error/complete branches
+        // below - success navigates away so this doesn't visibly re-enable the button then, it
+        // just also doesn't leave `sending` stuck true for a component that's about to be
+        // destroyed anyway.
+        finalize(() => {
+          this.sending.set(false);
         }),
       )
       .subscribe({
