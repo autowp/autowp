@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"math/rand"
 	"time"
 
 	"github.com/autowp/goautowp/logging"
@@ -16,6 +17,19 @@ var errItemIDMustBeDefined = errors.New("itemID must be defined")
 const (
 	defaultMinPictures      = 3
 	YoomoneyLabelDateFormat = time.DateOnly
+
+	picturesCountAlias = "p_count"
+	completeCountAlias = "p_complete_count"
+
+	// The weighted-random pick in candidate() favors items whose accepted pictures have both an
+	// author and a non-unknown licence ("fully documented"): weight ramps linearly from 1 (no
+	// fully-documented pictures) to completeCountMaxWeight at completeCountCap such pictures, then
+	// stops growing - a section with e.g. 40 fully-documented pictures gets no extra pull beyond
+	// the cap over one with 10, so it can't come to dominate the daily pick. The 1->7 span over
+	// [0,10] is chosen so a section with 5 fully-documented pictures - the point actually asked
+	// for - lands at 4x the baseline weight.
+	completeCountCap       = 10
+	completeCountMaxWeight = 7.0
 )
 
 type Repository struct {
@@ -32,6 +46,56 @@ type NextDate struct {
 type CandidateRecord struct {
 	ItemID int64 `db:"id"`
 	Count  int64 `db:"p_count"`
+}
+
+type weightedCandidate struct {
+	ItemID        int64 `db:"id"`
+	CompleteCount int64 `db:"p_complete_count"`
+}
+
+// completenessWeight is the weighted-random pick's relative pull for an item whose accepted
+// pictures include completeCount "fully documented" ones (both a credited author and a
+// non-unknown licence): a linear ramp from 1 (none) to completeCountMaxWeight at
+// completeCountCap such pictures, capped beyond that so a section that happens to have e.g. 40
+// fully-documented pictures gets no extra pull over one with 10 - it can't come to dominate the
+// daily pick. The 1->7 span over [0,10] is chosen so 5 fully-documented pictures lands at 4x the
+// baseline weight.
+func completenessWeight(completeCount int64) float64 {
+	if completeCount > completeCountCap {
+		completeCount = completeCountCap
+	}
+
+	return 1 + (completeCountMaxWeight-1)*float64(completeCount)/float64(completeCountCap)
+}
+
+// pickWeighted draws one candidate with probability proportional to weight(candidate) - the
+// standard cumulative-weight method: a single uniform draw over the total weight, then walk the
+// running sum until it's exceeded. A plain uniform pick is the same thing with every weight equal.
+func pickWeighted[T any](candidates []T, weight func(T) float64, rng *rand.Rand) (T, bool) {
+	var zero T
+
+	total := 0.0
+	for _, c := range candidates {
+		total += weight(c)
+	}
+
+	if total <= 0 {
+		return zero, false
+	}
+
+	threshold := rng.Float64() * total
+
+	sum := 0.0
+	for _, c := range candidates {
+		sum += weight(c)
+		if threshold < sum {
+			return c, true
+		}
+	}
+
+	// Floating-point rounding can leave threshold a hair below total after the loop above -
+	// the last candidate is the correct pick either way.
+	return candidates[len(candidates)-1], true
 }
 
 func NewRepository(db *goqu.Database) *Repository {
@@ -109,8 +173,6 @@ func (s *Repository) Pick(ctx context.Context) (bool, error) {
 }
 
 func (s *Repository) CandidateQuery() *goqu.SelectDataset {
-	const picturesCountAlias = "p_count"
-
 	sqSelect := s.db.Select(
 		schema.ItemTableIDCol,
 		goqu.COUNT(goqu.DISTINCT(schema.PictureTableIDCol)).As(picturesCountAlias),
@@ -236,6 +298,16 @@ func (s *Repository) Current(ctx context.Context) (*schema.OfDayRow, error) {
 }
 
 func (s *Repository) candidate(ctx context.Context) (int64, error) {
+	// A picture counts as "fully documented" once it has both a credited author (a picture_item
+	// row of type Author - independent of the plain item/picture join in CandidateQuery, which
+	// only ever matches the picture's content link) and a non-unknown licence.
+	authorExists := s.db.Select(goqu.L("1")).
+		From(schema.PictureItemTable).
+		Where(
+			schema.PictureItemTablePictureIDCol.Eq(schema.PictureTableIDCol),
+			schema.PictureItemTableTypeCol.Eq(schema.PictureItemTypeAuthor),
+		)
+
 	sqSelect := s.CandidateQuery().
 		Where(goqu.Or(
 			goqu.And(
@@ -247,19 +319,30 @@ func (s *Repository) candidate(ctx context.Context) (int64, error) {
 				schema.ItemTableEndModelYearCol.Gt(0),
 			),
 		)).
-		Order(goqu.Func("RANDOM").Desc()).
-		Limit(1)
+		SelectAppend(
+			goqu.L(
+				"COUNT(DISTINCT ?) FILTER (WHERE ? != ? AND EXISTS ?)",
+				schema.PictureTableIDCol, schema.PictureTableLicenseIDCol, schema.PictureLicenseUnknown, authorExists,
+			).As(completeCountAlias),
+		)
 
-	rec := CandidateRecord{}
+	// The full candidate list is small (once-a-day job, over the count of catalogue items with
+	// >= minPictures accepted pictures) - picking the weighted draw in Go is far simpler and more
+	// testable than encoding it as a single SQL ORDER BY expression, and there's no latency budget
+	// here worth trading that away for.
+	var candidates []weightedCandidate
 
-	success, err := sqSelect.Executor().ScanStructContext(ctx, &rec)
+	err := sqSelect.Executor().ScanStructsContext(ctx, &candidates)
 	if err != nil {
 		return 0, err
 	}
 
-	if !success {
+	chosen, found := pickWeighted(candidates, func(c weightedCandidate) float64 {
+		return completenessWeight(c.CompleteCount)
+	}, rand.New(rand.NewSource(time.Now().UnixNano()))) //nolint:gosec
+	if !found {
 		return 0, nil
 	}
 
-	return rec.ItemID, nil
+	return chosen.ItemID, nil
 }
