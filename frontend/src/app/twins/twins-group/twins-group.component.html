@@ -11,59 +11,43 @@
   </nav>
 }
 
-<div class="row">
-  @if (groupResource.error(); as error) {
-    <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
-  } @else if (groupResource.isLoading()) {
-    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
-  } @else if (groupResource.value(); as group) {
-    <div class="col-sm-8 order-2">
-      @if (!pageEnv.layoutParams().isGalleryPage) {
-        @if (group) {
-          <div class="page-header mb-4">
-            <h1 [innerHTML]="group.nameHtml"></h1>
-          </div>
-        }
-        <ul class="nav nav-pills mb-4">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="." routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-              <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
-              &ngsp;<ng-container i18n>group</ng-container>
-            </a>
-          </li>
-          @if (group.acceptedPicturesCount > 0) {
-            <li class="nav-item">
-              <a class="nav-link" routerLink="pictures" routerLinkActive="active">
-                <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
-                &ngsp;<ng-container i18n>all pictures</ng-container> &ngsp;<span
-                  class="badge rounded-pill bg-secondary"
-                  >{{ group.acceptedPicturesCount }}</span
-                >
-              </a>
-            </li>
-          }
-          @if (group.hasChildSpecs) {
-            <li class="nav-item">
-              <a class="nav-link" routerLink="specifications" routerLinkActive="active">
-                <i class="bi bi-card-list" aria-hidden="true"></i>
-                &ngsp;<ng-container i18n>specifications</ng-container>
-              </a>
-            </li>
-          }
-        </ul>
-      }
-      <router-outlet />
-    </div>
-  }
+@if (groupResource.error(); as error) {
+  <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
+} @else if (groupResource.isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (groupResource.value(); as group) {
   @if (!pageEnv.layoutParams().isGalleryPage) {
-    <div class="col-sm-4 order-1">
-      @if (selectedBrandsResource.error(); as error) {
-        <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
-      } @else if (selectedBrandsResource.isLoading()) {
-        <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
-      } @else if (selectedBrandsResource.value(); as selectedBrands) {
-        <app-twins-sidebar [selected]="selectedBrands" />
+    @if (group) {
+      <div class="page-header mb-4">
+        <h1 [innerHTML]="group.nameHtml"></h1>
+      </div>
+    }
+    <ul class="nav nav-pills mb-4">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="." routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
+          &ngsp;<ng-container i18n>group</ng-container>
+        </a>
+      </li>
+      @if (group.acceptedPicturesCount > 0) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="pictures" routerLinkActive="active">
+            <i class="bi bi-grid-3x2-gap-fill" aria-hidden="true"></i>
+            &ngsp;<ng-container i18n>all pictures</ng-container> &ngsp;<span class="badge rounded-pill bg-secondary">{{
+              group.acceptedPicturesCount
+            }}</span>
+          </a>
+        </li>
       }
-    </div>
+      @if (group.hasChildSpecs) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="specifications" routerLinkActive="active">
+            <i class="bi bi-card-list" aria-hidden="true"></i>
+            &ngsp;<ng-container i18n>specifications</ng-container>
+          </a>
+        </li>
+      }
+    </ul>
   }
-</div>
+  <router-outlet />
+}

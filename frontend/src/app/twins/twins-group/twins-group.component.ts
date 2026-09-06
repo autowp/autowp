@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {ItemFields, ItemListOptions, ItemParentListOptions, ItemRequest, ItemsRequest, ItemType} from '@grpc/spec.pb';
+import {ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
@@ -10,11 +10,9 @@ import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map} from 'rxjs';
 
-import {TwinsSidebarComponent} from '../sidebar.component';
-
 @Component({
   selector: 'app-twins-group',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, TwinsSidebarComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './twins-group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -57,37 +55,11 @@ export class TwinsGroupComponent {
   });
 
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
-  // guard against that, so selectedBrandsResource's params() and the constructor effect() below
-  // don't blow up on a non-NOT_FOUND groupResource error (surfaced generically by the template
-  // instead).
+  // guard against that, so the constructor effect() below doesn't blow up on a non-NOT_FOUND
+  // groupResource error (surfaced generically by the template instead).
   protected readonly groupData = computed(() =>
     this.groupResource.hasValue() ? this.groupResource.value() : undefined,
   );
-
-  protected readonly selectedBrandsResource = rxResource({
-    // Distinct id from groupResource above, also suffixed with the group id (see that resource's
-    // comment) - this is not actually a singleton per page across different twins groups.
-    id: `twins-group-selected-brands-${this.#groupID()}`,
-    // Angular skips stream() entirely while params() returns undefined, so group is always
-    // defined once stream() actually runs.
-    params: () => this.groupData(),
-    stream: ({params: group}) => {
-      return this.#itemsClient
-        .list(
-          new ItemsRequest({
-            options: new ItemListOptions({
-              child: new ItemParentListOptions({
-                itemParentParentByChild: new ItemParentListOptions({
-                  parentId: group.id,
-                }),
-              }),
-              typeId: ItemType.ITEM_TYPE_BRAND,
-            }),
-          }),
-        )
-        .pipe(map((response) => (response.items ?? []).map((item) => item.catname)));
-    },
-  });
 
   constructor() {
     effect(() => {

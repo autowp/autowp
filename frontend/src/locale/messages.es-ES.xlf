@@ -16540,6 +16540,14 @@ Utilice el mismo botón, formulario o la misma dirección para denunciar materia
         <source>PD</source>
         <target state="translated">PD</target>
       </trans-unit>
+      <trans-unit id="7715336365341452272" datatype="html">
+        <source>all groups</source>
+        <target state="translated">todos los grupos</target>
+      </trans-unit>
+      <trans-unit id="5610292640913590235" datatype="html">
+        <source>All groups</source>
+        <target state="translated">Todos los grupos</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -52,11 +52,16 @@ export const routes: Routes = [
   },
   {
     loadComponent: () => import('./twins.component').then((m) => m.TwinsComponent),
-    path: ':brand',
+    path: 'all',
     title: $localize`Twins`,
   },
   {
     loadComponent: () => import('./twins.component').then((m) => m.TwinsComponent),
+    path: ':brand',
+    title: $localize`Twins`,
+  },
+  {
+    loadComponent: () => import('./twins-index/twins-index.component').then((m) => m.TwinsIndexComponent),
     path: '',
     pathMatch: 'full',
     title: $localize`Twins`,

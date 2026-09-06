@@ -27,7 +27,6 @@ import {map, of} from 'rxjs';
 
 import {chunkBy} from '../chunk';
 import {PaginatorComponent} from '../paginator/paginator/paginator.component';
-import {TwinsSidebarComponent} from './sidebar.component';
 
 interface ChunkedGroup {
   childs: ItemParent[][];
@@ -37,7 +36,7 @@ interface ChunkedGroup {
 
 @Component({
   selector: 'app-twins',
-  imports: [RouterLink, PaginatorComponent, TwinsSidebarComponent, AsyncPipe],
+  imports: [RouterLink, PaginatorComponent, AsyncPipe],
   templateUrl: './twins.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

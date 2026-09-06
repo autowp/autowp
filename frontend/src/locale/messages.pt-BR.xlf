@@ -16541,6 +16541,14 @@ Use o mesmo botão, formulário ou o mesmo endereço para denunciar material que
         <source>PD</source>
         <target state="translated">PD</target>
       </trans-unit>
+      <trans-unit id="7715336365341452272" datatype="html">
+        <source>all groups</source>
+        <target state="translated">todos os grupos</target>
+      </trans-unit>
+      <trans-unit id="5610292640913590235" datatype="html">
+        <source>All groups</source>
+        <target state="translated">Todos os grupos</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

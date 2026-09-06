@@ -16544,6 +16544,14 @@ Usi lo stesso pulsante, modulo o lo stesso indirizzo per segnalare contenuti che
         <source>PD</source>
         <target state="translated">PD</target>
       </trans-unit>
+      <trans-unit id="7715336365341452272" datatype="html">
+        <source>all groups</source>
+        <target state="translated">tutti i gruppi</target>
+      </trans-unit>
+      <trans-unit id="5610292640913590235" datatype="html">
+        <source>All groups</source>
+        <target state="translated">Tutti i gruppi</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

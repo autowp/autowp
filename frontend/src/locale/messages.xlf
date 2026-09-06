@@ -630,8 +630,12 @@
           <context context-type="linenumber">5,8</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/twins/twins-index/twins-index.component.html</context>
+          <context context-type="linenumber">4,11</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">4,8</context>
+          <context context-type="linenumber">4,7</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/upload.component.html</context>
@@ -1217,10 +1221,6 @@
           <context context-type="linenumber">16,18</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/twins/sidebar.component.html</context>
-          <context context-type="linenumber">21,24</context>
-        </context-group>
-        <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-group/gallery/twins-group-gallery.component.html</context>
           <context context-type="linenumber">4,6</context>
         </context-group>
@@ -1238,15 +1238,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-group/twins-group.component.html</context>
-          <context context-type="linenumber">18,20</context>
+          <context context-type="linenumber">17,19</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/twins/twins-group/twins-group.component.html</context>
-          <context context-type="linenumber">63,64</context>
+          <context context-type="sourcefile">src/app/twins/twins-index/twins-index.component.html</context>
+          <context context-type="linenumber">40,42</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">27,29</context>
+          <context context-type="linenumber">23,25</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/select/select.component.html</context>
@@ -2179,7 +2179,11 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-group/twins-group.component.html</context>
-          <context context-type="linenumber">8,15</context>
+          <context context-type="linenumber">8,14</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/twins/twins-index/twins-index.component.html</context>
+          <context context-type="linenumber">11</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-routing.module.ts</context>
@@ -2187,15 +2191,15 @@ Good luck.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-routing.module.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/twins/twins-routing.module.ts</context>
+          <context context-type="linenumber">67</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">8,15</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">20,25</context>
+          <context context-type="linenumber">7,13</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
@@ -2667,7 +2671,7 @@ All images are posted for educational purposes.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">71,73</context>
+          <context context-type="linenumber">67,69</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/list-item/list-item.component.html</context>
@@ -3199,7 +3203,7 @@ All images are posted for educational purposes.</source>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">103,107</context>
+          <context context-type="linenumber">99,104</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/list-item/list-item.component.html</context>
@@ -3745,11 +3749,11 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-group/twins-group.component.html</context>
-          <context context-type="linenumber">38,39</context>
+          <context context-type="linenumber">36,37</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">95,96</context>
+          <context context-type="linenumber">91,93</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/list-item/list-item.component.html</context>
@@ -4629,7 +4633,7 @@ In addition, we can offer in return to [choose the next vehicle of the day](/don
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/donate/donate.component.html</context>
-          <context context-type="linenumber">78,79</context>
+          <context context-type="linenumber">69,70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6634159182190488147" datatype="html">
@@ -5545,13 +5549,6 @@ If you are not registered yet, please do so now [on the registration page](/sign
           <context context-type="linenumber">9,10</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="1419479195323304896" datatype="html">
-        <source>Cryptocurrencies</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/index/donate/donate.component.html</context>
-          <context context-type="linenumber">69,71</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="7003127234678662689" datatype="html">
         <source>Want to know which car was the fastest? Do you want to know how much the most powerful mining truck weighs? Come and find out.</source>
         <context-group purpose="location">
@@ -6213,7 +6210,7 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">75,77</context>
+          <context context-type="linenumber">71,74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3723015871976827820" datatype="html">
@@ -9038,11 +9035,11 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-group/twins-group.component.html</context>
-          <context context-type="linenumber">49,53</context>
+          <context context-type="linenumber">46,52</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins.component.html</context>
-          <context context-type="linenumber">88,91</context>
+          <context context-type="linenumber">84,88</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/list-item/list-item.component.html</context>
@@ -9815,7 +9812,21 @@ Questions about these Terms: [autowp@gmail.com](mailto:autowp@gmail.com).
         <source>group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/twins/twins-group/twins-group.component.html</context>
-          <context context-type="linenumber">31,34</context>
+          <context context-type="linenumber">29,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7715336365341452272" datatype="html">
+        <source>all groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/twins/twins-index/twins-index.component.html</context>
+          <context context-type="linenumber">11,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5610292640913590235" datatype="html">
+        <source>All groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/twins/twins.component.html</context>
+          <context context-type="linenumber">16,21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6793590364065695387" datatype="html">

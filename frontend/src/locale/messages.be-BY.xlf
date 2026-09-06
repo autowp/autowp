@@ -16532,6 +16532,14 @@ Use the same button or email address to report material that infringes a tradema
         <source>PD</source>
         <target state="translated">PD</target>
       </trans-unit>
+      <trans-unit id="7715336365341452272" datatype="html">
+        <source>all groups</source>
+        <target state="translated">усе групы</target>
+      </trans-unit>
+      <trans-unit id="5610292640913590235" datatype="html">
+        <source>All groups</source>
+        <target state="translated">Усе групы</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
