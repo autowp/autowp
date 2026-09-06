@@ -94,7 +94,7 @@
                 <div>
                   @for (fan of fans; track fan) {
                     @if (fansUsersResource.value()?.[fan.userId]; as user) {
-                      <app-user [user]="user" />
+                      <app-user class="me-1" [user]="user" />
                     }
                     <span class="badge rounded-pill text-bg-secondary">{{
                       (+fan.volume > 0 ? '+' : '') + fan.volume
