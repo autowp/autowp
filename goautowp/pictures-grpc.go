@@ -1511,30 +1511,54 @@ func (s *PicturesGRPCServer) GetInbox(ctx context.Context, in *InboxRequest) (*I
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	prevDate, err := service.PrevDate(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
 	currentDate := service.CurrentDate()
 
-	nextDate, err := service.NextDate(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	// The prev/next date lookups and the three day counts are independent once the current date
+	// is fixed - run them concurrently. Within a task the date lookup precedes its count because
+	// the count needs that date; DayPictures memoizes the date so the second call is just the
+	// count query. Each task touches a disjoint part of the service (prevDate / nextDate / none).
+	var (
+		prevDate, nextDate                 civil.Date
+		prevCount, currentCount, nextCount int32
+	)
 
-	prevCount, err := service.PrevDateCount(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	dayGroup, dayCtx := errgroup.WithContext(ctx)
 
-	currentCount, err := service.CurrentDateCount(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	dayGroup.Go(func() error {
+		var err error
 
-	nextCount, err := service.NextDateCount(ctx)
-	if err != nil {
+		prevDate, err = service.PrevDate(dayCtx)
+		if err != nil {
+			return err
+		}
+
+		prevCount, err = service.PrevDateCount(dayCtx)
+
+		return err
+	})
+
+	dayGroup.Go(func() error {
+		var err error
+
+		nextDate, err = service.NextDate(dayCtx)
+		if err != nil {
+			return err
+		}
+
+		nextCount, err = service.NextDateCount(dayCtx)
+
+		return err
+	})
+
+	dayGroup.Go(func() error {
+		var err error
+
+		currentCount, err = service.CurrentDateCount(dayCtx)
+
+		return err
+	})
+
+	if err = dayGroup.Wait(); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -1590,30 +1614,54 @@ func (s *PicturesGRPCServer) GetNewbox(ctx context.Context, in *NewboxRequest) (
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	prevDate, err := service.PrevDate(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
 	currentDate := service.CurrentDate()
 
-	nextDate, err := service.NextDate(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	// The prev/next date lookups and the three day counts are independent once the current date
+	// is fixed - run them concurrently. Within a task the date lookup precedes its count because
+	// the count needs that date; DayPictures memoizes the date so the second call is just the
+	// count query. Each task touches a disjoint part of the service (prevDate / nextDate / none).
+	var (
+		prevDate, nextDate                 civil.Date
+		prevCount, currentCount, nextCount int32
+	)
 
-	prevCount, err := service.PrevDateCount(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	dayGroup, dayCtx := errgroup.WithContext(ctx)
 
-	currentCount, err := service.CurrentDateCount(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	dayGroup.Go(func() error {
+		var err error
 
-	nextCount, err := service.NextDateCount(ctx)
-	if err != nil {
+		prevDate, err = service.PrevDate(dayCtx)
+		if err != nil {
+			return err
+		}
+
+		prevCount, err = service.PrevDateCount(dayCtx)
+
+		return err
+	})
+
+	dayGroup.Go(func() error {
+		var err error
+
+		nextDate, err = service.NextDate(dayCtx)
+		if err != nil {
+			return err
+		}
+
+		nextCount, err = service.NextDateCount(dayCtx)
+
+		return err
+	})
+
+	dayGroup.Go(func() error {
+		var err error
+
+		currentCount, err = service.CurrentDateCount(dayCtx)
+
+		return err
+	})
+
+	if err = dayGroup.Wait(); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
