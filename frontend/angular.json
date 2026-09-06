@@ -71,12 +71,13 @@
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": ["@angular/localize/init"],
             "allowedCommonJsDependencies": [
-              "jquery",
               "sprintf-js",
-              "showdown",
               "url-parse",
               "chart.js",
-              "keycloak-js"
+              "keycloak-js",
+              "leaflet",
+              "google-protobuf",
+              "extend"
             ],
             "assets": [
               "src/assets",
