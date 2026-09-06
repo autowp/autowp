@@ -71,6 +71,10 @@ export class CatalogueVehiclesComponent {
   protected readonly canAcceptPicture$ = this.#auth.hasRole$(Role.PICTURES_MODER);
 
   readonly #isModer = toSignal(this.isModer$, {initialValue: false});
+  // Also folded into the item/items resource ids: canEditSpecs is per-user but not
+  // moderator-only, so a plain signed-in visitor needs the same anonymous-cache refetch that
+  // #isModer already gives moderators.
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,
@@ -144,10 +148,10 @@ export class CatalogueVehiclesComponent {
   // adopt the server's always-non-moderator TransferState snapshot (missing inboxPicturesCount) with
   // no later isModer change left to trigger a refetch.
   protected readonly itemResource = rxResource({
-    id: `catalogue-vehicles-item-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}`,
+    id: `catalogue-vehicles-item-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const data = this.catalogueData();
-      return data ? {isModer: this.#isModer(), path: data.path} : undefined;
+      return data ? {authenticated: this.#authenticated(), isModer: this.#isModer(), path: data.path} : undefined;
     },
     stream: ({params: {isModer, path}}): Observable<Item> => {
       const last = path[path.length - 1];
@@ -198,16 +202,23 @@ export class CatalogueVehiclesComponent {
   // Same reasoning as catalogueData above.
   protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
 
-  // `id` folds in #isModer() - same reasoning as itemResource above.
+  // `id` folds in #isModer() and #authenticated() - same reasoning as itemResource above.
   protected readonly itemsResource = rxResource({
-    id: `catalogue-vehicles-items-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}`,
+    id: `catalogue-vehicles-items-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const data = this.catalogueData();
       const item = this.itemData();
       const routerLink = this.routerLink();
 
       return data && item && routerLink
-        ? {isModer: this.#isModer(), item, page: this.#page(), routerLink, type: data.type}
+        ? {
+            authenticated: this.#authenticated(),
+            isModer: this.#isModer(),
+            item,
+            page: this.#page(),
+            routerLink,
+            type: data.type,
+          }
         : undefined;
     },
     stream: ({

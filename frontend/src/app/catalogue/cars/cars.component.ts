@@ -21,6 +21,7 @@ import {
   PreviewPicturesRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
+import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
@@ -45,6 +46,13 @@ export class CatalogueCarsComponent {
   readonly #notFound = inject(NotFoundService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #auth = inject(AuthService);
+
+  // Folded into resultResource's id and params: the list carries per-user fields (canEditSpecs),
+  // and a server-side render is anonymous. Without this, hydration adopts the anonymous cached
+  // list on the `id` string alone and never refetches once auth resolves. See the long comment
+  // on CatalogueIndexComponent.brandResource.
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,
@@ -181,8 +189,9 @@ export class CatalogueCarsComponent {
   // itself with the wrong (unfiltered, or differently-filtered) list - and stick with it, since
   // params() never changes afterwards.
   protected readonly resultResource = rxResource({
-    id: `catalogue-cars-result-${this.#catname() ?? ''}-${this.vehicleTypeCatname() ?? ''}`,
+    id: `catalogue-cars-result-${this.#catname() ?? ''}-${this.vehicleTypeCatname() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => ({
+      authenticated: this.#authenticated(),
       brand: this.brandData(),
       currentVehicleType: this.currentVehicleType(),
       page: this.#page(),
