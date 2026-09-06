@@ -2148,6 +2148,8 @@ message Picture {
   repeated PictureAuthorSuggestion author_suggestions = 49;
   PictureLicense license = 50;
   string source_url = 51;
+  int64 change_source_url_user_id = 52;
+  google.protobuf.Timestamp change_source_url_date = 53;
 }
 
 message PictureAuthorSuggestion {
@@ -2242,6 +2244,9 @@ message PictureItem {
   Item item = 9;
   ItemParentCaches item_parent_cache_ancestors = 10;
   Picture picture = 11;
+  int64 add_user_id = 12;
+  google.protobuf.Timestamp create_time = 13;
+  int64 perspective_user_id = 14;
 }
 
 message UpdatePictureItemRequest {

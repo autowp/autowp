@@ -141,6 +141,16 @@
             <tr>
               <td>
                 <a [routerLink]="['/moder/items/item', item.itemId]" [innerHTML]="item.item?.nameHtml"></a>
+                @if (item.addUserId && item.addUserId !== '0') {
+                  <div class="small">
+                    @if (getUser$(item.addUserId) | async; as addUser) {
+                      <app-user class="me-1" [user]="addUser" />
+                    }
+                    @if (item.createTime; as createdAt) {
+                      <span [ngbTooltip]="createdAt.toDate() | date: 'medium'">{{ createdAt.toDate() | timeAgo }}</span>
+                    }
+                  </div>
+                }
               </td>
               <td>
                 @if (item.type === PictureItemType.PICTURE_ITEM_CONTENT) {
@@ -148,6 +158,13 @@
                     [perspectiveID]="item.perspectiveId"
                     (perspectiveChanged)="savePerspective($event, item)"
                   />
+                  @if (item.perspectiveUserId && item.perspectiveUserId !== '0') {
+                    <div class="small">
+                      @if (getUser$(item.perspectiveUserId) | async; as perspectiveUser) {
+                        <app-user [user]="perspectiveUser" />
+                      }
+                    </div>
+                  }
                 }
               </td>
               @if (picture.rights?.crop) {
@@ -414,6 +431,16 @@
               maxlength="500"
               [(ngModel)]="picture.sourceUrl"
             />
+            @if (picture.changeSourceUrlUserId && picture.changeSourceUrlUserId !== '0') {
+              <div class="small">
+                @if (getUser$(picture.changeSourceUrlUserId) | async; as sourceUrlUser) {
+                  <app-user class="me-1" [user]="sourceUrlUser" />
+                }
+                @if (picture.changeSourceUrlDate; as changedAt) {
+                  <span [ngbTooltip]="changedAt.toDate() | date: 'medium'">{{ changedAt.toDate() | timeAgo }}</span>
+                }
+              </div>
+            }
           </div>
           <button
             type="button"

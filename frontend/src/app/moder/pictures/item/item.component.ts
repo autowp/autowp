@@ -229,6 +229,10 @@ export class ModerPicturesItemComponent {
     }),
   );
 
+  protected getUser$(id: string): Observable<null | User> {
+    return this.#userService.getUser$(id, {authenticated: true});
+  }
+
   protected readonly lastItem$: Observable<LastItemInfo> = this.picture$.pipe(
     switchMap((picture) => {
       const localStorage = this.#window?.localStorage;

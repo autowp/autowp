@@ -704,7 +704,7 @@ func (s *PicturesGRPCServer) SetPictureItemItemID(
 	ctx = context.WithoutCancel(ctx)
 
 	err = s.repository.SetPictureItemItemID(
-		ctx, in.GetPictureId(), in.GetItemId(), pictureItemType, in.GetNewItemId(),
+		ctx, in.GetPictureId(), in.GetItemId(), pictureItemType, in.GetNewItemId(), userCtx.UserID,
 	)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -817,7 +817,7 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 	ctx = context.WithoutCancel(ctx)
 
 	success, err := s.repository.CreatePictureItem(
-		ctx, in.GetPictureId(), in.GetItemId(), pictureItemType, in.GetPerspectiveId(),
+		ctx, in.GetPictureId(), in.GetItemId(), pictureItemType, in.GetPerspectiveId(), userCtx.UserID,
 	)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -2256,7 +2256,7 @@ func (s *PicturesGRPCServer) setPictureSourceURL(
 		return status.Errorf(codes.InvalidArgument, "%s", strings.Join(problems, ", "))
 	}
 
-	err = s.repository.SetPictureSourceURL(ctx, pictureID, sourceURL)
+	err = s.repository.SetPictureSourceURL(ctx, pictureID, sourceURL, userCtx.UserID)
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
@@ -2368,7 +2368,7 @@ func (s *PicturesGRPCServer) setPictureItemPerspective(
 	pictureItemType := convertPictureItemType(values.GetType())
 
 	err := s.repository.SetPictureItemPerspective(
-		ctx, values.GetPictureId(), values.GetItemId(), pictureItemType, values.GetPerspectiveId(),
+		ctx, values.GetPictureId(), values.GetItemId(), pictureItemType, values.GetPerspectiveId(), userCtx.UserID,
 	)
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())

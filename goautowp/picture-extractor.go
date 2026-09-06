@@ -232,6 +232,14 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			resultRow.ChangeStatusUserId = row.ChangeStatusUserID.Int64
 		}
 
+		if row.ChangeSourceURLUserID.Valid {
+			resultRow.ChangeSourceUrlUserId = row.ChangeSourceURLUserID.Int64
+		}
+
+		if row.ChangeSourceURLDate.Valid {
+			resultRow.ChangeSourceUrlDate = timestamppb.New(row.ChangeSourceURLDate.Time)
+		}
+
 		if isModer && fields.GetSpecialName() {
 			resultRow.SpecialName = util.NullStringToString(row.Name)
 		}

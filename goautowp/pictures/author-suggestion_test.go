@@ -141,8 +141,9 @@ func TestProcessEXIFAuthorSingleMatchAutoLinks(t *testing.T) {
 
 	picID := createTestPicture(t, db, sql.NullInt64{})
 
-	err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: "© 2020 " + name}, false)
+	skipCopyrightsText, err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: "© 2020 " + name}, false, 0)
 	require.NoError(t, err)
+	require.False(t, skipCopyrightsText)
 
 	suggestions, err := repo.PictureAuthorSuggestions(ctx, picID)
 	require.NoError(t, err)
@@ -170,8 +171,9 @@ func TestProcessEXIFAuthorRespectsFormAuthor(t *testing.T) {
 
 	// authorLinked=true: the uploader picked an author in the form, so the single EXIF match is
 	// stored as a suggestion but not auto-linked.
-	err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: name}, true)
+	skipCopyrightsText, err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: name}, true, 0)
 	require.NoError(t, err)
+	require.False(t, skipCopyrightsText)
 
 	suggestions, err := repo.PictureAuthorSuggestions(ctx, picID)
 	require.NoError(t, err)
@@ -195,8 +197,9 @@ func TestProcessEXIFAuthorNamesakesNoAutoLink(t *testing.T) {
 
 	picID := createTestPicture(t, db, sql.NullInt64{})
 
-	err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: name}, false)
+	skipCopyrightsText, err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: name}, false, 0)
 	require.NoError(t, err)
+	require.False(t, skipCopyrightsText)
 
 	suggestions, err := repo.PictureAuthorSuggestions(ctx, picID)
 	require.NoError(t, err)
@@ -219,10 +222,11 @@ func TestProcessEXIFAuthorFallsBackToCopyright(t *testing.T) {
 
 	picID := createTestPicture(t, db, sql.NullInt64{})
 
-	err := repo.processEXIFAuthor(
-		ctx, picID, exifExtractedValues{artist: "", copyrights: name}, false,
+	skipCopyrightsText, err := repo.processEXIFAuthor(
+		ctx, picID, exifExtractedValues{artist: "", copyrights: name}, false, 0,
 	)
 	require.NoError(t, err)
+	require.True(t, skipCopyrightsText)
 
 	suggestions, err := repo.PictureAuthorSuggestions(ctx, picID)
 	require.NoError(t, err)

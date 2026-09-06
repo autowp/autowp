@@ -609,6 +609,8 @@ func (s *Repository) PictureSelect(
 		aliasTable.Col(schema.PictureTableDPIYColName),
 		aliasTable.Col(schema.PictureTableLicenseIDColName),
 		aliasTable.Col(schema.PictureTableSourceURLColName),
+		aliasTable.Col(schema.PictureTableChangeSourceURLUserIDColName),
+		aliasTable.Col(schema.PictureTableChangeSourceURLDateColName),
 	)
 
 	groupBy := !options.IsIDUnique()
@@ -874,6 +876,7 @@ func (s *Repository) SetPictureItemPerspective(
 	itemID int64,
 	pictureItemType schema.PictureItemType,
 	perspective int32,
+	userID int64,
 ) error {
 	if pictureItemType != schema.PictureItemTypeContent {
 		return errIsAllowedForPictureItemContentOnly
@@ -884,6 +887,10 @@ func (s *Repository) SetPictureItemPerspective(
 			schema.PictureItemTablePerspectiveIDColName: sql.NullInt32{
 				Valid: perspective > 0,
 				Int32: perspective,
+			},
+			schema.PictureItemTablePerspectiveUserIDColName: sql.NullInt64{
+				Valid: userID > 0,
+				Int64: userID,
 			},
 		}).
 		Where(
@@ -902,6 +909,7 @@ func (s *Repository) SetPictureItemItemID(
 	itemID int64,
 	pictureItemType schema.PictureItemType,
 	dstItemID int64,
+	userID int64,
 ) error {
 	isAllowed, err := s.isAllowedTypeByItemID(ctx, dstItemID, pictureItemType)
 	if err != nil {
@@ -914,9 +922,15 @@ func (s *Repository) SetPictureItemItemID(
 
 	ctx = context.WithoutCancel(ctx)
 
+	// Moving a picture to a different item re-attributes the association to whoever performed
+	// the move, same as if they'd created it fresh against the new item.
 	res, err := s.db.Update(schema.PictureItemTable).
 		Set(goqu.Record{
 			schema.PictureItemTableItemIDColName: dstItemID,
+			schema.PictureItemTableAddUserIDColName: sql.NullInt64{
+				Valid: userID > 0,
+				Int64: userID,
+			},
 		}).
 		Where(
 			schema.PictureItemTablePictureIDCol.Eq(pictureID),
@@ -1006,6 +1020,7 @@ func (s *Repository) CreatePictureItem(
 	itemID int64,
 	pictureItemType schema.PictureItemType,
 	perspective int32,
+	addUserID int64,
 ) (bool, error) {
 	isAllowed, err := s.isAllowedTypeByItemID(ctx, itemID, pictureItemType)
 	if err != nil {
@@ -1025,6 +1040,10 @@ func (s *Repository) CreatePictureItem(
 		schema.PictureItemTablePerspectiveIDColName: sql.NullInt32{
 			Valid: perspective > 0,
 			Int32: perspective,
+		},
+		schema.PictureItemTableAddUserIDColName: sql.NullInt64{
+			Valid: addUserID > 0,
+			Int64: addUserID,
 		},
 	}).OnConflict(goqu.DoNothing()).Executor().ExecContext(ctx)
 	if err != nil {
@@ -1116,11 +1135,17 @@ func (s *Repository) SetPictureLicense(ctx context.Context, pictureID int64, lic
 	return err
 }
 
-func (s *Repository) SetPictureSourceURL(ctx context.Context, pictureID int64, sourceURL string) error {
+func (s *Repository) SetPictureSourceURL(
+	ctx context.Context, pictureID int64, sourceURL string, userID int64,
+) error {
 	_, err := util.ExecAndRetryOnDeadlock(ctx,
 		s.db.Update(schema.PictureTable).
 			Set(goqu.Record{
 				schema.PictureTableSourceURLColName: sql.NullString{String: sourceURL, Valid: len(sourceURL) > 0},
+				schema.PictureTableChangeSourceURLUserIDColName: sql.NullInt64{
+					Int64: userID, Valid: userID > 0,
+				},
+				schema.PictureTableChangeSourceURLDateColName: sql.NullTime{Time: time.Now(), Valid: true},
 			}).
 			Where(schema.PictureTableIDCol.Eq(pictureID)).
 			Executor(),
@@ -1395,6 +1420,9 @@ func (s *Repository) PictureItemSelect(
 		aliasTable.Col(schema.PictureItemTableCropWidthColName),
 		aliasTable.Col(schema.PictureItemTableCropHeightColName),
 		aliasTable.Col(schema.PictureItemTablePerspectiveIDColName),
+		aliasTable.Col(schema.PictureItemTableAddUserIDColName),
+		aliasTable.Col(schema.PictureItemTablePerspectiveUserIDColName),
+		aliasTable.Col(schema.PictureItemTableCreatedAtColName),
 	), nil
 }
 
@@ -2235,6 +2263,12 @@ func (s *Repository) AddPictureFromReader(
 			String: sourceURL,
 			Valid:  len(sourceURL) > 0,
 		},
+		schema.PictureTableChangeSourceURLUserIDColName: sql.NullInt64{
+			Int64: userID, Valid: len(sourceURL) > 0 && userID > 0,
+		},
+		schema.PictureTableChangeSourceURLDateColName: sql.NullTime{
+			Time: time.Now(), Valid: len(sourceURL) > 0,
+		},
 	}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &pictureID)
 	if err != nil {
 		return 0, err
@@ -2251,6 +2285,7 @@ func (s *Repository) AddPictureFromReader(
 			itemID,
 			schema.PictureItemTypeContent,
 			perspectiveID,
+			userID,
 		)
 		if err != nil {
 			return 0, err
@@ -2269,7 +2304,7 @@ func (s *Repository) AddPictureFromReader(
 				perspectiveID = item.PerspectiveID.Int32
 			}
 
-			_, err = s.CreatePictureItem(ctx, pictureID, item.ItemID, item.Type, perspectiveID)
+			_, err = s.CreatePictureItem(ctx, pictureID, item.ItemID, item.Type, perspectiveID, userID)
 			if err != nil {
 				return 0, err
 			}
@@ -2277,7 +2312,7 @@ func (s *Repository) AddPictureFromReader(
 	}
 
 	if authorID > 0 {
-		_, err = s.CreatePictureItem(ctx, pictureID, authorID, schema.PictureItemTypeAuthor, 0)
+		_, err = s.CreatePictureItem(ctx, pictureID, authorID, schema.PictureItemTypeAuthor, 0, userID)
 		if err != nil {
 			return 0, err
 		}
@@ -2789,13 +2824,14 @@ func (s *Repository) processEXIF(
 		extractedEXIF = exifExtractedValues{}
 	}
 
-	if err = s.processEXIFAuthor(ctx, pictureID, extractedEXIF, authorLinked); err != nil {
+	skipCopyrightsText, err := s.processEXIFAuthor(ctx, pictureID, extractedEXIF, authorLinked, userID)
+	if err != nil {
 		return err
 	}
 
 	set := goqu.Record{}
 
-	if len(extractedEXIF.copyrights) > 0 {
+	if len(extractedEXIF.copyrights) > 0 && !skipCopyrightsText {
 		textID, err := s.textStorageRepository.CreateText(ctx, extractedEXIF.copyrights, userID)
 		if err != nil {
 			return err
@@ -2834,9 +2870,14 @@ func (s *Repository) processEXIF(
 // processEXIFAuthor derives author candidates from the EXIF Artist tag (falling back to Copyright
 // only when Artist is empty), stores them as advisory suggestions, and — when the uploader left
 // the author unset and there is exactly one catalogue match — links that author right away.
+//
+// Its bool return reports whether the caller should skip saving extractedEXIF.copyrights as the
+// picture's free-text copyrights block: when Artist was empty, the Copyright tag doubled as the
+// author source, and an unambiguous match was found there, the linked author already conveys that
+// exact text - copying it into copyrights too would just duplicate it.
 func (s *Repository) processEXIFAuthor(
-	ctx context.Context, pictureID int64, extractedEXIF exifExtractedValues, authorLinked bool,
-) error {
+	ctx context.Context, pictureID int64, extractedEXIF exifExtractedValues, authorLinked bool, userID int64,
+) (bool, error) {
 	source := schema.PictureAuthorSuggestionSourceEXIFArtist
 	rawValue := strings.TrimSpace(extractedEXIF.artist)
 
@@ -2846,16 +2887,16 @@ func (s *Repository) processEXIFAuthor(
 	}
 
 	if rawValue == "" {
-		return nil
+		return false, nil
 	}
 
 	personIDs, err := s.ResolveAuthorPersons(ctx, rawValue)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if len(personIDs) == 0 {
-		return nil
+		return false, nil
 	}
 
 	matchedName := NormalizeAuthorName(rawValue)
@@ -2873,18 +2914,18 @@ func (s *Repository) processEXIFAuthor(
 	}
 
 	if err = s.SetPictureAuthorSuggestions(ctx, pictureID, rows); err != nil {
-		return err
+		return false, err
 	}
 
 	if !authorLinked && len(personIDs) == 1 {
 		if _, err = s.CreatePictureItem(
-			ctx, pictureID, personIDs[0], schema.PictureItemTypeAuthor, 0,
+			ctx, pictureID, personIDs[0], schema.PictureItemTypeAuthor, 0, userID,
 		); err != nil {
-			return err
+			return false, err
 		}
 	}
 
-	return nil
+	return source == schema.PictureAuthorSuggestionSourceEXIFCopyright && len(personIDs) == 1, nil
 }
 
 func (s *Repository) randomIdentity() string {

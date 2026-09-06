@@ -8,6 +8,7 @@ import (
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type PictureItemExtractor struct {
@@ -62,14 +63,17 @@ func (s *PictureItemExtractor) ExtractRows(
 
 	for _, row := range rows {
 		resultRow := &PictureItem{
-			PictureId:     row.PictureID,
-			ItemId:        row.ItemID,
-			Type:          extractPictureItemType(row.Type),
-			CropLeft:      uint32(util.NullInt32ToScalar(row.CropLeft)),   //nolint:gosec
-			CropTop:       uint32(util.NullInt32ToScalar(row.CropTop)),    //nolint:gosec
-			CropWidth:     uint32(util.NullInt32ToScalar(row.CropWidth)),  //nolint:gosec
-			CropHeight:    uint32(util.NullInt32ToScalar(row.CropHeight)), //nolint:gosec
-			PerspectiveId: util.NullInt32ToScalar(row.PerspectiveID),
+			PictureId:         row.PictureID,
+			ItemId:            row.ItemID,
+			Type:              extractPictureItemType(row.Type),
+			CropLeft:          uint32(util.NullInt32ToScalar(row.CropLeft)),   //nolint:gosec
+			CropTop:           uint32(util.NullInt32ToScalar(row.CropTop)),    //nolint:gosec
+			CropWidth:         uint32(util.NullInt32ToScalar(row.CropWidth)),  //nolint:gosec
+			CropHeight:        uint32(util.NullInt32ToScalar(row.CropHeight)), //nolint:gosec
+			PerspectiveId:     util.NullInt32ToScalar(row.PerspectiveID),
+			AddUserId:         util.NullInt64ToScalar(row.AddUserID),
+			PerspectiveUserId: util.NullInt64ToScalar(row.PerspectiveUserID),
+			CreateTime:        timestamppb.New(row.CreatedAt),
 		}
 
 		if itemRequest != nil {
