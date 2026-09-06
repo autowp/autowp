@@ -1,10 +1,10 @@
 <div class="page-header">
   <h1 i18n>Contacts</h1>
 </div>
-<div class="row">
+<div class="row gy-5">
   @for (contact of items$ | async; track contact.contactUserId) {
     @if (contact.user) {
-      <div class="col-md-6 mb-2">
+      <div class="col-md-6">
         <div class="d-flex justify-content-start">
           <div class="align-self-start me-3">
             @if (!contact.user.deleted) {
@@ -21,12 +21,20 @@
             }
           </div>
           <div class="flex-grow-1">
-            <button type="button" class="btn-close float-end" (click)="deleteContact(contact.user.id)"></button>
+            <button
+              type="button"
+              class="btn-close float-end"
+              ngbTooltip="Remove from contacts"
+              i18n-ngbTooltip
+              (click)="deleteContact(contact.user.id)"
+            ></button>
             <h4>
               <app-user [user]="contact.user" />
             </h4>
             @if (contact.user.lastOnline; as date) {
-              <p [ngbTooltip]="date.toDate() | date: 'medium'">{{ date.toDate() | timeAgo }}</p>
+              <p>
+                <span [ngbTooltip]="date.toDate() | date: 'medium'">{{ date.toDate() | timeAgo }}</span>
+              </p>
             }
           </div>
         </div>
