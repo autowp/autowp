@@ -1,0 +1,121 @@
+<div class="modal-header">
+  <h3 class="modal-title" i18n>Set licence, source and author</h3>
+  <button class="btn-close" type="button" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  @if (loading()) {
+    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+  } @else {
+    <p i18n>{{ pictureIds().length }} photos selected.</p>
+    <p class="text-muted small" i18n>
+      Fields left as "leave as is", or an empty source URL, are not changed on any photo.
+    </p>
+
+    <div class="mb-3">
+      <label class="form-label" i18n for="bulk_license">Licence</label>
+      <div class="d-flex align-items-center gap-2">
+        <select
+          id="bulk_license"
+          class="form-select"
+          name="license"
+          [ngModel]="licenseChoice()"
+          (ngModelChange)="licenseChoice.set($event)"
+        >
+          <option i18n [ngValue]="null">— leave as is —</option>
+          @for (option of licenseOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          title="What do these mean?"
+          i18n-title
+          (click)="showLicenseHelp()"
+        >
+          <i class="bi bi-question-circle" aria-hidden="true"></i>
+        </button>
+      </div>
+      @if (licenseWarningCount() > 0) {
+        <p class="alert alert-warning mt-2 mb-0 py-2" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+          <ng-container i18n
+            >{{ licenseWarningCount() }} of the selected photos already have a different licence set and will be
+            overwritten.</ng-container
+          >
+        </p>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" i18n for="bulk_source_url">Source URL</label>
+      <input
+        type="url"
+        class="form-control"
+        id="bulk_source_url"
+        name="sourceUrl"
+        maxlength="500"
+        placeholder="leave empty to not change"
+        i18n-placeholder
+        [ngModel]="sourceUrlChoice()"
+        (ngModelChange)="sourceUrlChoice.set($event)"
+      />
+      @if (sourceUrlWarningCount() > 0) {
+        <p class="alert alert-warning mt-2 mb-0 py-2" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+          <ng-container i18n
+            >{{ sourceUrlWarningCount() }} of the selected photos already have a different source URL and will be
+            overwritten.</ng-container
+          >
+        </p>
+      }
+      @if (licenseNeedsSourceCount() > 0) {
+        <p class="text-danger small mb-0" i18n>
+          {{ licenseNeedsSourceCount() }} of the selected photos have no source URL of their own - a source URL is
+          required for this licence.
+        </p>
+      }
+    </div>
+
+    <div class="mb-3">
+      <span class="form-label d-block" i18n>Author</span>
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        @if (authorChoice(); as author) {
+          <span [innerHTML]="author.nameHtml"></span>
+          <button type="button" class="btn btn-link btn-sm p-0" i18n (click)="clearAuthorChoice()">
+            leave as is instead
+          </button>
+        } @else {
+          <app-person-search
+            [pictureItemType]="PictureItemType.PICTURE_ITEM_AUTHOR"
+            (selected)="onAuthorSelected($event)"
+          />
+        }
+      </div>
+      @if (authorWarningCount() > 0) {
+        <p class="alert alert-warning mt-2 mb-0 py-2" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+          <ng-container i18n
+            >{{ authorWarningCount() }} of the selected photos already have a different author set and will be
+            overwritten.</ng-container
+          >
+        </p>
+      }
+    </div>
+  }
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" i18n (click)="activeModal.dismiss()">Cancel</button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    i18n
+    [disabled]="loading() || saving() || licenseNeedsSourceCount() > 0"
+    (click)="apply()"
+  >
+    Apply
+  </button>
+  @if (saving()) {
+    <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
+  }
+</div>

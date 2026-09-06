@@ -16540,6 +16540,102 @@ Use the same button or email address to report material that infringes a tradema
         <source>and others</source>
         <target state="translated">及其他</target>
       </trans-unit>
+          <trans-unit id="2803614446273040896" datatype="html">
+        <source>Set licence, source and author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">2,3</context>
+        </context-group>
+        <target state="translated">设置许可证、来源和作者</target>
+      </trans-unit>
+      <trans-unit id="2776151190159640113" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ pictureIds().length }}"/> photos selected.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">9,10</context>
+        </context-group>
+        <target state="translated">已选择<x id="INTERPOLATION" equiv-text="{{ pictureIds().length }}"/>张照片。</target>
+      </trans-unit>
+      <trans-unit id="5030279332307869310" datatype="html">
+        <source> Fields left as &quot;leave as is&quot;, or an empty source URL, are not changed on any photo. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">11,15</context>
+        </context-group>
+        <target state="translated"> 保持为“保持不变”的字段，或空的来源URL，不会更改任何照片。 </target>
+      </trans-unit>
+      <trans-unit id="8646529510569623029" datatype="html">
+        <source>— leave as is —</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">24,26</context>
+        </context-group>
+        <target state="translated">— 保持不变 —</target>
+      </trans-unit>
+      <trans-unit id="1735613872790650263" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ licenseWarningCount() }}"/> of the selected photos already have a different licence set and will be overwritten.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">43,44</context>
+        </context-group>
+        <target state="translated">已选照片中有<x id="INTERPOLATION" equiv-text="{{ licenseWarningCount() }}"/>张已设置不同的许可证，将被覆盖。</target>
+      </trans-unit>
+      <trans-unit id="3293722117214633519" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ sourceUrlWarningCount() }}"/> of the selected photos already have a different source URL and will be overwritten.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">67,68</context>
+        </context-group>
+        <target state="translated">已选照片中有<x id="INTERPOLATION" equiv-text="{{ sourceUrlWarningCount() }}"/>张已设置不同的来源URL，将被覆盖。</target>
+      </trans-unit>
+      <trans-unit id="5812391417219618810" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="{{ licenseNeedsSourceCount() }}"/> of the selected photos have no source URL of their own - a source URL is required for this licence. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">74,76</context>
+        </context-group>
+        <target state="translated"> 已选照片中有<x id="INTERPOLATION" equiv-text="{{ licenseNeedsSourceCount() }}"/>张没有自己的来源URL — 此许可证需要来源URL。 </target>
+      </trans-unit>
+      <trans-unit id="8216680327055125192" datatype="html">
+        <source> leave as is instead </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">86,89</context>
+        </context-group>
+        <target state="translated"> 改为保持不变 </target>
+      </trans-unit>
+      <trans-unit id="4065445245430593293" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ authorWarningCount() }}"/> of the selected photos already have a different author set and will be overwritten.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">99,100</context>
+        </context-group>
+        <target state="translated">已选照片中有<x id="INTERPOLATION" equiv-text="{{ authorWarningCount() }}"/>张已设置不同的作者，将被覆盖。</target>
+      </trans-unit>
+      <trans-unit id="8921540071453284185" datatype="html">
+        <source> Set licence, source, author… </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.component.html</context>
+          <context context-type="linenumber">534,539</context>
+        </context-group>
+        <target state="translated"> 设置许可证、来源、作者… </target>
+      </trans-unit>
+      <trans-unit id="4895890773074468839" datatype="html">
+        <source>leave empty to not change</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">58,59</context>
+        </context-group>
+        <target state="translated">留空以不更改</target>
+      </trans-unit>
+      <trans-unit id="4517691647545108767" datatype="html">
+        <source> Apply </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
+          <context context-type="linenumber">109,116</context>
+        </context-group>
+        <target state="translated"> 应用 </target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

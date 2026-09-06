@@ -524,6 +524,15 @@
             </div>
           }
         </div>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          i18n
+          [disabled]="!hasSelectedItem()"
+          (click)="openBulkEditModal()"
+        >
+          Set licence, source, author…
+        </button>
       </div>
     </div>
 

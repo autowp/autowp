@@ -34,7 +34,7 @@ import {
   UsersRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient, UsersClient} from '@grpc/spec.pbsc';
-import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
+import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbModal, NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
@@ -42,6 +42,7 @@ import {PageId} from '@services/page-id';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {parseStringToGrpcDate} from '@services/utils';
 import {VehicleTypeService} from '@services/vehicle-type';
+import {getModalComponentRef} from '@utils/modal-component-ref';
 import {getPerspectiveTranslation, getVehicleTypeTranslation} from '@utils/translations';
 import {
   BehaviorSubject,
@@ -63,6 +64,7 @@ import {chunkBy} from '../../chunk';
 import {PaginatorComponent} from '../../paginator/paginator/paginator.component';
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../../toasts/toasts.service';
+import {ModerPicturesBulkEditModalComponent} from './bulk-edit-modal/bulk-edit-modal.component';
 
 type LicenseFilter = 'all-rights-reserved' | 'cc' | 'pd' | null;
 
@@ -145,6 +147,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #usersClient = inject(UsersClient);
   readonly #picturesClient = inject(PicturesClient);
+  readonly #modalService = inject(NgbModal);
 
   protected readonly hasSelectedItem = signal(false);
   #selected: string[] = [];
@@ -803,6 +806,18 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
     }
     this.#selected = [];
     this.hasSelectedItem.set(false);
+  }
+
+  protected openBulkEditModal(): void {
+    const modalRef = this.#modalService.open(ModerPicturesBulkEditModalComponent, {centered: true, size: 'lg'});
+    const componentRef = getModalComponentRef<ModerPicturesBulkEditModalComponent>(modalRef);
+    componentRef.setInput('pictureIds', [...this.#selected]);
+
+    componentRef.instance.applied.subscribe(() => {
+      this.#selected = [];
+      this.hasSelectedItem.set(false);
+      this.#change$.next();
+    });
   }
 
   protected readonly PicturesRequest = PicturesRequest;
