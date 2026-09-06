@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"cloud.google.com/go/civil"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/image/storage"
@@ -431,6 +432,62 @@ func (s *Repository) Count(ctx context.Context, options *query.PictureListOption
 	}
 
 	return count, nil
+}
+
+// AcceptedContentCountByItemID counts, per item, the accepted CONTENT pictures linked to that
+// item within the given accept-date window. One grouped query for the whole set instead of a
+// Count() per item.
+func (s *Repository) AcceptedContentCountByItemID(
+	ctx context.Context,
+	itemIDs []int64,
+	acceptDate civil.Date,
+	timezone *time.Location,
+) (map[int64]int32, error) {
+	result := make(map[int64]int32, len(itemIDs))
+
+	if len(itemIDs) == 0 {
+		return result, nil
+	}
+
+	options := query.PictureListOptions{
+		Status:     schema.PictureStatusAccepted,
+		AcceptDate: &acceptDate,
+		Timezone:   timezone,
+		PictureItem: &query.PictureItemListOptions{
+			ItemIDs: itemIDs,
+			TypeID:  schema.PictureItemTypeContent,
+		},
+	}
+
+	sqSelect, err := options.Select(s.db, query.PictureAlias)
+	if err != nil {
+		return nil, err
+	}
+
+	itemIDCol := goqu.T(query.AppendPictureItemAlias(query.PictureAlias, "0")).
+		Col(schema.PictureItemTableItemIDColName)
+
+	var rows []struct {
+		ItemID int64 `db:"item_id"`
+		Count  int   `db:"count"`
+	}
+
+	err = sqSelect.
+		Select(
+			itemIDCol.As("item_id"),
+			goqu.COUNT(goqu.DISTINCT(goqu.T(query.PictureAlias).Col(schema.PictureTableIDColName))).As("count"),
+		).
+		GroupBy(itemIDCol).
+		ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range rows {
+		result[row.ItemID] = int32(row.Count) //nolint:gosec
+	}
+
+	return result, nil
 }
 
 func (s *Repository) TopLikes(ctx context.Context, limit uint) ([]RatingUser, error) {

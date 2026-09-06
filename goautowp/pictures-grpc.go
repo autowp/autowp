@@ -26,6 +26,7 @@ import (
 	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/validation"
 	"github.com/paulmach/orb"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/codes"
@@ -36,6 +37,7 @@ import (
 const (
 	newboxPicturesPerPage   = 60
 	newboxPicturesPerLine   = 6
+	newboxGroupParallelism  = 4
 	newboxGroupTypeItem     = "item"
 	newboxGroupTypePicture  = "picture"
 	newboxGroupTypePictures = "pictures"
@@ -3053,34 +3055,72 @@ func (s *PicturesGRPCServer) newboxGroups(
 		return nil, nil, err
 	}
 
-	groups := make([]*NewboxGroup, 0)
+	// Per-item content counts for every item group in one grouped query, instead of a Count()
+	// inside the loop below.
+	itemGroupIDs := make([]int64, 0, len(groupsData))
 
 	for _, groupData := range groupsData {
-		group := &NewboxGroup{
-			Type: groupData.Type,
-		}
-
 		if groupData.Type == newboxGroupTypeItem {
+			itemGroupIDs = append(itemGroupIDs, groupData.ItemID)
+		}
+	}
+
+	totalPicturesByItemID, err := s.repository.AcceptedContentCountByItemID(
+		ctx, itemGroupIDs, acceptDate, timezone,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Each group's item lookup + picture extraction is independent; run them concurrently the way
+	// PictureExtractor.ExtractRows already does internally. Every goroutine writes only its own
+	// groups[i] slot.
+	groups := make([]*NewboxGroup, len(groupsData))
+
+	groupsGroup, groupsCtx := errgroup.WithContext(ctx)
+	groupsGroup.SetLimit(newboxGroupParallelism)
+
+	for i, groupData := range groupsData {
+		groupsGroup.Go(func() error {
+			group := &NewboxGroup{
+				Type: groupData.Type,
+			}
+
+			if groupData.Type != newboxGroupTypeItem {
+				var err error
+
+				group.Pictures, err = s.pictureExtractor.ExtractRows(
+					groupsCtx, groupData.Pictures, &pictureFields, lang, userCtx,
+				)
+				if err != nil {
+					return err
+				}
+
+				groups[i] = group
+
+				return nil
+			}
+
 			itemRow, err := s.itemRepository.Item(
-				ctx,
+				groupsCtx,
 				&query.ItemListOptions{ItemID: groupData.ItemID},
 				repoItemFields,
 			)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 
-			group.Item, err = s.itemExtractor.Extract(ctx, itemRow, &itemFields, lang, userCtx)
+			group.Item, err = s.itemExtractor.Extract(groupsCtx, itemRow, &itemFields, lang, userCtx)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 
-			ids := make([]int64, 0)
+			ids := make([]int64, 0, len(groupData.Pictures))
 			for _, picture := range groupData.Pictures {
 				ids = append(ids, picture.ID)
 			}
 
-			pictureRows, _, err := s.repository.Pictures(ctx, &query.PictureListOptions{
+			pictureRows, _, err := s.repository.Pictures(groupsCtx, &query.PictureListOptions{
 				IDs:    ids,
 				Status: schema.PictureStatusAccepted,
 				PictureItem: &query.PictureItemListOptions{
@@ -3089,42 +3129,30 @@ func (s *PicturesGRPCServer) newboxGroups(
 				Limit: newboxPicturesPerLine,
 			}, repoItemPictureFields, pictures.OrderByAcceptDatetimeDesc, false)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 
 			group.Pictures, err = s.pictureExtractor.ExtractRows(
-				ctx,
+				groupsCtx,
 				pictureRows,
 				&itemPictureFields,
 				lang,
 				userCtx,
 			)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 
-			totalPictures, err := s.repository.Count(ctx, &query.PictureListOptions{
-				Status: schema.PictureStatusAccepted,
-				PictureItem: &query.PictureItemListOptions{
-					ItemID: groupData.ItemID,
-					TypeID: schema.PictureItemTypeContent,
-				},
-				AcceptDate: &acceptDate,
-				Timezone:   timezone,
-			})
-			if err != nil {
-				return nil, nil, err
-			}
+			group.TotalPictures = totalPicturesByItemID[groupData.ItemID]
 
-			group.TotalPictures = int32(totalPictures) //nolint: gosec
-		} else {
-			group.Pictures, err = s.pictureExtractor.ExtractRows(ctx, groupData.Pictures, &pictureFields, lang, userCtx)
-			if err != nil {
-				return nil, nil, err
-			}
-		}
+			groups[i] = group
 
-		groups = append(groups, group)
+			return nil
+		})
+	}
+
+	if err := groupsGroup.Wait(); err != nil {
+		return nil, nil, err
 	}
 
 	return groups, pages, nil
