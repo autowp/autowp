@@ -714,11 +714,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/brands/item/item.component.html</context>
-          <context context-type="linenumber">15,21</context>
+          <context context-type="linenumber">18,24</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/brands/item/item.component.html</context>
-          <context context-type="linenumber">44,46</context>
+          <context context-type="linenumber">47,49</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/cars/dateless/dateless.component.html</context>
@@ -978,7 +978,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/brands/brand/brand.component.html</context>
-          <context context-type="linenumber">15,19</context>
+          <context context-type="linenumber">18,22</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/categories/categories.component.html</context>
@@ -986,7 +986,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/categories/category/category.component.html</context>
-          <context context-type="linenumber">15,19</context>
+          <context context-type="linenumber">18,22</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/factories/factories.component.html</context>
@@ -994,7 +994,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/factories/factory/factory.component.html</context>
-          <context context-type="linenumber">15,19</context>
+          <context context-type="linenumber">18,22</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/index/index.component.html</context>
@@ -2532,7 +2532,7 @@ All images are posted for educational purposes.</source>
         <source>Terms of Service</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">249,251</context>
+          <context context-type="linenumber">251,253</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/terms-gate/terms-gate.component.html</context>
@@ -2551,7 +2551,7 @@ All images are posted for educational purposes.</source>
         <source>Privacy Policy</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">250,252</context>
+          <context context-type="linenumber">252,254</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/policy/policy-routing.module.ts</context>
@@ -2570,14 +2570,14 @@ All images are posted for educational purposes.</source>
         <source>Copyright</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">251,253</context>
+          <context context-type="linenumber">253,255</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3906086328287885567" datatype="html">
         <source>Licenses</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">252,254</context>
+          <context context-type="linenumber">254,256</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/licenses/licenses-routing.module.ts</context>
@@ -2592,7 +2592,7 @@ All images are posted for educational purposes.</source>
         <source>Legal Notice</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">253,254</context>
+          <context context-type="linenumber">255,256</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/legal-notice/legal-notice-routing.module.ts</context>
@@ -2607,7 +2607,7 @@ All images are posted for educational purposes.</source>
         <source>Cookie settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">254,260</context>
+          <context context-type="linenumber">256,262</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5539833462297888878" datatype="html">
@@ -2691,18 +2691,37 @@ All images are posted for educational purposes.</source>
           <context context-type="linenumber">17,19</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2926176246666361657" datatype="html">
+        <source>and others</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/brands/item/item.component.html</context>
+          <context context-type="linenumber">12,17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/index/brands/brand/brand.component.html</context>
+          <context context-type="linenumber">12,17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/index/categories/category/category.component.html</context>
+          <context context-type="linenumber">12,17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/index/factories/factory/factory.component.html</context>
+          <context context-type="linenumber">12,17</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="4034008647149874667" datatype="html">
         <source>New <x id="INTERPOLATION" equiv-text="{{ brand.name }}"/> vehicles</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/brands/item/item.component.html</context>
-          <context context-type="linenumber">32,33</context>
+          <context context-type="linenumber">35,36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6331108159069677440" datatype="html">
         <source>pictures:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/brands/item/item.component.html</context>
-          <context context-type="linenumber">41,43</context>
+          <context context-type="linenumber">44,46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="186236568870281953" datatype="html">

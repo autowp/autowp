@@ -1473,7 +1473,10 @@ func (s *ItemsGRPCServer) GetBrandNewItems(
 	}
 
 	const (
-		newItemsLimit = 30
+		// The frontend popover shows at most 10 and a "and others" suffix once there's more -
+		// fetching one extra row is enough to know that without pulling a whole page of rows it
+		// will never display.
+		newItemsLimit = 11
 		daysLimit     = 7
 	)
 
@@ -1553,7 +1556,10 @@ func (s *ItemsGRPCServer) GetNewItems(
 	}
 
 	const (
-		newItemsLimit = 20
+		// The frontend popover shows at most 10 and a "and others" suffix once there's more -
+		// fetching one extra row is enough to know that without pulling a whole page of rows it
+		// will never display.
+		newItemsLimit = 11
 		daysLimit     = 7
 	)
 

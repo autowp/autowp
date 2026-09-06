@@ -16904,6 +16904,10 @@ Transmission is not considered</source>
         <source>All groups</source>
         <target state="translated">すべてのグループ</target>
       </trans-unit>
+      <trans-unit id="2926176246666361657" datatype="html">
+        <source>and others</source>
+        <target state="translated">他</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

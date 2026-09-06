@@ -16541,6 +16541,10 @@ Use o mesmo botão, formulário ou o mesmo endereço para denunciar material que
         <source>All groups</source>
         <target state="translated">Todos os grupos</target>
       </trans-unit>
+      <trans-unit id="2926176246666361657" datatype="html">
+        <source>and others</source>
+        <target state="translated">e outros</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

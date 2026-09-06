@@ -16544,6 +16544,10 @@ Usi lo stesso pulsante, modulo o lo stesso indirizzo per segnalare contenuti che
         <source>All groups</source>
         <target state="translated">Tutti i gruppi</target>
       </trans-unit>
+      <trans-unit id="2926176246666361657" datatype="html">
+        <source>and others</source>
+        <target state="translated">e altri</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

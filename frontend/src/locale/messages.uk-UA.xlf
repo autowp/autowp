@@ -16539,6 +16539,10 @@ Use the same button or email address to report material that infringes a tradema
         <source>All groups</source>
         <target state="translated">Усі групи</target>
       </trans-unit>
+      <trans-unit id="2926176246666361657" datatype="html">
+        <source>and others</source>
+        <target state="translated">та інші</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

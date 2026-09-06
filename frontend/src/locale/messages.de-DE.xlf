@@ -16904,6 +16904,10 @@ Getriebe wird nicht berücksichtigt</target>
         <source>All groups</source>
         <target state="translated">Alle Gruppen</target>
       </trans-unit>
+      <trans-unit id="2926176246666361657" datatype="html">
+        <source>and others</source>
+        <target state="translated">und andere</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

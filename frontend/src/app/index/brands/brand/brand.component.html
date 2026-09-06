@@ -5,8 +5,11 @@
         @if (response.brand?.brandicon?.src) {
           <img alt="" style="float: right; margin: 0 0 5px 5px" [src]="response.brand.brandicon.src" />
         }
-        @for (item of response.items; track item.id) {
+        @for (item of (response.items || []).slice(0, 10); track item.id) {
           <p [innerHTML]="item.nameHtml"></p>
+        }
+        @if ((response.items || []).length > 10) {
+          <p><em i18n>and others</em></p>
         }
         <br style="clear: both" />
       }
