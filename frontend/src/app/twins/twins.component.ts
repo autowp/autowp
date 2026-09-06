@@ -155,7 +155,7 @@ export class TwinsComponent {
 
     return {
       groups: (response.items ?? []).map((group): ChunkedGroup => ({
-        childs: chunkBy(group.itemParentChilds?.items ?? [], 3),
+        childs: chunkBy(group.itemParentChilds?.items ?? [], 4),
         hasMoreImages: TwinsComponent.hasMoreImages(group),
         item: group,
       })),

@@ -8,31 +8,27 @@
 
 <div class="page-header">
   <h1>
-    <ng-container i18n>Twins</ng-container>&ngsp;<small><a routerLink="/twins/all" i18n>all groups</a></small>
+    <ng-container i18n>Twins</ng-container>&ngsp;<small><a routerLink="/twins/all" i18n>all</a></small>
   </h1>
 </div>
 
 @if (brands$ | async; as brands) {
-  <div class="row">
+  <div class="brand-icons row">
     @for (brand of brands.items; track brand.id) {
       <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div class="card mb-3">
-          <div class="card-body">
-            @if (iconsData(); as icons) {
-              <a
-                [routerLink]="['/twins', brand.catname]"
-                [class]="'brandicon brandicon-' + cssClass(brand)"
-                [style.background-image]="'url(' + icons.image + ')'"
-              ></a>
-            }
-            <app-name-count
-              [routerLink]="['/twins', brand.catname]"
-              [name]="brand.name"
-              [count]="brand.count - brand.newCount"
-              [newCount]="brand.newCount"
-            />
-          </div>
-        </div>
+        @if (iconsData(); as icons) {
+          <a
+            [routerLink]="['/twins', brand.catname]"
+            [class]="'brandicon brandicon-' + cssClass(brand)"
+            [style.background-image]="'url(' + icons.image + ')'"
+          ></a>
+        }
+        <app-name-count
+          [routerLink]="['/twins', brand.catname]"
+          [name]="brand.name"
+          [count]="brand.count - brand.newCount"
+          [newCount]="brand.newCount"
+        />
       </div>
     }
   </div>
