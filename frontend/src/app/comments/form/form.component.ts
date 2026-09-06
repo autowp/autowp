@@ -8,7 +8,7 @@ import {AddCommentRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {switchMap, take} from 'rxjs';
+import {finalize, switchMap, take} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -33,6 +33,7 @@ export class CommentsFormComponent {
   readonly #resolve$ = toObservable(this.resolve);
 
   protected readonly invalidParams = signal<InvalidParams>({});
+  protected readonly sending = signal(false);
   protected readonly form = {
     message: '',
     moderator_attention: false,
@@ -47,7 +48,12 @@ export class CommentsFormComponent {
   }
 
   protected sendMessage() {
+    if (this.sending()) {
+      return;
+    }
+
     this.invalidParams.set({});
+    this.sending.set(true);
 
     this.#resolve$
       .pipe(
@@ -64,6 +70,9 @@ export class CommentsFormComponent {
             }),
           ),
         ),
+        finalize(() => {
+          this.sending.set(false);
+        }),
       )
       .subscribe({
         error: (response: unknown) => {
