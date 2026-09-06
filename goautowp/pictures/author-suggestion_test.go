@@ -141,7 +141,13 @@ func TestProcessEXIFAuthorSingleMatchAutoLinks(t *testing.T) {
 
 	picID := createTestPicture(t, db, sql.NullInt64{})
 
-	skipCopyrightsText, err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: "© 2020 " + name}, false, 0)
+	skipCopyrightsText, err := repo.processEXIFAuthor(
+		ctx,
+		picID,
+		exifExtractedValues{artist: "© 2020 " + name},
+		false,
+		0,
+	)
 	require.NoError(t, err)
 	require.False(t, skipCopyrightsText)
 
@@ -171,7 +177,13 @@ func TestProcessEXIFAuthorRespectsFormAuthor(t *testing.T) {
 
 	// authorLinked=true: the uploader picked an author in the form, so the single EXIF match is
 	// stored as a suggestion but not auto-linked.
-	skipCopyrightsText, err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: name}, true, 0)
+	skipCopyrightsText, err := repo.processEXIFAuthor(
+		ctx,
+		picID,
+		exifExtractedValues{artist: name},
+		true,
+		0,
+	)
 	require.NoError(t, err)
 	require.False(t, skipCopyrightsText)
 
@@ -197,7 +209,13 @@ func TestProcessEXIFAuthorNamesakesNoAutoLink(t *testing.T) {
 
 	picID := createTestPicture(t, db, sql.NullInt64{})
 
-	skipCopyrightsText, err := repo.processEXIFAuthor(ctx, picID, exifExtractedValues{artist: name}, false, 0)
+	skipCopyrightsText, err := repo.processEXIFAuthor(
+		ctx,
+		picID,
+		exifExtractedValues{artist: name},
+		false,
+		0,
+	)
 	require.NoError(t, err)
 	require.False(t, skipCopyrightsText)
 

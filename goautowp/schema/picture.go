@@ -69,12 +69,14 @@ var (
 	PictureTableCreatedAtCol             = PictureTable.Col(PictureTableCreatedAtColName)
 	PictureTableLicenseIDCol             = PictureTable.Col(PictureTableLicenseIDColName)
 	PictureTableSourceURLCol             = PictureTable.Col(PictureTableSourceURLColName)
-	PictureTableChangeSourceURLUserIDCol = PictureTable.Col(PictureTableChangeSourceURLUserIDColName)
-	PictureTableChangeSourceURLDateCol   = PictureTable.Col(PictureTableChangeSourceURLDateColName)
+	PictureTableChangeSourceURLUserIDCol = PictureTable.Col(
+		PictureTableChangeSourceURLUserIDColName,
+	)
+	PictureTableChangeSourceURLDateCol = PictureTable.Col(PictureTableChangeSourceURLDateColName)
 )
 
 type PictureRow struct {
-	ID                    int64          `db:"id"                    goqu:"pk,skipinsert"`
+	ID                    int64          `db:"id"                        goqu:"pk,skipinsert"`
 	OwnerID               sql.NullInt64  `db:"owner_id"`
 	ChangeStatusUserID    sql.NullInt64  `db:"change_status_user_id"`
 	Identity              string         `db:"identity"`
