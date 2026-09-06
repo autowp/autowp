@@ -194,6 +194,7 @@
         } @else {
           <ng-container i18n>contributor</ng-container>
         }
+        &ngsp;
         @for (contributor of item.contributors; track contributor) {
           @if (contributor; as user) {
             <app-user [user]="user" />
