@@ -4,6 +4,13 @@
 
 @if (folder$ | async; as folder) {
   @if (messages$ | async; as data) {
+    @if (data.sendingBlocked) {
+      <div class="alert alert-secondary" role="alert">
+        <ng-container i18n
+          >This user does not accept messages from you, so you cannot reply in this dialog.</ng-container
+        >
+      </div>
+    }
     @if (data.paginator && data.paginator.totalItemCount) {
       @if (folder === 'sent') {
         <div class="mb-4">
@@ -66,7 +73,7 @@
                   <ng-container i18n>delete</ng-container>
                 </a>
               }
-              @if (message.message.canReply) {
+              @if (message.message.canReply && !data.sendingBlocked) {
                 <span>
                   <i class="bi bi-reply me-1" aria-hidden="true"></i>
                   <a href="#" i18n (click)="openMessageForm(folder, message.message.authorId)">reply</a>

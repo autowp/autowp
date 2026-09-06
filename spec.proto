@@ -140,6 +140,9 @@ service Users {
   rpc GetUserPreferences(UserPreferencesRequest) returns (UserPreferencesResponse) {}
   rpc DisableUserCommentsNotifications(UserPreferencesRequest) returns (google.protobuf.Empty) {}
   rpc EnableUserCommentsNotifications(UserPreferencesRequest) returns (google.protobuf.Empty) {}
+  rpc AddUserToBlacklist(UserPreferencesRequest) returns (google.protobuf.Empty) {}
+  rpc RemoveUserFromBlacklist(UserPreferencesRequest) returns (google.protobuf.Empty) {}
+  rpc GetBlacklistedUsers(google.protobuf.Empty) returns (UsersResponse) {}
   rpc GetUsers(UsersRequest) returns (UsersResponse) {}
   rpc GetAccounts(google.protobuf.Empty) returns (AccountsResponse) {}
   rpc DeleteUserAccount(DeleteUserAccountRequest) returns (google.protobuf.Empty) {}
@@ -2396,6 +2399,9 @@ message MessagingGetMessagesRequest {
 message MessagingGetMessagesResponse {
   repeated Message items = 1;
   Pages paginator = 2;
+  // Set on the "dialog" folder only: the other party has blacklisted the requester, so the
+  // requester cannot send them messages. The client hides the reply affordances.
+  bool sending_blocked = 3;
 }
 
 message Pages {
@@ -2447,6 +2453,10 @@ message UserPreferencesRequest {
 
 message UserPreferencesResponse {
   bool disable_comments_notifications = 1;
+  // The requester has added user_id to their blacklist.
+  bool blacklist = 2;
+  // user_id has added the requester to their blacklist (the requester cannot message them).
+  bool blocked_by_target = 3;
 }
 
 message UsersRequest {

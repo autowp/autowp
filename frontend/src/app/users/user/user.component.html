@@ -43,10 +43,17 @@
         <p i18n>Database id: {{ user.id }}</p>
         <app-social-contact-list [contacts]="user.contacts ?? []" />
         @if (user && isNotMe()) {
-          <p>
-            <i class="bi bi-reply me-1" aria-hidden="true"></i>
-            <a href="#" i18n (click)="openMessageForm(user)">Send personal message</a>
-          </p>
+          @if (blockedByTargetData()) {
+            <p class="text-muted">
+              <i class="bi bi-slash-circle me-1" aria-hidden="true"></i>
+              <ng-container i18n>This user does not accept messages from you</ng-container>
+            </p>
+          } @else {
+            <p>
+              <i class="bi bi-reply me-1" aria-hidden="true"></i>
+              <a href="#" i18n (click)="openMessageForm(user)">Send personal message</a>
+            </p>
+          }
         }
         <!--      <p *ngFor="let account of user.accounts">-->
         <!--        <i class="{{ account.icon }}" aria-hidden="true"></i>-->
@@ -229,6 +236,24 @@
                       <ng-container i18n>Enable comments notifications</ng-container>
                     } @else {
                       <ng-container i18n>Disable comments notifications</ng-container>
+                    }
+                  </button>
+                </div>
+              }
+              @if (blacklistData() !== undefined) {
+                <div class="col-6">
+                  <button
+                    type="submit"
+                    class="btn btn-lg btn-contact"
+                    [class.btn-primary]="blacklistData()"
+                    [class.btn-danger]="!blacklistData()"
+                    (click)="setBlacklisted(user, !blacklistData())"
+                  >
+                    <span class="bi bi-slash-circle me-1" aria-hidden="true"></span>
+                    @if (blacklistData()) {
+                      <ng-container i18n>Remove from blacklist</ng-container>
+                    } @else {
+                      <ng-container i18n>Add to blacklist</ng-container>
                     }
                   </button>
                 </div>

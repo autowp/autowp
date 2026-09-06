@@ -1,0 +1,78 @@
+import type {OnInit} from '@angular/core';
+import type {User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {AsyncPipe, DatePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {UserPreferencesRequest} from '@grpc/spec.pb';
+import {UsersClient} from '@grpc/spec.pbsc';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {Empty} from '@ngx-grpc/well-known-types';
+import {AuthService} from '@services/auth.service';
+import {LanguageService} from '@services/language';
+import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
+import {browserWindow} from '@utils/browser-window';
+import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import Keycloak from 'keycloak-js';
+import {BehaviorSubject, catchError, EMPTY, map, of, switchMap} from 'rxjs';
+
+import {ToastsService} from '../../toasts/toasts.service';
+import {UserComponent} from '../../user/user/user.component';
+
+@Component({
+  selector: 'app-account-blacklist',
+  imports: [RouterLink, UserComponent, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
+  templateUrl: './blacklist.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AccountBlacklistComponent implements OnInit {
+  readonly #pageEnv = inject(PageEnvService);
+  readonly #toastService = inject(ToastsService);
+  readonly #auth = inject(AuthService);
+  readonly #usersClient = inject(UsersClient);
+  readonly #languageService = inject(LanguageService);
+  readonly #keycloak = inject(Keycloak);
+  readonly #window = browserWindow();
+
+  readonly #reload$ = new BehaviorSubject<void>(void 0);
+
+  protected readonly items$: Observable<User[]> = this.#auth.authenticated$.pipe(
+    switchMap((authenticated) => {
+      if (!authenticated) {
+        if (this.#window) {
+          void this.#keycloak.login({
+            locale: this.#languageService.language,
+            redirectUri: this.#window.location.href,
+          });
+        }
+        return EMPTY;
+      }
+      return of(authenticated);
+    }),
+    switchMap(() => this.#reload$),
+    switchMap(() => this.#usersClient.getBlacklistedUsers(new Empty())),
+    catchError((error: unknown) => {
+      this.#toastService.handleError(error);
+      return EMPTY;
+    }),
+    map((response) => response.items ?? []),
+  );
+
+  ngOnInit(): void {
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_BLACKLIST, title: $localize`Blacklist`});
+  }
+
+  protected removeFromBlacklist(userId: string) {
+    this.#usersClient.removeUserFromBlacklist(new UserPreferencesRequest({userId})).subscribe({
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
+      next: () => {
+        this.#reload$.next(void 0);
+      },
+    });
+    return false;
+  }
+}

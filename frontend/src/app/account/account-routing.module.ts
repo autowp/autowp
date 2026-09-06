@@ -19,6 +19,12 @@ export const routes: Routes = [
       },
       {
         canActivate: [authGuard],
+        loadComponent: () => import('./blacklist/blacklist.component').then((m) => m.AccountBlacklistComponent),
+        path: 'blacklist',
+        title: $localize`Blacklist`,
+      },
+      {
+        canActivate: [authGuard],
         loadComponent: () => import('./contacts/contacts.component').then((m) => m.AccountContactsComponent),
         path: 'contacts',
         title: $localize`Contacts`,

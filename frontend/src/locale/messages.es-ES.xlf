@@ -16640,6 +16640,34 @@ Utilice el mismo botón, formulario o la misma dirección para denunciar materia
         </context-group>
         <target state="translated"> Aplicar </target>
       </trans-unit>
+      <trans-unit id="8352962266652288744" datatype="html">
+        <source>Blacklist</source>
+        <target state="translated">Lista negra</target>
+      </trans-unit>
+      <trans-unit id="6918676923255755842" datatype="html">
+        <source>Users on your blacklist cannot send you personal messages, and you stop receiving notifications about their replies to your comments.</source>
+        <target state="translated">Los usuarios de tu lista negra no pueden enviarte mensajes privados y dejas de recibir notificaciones sobre sus respuestas a tus comentarios.</target>
+      </trans-unit>
+      <trans-unit id="4355497146315871431" datatype="html">
+        <source>Remove from blacklist</source>
+        <target state="translated">Quitar de la lista negra</target>
+      </trans-unit>
+      <trans-unit id="2412281364130978778" datatype="html">
+        <source>Your blacklist is empty</source>
+        <target state="translated">Tu lista negra está vacía</target>
+      </trans-unit>
+      <trans-unit id="8170783978747348201" datatype="html">
+        <source>This user does not accept messages from you, so you cannot reply in this dialog.</source>
+        <target state="translated">Este usuario no acepta tus mensajes, por lo que no puedes responder en esta conversación.</target>
+      </trans-unit>
+      <trans-unit id="4706145335383067749" datatype="html">
+        <source>This user does not accept messages from you</source>
+        <target state="translated">Este usuario no acepta tus mensajes</target>
+      </trans-unit>
+      <trans-unit id="7681771150739834704" datatype="html">
+        <source>Add to blacklist</source>
+        <target state="translated">Añadir a la lista negra</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

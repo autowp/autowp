@@ -68,6 +68,12 @@ export class AccountComponent {
           routerLink: ['/account/contacts'],
         },
         {
+          icon: 'bi-slash-circle',
+          name: $localize`Blacklist`,
+          pageId: PageId.ACCOUNT_BLACKLIST,
+          routerLink: ['/account/blacklist'],
+        },
+        {
           icon: 'bi-envelope-open',
           name: $localize`My e-mail`,
           pageId: PageId.ACCOUNT_EMAIL,

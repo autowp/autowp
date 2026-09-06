@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/autowp/goautowp/messaging"
+	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/validation"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -196,6 +197,21 @@ func (s *MessagingGRPCServer) CreateMessage(
 		return nil, wrapFieldViolations(fvs)
 	}
 
+	// A blacklisted sender cannot message the recipient. Only an administrator bypasses this.
+	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
+		blocked, err := s.repository.IsBlacklisted(ctx, message.GetToUserId(), userCtx.UserID)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		if blocked {
+			return nil, status.Error(
+				codes.PermissionDenied,
+				"the recipient does not accept messages from you",
+			)
+		}
+	}
+
 	err = s.repository.CreateMessage(ctx, userCtx.UserID, message.GetToUserId(), messageText)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -244,6 +260,16 @@ func (s *MessagingGRPCServer) GetMessages(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	var sendingBlocked bool
+
+	if in.GetFolder() == "dialog" && in.GetUserId() != 0 &&
+		!util.Contains(userCtx.Roles, users.RoleAdmin) {
+		sendingBlocked, err = s.repository.IsBlacklisted(ctx, in.GetUserId(), userCtx.UserID)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
 	items := make([]*Message, len(messages))
 
 	for idx, msg := range messages {
@@ -277,5 +303,6 @@ func (s *MessagingGRPCServer) GetMessages(
 			Current:        pages.Current,
 			TotalItemCount: pages.TotalItemCount,
 		},
+		SendingBlocked: sendingBlocked,
 	}, nil
 }

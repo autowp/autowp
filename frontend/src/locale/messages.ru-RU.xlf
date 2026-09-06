@@ -16627,6 +16627,34 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated"> Применить </target>
       </trans-unit>
+      <trans-unit id="8352962266652288744" datatype="html">
+        <source>Blacklist</source>
+        <target state="translated">Чёрный список</target>
+      </trans-unit>
+      <trans-unit id="6918676923255755842" datatype="html">
+        <source>Users on your blacklist cannot send you personal messages, and you stop receiving notifications about their replies to your comments.</source>
+        <target state="translated">Пользователи из вашего чёрного списка не могут отправлять вам личные сообщения, и вы перестаёте получать уведомления об их ответах на ваши комментарии.</target>
+      </trans-unit>
+      <trans-unit id="4355497146315871431" datatype="html">
+        <source>Remove from blacklist</source>
+        <target state="translated">Убрать из чёрного списка</target>
+      </trans-unit>
+      <trans-unit id="2412281364130978778" datatype="html">
+        <source>Your blacklist is empty</source>
+        <target state="translated">Ваш чёрный список пуст</target>
+      </trans-unit>
+      <trans-unit id="8170783978747348201" datatype="html">
+        <source>This user does not accept messages from you, so you cannot reply in this dialog.</source>
+        <target state="translated">Этот пользователь не принимает от вас сообщения, поэтому вы не можете отвечать в этом диалоге.</target>
+      </trans-unit>
+      <trans-unit id="4706145335383067749" datatype="html">
+        <source>This user does not accept messages from you</source>
+        <target state="translated">Этот пользователь не принимает от вас сообщения</target>
+      </trans-unit>
+      <trans-unit id="7681771150739834704" datatype="html">
+        <source>Add to blacklist</source>
+        <target state="translated">Добавить в чёрный список</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

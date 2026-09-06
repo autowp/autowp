@@ -20,6 +20,7 @@ import {
   PicturesRequest,
   UserFields,
   UserPreferencesRequest,
+  UserPreferencesResponse,
 } from '@grpc/spec.pb';
 import {
   AchievementsClient,
@@ -240,8 +241,8 @@ export class UsersUserComponent {
   });
 
   // `id` folds in #authenticated() - same reasoning as inContactsResource above.
-  protected readonly disableCommentsNotificationsResource = rxResource({
-    id: `users-user-disable-comments-notifications-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
+  protected readonly userPreferencesResource = rxResource({
+    id: `users-user-preferences-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const user = this.userData();
 
@@ -249,12 +250,10 @@ export class UsersUserComponent {
     },
     stream: ({params: {authenticated, isNotMe, userId}}) => {
       if (!authenticated || !isNotMe) {
-        return of(false);
+        return of(new UserPreferencesResponse());
       }
 
-      return this.#usersGrpc
-        .getUserPreferences(new UserPreferencesRequest({userId}))
-        .pipe(map(({disableCommentsNotifications}) => disableCommentsNotifications));
+      return this.#usersGrpc.getUserPreferences(new UserPreferencesRequest({userId}));
     },
   });
 
@@ -264,9 +263,16 @@ export class UsersUserComponent {
     this.inContactsResource.hasValue() ? this.inContactsResource.value() : undefined,
   );
   protected readonly disableCommentsNotificationsData = computed(() =>
-    this.disableCommentsNotificationsResource.hasValue()
-      ? this.disableCommentsNotificationsResource.value()
+    this.userPreferencesResource.hasValue()
+      ? this.userPreferencesResource.value().disableCommentsNotifications
       : undefined,
+  );
+  protected readonly blacklistData = computed(() =>
+    this.userPreferencesResource.hasValue() ? this.userPreferencesResource.value().blacklist : undefined,
+  );
+  // The viewed user has blacklisted the signed-in user: messaging them is not possible.
+  protected readonly blockedByTargetData = computed(() =>
+    this.userPreferencesResource.hasValue() ? this.userPreferencesResource.value().blockedByTarget : false,
   );
 
   constructor() {
@@ -315,24 +321,33 @@ export class UsersUserComponent {
   }
 
   protected setCommentNotificationsDisabled(user: User, value: boolean) {
-    if (value) {
-      this.#usersGrpc.disableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-        },
-        next: () => {
-          this.disableCommentsNotificationsResource.reload();
-        },
-      });
-      return;
-    }
+    const request = new UserPreferencesRequest({userId: user.id});
+    const call$ = value
+      ? this.#usersGrpc.disableUserCommentsNotifications(request)
+      : this.#usersGrpc.enableUserCommentsNotifications(request);
 
-    this.#usersGrpc.enableUserCommentsNotifications(new UserPreferencesRequest({userId: user.id})).subscribe({
+    call$.subscribe({
       error: (response: unknown) => {
         this.#toastService.handleError(response);
       },
       next: () => {
-        this.disableCommentsNotificationsResource.reload();
+        this.userPreferencesResource.reload();
+      },
+    });
+  }
+
+  protected setBlacklisted(user: User, value: boolean) {
+    const request = new UserPreferencesRequest({userId: user.id});
+    const call$ = value
+      ? this.#usersGrpc.addUserToBlacklist(request)
+      : this.#usersGrpc.removeUserFromBlacklist(request);
+
+    call$.subscribe({
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
+      next: () => {
+        this.userPreferencesResource.reload();
       },
     });
   }

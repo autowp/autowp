@@ -251,9 +251,64 @@ func (s *UsersGRPCServer) GetUserPreferences(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	blockedByTarget, err := s.userRepository.IsBlacklisted(ctx, in.GetUserId(), userCtx.UserID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &UserPreferencesResponse{
 		DisableCommentsNotifications: prefs.DisableCommentsNotifications,
+		Blacklist:                    prefs.Blacklist,
+		BlockedByTarget:              blockedByTarget,
 	}, nil
+}
+
+func (s *UsersGRPCServer) AddUserToBlacklist(
+	ctx context.Context,
+	in *UserPreferencesRequest,
+) (*emptypb.Empty, error) {
+	return s.setUserBlacklist(ctx, in, true)
+}
+
+func (s *UsersGRPCServer) RemoveUserFromBlacklist(
+	ctx context.Context,
+	in *UserPreferencesRequest,
+) (*emptypb.Empty, error) {
+	return s.setUserBlacklist(ctx, in, false)
+}
+
+func (s *UsersGRPCServer) GetBlacklistedUsers(
+	ctx context.Context,
+	_ *emptypb.Empty,
+) (*UsersResponse, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, s.auth.GRPCError(err)
+	}
+
+	if userCtx.UserID == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	rows, _, err := s.userRepository.Users(ctx, &query.UserListOptions{
+		BlacklistedBy: userCtx.UserID,
+	}, users.UserFields{}, users.OrderByDeletedName)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	result := make([]*User, 0, len(rows))
+
+	for idx := range rows {
+		apiUser, err := s.userExtractor.Extract(ctx, &rows[idx], nil, userCtx.UserID, userCtx.Roles)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		result = append(result, apiUser)
+	}
+
+	return &UsersResponse{Items: result}, nil
 }
 
 func (s *UsersGRPCServer) GetUsers(
@@ -537,6 +592,32 @@ func (s *UsersGRPCServer) UpdateUser(
 		if err = s.userRepository.SetUserContacts(ctx, userCtx.UserID, contacts); err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *UsersGRPCServer) setUserBlacklist(
+	ctx context.Context,
+	in *UserPreferencesRequest,
+	blacklisted bool,
+) (*emptypb.Empty, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, s.auth.GRPCError(err)
+	}
+
+	if userCtx.UserID == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	if in.GetUserId() == userCtx.UserID {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
+	}
+
+	err = s.userRepository.SetUserBlacklist(ctx, userCtx.UserID, in.GetUserId(), blacklisted)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil

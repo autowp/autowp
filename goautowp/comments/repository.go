@@ -924,7 +924,8 @@ func (s *Repository) NotifySubscribers(ctx context.Context, messageID int64) err
 			return err
 		}
 
-		if !prefs.DisableCommentsNotifications {
+		// Blacklisting a user implies not wanting reply-comment notifications from them either.
+		if !prefs.DisableCommentsNotifications && !prefs.Blacklist {
 			filteredIDs = append(filteredIDs, id)
 		}
 	}

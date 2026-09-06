@@ -136,6 +136,7 @@ const pages: Page[] = [
       {id: PageId.ACCOUNT_PICTURES, childs: []},
       {id: PageId.FORUM_SUBSCRIPTIONS, childs: []},
       {id: PageId.ACCOUNT_CONTACTS, childs: []},
+      {id: PageId.ACCOUNT_BLACKLIST, childs: []},
       {id: PageId.ABOUT, childs: []},
       {
         id: PageId.CATALOGUE_INDEX,

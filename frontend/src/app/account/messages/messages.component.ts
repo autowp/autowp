@@ -64,6 +64,7 @@ export class AccountMessagesComponent {
   protected readonly messages$: Observable<{
     items: {author$: Observable<null | User>; message: Message}[];
     paginator: Pages | undefined;
+    sendingBlocked: boolean;
   }> = combineLatest([this.folder$, this.page$, this.#userId$, this.#change$, this.#messageService.changed$]).pipe(
     debounceTime(50),
     switchMap(([folder, page, userId]) => {
@@ -110,6 +111,7 @@ export class AccountMessagesComponent {
         message: msg,
       })),
       paginator: response.paginator,
+      sendingBlocked: response.sendingBlocked,
     })),
   );
 

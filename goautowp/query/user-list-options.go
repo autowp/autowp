@@ -13,6 +13,7 @@ type UserListOptions struct {
 	ExcludeIDs    []int64
 	Identity      string
 	InContacts    int64
+	BlacklistedBy int64
 	Deleted       *bool
 	HasSpecs      *bool
 	IsOnline      bool
@@ -58,6 +59,16 @@ func (s *UserListOptions) apply(alias string, sqSelect *goqu.SelectDataset) *goq
 			schema.ContactTable,
 			goqu.On(idCol.Eq(schema.ContactTableContactUserIDCol))).
 			Where(schema.ContactTableUserIDCol.Eq(s.InContacts))
+	}
+
+	if s.BlacklistedBy != 0 {
+		sqSelect = sqSelect.Join(
+			schema.UserUserPreferencesTable,
+			goqu.On(idCol.Eq(schema.UserUserPreferencesTableToUserIDCol))).
+			Where(
+				schema.UserUserPreferencesTableUserIDCol.Eq(s.BlacklistedBy),
+				schema.UserUserPreferencesTableBlacklistCol.IsTrue(),
+			)
 	}
 
 	if s.Deleted != nil {

@@ -202,3 +202,36 @@ func TestDialogCount(t *testing.T) { //nolint:paralleltest
 	require.NoError(t, err)
 	require.Equal(t, countAfter, messages[0].DialogCount)
 }
+
+func TestIsBlacklisted(t *testing.T) { //nolint:paralleltest
+	repo := createRepository(t)
+	ctx := t.Context()
+
+	user1 := createRandomUser(t, repo)
+	user2 := createRandomUser(t, repo)
+
+	blacklisted, err := repo.IsBlacklisted(ctx, user1, user2)
+	require.NoError(t, err)
+	require.False(t, blacklisted)
+
+	_, err = repo.db.Insert(schema.UserUserPreferencesTable).Rows(goqu.Record{
+		schema.UserUserPreferencesTableUserIDColName:    user1,
+		schema.UserUserPreferencesTableToUserIDColName:  user2,
+		schema.UserUserPreferencesTableBlacklistColName: true,
+	}).Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	blacklisted, err = repo.IsBlacklisted(ctx, user1, user2)
+	require.NoError(t, err)
+	require.True(t, blacklisted)
+
+	// the relation is directional
+	blacklisted, err = repo.IsBlacklisted(ctx, user2, user1)
+	require.NoError(t, err)
+	require.False(t, blacklisted)
+
+	// a zero participant is never blacklisted (system messages)
+	blacklisted, err = repo.IsBlacklisted(ctx, user1, 0)
+	require.NoError(t, err)
+	require.False(t, blacklisted)
+}

@@ -16636,6 +16636,34 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated"> 应用 </target>
       </trans-unit>
+      <trans-unit id="8352962266652288744" datatype="html">
+        <source>Blacklist</source>
+        <target state="translated">黑名单</target>
+      </trans-unit>
+      <trans-unit id="6918676923255755842" datatype="html">
+        <source>Users on your blacklist cannot send you personal messages, and you stop receiving notifications about their replies to your comments.</source>
+        <target state="translated">黑名单中的用户无法向您发送私信，您也不会再收到他们回复您评论的通知。</target>
+      </trans-unit>
+      <trans-unit id="4355497146315871431" datatype="html">
+        <source>Remove from blacklist</source>
+        <target state="translated">移出黑名单</target>
+      </trans-unit>
+      <trans-unit id="2412281364130978778" datatype="html">
+        <source>Your blacklist is empty</source>
+        <target state="translated">您的黑名单为空</target>
+      </trans-unit>
+      <trans-unit id="8170783978747348201" datatype="html">
+        <source>This user does not accept messages from you, so you cannot reply in this dialog.</source>
+        <target state="translated">该用户不接收您的消息，因此您无法在此对话中回复。</target>
+      </trans-unit>
+      <trans-unit id="4706145335383067749" datatype="html">
+        <source>This user does not accept messages from you</source>
+        <target state="translated">该用户不接收您的消息</target>
+      </trans-unit>
+      <trans-unit id="7681771150739834704" datatype="html">
+        <source>Add to blacklist</source>
+        <target state="translated">加入黑名单</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

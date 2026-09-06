@@ -1,0 +1,47 @@
+<div class="page-header">
+  <h1 i18n>Blacklist</h1>
+</div>
+<p class="text-muted">
+  <ng-container i18n
+    >Users on your blacklist cannot send you personal messages, and you stop receiving notifications about their replies
+    to your comments.</ng-container
+  >
+</p>
+<div class="row gy-5">
+  @for (user of items$ | async; track user.id) {
+    <div class="col-md-6">
+      <div class="d-flex justify-content-start">
+        <div class="align-self-start me-3">
+          @if (!user.deleted) {
+            <a class="photo" [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]">
+              @if (user.avatar) {
+                <img alt="" class="rounded" loading="lazy" [src]="user.avatar.src" />
+              } @else if (user.gravatar) {
+                <img alt="" class="rounded" loading="lazy" [src]="user.gravatar" />
+              }
+            </a>
+          }
+        </div>
+        <div class="flex-grow-1">
+          <button
+            type="button"
+            class="btn-close float-end"
+            ngbTooltip="Remove from blacklist"
+            i18n-ngbTooltip
+            (click)="removeFromBlacklist(user.id)"
+          ></button>
+          <h4>
+            <app-user [user]="user" />
+          </h4>
+          @if (user.lastOnline; as date) {
+            <p>
+              <span [ngbTooltip]="date.toDate() | date: 'medium'">{{ date.toDate() | timeAgo }}</span>
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <p i18n>Your blacklist is empty</p>
+  }
+</div>

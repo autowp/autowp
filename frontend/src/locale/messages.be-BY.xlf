@@ -16632,6 +16632,34 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated"> Прымяніць </target>
       </trans-unit>
+      <trans-unit id="8352962266652288744" datatype="html">
+        <source>Blacklist</source>
+        <target state="translated">Чорны спіс</target>
+      </trans-unit>
+      <trans-unit id="6918676923255755842" datatype="html">
+        <source>Users on your blacklist cannot send you personal messages, and you stop receiving notifications about their replies to your comments.</source>
+        <target state="translated">Карыстальнікі з вашага чорнага спісу не могуць дасылаць вам асабістыя паведамленні, і вы больш не атрымліваеце апавяшчэнні пра іх адказы на вашы каментарыі.</target>
+      </trans-unit>
+      <trans-unit id="4355497146315871431" datatype="html">
+        <source>Remove from blacklist</source>
+        <target state="translated">Прыбраць з чорнага спісу</target>
+      </trans-unit>
+      <trans-unit id="2412281364130978778" datatype="html">
+        <source>Your blacklist is empty</source>
+        <target state="translated">Ваш чорны спіс пусты</target>
+      </trans-unit>
+      <trans-unit id="8170783978747348201" datatype="html">
+        <source>This user does not accept messages from you, so you cannot reply in this dialog.</source>
+        <target state="translated">Гэты карыстальнік не прымае ад вас паведамленні, таму вы не можаце адказваць у гэтым дыялогу.</target>
+      </trans-unit>
+      <trans-unit id="4706145335383067749" datatype="html">
+        <source>This user does not accept messages from you</source>
+        <target state="translated">Гэты карыстальнік не прымае ад вас паведамленні</target>
+      </trans-unit>
+      <trans-unit id="7681771150739834704" datatype="html">
+        <source>Add to blacklist</source>
+        <target state="translated">Дадаць у чорны спіс</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

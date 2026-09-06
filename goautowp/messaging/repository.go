@@ -291,6 +291,32 @@ func (s *Repository) CreateMessage(
 	return s.listChangedCallback(ctx, userIDs)
 }
 
+// IsBlacklisted reports whether byUserID has blacklisted targetUserID (in which case
+// targetUserID may not send byUserID personal messages).
+func (s *Repository) IsBlacklisted(
+	ctx context.Context,
+	byUserID int64,
+	targetUserID int64,
+) (bool, error) {
+	if byUserID == 0 || targetUserID == 0 {
+		return false, nil
+	}
+
+	var blacklisted bool
+
+	success, err := s.db.Select(schema.UserUserPreferencesTableBlacklistCol).
+		From(schema.UserUserPreferencesTable).
+		Where(
+			schema.UserUserPreferencesTableUserIDCol.Eq(byUserID),
+			schema.UserUserPreferencesTableToUserIDCol.Eq(targetUserID),
+		).ScanValContext(ctx, &blacklisted)
+	if err != nil {
+		return false, err
+	}
+
+	return success && blacklisted, nil
+}
+
 func (s *Repository) GetInbox(
 	ctx context.Context,
 	userID int64,

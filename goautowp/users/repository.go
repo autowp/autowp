@@ -117,6 +117,7 @@ type Repository struct {
 // UserPreferences object.
 type UserPreferences struct {
 	DisableCommentsNotifications bool `db:"disable_comments_notifications" json:"disable_comments_notifications"`
+	Blacklist                    bool `db:"blacklist"                      json:"blacklist"`
 }
 
 // NewRepository constructor.
@@ -938,6 +939,35 @@ func (s *Repository) SetDisableUserCommentsNotifications(
 	return err
 }
 
+// SetUserBlacklist adds toUserID to userID's blacklist (or removes it). A blacklisted user
+// cannot send userID personal messages, and userID stops receiving reply-comment notifications
+// caused by that user.
+func (s *Repository) SetUserBlacklist(
+	ctx context.Context,
+	userID int64,
+	toUserID int64,
+	blacklisted bool,
+) error {
+	_, err := s.db.Insert(schema.UserUserPreferencesTable).
+		Rows(goqu.Record{
+			schema.UserUserPreferencesTableUserIDColName:    userID,
+			schema.UserUserPreferencesTableToUserIDColName:  toUserID,
+			schema.UserUserPreferencesTableBlacklistColName: blacklisted,
+		}).
+		OnConflict(
+			goqu.DoUpdate(
+				schema.UserUserPreferencesTableUserIDColName+", "+schema.UserUserPreferencesTableToUserIDColName,
+				goqu.Record{
+					schema.UserUserPreferencesTableBlacklistColName: schema.Excluded(
+						schema.UserUserPreferencesTableBlacklistColName,
+					),
+				},
+			),
+		).Executor().ExecContext(ctx)
+
+	return err
+}
+
 func (s *Repository) UserPreferences(
 	ctx context.Context,
 	userID int64,
@@ -945,7 +975,10 @@ func (s *Repository) UserPreferences(
 ) (*UserPreferences, error) {
 	var row UserPreferences
 
-	_, err := s.db.Select(schema.UserUserPreferencesTableDCNCol).
+	_, err := s.db.Select(
+		schema.UserUserPreferencesTableDCNCol,
+		schema.UserUserPreferencesTableBlacklistCol,
+	).
 		From(schema.UserUserPreferencesTable).
 		Where(
 			schema.UserUserPreferencesTableUserIDCol.Eq(userID),
@@ -953,6 +986,27 @@ func (s *Repository) UserPreferences(
 		).ScanStructContext(ctx, &row)
 
 	return &row, err
+}
+
+// IsBlacklisted reports whether byUserID has blacklisted targetUserID.
+func (s *Repository) IsBlacklisted(
+	ctx context.Context,
+	byUserID int64,
+	targetUserID int64,
+) (bool, error) {
+	var blacklisted bool
+
+	success, err := s.db.Select(schema.UserUserPreferencesTableBlacklistCol).
+		From(schema.UserUserPreferencesTable).
+		Where(
+			schema.UserUserPreferencesTableUserIDCol.Eq(byUserID),
+			schema.UserUserPreferencesTableToUserIDCol.Eq(targetUserID),
+		).ScanValContext(ctx, &blacklisted)
+	if err != nil {
+		return false, err
+	}
+
+	return success && blacklisted, nil
 }
 
 func (s *Repository) IncForumTopics(ctx context.Context, userID int64) error {
