@@ -2583,19 +2583,15 @@ Good luck.</source>
         </context-group>
         <target state="translated">捐助</target>
       </trans-unit>
-      <trans-unit id="3937813557926167615" datatype="html">
+            <trans-unit id="2449511709964189843" datatype="html">
         <source>Please note that all material on this server autowp.ru, added visitors.
 
-The site administration does not have information on the legality of the publication of these materials.
-
 All images are posted for educational purposes.</source>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">238,249</context>
         </context-group>
         <target state="translated">请知悉，autowp服务器中全部素材都是由浏览者添加的。
-
-站长没有这些素材的相关法律信息。
 
 所有图片仅用于传播知识。</target>
       </trans-unit>
@@ -9037,17 +9033,15 @@ Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*</target>
         </context-group>
         <target state="translated">被删除</target>
       </trans-unit>
-      <trans-unit id="9107547038979295873" datatype="html">
-        <source>All images have their owners.
-
-  If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
+            <trans-unit id="4379739353357642506" datatype="html">
+        <source>If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
 
   Discuss anything and just talk about cars and not only can you on [the forum](/forums/).</source>
-        <context-group purpose="location">
+<context-group purpose="location">
           <context context-type="sourcefile">src/app/picture/picture.component.html</context>
           <context context-type="linenumber">263,270</context>
         </context-group>
-        <target state="translated">任何图片都有权益人。 如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
+        <target state="translated">如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
 前往[论坛](/forums/)可以讨论任何车型的任何话题。</target>
       </trans-unit>
       <trans-unit id="picture/propose-image-replacement" datatype="html">
