@@ -187,8 +187,12 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		})
 	}
 
-	if fields.GetImage() || fields.GetImageGallery() || isModer {
-		preloadGroup.Go(func() error {
+	// One task for both image steps because they are ordered: the formatted-variant requests can
+	// need the raw image rows (crop dimensions for the gallery format). The raw rows are loaded
+	// only when a caller wants the original/gallery image or is a moderator; the formatted
+	// variants - thumbnails included - are loaded whenever any field asks for one, regardless.
+	preloadGroup.Go(func() error {
+		if fields.GetImage() || fields.GetImageGallery() || isModer {
 			ids := make([]int, 0, len(rows))
 			for _, row := range rows {
 				if row.ImageID.Valid {
@@ -202,23 +206,23 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			}
 
 			maps.Copy(images, loadedImages)
+		}
 
-			// Formatted variants for the whole batch: one query per format asked for, rather than
-			// one per format per row - a gallery of two dozen pictures used to make two dozen of
-			// them. FormattedImages looks the format up for a set of images and generates the
-			// ones that are missing, exactly as FormattedImage does for one.
-			for formatName, formatIDs := range pictureImageFormatRequests(rows, fields, images) {
-				formattedImages, preloadErr := imageStorage.FormattedImages(preloadCtx, formatIDs, formatName)
-				if preloadErr != nil {
-					return preloadErr
-				}
-
-				formatted[formatName] = formattedImages
+		// Formatted variants for the whole batch: one query per format asked for, rather than one
+		// per format per row - a gallery of two dozen pictures used to make two dozen of them.
+		// FormattedImages looks the format up for a set of images and generates the ones that are
+		// missing, exactly as FormattedImage does for one.
+		for formatName, formatIDs := range pictureImageFormatRequests(rows, fields, images) {
+			formattedImages, preloadErr := imageStorage.FormattedImages(preloadCtx, formatIDs, formatName)
+			if preloadErr != nil {
+				return preloadErr
 			}
 
-			return nil
-		})
-	}
+			formatted[formatName] = formattedImages
+		}
+
+		return nil
+	})
 
 	if err = preloadGroup.Wait(); err != nil {
 		return nil, err

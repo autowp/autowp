@@ -2718,11 +2718,12 @@ func TestPersonPreviewPictures(t *testing.T) {
 	require.NotEmpty(t, res2.GetItems())
 	require.NotEmpty(t, res2.GetItems()[0].GetPreviewPictures())
 	require.EqualValues(t, 1, res2.GetItems()[0].GetPreviewPictures().GetTotalPictures())
-	require.Equal(
-		t,
-		pictureID,
-		res2.GetItems()[0].GetPreviewPictures().GetPictures()[0].GetPicture().GetId(),
-	)
+
+	previewPicture := res2.GetItems()[0].GetPreviewPictures().GetPictures()[0]
+	require.Equal(t, pictureID, previewPicture.GetPicture().GetId())
+	// The thumbnail must be extracted for an anonymous caller too - it is what the catalogue and
+	// its server-rendered pages actually display.
+	require.NotEmpty(t, previewPicture.GetPicture().GetThumbMedium().GetSrc())
 }
 
 func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
