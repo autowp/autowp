@@ -3120,7 +3120,34 @@ func (s *PicturesGRPCServer) newboxGroups(
 		return nil, nil, err
 	}
 
-	// Each group's item lookup + picture extraction is independent; run them concurrently the way
+	// Extract every item group's item in one batch instead of a fetch + Extract per group:
+	// ItemExtractor.ExtractRows shares its parent/category/twin graph preloads across the whole
+	// set, and each group just picks its item out of the map below.
+	itemsByID := make(map[int64]*Item, len(itemGroupIDs))
+
+	if len(itemGroupIDs) > 0 {
+		itemRows, _, err := s.itemRepository.List(
+			ctx,
+			&query.ItemListOptions{ItemIDs: itemGroupIDs},
+			repoItemFields,
+			items.OrderByNone,
+			false,
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		extractedItems, err := s.itemExtractor.ExtractRows(ctx, itemRows, &itemFields, lang, userCtx)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		for _, item := range extractedItems {
+			itemsByID[item.GetId()] = item
+		}
+	}
+
+	// Each group's picture extraction is independent; run them concurrently the way
 	// PictureExtractor.ExtractRows already does internally. Every goroutine writes only its own
 	// groups[i] slot.
 	groups := make([]*NewboxGroup, len(groupsData))
@@ -3149,19 +3176,12 @@ func (s *PicturesGRPCServer) newboxGroups(
 				return nil
 			}
 
-			itemRow, err := s.itemRepository.Item(
-				groupsCtx,
-				&query.ItemListOptions{ItemID: groupData.ItemID},
-				repoItemFields,
-			)
-			if err != nil {
-				return err
+			extractedItem, ok := itemsByID[groupData.ItemID]
+			if !ok {
+				return fmt.Errorf("%w: newbox group item %d", items.ErrItemNotFound, groupData.ItemID)
 			}
 
-			group.Item, err = s.itemExtractor.Extract(groupsCtx, itemRow, &itemFields, lang, userCtx)
-			if err != nil {
-				return err
-			}
+			group.Item = extractedItem
 
 			ids := make([]int64, 0, len(groupData.Pictures))
 			for _, picture := range groupData.Pictures {
