@@ -15,7 +15,7 @@
 @if (brands$ | async; as brands) {
   <div class="brand-icons row">
     @for (brand of brands.items; track brand.id) {
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4">
         @if (iconsData(); as icons) {
           <a
             [routerLink]="['/twins', brand.catname]"
@@ -23,12 +23,15 @@
             [style.background-image]="'url(' + icons.image + ')'"
           ></a>
         }
-        <app-name-count
-          [routerLink]="['/twins', brand.catname]"
-          [name]="brand.name"
-          [count]="brand.count - brand.newCount"
-          [newCount]="brand.newCount"
-        />
+        <h4>
+          <a class="me-1" [routerLink]="['/twins', brand.catname]">{{ brand.name }}</a>
+          <small class="badge bg-secondary-subtle text-secondary-emphasis">
+            {{ brand.count - brand.newCount }}
+            @if (brand.newCount > 0) {
+              <span>+{{ brand.newCount }}</span>
+            }
+          </small>
+        </h4>
       </div>
     }
   </div>

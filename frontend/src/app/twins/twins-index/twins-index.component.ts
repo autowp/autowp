@@ -12,7 +12,6 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
-import {NameCountComponent} from '@utils/name-count/name-count.component';
 
 function addCSS(document: Document, url: string) {
   const cssId = 'brands-css';
@@ -30,7 +29,7 @@ function addCSS(document: Document, url: string) {
 
 @Component({
   selector: 'app-twins-index',
-  imports: [RouterLink, AsyncPipe, NameCountComponent],
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './twins-index.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
