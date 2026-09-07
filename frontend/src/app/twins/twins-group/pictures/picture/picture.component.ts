@@ -60,8 +60,8 @@ export class TwinsGroupPictureComponent {
 
   protected readonly pictureResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: `twins-group-picture-${this.groupId()}-${this.#identity() ?? ''}`,
-    params: () => ({groupId: this.groupId(), identity: this.#identity()}),
+    id: `twins-group-picture-${this.groupId()}-${this.#identity() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
+    params: () => ({authenticated: !!this.#authenticated(), groupId: this.groupId(), identity: this.#identity()}),
     stream: ({params: {groupId, identity}}) => {
       if (!identity) {
         return notFoundError();

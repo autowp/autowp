@@ -127,12 +127,17 @@ export class CatalogueVehiclesPicturesPictureComponent {
   // `id` additionally includes `identity` (unlike catalogueResource's id): navigating between two
   // pictures of the same item reuses this component instance, so without it a stale
   // TransferState entry from the previous picture would seed this resource with the wrong data.
+  // #authenticated is folded into id and params: the picture carries per-user fields (subscribed,
+  // the caller's own vote). A server-side render is anonymous; without this the client would keep
+  // that anonymous snapshot after auth resolves. See CatalogueIndexComponent.
   protected readonly pictureResource = rxResource({
-    id: `catalogue-vehicles-pictures-picture-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}-${this.identity() ?? ''}`,
+    id: `catalogue-vehicles-pictures-picture-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}-${this.identity() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const data = this.catalogueData();
       const identity = this.identity();
-      return data && identity ? {identity, itemID: data.path[data.path.length - 1].itemId} : undefined;
+      return data && identity
+        ? {authenticated: !!this.#authenticated(), identity, itemID: data.path[data.path.length - 1].itemId}
+        : undefined;
     },
     stream: ({params: {identity, itemID}}): Observable<Picture> =>
       this.#picturesClient.getPicture(

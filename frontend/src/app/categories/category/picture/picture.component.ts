@@ -102,12 +102,15 @@ export class CategoryPictureComponent {
     return ['/category', data.category.catname, ...data.pathCatnames, 'gallery', identity];
   });
 
+  // #authenticated is folded into id and params: the picture carries per-user fields (subscribed,
+  // the caller's own vote). A server-side render is anonymous; without this the client would keep
+  // that anonymous snapshot after auth resolves. See CatalogueIndexComponent.
   protected readonly pictureResource = rxResource({
-    id: `category-picture-${this.#identity() ?? ''}`,
+    id: `category-picture-${this.#identity() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const current = this.categoryData()?.current;
 
-      return current ? {current, identity: this.#identity()} : undefined;
+      return current ? {authenticated: !!this.#authenticated(), current, identity: this.#identity()} : undefined;
     },
     stream: ({params: {current, identity}}) => {
       if (!identity) {

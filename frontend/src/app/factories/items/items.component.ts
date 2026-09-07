@@ -46,6 +46,11 @@ export class FactoryItemsComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
+  // Folded into itemsResource's id and params: the list carries the per-user canEditSpecs, and a
+  // server-side render is anonymous. Without this, hydration adopts the anonymous cached list on
+  // the id string alone and never refetches once auth resolves. See CatalogueIndexComponent.
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
     requireSync: true,
   });
@@ -83,11 +88,11 @@ export class FactoryItemsComponent {
   );
 
   protected readonly itemsResource = rxResource({
-    id: `factory-items-list-${this.#itemID()}`,
+    id: `factory-items-list-${this.#itemID()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const factory = this.factoryData();
 
-      return factory ? {factoryID: factory.id, page: this.#page()} : undefined;
+      return factory ? {authenticated: this.#authenticated(), factoryID: factory.id, page: this.#page()} : undefined;
     },
     stream: ({params: {factoryID, page}}) =>
       this.#itemsClient.list(

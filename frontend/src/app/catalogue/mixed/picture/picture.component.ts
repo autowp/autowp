@@ -117,10 +117,16 @@ export class CatalogueMixedPictureComponent {
   // Only fetches once brandResource has resolved - while it's still loading or in an error state,
   // this stays idle so the picture is never fetched (and never briefly flashed) under the wrong
   // brand.
+  // #authenticated is folded into id and params: the picture carries per-user fields (subscribed,
+  // the caller's own vote). A server-side render is anonymous; without this the client would keep
+  // that anonymous snapshot after auth resolves. See CatalogueIndexComponent.
   protected readonly pictureResource = rxResource({
-    id: `catalogue-mixed-picture-${this.data().catname}-${this.#catname() ?? ''}-${this.identity() ?? ''}`,
-    params: () => this.brandData(),
-    stream: ({params: brand}): Observable<Picture> => {
+    id: `catalogue-mixed-picture-${this.data().catname}-${this.#catname() ?? ''}-${this.identity() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
+    params: () => {
+      const brand = this.brandData();
+      return brand ? {authenticated: !!this.#authenticated(), brand} : undefined;
+    },
+    stream: ({params: {brand}}): Observable<Picture> => {
       const identity = this.identity();
       if (!identity) {
         return notFoundError();

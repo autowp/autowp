@@ -55,6 +55,12 @@ export class CategoriesCategoryItemComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
+  // Folded into itemParentsResource's and itemResource's id and params: those lists carry the
+  // per-user canEditSpecs, and a server-side render is anonymous. Without this, hydration adopts
+  // the anonymous cached list on the id string alone and never refetches once auth resolves.
+  // See CatalogueIndexComponent.
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+
   // No params function: categoryPipe$'s Observable is itself long-lived and already reacts to
   // route param changes internally (see CategoriesService.categoryPipe$).
   protected readonly categoryDataResource = rxResource({
@@ -77,12 +83,18 @@ export class CategoriesCategoryItemComponent {
   });
 
   protected readonly itemParentsResource = rxResource({
-    id: 'categories-category-item-parents',
+    id: `categories-category-item-parents${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const data = this.categoryData();
 
       return data?.current
-        ? {category: data.category, current: data.current, page: this.#page(), pathCatnames: data.pathCatnames}
+        ? {
+            authenticated: this.#authenticated(),
+            category: data.category,
+            current: data.current,
+            page: this.#page(),
+            pathCatnames: data.pathCatnames,
+          }
         : undefined;
     },
     stream: ({params: {category, current, page, pathCatnames}}) =>
@@ -211,13 +223,13 @@ export class CategoriesCategoryItemComponent {
   });
 
   protected readonly itemResource = rxResource({
-    id: 'categories-category-item-single',
+    id: `categories-category-item-single${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       const data = this.categoryData();
       const itemParents = this.itemParentsData();
 
       return data?.current && itemParents
-        ? {current: data.current, itemParentsCount: itemParents.items.length}
+        ? {authenticated: this.#authenticated(), current: data.current, itemParentsCount: itemParents.items.length}
         : undefined;
     },
     stream: ({params: {current, itemParentsCount}}) => {

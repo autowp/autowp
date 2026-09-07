@@ -14,6 +14,7 @@ import {
   PreviewPicturesRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
+import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
@@ -34,6 +35,12 @@ export class CarsDatelessComponent implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
+  readonly #auth = inject(AuthService);
+
+  // Folded into dataResource's id and params: the list carries the per-user canEditSpecs, and a
+  // server-side render is anonymous. Without this, hydration adopts the anonymous cached list on
+  // the id string alone and never refetches once auth resolves. See CatalogueIndexComponent.
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
 
   readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
     requireSync: true,
@@ -41,9 +48,9 @@ export class CarsDatelessComponent implements OnInit {
 
   protected readonly dataResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: 'cars-dateless-page',
-    params: () => this.#page(),
-    stream: ({params: page}) =>
+    id: `cars-dateless-page${this.#authenticated() ? '-auth' : ''}`,
+    params: () => ({authenticated: this.#authenticated(), page: this.#page()}),
+    stream: ({params: {page}}) =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({

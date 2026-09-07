@@ -71,8 +71,8 @@ export class PersonsPersonAuthorPictureComponent {
 
   protected readonly pictureResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
-    id: `persons-person-author-picture-${this.#personID()}-${this.#identity() ?? ''}`,
-    params: () => ({identity: this.#identity(), itemID: this.#personID()}),
+    id: `persons-person-author-picture-${this.#personID()}-${this.#identity() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
+    params: () => ({authenticated: !!this.#authenticated(), identity: this.#identity(), itemID: this.#personID()}),
     stream: ({params: {identity, itemID}}) => {
       if (!identity) {
         return notFoundError();

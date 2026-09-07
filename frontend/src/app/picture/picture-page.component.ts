@@ -52,10 +52,13 @@ export class PicturePageComponent {
   // The canonical-route redirect runs in pictureCanonicalGuard, so by the time this component is
   // constructed the URL is already the canonical one and the picture can be fetched straight off
   // the identity.
+  // #authenticated is folded into id and params: the picture carries per-user fields (subscribed,
+  // the caller's own vote, moder rights). A server-side render is anonymous; without this the
+  // client would keep that anonymous snapshot after auth resolves. See CatalogueIndexComponent.
   protected readonly pictureResource = rxResource({
-    id: `picture-page-${this.#identity() ?? ''}`,
-    params: () => this.#identity(),
-    stream: ({params: identity}) => {
+    id: `picture-page-${this.#identity() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
+    params: () => ({authenticated: !!this.#authenticated(), identity: this.#identity()}),
+    stream: ({params: {identity}}) => {
       if (!identity) {
         return of(undefined);
       }

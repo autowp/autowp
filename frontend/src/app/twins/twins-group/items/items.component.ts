@@ -16,6 +16,7 @@ import {
   PreviewPicturesRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
+import {AuthService} from '@services/auth.service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
@@ -37,6 +38,12 @@ export class TwinsGroupItemsComponent {
   readonly #pageEnv = inject(PageEnvService);
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
+  readonly #auth = inject(AuthService);
+
+  // Folded into childsResource's id and params: the list carries the per-user canEditSpecs, and a
+  // server-side render is anonymous. Without this, hydration adopts the anonymous cached list on
+  // the id string alone and never refetches once auth resolves. See CatalogueIndexComponent.
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
 
   protected readonly groupId = toSignal(
     requireRouteParent(this.#route).paramMap.pipe(map((params) => params.get('group') ?? '')),
@@ -65,9 +72,9 @@ export class TwinsGroupItemsComponent {
   });
 
   protected readonly childsResource = rxResource({
-    id: `twins-group-items-childs-${this.groupId()}`,
-    params: () => this.groupId(),
-    stream: ({params: groupId}) =>
+    id: `twins-group-items-childs-${this.groupId()}${this.#authenticated() ? '-auth' : ''}`,
+    params: () => ({authenticated: this.#authenticated(), groupId: this.groupId()}),
+    stream: ({params: {groupId}}) =>
       this.#itemsClient.list(
         new ItemsRequest({
           fields: new ItemFields({
