@@ -308,6 +308,10 @@ func (s *Repository) candidate(ctx context.Context) (int64, error) {
 			schema.PictureItemTableTypeCol.Eq(schema.PictureItemTypeAuthor),
 		)
 
+	// Replace CandidateQuery's projection rather than appending to it: weightedCandidate only
+	// needs id and the complete-count, and goqu's ScanStructs errors on any returned column
+	// (p_count) that has no matching struct field. The GROUP BY / HAVING from CandidateQuery
+	// stay - HAVING refers to the aggregate expression itself, not the dropped alias.
 	sqSelect := s.CandidateQuery().
 		Where(goqu.Or(
 			goqu.And(
@@ -319,7 +323,8 @@ func (s *Repository) candidate(ctx context.Context) (int64, error) {
 				schema.ItemTableEndModelYearCol.Gt(0),
 			),
 		)).
-		SelectAppend(
+		Select(
+			schema.ItemTableIDCol,
 			goqu.L(
 				"COUNT(DISTINCT ?) FILTER (WHERE ? != ? AND EXISTS ?)",
 				schema.PictureTableIDCol, schema.PictureTableLicenseIDCol, schema.PictureLicenseUnknown, authorExists,
