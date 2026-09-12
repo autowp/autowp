@@ -367,16 +367,20 @@ func (s *MapGRPCServer) pointsWithContent(
 		return nil, err
 	}
 
-	rows, err := sqSelect.
-		SelectAppend(
-			schema.ItemTableIDCol,
-			nameExpr,
-			schema.ItemTableBeginYearCol,
-			schema.ItemTableEndYearCol,
-			schema.ItemTableItemTypeIDCol,
-			schema.ItemTableTodayCol,
-		).
-		Join(schema.ItemTable, goqu.On(schema.ItemPointTableItemIDCol.Eq(schema.ItemTableIDCol))).
+	rows, err := items.LeftJoinItemLanguageCache(
+		sqSelect.
+			SelectAppend(
+				schema.ItemTableIDCol,
+				nameExpr,
+				schema.ItemTableBeginYearCol,
+				schema.ItemTableEndYearCol,
+				schema.ItemTableItemTypeIDCol,
+				schema.ItemTableTodayCol,
+			).
+			Join(schema.ItemTable, goqu.On(schema.ItemPointTableItemIDCol.Eq(schema.ItemTableIDCol))),
+		schema.ItemTableName,
+		lang,
+	).
 		Executor().QueryContext(ctx) //nolint:sqlclosecheck
 
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {

@@ -606,6 +606,10 @@ func (s *Repository) List( //nolint:maintidx
 
 	sqSelect = sqSelect.GroupBy(aliasTable.Col(schema.ItemTableIDColName))
 
+	// Must come after GroupBy above: goqu's GroupBy() replaces the clause rather than appending,
+	// so an earlier GroupByAppend here (from joinItemLanguageCache) would be wiped out by it.
+	sqSelect = s.joinItemLanguageCache(sqSelect, alias, fields, orderBy, options.Language)
+
 	var pages *util.Pages
 
 	outAlias := query.ItemAlias
@@ -695,6 +699,11 @@ func (s *Repository) List( //nolint:maintidx
 			)).
 			GroupBy(schema.ItemTableIDCol).
 			GroupByAppend(groupByColumnsExpr...)
+
+		// Must come after the chain above: goqu's From()/GroupBy() replace their clause rather
+		// than appending, so an earlier join/GroupByAppend here (from joinItemLanguageCache)
+		// would be wiped out by them.
+		sqSelect = s.joinItemLanguageCache(sqSelect, options.Alias, fields, orderBy, options.Language)
 
 		wrapperOrderBy, groupBy, err := s.wrapperOrderBy(schema.ItemTableName, wrappedAlias, orderBy, options.Language)
 		if err != nil {
@@ -1294,6 +1303,11 @@ func (s *Repository) UpdateItemLanguage(
 		if err != nil {
 			return nil, err
 		}
+
+		err = s.recomputeItemLanguageCache(ctx, itemID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return changes, nil
@@ -1876,6 +1890,11 @@ func (s *Repository) ItemParentSelect(
 			aliasTable.Col(schema.ItemParentTableItemIDColName).
 				Eq(itemOrderAliasTable.Col(schema.ItemTableIDColName)),
 		))
+		sqSelect = LeftJoinItemLanguageCache(sqSelect, itemOrderAlias, listOptions.Language)
+
+		if groupBy {
+			sqSelect = sqSelect.GroupByAppend(GroupByItemLanguageCacheCols(itemOrderAlias)...)
+		}
 	}
 
 	return sqSelect, nil
@@ -2317,10 +2336,14 @@ func (s *Repository) DesignInfo(ctx context.Context, id int64, lang string) (*De
 		return nil, err
 	}
 
-	sqSelect := s.db.Select(
-		schema.ItemTableCatnameCol, expr.As("name"), schema.ItemParentTableCatnameCol.As("brand_item_catname"),
+	sqSelect := LeftJoinItemLanguageCache(
+		s.db.Select(
+			schema.ItemTableCatnameCol, expr.As("name"), schema.ItemParentTableCatnameCol.As("brand_item_catname"),
+		).
+			From(schema.ItemTable),
+		schema.ItemTableName,
+		lang,
 	).
-		From(schema.ItemTable).
 		Join(schema.ItemParentTable, goqu.On(schema.ItemTableIDCol.Eq(schema.ItemParentTableParentIDCol))).
 		Join(schema.ItemParentCacheTable, goqu.On(
 			schema.ItemParentTableItemIDCol.Eq(schema.ItemParentCacheTableParentIDCol),
@@ -3085,6 +3108,14 @@ func (s *Repository) CreateItem(
 		if err != nil {
 			return 0, err
 		}
+	} else {
+		// setItemLanguageName (called above for a non-empty name) already recomputes the cache;
+		// for an empty name there's no item_language write to trigger that, so a freshly created
+		// item would otherwise have no item_language_cache rows at all until its first edit.
+		err = s.recomputeItemLanguageCache(ctx, itemID)
+		if err != nil {
+			return 0, err
+		}
 	}
 
 	_, err = s.UpdateOrderCache(ctx, itemID)
@@ -3785,6 +3816,45 @@ func (s *Repository) wrappedSelectColumns(orderBy OrderBy) map[string]Column {
 	return columns
 }
 
+// needsItemLanguageCache reports whether a List() query needs the item_language_cache join at
+// all: either an output column resolves it - not just NameOnly (and anything columnsByFields also
+// maps to it: NameText/NameHTML/Meta), but also NameDefault, whose comparison against the
+// resolved name reads the same cache - or the requested SQL ordering does (OrderByName/OrderByAge
+// go through s.nameColumn, see wrappedOrderBy/wrapperOrderBy/orderBy). Deferring to
+// columnsByFields itself, rather than duplicating its condition, keeps this from silently
+// drifting out of sync with it.
+func (s *Repository) needsItemLanguageCache(fields *ItemFields, orderBy OrderBy) bool {
+	if orderBy == OrderByName || orderBy == OrderByAge {
+		return true
+	}
+
+	if fields == nil {
+		return false
+	}
+
+	columns := s.columnsByFields(fields)
+	_, nameOnly := columns[colNameOnly]
+	_, nameDefault := columns[colNameDefault]
+
+	return nameOnly || nameDefault
+}
+
+// joinItemLanguageCache adds the item_language_cache join for a List() query stage, only when
+// something in that stage will actually reference it (see needsItemLanguageCache).
+func (s *Repository) joinItemLanguageCache(
+	sqSelect *goqu.SelectDataset, alias string, fields *ItemFields, orderBy OrderBy, lang string,
+) *goqu.SelectDataset {
+	if !s.needsItemLanguageCache(fields, orderBy) {
+		return sqSelect
+	}
+
+	sqSelect = LeftJoinItemLanguageCache(sqSelect, alias, lang)
+
+	// Both List() query stages already GROUP BY item.id for other columns, so the join's own
+	// primary key needs to be listed too (see GroupByItemLanguageCacheCols).
+	return sqSelect.GroupByAppend(GroupByItemLanguageCacheCols(alias)...)
+}
+
 func (s *Repository) setItemVehicleTypeRow(
 	ctx context.Context,
 	itemID int64,
@@ -4315,6 +4385,77 @@ func (s *Repository) setItemLanguageName(
 			schema.ItemLanguageTableNameColName: schema.Excluded(schema.ItemLanguageTableNameColName),
 		},
 	)).Executor().ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	return s.recomputeItemLanguageCache(ctx, itemID)
+}
+
+// recomputeItemLanguageCache rebuilds item_language_cache for itemID from the current
+// item_language rows, one resolved name per cachedLanguages entry. Called from every write path
+// that can change item_language.name for this item (setItemLanguageName, UpdateItemLanguage) and
+// unconditionally from CreateItem, so a freshly created item always has a consistent (possibly
+// empty) cache instead of a stale or missing one.
+func (s *Repository) recomputeItemLanguageCache(ctx context.Context, itemID int64) error {
+	var rows []schema.ItemLanguageRow
+
+	err := s.db.Select(schema.ItemLanguageTableLanguageCol, schema.ItemLanguageTableNameCol).
+		From(schema.ItemLanguageTable).
+		Where(schema.ItemLanguageTableItemIDCol.Eq(itemID)).
+		ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return err
+	}
+
+	names := make(map[string]string, len(rows))
+
+	for _, row := range rows {
+		if row.Name.Valid && len(row.Name.String) > 0 {
+			names[row.Language] = row.Name.String
+		}
+	}
+
+	records := make([]interface{}, 0, len(cachedLanguages))
+	resolvedLangs := make([]string, 0, len(cachedLanguages))
+
+	for lang := range cachedLanguages {
+		name := resolveByPriority(names, lang)
+		if name == "" {
+			continue
+		}
+
+		resolvedLangs = append(resolvedLangs, lang)
+		records = append(records, goqu.Record{
+			schema.ItemLanguageCacheTableItemIDColName:   itemID,
+			schema.ItemLanguageCacheTableLanguageColName: lang,
+			schema.ItemLanguageCacheTableNameColName:     name,
+		})
+	}
+
+	if len(records) > 0 {
+		_, err = s.db.Insert(schema.ItemLanguageCacheTable).Rows(records...).OnConflict(goqu.DoUpdate(
+			schema.ItemLanguageCacheTableItemIDColName+","+schema.ItemLanguageCacheTableLanguageColName,
+			goqu.Record{
+				schema.ItemLanguageCacheTableNameColName: schema.Excluded(schema.ItemLanguageCacheTableNameColName),
+			},
+		)).Executor().ExecContext(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Drop only languages that no longer resolve to any name (e.g. the last item_language row
+	// for that fallback chain was cleared) - everything still resolved was just upserted above in
+	// place, not deleted and reinserted.
+	deleteQuery := s.db.Delete(schema.ItemLanguageCacheTable).
+		Where(schema.ItemLanguageCacheTableItemIDCol.Eq(itemID))
+
+	if len(resolvedLangs) > 0 {
+		deleteQuery = deleteQuery.Where(schema.ItemLanguageCacheTableLanguageCol.NotIn(resolvedLangs))
+	}
+
+	_, err = deleteQuery.Executor().ExecContext(ctx)
 
 	return err
 }

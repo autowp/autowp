@@ -236,6 +236,55 @@ var languagePriority = map[string][]string{
 	},
 }
 
+// cachedLanguages is the set of viewer/UI languages item_language_cache stores a resolved name
+// for - i.e. the site's selectable languages (config.Languages keys). schema.DefaultLanguageCode
+// ("xx") and the plain schema.PortugueseLanguageCode ("pt") are deliberately excluded: they're
+// never a real viewer's requested language, only fallback rungs within languagePriority itself.
+var cachedLanguages = map[string]struct{}{
+	schema.EnglishLanguageCode:             {},
+	schema.SimplifiedChineseLanguageCode:   {},
+	schema.RussianLanguageCode:             {},
+	schema.PortugueseBrazilianLanguageCode: {},
+	schema.FrenchLanguageCode:              {},
+	schema.BelarusianLanguageCode:          {},
+	schema.UkrainianLanguageCode:           {},
+	schema.SpanishLanguageCode:             {},
+	schema.ItalianLanguageCode:             {},
+	schema.HebrewLanguageCode:              {},
+	schema.GermanLanguageCode:              {},
+	schema.JapaneseLanguageCode:            {},
+}
+
+// NormalizeCacheLanguage maps a requested language to one item_language_cache actually stores a
+// row for, collapsing anything outside cachedLanguages (including "xx" and unselectable "pt") to
+// English so every SelectExpr/join call generates the exact same query shape.
+func NormalizeCacheLanguage(lang string) string {
+	if _, ok := cachedLanguages[lang]; ok {
+		return lang
+	}
+
+	return schema.EnglishLanguageCode
+}
+
+// resolveByPriority picks the best available name out of names (keyed by the language of the
+// translation) for a viewer requesting lang, walking languagePriority[lang] in order. Returns ""
+// if none of the candidate languages have a name - the pure-Go equivalent of the
+// array_position-ordered SQL fallback, used to populate item_language_cache.
+func resolveByPriority(names map[string]string, lang string) string {
+	order, ok := languagePriority[lang]
+	if !ok {
+		order = languagePriority[schema.DefaultLanguageCode]
+	}
+
+	for _, candidate := range order {
+		if name, ok := names[candidate]; ok {
+			return name
+		}
+	}
+
+	return ""
+}
+
 func langPriorityOrderExpr( //nolint: ireturn
 	col exp.IdentifierExpression, lang string,
 ) (exp.OrderedExpression, error) {

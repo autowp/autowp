@@ -89,6 +89,39 @@ spec:
             requests:
               memory: 10M
               cpu: 50m
+        # `serve` itself always runs migrations before opening its ports (see the startupProbe
+        # comment below) - but a big backfill migration can run long enough to make even that
+        # generous probe risky. Running migrate-postgres here instead means its duration doesn't
+        # compete with any health check at all: initContainers have no probes, Kubernetes just
+        # waits for them to exit. By the time goautowp-serve starts, everything is already
+        # applied, so its own migration step is a fast no-op.
+        - name: goautowp-migrate
+          image: {{ include "autowp.goautowp.image" . }}
+          imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
+          args:
+            - migrate-postgres
+          volumeMounts:
+            - mountPath: /config.yaml
+              name: config
+              subPath: config.yaml
+              readOnly: true
+            - mountPath: /tmp
+              name: tmp
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: 2000m
+            requests:
+              memory: 256M
+              cpu: 250m
       containers:
         - name: frontend-assets
           image: {{ include "autowp.frontend.assets.image" . }}

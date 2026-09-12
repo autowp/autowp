@@ -205,50 +205,32 @@ type NameDefaultColumn struct {
 	db *goqu.Database
 }
 
-func (s NameDefaultColumn) SelectExpr(alias string, lang string) (AliaseableExpression, error) {
+// NameDefaultColumn returns the item's original/native name (item_language row for "xx"), but
+// only when it differs from the resolved display name for lang - otherwise "" (nothing extra to
+// show alongside the display name). The "resolved display name" half of that comparison used to
+// be its own priority-sorted item_language subquery (identical to NameOnlyColumn's, before that
+// moved to item_language_cache); it now just reads the same cache instead of recomputing it,
+// same as NameOnlyColumn.SelectExpr - see that method's comment for the join precondition.
+func (s NameDefaultColumn) SelectExpr(alias string, _ string) (AliaseableExpression, error) {
 	il1Alias := alias + "il1"
 	il1AliasTable := goqu.T(il1Alias)
-	il2Alias := alias + "il2"
-	il2AliasTable := goqu.T(il2Alias)
-
-	orderExpr, err := langPriorityOrderExpr(
-		il2AliasTable.Col(schema.ItemLanguageTableLanguageColName),
-		lang,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	subQuery := s.db.Select(il2AliasTable.Col(schema.ItemLanguageTableNameColName)).
-		From(schema.ItemLanguageTable.As(il2Alias)).
-		Where(
-			il2AliasTable.Col(schema.ItemLanguageTableItemIDColName).
-				Eq(goqu.T(alias).Col(schema.ItemTableIDColName)),
-			goqu.Func("LENGTH", il2AliasTable.Col(schema.ItemLanguageTableNameColName)).Gt(0),
-		).
-		Order(orderExpr).
-		Limit(1)
-	subQueryAlias := alias + "subquery"
+	joinAlias := itemLanguageCacheJoinAlias(alias)
 
 	return goqu.Func(
-			"COALESCE",
-			s.db.Select(il1AliasTable.Col(schema.ItemLanguageTableNameColName)).
-				From(schema.ItemLanguageTable.As(il1Alias)).
-				Join(subQuery.As(subQueryAlias), goqu.On(
-					il1AliasTable.Col(schema.ItemLanguageTableNameColName).Neq(
-						goqu.T(subQueryAlias).Col(schema.ItemLanguageTableNameColName),
-					),
-				)).
-				Where(
-					il1AliasTable.Col(schema.ItemLanguageTableItemIDColName).
-						Eq(goqu.T(alias).Col(schema.ItemTableIDColName)),
-					il1AliasTable.Col(schema.ItemLanguageTableLanguageColName).
-						Eq(schema.DefaultLanguageCode),
-				).
-				Limit(1),
-			goqu.V(""),
-		),
-		nil
+		"COALESCE",
+		s.db.Select(il1AliasTable.Col(schema.ItemLanguageTableNameColName)).
+			From(schema.ItemLanguageTable.As(il1Alias)).
+			Where(
+				il1AliasTable.Col(schema.ItemLanguageTableItemIDColName).
+					Eq(goqu.T(alias).Col(schema.ItemTableIDColName)),
+				il1AliasTable.Col(schema.ItemLanguageTableLanguageColName).
+					Eq(schema.DefaultLanguageCode),
+				il1AliasTable.Col(schema.ItemLanguageTableNameColName).
+					Neq(goqu.T(joinAlias).Col(schema.ItemLanguageCacheTableNameColName)),
+			).
+			Limit(1),
+		goqu.V(""),
+	), nil
 }
 
 func (s NameDefaultColumn) GroupByExpr() interface{} {
@@ -259,28 +241,64 @@ type NameOnlyColumn struct {
 	DB *goqu.Database
 }
 
-func (s NameOnlyColumn) SelectExpr(alias string, lang string) (AliaseableExpression, error) {
-	orderExpr, err := langPriorityOrderExpr(schema.ItemLanguageTableLanguageCol, lang)
-	if err != nil {
-		return nil, err
-	}
+// itemLanguageCacheJoinAlias is the alias LeftJoinItemLanguageCache joins item_language_cache
+// under for a given item table alias - shared with NameOnlyColumn.SelectExpr so the two agree on
+// where to find it without the Column interface needing to carry join information itself.
+func itemLanguageCacheJoinAlias(alias string) string {
+	return alias + "_ilc"
+}
 
-	// No fallback to the legacy item.name column here: item_language is the single source of
-	// truth for display names (same as NameDefaultColumn), so a missing item_language row reads
-	// as "" rather than silently reviving a possibly stale item.name value.
-	return goqu.Func(
-			"COALESCE",
-			s.DB.Select(schema.ItemLanguageTableNameCol).
-				From(schema.ItemLanguageTable).
-				Where(
-					schema.ItemLanguageTableItemIDCol.Eq(goqu.T(alias).Col(schema.ItemTableIDColName)),
-					goqu.Func("LENGTH", schema.ItemLanguageTableNameCol).Gt(0),
-				).
-				Order(orderExpr).
-				Limit(1),
-			goqu.V(""),
+// LeftJoinItemLanguageCache LEFT JOINs item_language_cache under itemLanguageCacheJoinAlias(alias),
+// scoped to the normalized cache language - matching what NameOnlyColumn.SelectExpr expects to
+// find there. Every caller of NameOnlyColumn.SelectExpr(alias, lang) (directly, or indirectly via
+// Repository.List/s.nameColumn/s.nameOnlyColumn) must add this join for that exact alias first;
+// SelectExpr itself has no way to add it, since it only returns an expression, not a query to
+// mutate. Exported because callers outside this package (pictures, attrs, the grpc map handler)
+// build their own item-name queries via NameOnlyColumn directly.
+func LeftJoinItemLanguageCache(
+	sqSelect *goqu.SelectDataset, alias string, lang string,
+) *goqu.SelectDataset {
+	joinAlias := itemLanguageCacheJoinAlias(alias)
+	cacheLang := NormalizeCacheLanguage(lang)
+
+	return sqSelect.LeftJoin(
+		schema.ItemLanguageCacheTable.As(joinAlias),
+		goqu.On(
+			goqu.T(joinAlias).Col(schema.ItemLanguageCacheTableItemIDColName).
+				Eq(goqu.T(alias).Col(schema.ItemTableIDColName)),
+			goqu.T(joinAlias).Col(schema.ItemLanguageCacheTableLanguageColName).Eq(cacheLang),
 		),
-		nil
+	)
+}
+
+// GroupByItemLanguageCacheCols returns item_language_cache's full primary key for the join under
+// alias - Postgres only allows using another column of a joined table (here, .name) outside an
+// aggregate when that table's own declared primary key is listed in GROUP BY. Callers that build
+// a query with any GROUP BY at all (see Repository.List, ItemParentSelect, TopUserBrands) must
+// append these; callers with no GROUP BY at all don't need it - a plain joined column is fine on
+// its own as long as nothing else in that query forces group-by/aggregate semantics.
+func GroupByItemLanguageCacheCols(alias string) []interface{} {
+	joinAlias := itemLanguageCacheJoinAlias(alias)
+
+	return []interface{}{
+		goqu.T(joinAlias).Col(schema.ItemLanguageCacheTableItemIDColName),
+		goqu.T(joinAlias).Col(schema.ItemLanguageCacheTableLanguageColName),
+	}
+}
+
+func (s NameOnlyColumn) SelectExpr(alias string, _ string) (AliaseableExpression, error) {
+	joinAlias := itemLanguageCacheJoinAlias(alias)
+
+	// The caller is expected to have already LEFT JOINed item_language_cache under joinAlias
+	// (LeftJoinItemLanguageCache), filtered to this row's normalized language - at most one
+	// matching row. No fallback to the legacy item.name column: item_language is the single
+	// source of truth for display names (same as NameDefaultColumn), so no cached row reads as ""
+	// rather than reviving a stale item.name.
+	return goqu.Func(
+		"COALESCE",
+		goqu.T(joinAlias).Col(schema.ItemLanguageCacheTableNameColName),
+		goqu.V(""),
+	), nil
 }
 
 func (s NameOnlyColumn) GroupByExpr() interface{} {

@@ -2084,8 +2084,12 @@ func (s *Repository) FileNamePattern(ctx context.Context, pictureID int64) (stri
 		return "", err
 	}
 
-	err = s.db.Select(schema.ItemTableIDCol, nameColExpr.As("name"), schema.PictureItemTableTypeCol).
-		From(schema.ItemTable).
+	err = items.LeftJoinItemLanguageCache(
+		s.db.Select(schema.ItemTableIDCol, nameColExpr.As("name"), schema.PictureItemTableTypeCol).
+			From(schema.ItemTable),
+		schema.ItemTableName,
+		schema.CatnameLanguageCode,
+	).
 		Join(schema.PictureItemTable, goqu.On(schema.ItemTableIDCol.Eq(schema.PictureItemTableItemIDCol))).
 		Where(schema.PictureItemTablePictureIDCol.Eq(pictureID)).
 		Order(goqu.L("?", schema.PictureItemTableTypeCol.Eq(schema.PictureItemTypeContent)).Desc()).

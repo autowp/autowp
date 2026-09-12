@@ -329,11 +329,21 @@ func (s *Repository) TopUserBrands(
 		return nil, err
 	}
 
-	err = s.db.Select(
-		schema.ItemTableIDCol, nameExpr.As(nameAlias), schema.ItemTableCatnameCol,
-		goqu.COUNT(goqu.Star()).As(volumeAlias),
+	// goqu.COUNT below makes this an aggregate query, so item_language_cache's own primary key
+	// must be grouped too for nameExpr's plain column reference into it to be valid.
+	groupByCols := append(
+		[]interface{}{schema.ItemTableIDCol}, items.GroupByItemLanguageCacheCols(schema.ItemTableName)...,
+	)
+
+	err = items.LeftJoinItemLanguageCache(
+		s.db.Select(
+			schema.ItemTableIDCol, nameExpr.As(nameAlias), schema.ItemTableCatnameCol,
+			goqu.COUNT(goqu.Star()).As(volumeAlias),
+		).
+			From(schema.ItemTable),
+		schema.ItemTableName,
+		lang,
 	).
-		From(schema.ItemTable).
 		Join(schema.ItemParentCacheTable, goqu.On(schema.ItemTableIDCol.Eq(schema.ItemParentCacheTableParentIDCol))).
 		Join(
 			schema.AttrsUserValuesTable,
@@ -343,7 +353,7 @@ func (s *Repository) TopUserBrands(
 			schema.ItemTableItemTypeIDCol.Eq(schema.ItemTableItemTypeIDBrand),
 			schema.AttrsUserValuesTableUserIDCol.Eq(userID),
 		).
-		GroupBy(schema.ItemTableIDCol).
+		GroupBy(groupByCols...).
 		Order(goqu.C(volumeAlias).Desc()).
 		Limit(limit).
 		ScanStructsContext(ctx, &rows)
