@@ -74,6 +74,7 @@ type PicturesGRPCServer struct {
 	itemExtractor         *ItemExtractor
 	catalogue             *Catalogue
 	itemOfDayCached       *ItemOfDayCached
+	inboxBrandsCached     *InboxBrandsCached
 }
 
 func NewPicturesGRPCServer(
@@ -93,6 +94,7 @@ func NewPicturesGRPCServer(
 	itemExtractor *ItemExtractor,
 	catalogue *Catalogue,
 	itemOfDayCached *ItemOfDayCached,
+	inboxBrandsCached *InboxBrandsCached,
 ) *PicturesGRPCServer {
 	return &PicturesGRPCServer{
 		repository:            repository,
@@ -113,6 +115,7 @@ func NewPicturesGRPCServer(
 		itemExtractor:         itemExtractor,
 		catalogue:             catalogue,
 		itemOfDayCached:       itemOfDayCached,
+		inboxBrandsCached:     inboxBrandsCached,
 	}
 }
 
@@ -3022,31 +3025,7 @@ func restrictPictureListOptionsToModer(options *query.PictureListOptions, isMode
 }
 
 func (s *PicturesGRPCServer) inboxBrands(ctx context.Context, lang string) ([]*InboxBrand, error) {
-	rows, _, err := s.itemRepository.List(ctx, &query.ItemListOptions{
-		Language:   lang,
-		SortByName: true,
-		TypeID:     []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
-		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
-			PictureItemsByItemID: &query.PictureItemListOptions{
-				Pictures: &query.PictureListOptions{
-					Status: schema.PictureStatusInbox,
-				},
-			},
-		},
-	}, &items.ItemFields{NameOnly: true}, items.OrderByName, false)
-	if err != nil {
-		return nil, err
-	}
-
-	res := make([]*InboxBrand, 0, len(rows))
-	for _, row := range rows {
-		res = append(res, &InboxBrand{
-			Id:   row.ID,
-			Name: row.NameOnly,
-		})
-	}
-
-	return res, nil
+	return s.inboxBrandsCached.Get(ctx, lang)
 }
 
 func (s *PicturesGRPCServer) newboxGroups(

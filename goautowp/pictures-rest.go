@@ -58,6 +58,7 @@ type PicturesREST struct {
 	duplicateFinder      *DuplicateFinder
 	telegramService      *telegram.Service
 	itemOfDayCached      *ItemOfDayCached
+	inboxBrandsCached    *InboxBrandsCached
 }
 
 func NewPicturesREST(
@@ -73,6 +74,7 @@ func NewPicturesREST(
 	duplicateFinder *DuplicateFinder,
 	telegramService *telegram.Service,
 	itemOfDayCached *ItemOfDayCached,
+	inboxBrandsCached *InboxBrandsCached,
 ) *PicturesREST {
 	return &PicturesREST{
 		auth:                 auth,
@@ -87,6 +89,7 @@ func NewPicturesREST(
 		duplicateFinder:      duplicateFinder,
 		telegramService:      telegramService,
 		itemOfDayCached:      itemOfDayCached,
+		inboxBrandsCached:    inboxBrandsCached,
 	}
 }
 
@@ -362,6 +365,11 @@ func (s *PicturesREST) handlePicturePOST(ctx *gin.Context) {
 	}
 
 	err = s.itemOfDayCached.FlushItemOfDayCacheByPictureID(ctx, pictureID)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, err.Error())
+	}
+
+	err = s.inboxBrandsCached.Flush(ctx)
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, err.Error())
 	}

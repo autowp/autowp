@@ -85,6 +85,7 @@ type Container struct {
 	itemOfDayRepository          *itemofday.Repository
 	itemsGrpcServer              *ItemsGRPCServer
 	itemOfDayCached              *ItemOfDayCached
+	inboxBrandsCached            *InboxBrandsCached
 	itemParentLanguageRepository *items.ItemParentLanguageRepository
 	ratingGrpcServer             *RatingGRPCServer
 	votingsGrpcServer            *VotingsGRPCServer
@@ -1171,6 +1172,11 @@ func (s *Container) picturesRESTLocked(ctx context.Context) (*PicturesREST, erro
 		return nil, err
 	}
 
+	inboxBrandsCached, err := s.inboxBrandsCachedLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return NewPicturesREST(
 		auth,
 		picturesRepo,
@@ -1184,6 +1190,7 @@ func (s *Container) picturesRESTLocked(ctx context.Context) (*PicturesREST, erro
 		df,
 		ts,
 		itemOfDayCached,
+		inboxBrandsCached,
 	), nil
 }
 
@@ -1895,6 +1902,24 @@ func (s *Container) itemOfDayCachedLocked(ctx context.Context) (*ItemOfDayCached
 	return s.itemOfDayCached, nil
 }
 
+func (s *Container) inboxBrandsCachedLocked(ctx context.Context) (*InboxBrandsCached, error) {
+	if s.inboxBrandsCached == nil {
+		itemsRepo, err := s.itemsRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		redisClient, err := s.redisLocked()
+		if err != nil {
+			return nil, err
+		}
+
+		s.inboxBrandsCached = NewInboxBrandsCached(itemsRepo, s.Config().ContentLanguages, redisClient)
+	}
+
+	return s.inboxBrandsCached, nil
+}
+
 func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer, error) {
 	if s.itemsGrpcServer == nil {
 		repo, err := s.itemsRepositoryLocked(ctx)
@@ -2207,6 +2232,11 @@ func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*PicturesGRPC
 			return nil, err
 		}
 
+		inboxBrandsCached, err := s.inboxBrandsCachedLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.picturesGrpcServer = NewPicturesGRPCServer(
 			repository,
 			auth,
@@ -2224,6 +2254,7 @@ func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*PicturesGRPC
 			s.ItemExtractor(),
 			catalogue,
 			itemOfDayCached,
+			inboxBrandsCached,
 		)
 	}
 
