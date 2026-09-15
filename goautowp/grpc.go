@@ -7,10 +7,12 @@ import (
 	"net"
 
 	"github.com/autowp/goautowp/comments"
+	"github.com/autowp/goautowp/compliance"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/contentreport"
 	"github.com/autowp/goautowp/feedback"
 	"github.com/autowp/goautowp/image/storage"
+	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/validation"
 	grpclogging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -47,13 +49,16 @@ func APIImageToGRPC(image *storage.Image) *Image {
 type GRPCServer struct {
 	UnimplementedAutowpServer
 
-	auth            *Auth
-	reCaptchaConfig config.RecaptchaConfig
-	comments        *comments.Repository
-	ipExtractor     *IPExtractor
-	feedback        *feedback.Repository
-	contentReports  *contentreport.Repository
-	captchaEnabled  bool
+	auth                 *Auth
+	reCaptchaConfig      config.RecaptchaConfig
+	comments             *comments.Repository
+	ipExtractor          *IPExtractor
+	feedback             *feedback.Repository
+	contentReports       *contentreport.Repository
+	complianceRepository *compliance.Repository
+	picturesRepository   *pictures.Repository
+	events               *Events
+	captchaEnabled       bool
 }
 
 func NewGRPCServer(
@@ -63,16 +68,22 @@ func NewGRPCServer(
 	ipExtractor *IPExtractor,
 	feedback *feedback.Repository,
 	contentReports *contentreport.Repository,
+	complianceRepository *compliance.Repository,
+	picturesRepository *pictures.Repository,
+	events *Events,
 	captchaEnabled bool,
 ) *GRPCServer {
 	return &GRPCServer{ //nolint:exhaustruct
-		auth:            auth,
-		reCaptchaConfig: reCaptchaConfig,
-		comments:        comments,
-		ipExtractor:     ipExtractor,
-		feedback:        feedback,
-		contentReports:  contentReports,
-		captchaEnabled:  captchaEnabled,
+		auth:                 auth,
+		reCaptchaConfig:      reCaptchaConfig,
+		comments:             comments,
+		ipExtractor:          ipExtractor,
+		feedback:             feedback,
+		contentReports:       contentReports,
+		complianceRepository: complianceRepository,
+		picturesRepository:   picturesRepository,
+		events:               events,
+		captchaEnabled:       captchaEnabled,
 	}
 }
 

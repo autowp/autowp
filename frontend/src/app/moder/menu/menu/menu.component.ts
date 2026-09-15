@@ -10,6 +10,7 @@ import {map} from 'rxjs';
 
 import {APICommentsService} from '../../../api/comments/comments.service';
 import {APIContentReportsService} from '../../../api/content-reports/content-reports.service';
+import {APIGdprObjectionsService} from '../../../api/gdpr-objections/gdpr-objections.service';
 
 interface MenuItem {
   badgeClass?: string;
@@ -32,6 +33,7 @@ export class MenuComponent {
   readonly #pictureService = inject(PictureService);
   readonly #commentService = inject(APICommentsService);
   readonly #contentReportsService = inject(APIContentReportsService);
+  readonly #gdprObjectionsService = inject(APIGdprObjectionsService);
 
   protected readonly items$: Observable<MenuItem[] | null> = this.auth.hasRole$(Role.MODER).pipe(
     map((isModer) => {
@@ -76,6 +78,13 @@ export class MenuComponent {
           icon: 'bi bi-flag-fill',
           label: $localize`Content reports`,
           routerLink: ['/moder/content-reports'],
+        },
+        {
+          badgeClass: 'text-bg-danger',
+          count$: this.#gdprObjectionsService.openObjectionHitsCount$,
+          icon: 'bi bi-shield-exclamation',
+          label: $localize`GDPR suppression list`,
+          routerLink: ['/moder/gdpr-objections'],
         },
       ];
     }),

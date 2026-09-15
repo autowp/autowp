@@ -743,15 +743,68 @@ func (s *Storage) AddImageFromBlob(
 }
 
 func (s *Storage) Flop(ctx context.Context, imageID int) error {
-	return s.doImagickOperation(ctx, imageID, func(mw *imagick.MagickWand) error {
-		return mw.FlopImage()
+	return s.doImagickOperation(ctx, imageID, func(mw *imagick.MagickWand) (bool, error) {
+		return true, mw.FlopImage()
 	})
 }
 
 func (s *Storage) Normalize(ctx context.Context, imageID int) error {
-	return s.doImagickOperation(ctx, imageID, func(mw *imagick.MagickWand) error {
-		return mw.NormalizeImage()
+	return s.doImagickOperation(ctx, imageID, func(mw *imagick.MagickWand) (bool, error) {
+		return true, mw.NormalizeImage()
 	})
+}
+
+// StripEXIFIfContains checks every embedded metadata property of the stored original image
+// (EXIF, IPTC, XMP - a photographer's name commonly lives in any of these, not just the EXIF
+// Artist/Copyright tags read by pictures.processEXIF, so all of them are searched) for any of
+// needles as a case-insensitive substring - callers should pass every localized spelling of the
+// name, not just one - and only if one is found strips every metadata property and rewrites the
+// object. Same operation the `strip: true` format option applies to generated variants (see
+// image/sampler/sampler.go), but here rewriting the archived original itself rather than a
+// derived copy. Leaves the image untouched (no write) when nothing matches, so unrelated metadata
+// (camera model, other legitimate credits) on pictures that merely lost this one author's
+// catalogue link is not destroyed needlessly. Reports whether anything was stripped.
+func (s *Storage) StripEXIFIfContains(ctx context.Context, imageID int, needles []string) (bool, error) {
+	lowered := make([]string, 0, len(needles))
+
+	for _, needle := range needles {
+		needle = strings.ToLower(strings.TrimSpace(needle))
+		if needle != "" {
+			lowered = append(lowered, needle)
+		}
+	}
+
+	if len(lowered) == 0 {
+		return false, nil
+	}
+
+	matched := false
+
+	err := s.doImagickOperation(ctx, imageID, func(mw *imagick.MagickWand) (bool, error) {
+		for _, name := range mw.GetImageProperties("*") {
+			value := strings.ToLower(mw.GetImageProperty(name))
+
+			for _, needle := range lowered {
+				if strings.Contains(value, needle) {
+					matched = true
+
+					break
+				}
+			}
+
+			if matched {
+				break
+			}
+		}
+
+		if !matched {
+			return false, nil
+		}
+
+		return true, mw.StripImage()
+	})
+
+	return matched, err
 }
 
 func (s *Storage) SetImageCrop(ctx context.Context, imageID int, crop sampler.Crop) error {
@@ -1729,10 +1782,14 @@ func (s *Storage) createImagePath(
 	return namingStrategy.Generate(options), nil
 }
 
+// doImagickOperation downloads the stored original, runs callback against it, and - only when
+// callback reports changed=true - re-uploads the result in place and flushes cached formatted
+// variants. A callback that decides not to modify the image (e.g. StripEXIFIfContains finding no
+// match) returns changed=false to skip the write entirely.
 func (s *Storage) doImagickOperation(
 	ctx context.Context,
 	imageID int,
-	callback func(*imagick.MagickWand) error,
+	callback func(*imagick.MagickWand) (bool, error),
 ) error {
 	var img schema.ImageRow
 
@@ -1782,9 +1839,13 @@ func (s *Storage) doImagickOperation(
 		return err
 	}
 
-	err = callback(mw)
+	changed, err := callback(mw)
 	if err != nil {
 		return err
+	}
+
+	if !changed {
+		return nil
 	}
 
 	blob, err := mw.GetImagesBlob()

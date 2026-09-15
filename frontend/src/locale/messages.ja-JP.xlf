@@ -17032,6 +17032,310 @@ Transmission is not considered</source>
         <source>Add to blacklist</source>
         <target state="translated">ブロックリストに追加</target>
       </trans-unit>
+      <trans-unit id="4377537324460215767" datatype="html">
+        <source>GDPR suppression list</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">13,18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/menu/menu/menu.component.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <target state="translated">GDPR 抑制リスト</target>
+      </trans-unit>
+      <trans-unit id="5211958463651370124" datatype="html">
+        <source>Internal, admin-only record of names that objected to / requested erasure of being used as a public photo-author credit. Never shown publicly. See &quot;Suppress author&quot; on a person&apos;s moderator card to add an entry automatically.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">18,26</context>
+        </context-group>
+        <target state="translated">写真の公開クレジットとして氏名を使用されることに異議を申し立てた、または削除を求めた人物の名前を記録する、管理者専用の内部リストです。公開されることはありません。エントリを自動的に追加するには、人物のモデレーターカードにある「著者をブロック」を参照してください。</target>
+      </trans-unit>
+      <trans-unit id="877345616307472545" datatype="html">
+        <source>Only show entries hit again</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">32,36</context>
+        </context-group>
+        <target state="translated">再検出されたエントリのみ表示</target>
+      </trans-unit>
+      <trans-unit id="3147371091697922238" datatype="html">
+        <source>Reference</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">41,44</context>
+        </context-group>
+        <target state="translated">参照番号</target>
+      </trans-unit>
+      <trans-unit id="990599016277529838" datatype="html">
+        <source>Contact e-mail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">42,45</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">136,137</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">99,101</context>
+        </context-group>
+        <target state="translated">連絡先メールアドレス</target>
+      </trans-unit>
+      <trans-unit id="4207916966377787111" datatype="html">
+        <source>Created</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">44,48</context>
+        </context-group>
+        <target state="translated">作成日</target>
+      </trans-unit>
+      <trans-unit id="4793456052173041220" datatype="html">
+        <source>Hits</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">45,50</context>
+        </context-group>
+        <target state="translated">検出回数</target>
+      </trans-unit>
+      <trans-unit id="4181740960816671566" datatype="html">
+        <source>View original request</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">71,74</context>
+        </context-group>
+        <target state="translated">元のリクエストを表示</target>
+      </trans-unit>
+      <trans-unit id="3071620290019453863" datatype="html">
+        <source>Mark reviewed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">98,101</context>
+        </context-group>
+        <target state="translated">確認済みにする</target>
+      </trans-unit>
+      <trans-unit id="430662670077088259" datatype="html">
+        <source>No entries.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">113,119</context>
+        </context-group>
+        <target state="translated">エントリはありません。</target>
+      </trans-unit>
+      <trans-unit id="503153018057897371" datatype="html">
+        <source>Add entry manually</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">125,127</context>
+        </context-group>
+        <target state="translated">エントリを手動で追加</target>
+      </trans-unit>
+      <trans-unit id="7137878719164647615" datatype="html">
+        <source>Case reference</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">132,133</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">95,96</context>
+        </context-group>
+        <target state="translated">案件参照番号</target>
+      </trans-unit>
+      <trans-unit id="7728784723903620710" datatype="html">
+        <source>Original request text (kept internal-only)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">144,145</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">113,116</context>
+        </context-group>
+        <target state="translated">元のリクエストの本文（内部のみで保持）</target>
+      </trans-unit>
+      <trans-unit id="1182948153957603954" datatype="html">
+        <source>Add to suppression list</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">147,150</context>
+        </context-group>
+        <target state="translated">抑制リストに追加</target>
+      </trans-unit>
+      <trans-unit id="6137649443564269922" datatype="html">
+        <source>(empty)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.ts</context>
+          <context context-type="linenumber">208</context>
+        </context-group>
+        <target state="translated">（空）</target>
+      </trans-unit>
+      <trans-unit id="8193527273644698864" datatype="html">
+        <source>GDPR: suppress author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">77,80</context>
+        </context-group>
+        <target state="translated">GDPR: 著者をブロック</target>
+      </trans-unit>
+      <trans-unit id="574093740280189528" datatype="html">
+        <source>Unlinks this person from every picture it is credited author of, drops any pending EXIF author suggestions for it, and adds it to the internal suppression list so the name is not silently reintroduced.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">80,84</context>
+        </context-group>
+        <target state="translated">この人物を、著者としてクレジットされているすべての写真から解除し、保留中のEXIF著者候補をすべて破棄し、内部の抑制リストに追加します。これにより、氏名が気づかれずに再び登録されることを防ぎます。</target>
+      </trans-unit>
+      <trans-unit id="8672414248556534507" datatype="html">
+        <source>Suppress author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">90,93</context>
+        </context-group>
+        <target state="translated">著者をブロック</target>
+      </trans-unit>
+      <trans-unit id="8729398902641287119" datatype="html">
+        <source>Confirm suppress author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">123,126</context>
+        </context-group>
+        <target state="translated">著者のブロックを確定</target>
+      </trans-unit>
+      <trans-unit id="3104251512108244161" datatype="html">
+        <source>Author unlinked from <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> picture(s) and added to the GDPR suppression list. Stored-file metadata cleanup for these pictures is running in the background and may take a while for a large number of pictures.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.ts</context>
+          <context context-type="linenumber">312</context>
+        </context-group>
+        <target state="translated">著者は<x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/>枚の写真から解除され、GDPR抑制リストに追加されました。これらの写真の保存ファイルのメタデータのクリーンアップはバックグラウンドで実行中で、枚数が多い場合は時間がかかることがあります。</target>
+      </trans-unit>
+      <trans-unit id="3969470890262023196" datatype="html">
+        <source>Also review the copyrights text on <x id="count" equiv-text="response.copyrightsTextPictureIds.length"/> picture(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.ts</context>
+          <context context-type="linenumber">317</context>
+        </context-group>
+        <target state="translated"><x id="count" equiv-text="response.copyrightsTextPictureIds.length"/>枚の写真のコピーライト表記も確認してください。</target>
+      </trans-unit>
+      <trans-unit id="2488327635935037030" datatype="html">
+        <source>Author information withheld at the photographer&apos;s request.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/picture/picture.component.html</context>
+          <context context-type="linenumber">186,190</context>
+        </context-group>
+        <target state="translated">撮影者の希望により、著者情報は非公開となっています。</target>
+      </trans-unit>
+      <trans-unit id="2128800934734769071" datatype="html">
+        <source>Names</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">40,42</context>
+        </context-group>
+        <target state="translated">氏名</target>
+      </trans-unit>
+      <trans-unit id="5208514121773007678" datatype="html">
+        <source>Affected pictures:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">84,85</context>
+        </context-group>
+        <target state="translated">影響を受けた写真:</target>
+      </trans-unit>
+      <trans-unit id="1790021971578762105" datatype="html">
+        <source>No affected pictures found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">91,94</context>
+        </context-group>
+        <target state="translated">影響を受けた写真は見つかりませんでした。</target>
+      </trans-unit>
+      <trans-unit id="8428910023435284247" datatype="html">
+        <source>View affected pictures</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">101,104</context>
+        </context-group>
+        <target state="translated">影響を受けた写真を表示</target>
+      </trans-unit>
+      <trans-unit id="8991051995049340943" datatype="html">
+        <source>Names (one spelling per line)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">157,158</context>
+        </context-group>
+        <target state="translated">氏名（1行に1表記）</target>
+      </trans-unit>
+      <trans-unit id="8114008987432227022" datatype="html">
+        <source>Internal, staff-only record of names that objected to / requested erasure of being used as a public photo-author credit. Never shown publicly. See &quot;Suppress author&quot; on a person&apos;s moderator card to add an entry automatically.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">18,26</context>
+        </context-group>
+        <target state="translated">写真の公開クレジットとして氏名を使用されることに異議を申し立てた、または削除を求めた人物の名前を記録する、モデレーター向けの内部リストです。公開されることはありません。エントリを自動的に追加するには、人物のモデレーターカードにある「著者をブロック」を参照してください。</target>
+      </trans-unit>
+      <trans-unit id="1282154386082930059" datatype="html">
+        <source>Also mentioned in (review manually):</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">109,111</context>
+        </context-group>
+        <target state="translated">他にも言及あり（要目視確認）：</target>
+      </trans-unit>
+      <trans-unit id="5844404198314672549" datatype="html">
+        <source>(copyrights text)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">122,124</context>
+        </context-group>
+        <target state="translated">（コピーライト表記）</target>
+      </trans-unit>
+      <trans-unit id="3054692242041944023" datatype="html">
+        <source>resolved</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">137,139</context>
+        </context-group>
+        <target state="translated">対応済み</target>
+      </trans-unit>
+      <trans-unit id="3486318045815416322" datatype="html">
+        <source>Mark resolved</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">145,147</context>
+        </context-group>
+        <target state="translated">対応済みにする</target>
+      </trans-unit>
+      <trans-unit id="5731769731667362511" datatype="html">
+        <source>View cleanup candidates</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">161,164</context>
+        </context-group>
+        <target state="translated">クリーンアップ候補を表示</target>
+      </trans-unit>
+      <trans-unit id="4100023054527262582" datatype="html">
+        <source><x id="count" equiv-text="candidateCount"/> possible mention(s) elsewhere (copyrights text / comments) were found for manual review on the GDPR suppression list page.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.ts</context>
+          <context context-type="linenumber">319</context>
+        </context-group>
+        <target state="translated">他の場所（コピーライト表記／コメント）で<x id="count" equiv-text="candidateCount"/>件の言及の可能性が見つかりました。GDPR抑制リストのページで目視確認できます。</target>
+      </trans-unit>
+      <trans-unit id="779193610822771115" datatype="html">
+        <source>Author unlinked from <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> picture(s) and added to the GDPR suppression list. Stored-file metadata cleanup and a search for other mentions (copyrights text / comments) are running in the background and may take a while - check the GDPR suppression list page for results.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.ts</context>
+          <context context-type="linenumber">312</context>
+        </context-group>
+        <target state="translated">著者は<x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/>枚の写真から解除され、GDPR抑制リストに追加されました。保存ファイルのメタデータのクリーンアップと、他の言及（コピーライト表記／コメント）の検索がバックグラウンドで実行されており、時間がかかる場合があります。結果はGDPR抑制リストのページで確認してください。</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

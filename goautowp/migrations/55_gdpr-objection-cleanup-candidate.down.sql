@@ -1,0 +1,1 @@
+DROP TABLE gdpr_objection_cleanup_candidate;

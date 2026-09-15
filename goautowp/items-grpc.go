@@ -14,12 +14,15 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/attrs"
+	"github.com/autowp/goautowp/comments"
+	"github.com/autowp/goautowp/compliance"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/index"
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/query"
@@ -123,6 +126,8 @@ type ItemsGRPCServer struct {
 	catalogue             *Catalogue
 	fileStorageConfig     config.FileStorageConfig
 	itemOfDayCached       *ItemOfDayCached
+	complianceRepository  *compliance.Repository
+	commentsRepository    *comments.Repository
 }
 
 func NewItemsGRPCServer(
@@ -147,6 +152,8 @@ func NewItemsGRPCServer(
 	catalogue *Catalogue,
 	fileStorageConfig config.FileStorageConfig,
 	itemOfDayCached *ItemOfDayCached,
+	complianceRepository *compliance.Repository,
+	commentsRepository *comments.Repository,
 ) *ItemsGRPCServer {
 	return &ItemsGRPCServer{
 		repository:            repository,
@@ -170,6 +177,8 @@ func NewItemsGRPCServer(
 		catalogue:             catalogue,
 		fileStorageConfig:     fileStorageConfig,
 		itemOfDayCached:       itemOfDayCached,
+		complianceRepository:  complianceRepository,
+		commentsRepository:    commentsRepository,
 	}
 }
 
@@ -1147,6 +1156,12 @@ func (s *ItemsGRPCServer) UpdateItemLanguage(
 	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, itemID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if item.ItemTypeID == schema.ItemTableItemTypeIDPerson && in.GetName() != "" {
+		if err = recordGdprObjectionHitIfMatched(ctx, s.complianceRepository, in.GetName()); err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 	}
 
 	return &emptypb.Empty{}, nil
@@ -2610,7 +2625,269 @@ func (s *ItemsGRPCServer) CreateItem(ctx context.Context, in *Item) (*ItemID, er
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	if set.ItemTypeID == schema.ItemTableItemTypeIDPerson {
+		if err = recordGdprObjectionHitIfMatched(ctx, s.complianceRepository, in.GetName()); err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
 	return &ItemID{Id: itemID}, nil
+}
+
+// recordGdprObjectionHitIfMatched checks name against the GDPR-objection suppression list and, on
+// a hit, bumps its hit counter so it surfaces in the moderator-menu badge and the
+// /moder/gdpr-objections "hits" view - never blocks, since the same name could belong to an
+// unrelated namesake and a human has to decide. A log-event line was tried first and dropped:
+// moderators don't watch that feed, so a hit there went unseen. Shared by
+// ItemsGRPCServer.CreateItem and PicturesGRPCServer.CreatePictureItem.
+func recordGdprObjectionHitIfMatched(
+	ctx context.Context, complianceRepository *compliance.Repository, name string,
+) error {
+	objection, blocked, err := complianceRepository.FindExact(ctx, name)
+	if err != nil || !blocked {
+		return err
+	}
+
+	return complianceRepository.RecordHit(ctx, objection.ID)
+}
+
+const (
+	suppressAuthorReferenceMaxLength = 255
+	suppressAuthorNoteMaxLength      = 4000
+)
+
+// SuppressAuthor is the one-click GDPR erasure/objection action on a person item's moderator
+// card: unlink it from every picture it is credited AUTHOR of, drop any pending EXIF author
+// suggestions for it, and add it to the suppression list so the name is not silently reintroduced
+// (see compliance.Repository and warnIfGdprObjection). Admin-only: this is a destructive,
+// legally-motivated action, not routine moderation.
+func (s *ItemsGRPCServer) SuppressAuthor(
+	ctx context.Context, in *SuppressAuthorRequest,
+) (*SuppressAuthorResponse, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, s.auth.GRPCError(err)
+	}
+
+	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
+		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
+	}
+
+	if in.GetItemId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid item_id")
+	}
+
+	referenceFilter := validation.InputFilter{
+		Filters: []validation.FilterInterface{&validation.StringTrimFilter{}},
+		Validators: []validation.ValidatorInterface{
+			&validation.NotEmpty{},
+			&validation.StringLength{Min: 0, Max: suppressAuthorReferenceMaxLength},
+		},
+	}
+
+	reference, problems, err := referenceFilter.IsValidString(in.GetReference())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	fv := make([]*errdetails.BadRequest_FieldViolation, 0)
+	for _, p := range problems {
+		fv = append(fv, &errdetails.BadRequest_FieldViolation{Field: "reference", Description: p})
+	}
+
+	noteFilter := validation.InputFilter{
+		Filters: []validation.FilterInterface{&validation.StringTrimFilter{}},
+		Validators: []validation.ValidatorInterface{
+			&validation.StringLength{Min: 0, Max: suppressAuthorNoteMaxLength},
+		},
+	}
+
+	note, problems, err := noteFilter.IsValidString(in.GetNote())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	for _, p := range problems {
+		fv = append(fv, &errdetails.BadRequest_FieldViolation{Field: "note", Description: p})
+	}
+
+	if len(fv) > 0 {
+		return nil, wrapFieldViolations(fv)
+	}
+
+	ctx = context.WithoutCancel(ctx)
+
+	item, err := s.repository.Item(
+		ctx,
+		&query.ItemListOptions{ItemID: in.GetItemId(), Language: EventsDefaultLanguage},
+		&items.ItemFields{NameOnly: true},
+	)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if item.ItemTypeID != schema.ItemTableItemTypeIDPerson {
+		return nil, status.Error(codes.InvalidArgument, "item is not a person")
+	}
+
+	// Every localized spelling of the name, not just the one language.NameOnly resolves to - a
+	// EXIF/IPTC/XMP blob or a freeform copyrights text may quote whichever language variant the
+	// uploader/camera happened to write, and a future rename check (recordGdprObjectionHitIfMatched)
+	// must catch a match in any of them too.
+	itemLanguages, err := s.repository.ItemLanguageList(ctx, in.GetItemId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	names := dedupeNames(append([]string{item.NameOnly}, itemLanguageNames(itemLanguages)...))
+
+	// Free-text/metadata searches also need every given-name/family-name word order, not just the
+	// order each name happens to be catalogued in - swapping them is common between EXIF
+	// conventions, cultures, and hand-typed entries. Suppression-list rows themselves stay
+	// unpermuted (compliance.FindExact already matches regardless of order via CanonicalizeName),
+	// so the list doesn't fill up with redundant reordered display rows.
+	searchNames := make([]string, 0, len(names)*2)
+	for _, name := range names {
+		searchNames = append(searchNames, compliance.NamePermutations(name)...)
+	}
+
+	searchNames = dedupeNames(searchNames)
+
+	pictureIDs, err := s.picturesRepository.DeletePictureItemsByItemAndType(
+		ctx, in.GetItemId(), schema.PictureItemTypeAuthor,
+	)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if err = s.picturesRepository.DeleteAuthorSuggestionsByItem(ctx, in.GetItemId()); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	objectionID, err := s.complianceRepository.Create(ctx, compliance.CreateOptions{
+		Names:        names,
+		Reference:    reference,
+		ContactEmail: in.GetContactEmail(),
+		Note:         note,
+		SourceText:   in.GetSourceText(),
+		AuthorUserID: userCtx.UserID,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if err = s.picturesRepository.SetAuthorSuppression(ctx, pictureIDs, objectionID); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// Everything below is too slow to await inline: stripping EXIF is one S3 round trip plus an
+	// ImageMagick decode per picture, and the copyrights-text/comment searches are ILIKE '%...%'
+	// scans (leading wildcard, so no index helps) over tables that can hold millions of rows on a
+	// busy site - either alone can already exceed any request timeout for an author credited on
+	// thousands of pictures. ctx is already context.WithoutCancel'd above, so it survives this RPC
+	// returning; each step logs its own progress/failures since there is no request left to report
+	// them to. The trade-off: SuppressAuthorResponse can no longer report copyrights-text/comment
+	// hits synchronously - a moderator finds them later on the suppression-list page.
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logging.Errorf("SuppressAuthor: panic in background cleanup for objection %d: %v", objectionID, r)
+			}
+		}()
+
+		if stripErr := s.picturesRepository.StripAuthorEXIF(ctx, pictureIDs, searchNames); stripErr != nil {
+			logging.Warnf("SuppressAuthor: StripAuthorEXIF: %s", stripErr.Error())
+		}
+
+		copyrightsTextPictureIDs, findErr := s.picturesRepository.FindPicturesWithCopyrightsTextContaining(
+			ctx,
+			searchNames,
+		)
+		if findErr != nil {
+			logging.Warnf("SuppressAuthor: FindPicturesWithCopyrightsTextContaining: %s", findErr.Error())
+		} else if addErr := s.complianceRepository.AddCleanupCandidates(
+			ctx,
+			objectionID,
+			schema.GdprObjectionCleanupCandidateEntityTypeCopyrightsTextPicture,
+			copyrightsTextPictureIDs,
+		); addErr != nil {
+			logging.Warnf("SuppressAuthor: AddCleanupCandidates(copyrights text): %s", addErr.Error())
+		}
+
+		// Comments are third-party speech (a well-meaning visitor may have credited the author in
+		// a comment), not site-generated metadata - never edited/deleted automatically, only
+		// surfaced as a candidate for a moderator to review via the existing report/moderation
+		// tooling.
+		commentIDs, findErr := s.commentsRepository.FindCommentsContaining(ctx, searchNames)
+		if findErr != nil {
+			logging.Warnf("SuppressAuthor: FindCommentsContaining: %s", findErr.Error())
+		} else if addErr := s.complianceRepository.AddCleanupCandidates(
+			ctx, objectionID, schema.GdprObjectionCleanupCandidateEntityTypeComment, commentIDs,
+		); addErr != nil {
+			logging.Warnf("SuppressAuthor: AddCleanupCandidates(comments): %s", addErr.Error())
+		}
+
+		logging.Infof(
+			"SuppressAuthor: background cleanup for objection %d done, %d copyrights-text picture(s), %d comment(s)",
+			objectionID, len(copyrightsTextPictureIDs), len(commentIDs),
+		)
+	}()
+
+	err = s.events.Add(ctx, Event{
+		UserID: userCtx.UserID,
+		Message: fmt.Sprintf(
+			"GDPR: автор %q (%d вариант(а) написания) отвязан от %d фото и внесён в suppression list (реф. %q)",
+			item.NameOnly, len(names), len(pictureIDs), reference,
+		),
+		Items:    []int64{in.GetItemId()},
+		Pictures: pictureIDs,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId()); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &SuppressAuthorResponse{
+		UnlinkedPicturesCount: int64(len(pictureIDs)),
+		GdprObjectionId:       objectionID,
+	}, nil
+}
+
+func itemLanguageNames(rows []items.ItemLanguage) []string {
+	names := make([]string, 0, len(rows))
+	for _, row := range rows {
+		names = append(names, row.Name)
+	}
+
+	return names
+}
+
+// dedupeNames drops empty strings and case-insensitively duplicate names, keeping the first
+// spelling seen.
+func dedupeNames(names []string) []string {
+	seen := make(map[string]struct{}, len(names))
+	result := make([]string, 0, len(names))
+
+	for _, name := range names {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+
+		key := strings.ToLower(name)
+		if _, ok := seen[key]; ok {
+			continue
+		}
+
+		seen[key] = struct{}{}
+
+		result = append(result, name)
+	}
+
+	return result
 }
 
 func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
@@ -2822,6 +3099,13 @@ func (s *ItemsGRPCServer) UpdateItem( //nolint: maintidx
 	err = s.repository.UpdateItem(ctx, set, name, mask.GetPaths(), userCtx.UserID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if item.ItemTypeID == schema.ItemTableItemTypeIDPerson &&
+		util.Contains(mask.GetPaths(), itemNameField) && name != "" {
+		if err = recordGdprObjectionHitIfMatched(ctx, s.complianceRepository, name); err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 	}
 
 	if util.Contains(mask.GetPaths(), "location") {

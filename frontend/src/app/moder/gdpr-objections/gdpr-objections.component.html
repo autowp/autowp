@@ -1,0 +1,244 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a routerLink="/" i18n>Index page</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a routerLink="/moder" i18n>Moderator page</a>
+    </li>
+  </ol>
+</nav>
+
+<div class="page-header">
+  <h1 i18n>GDPR suppression list</h1>
+</div>
+
+<p class="text-muted">
+  <ng-container i18n
+    >Internal, staff-only record of names that objected to / requested erasure of being used as a public photo-author
+    credit. Never shown publicly. See "Suppress author" on a person's moderator card to add an entry
+    automatically.</ng-container
+  >
+</p>
+
+<form class="form-check mb-3">
+  <input
+    id="gdpr-objections-hits-only"
+    class="form-check-input"
+    type="checkbox"
+    [formControl]="hitsOnly"
+    (change)="setFilter()"
+  />
+  <label class="form-check-label" for="gdpr-objections-hits-only" i18n>Only show entries hit again</label>
+</form>
+
+@if (data$ | async; as data) {
+  <div class="table-responsive mb-4">
+    <table class="table table-sm align-middle">
+      <thead>
+        <tr>
+          <th i18n>Names</th>
+          <th i18n>Reference</th>
+          <th i18n>Contact e-mail</th>
+          <th i18n>Note</th>
+          <th i18n>Created</th>
+          <th i18n>Hits</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of data.objections; track row.objection.id) {
+          <tr>
+            <td>
+              @for (name of row.objection.names; track name) {
+                <div>{{ name }}</div>
+              }
+            </td>
+            <td>{{ row.objection.reference }}</td>
+            <td>{{ row.objection.contactEmail }}</td>
+            <td class="text-break">
+              {{ row.objection.note }}
+              @if (row.objection.hasSourceText) {
+                <div class="mt-1">
+                  @if (row.sourceText() !== null) {
+                    <pre class="small text-break text-wrap border rounded p-2 bg-body-secondary">{{
+                      row.sourceText()
+                    }}</pre>
+                  } @else {
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      [disabled]="row.sourceTextLoading()"
+                      (click)="loadSourceText(row)"
+                    >
+                      <i class="bi bi-envelope me-1" aria-hidden="true"></i>
+                      <ng-container i18n>View original request</ng-container>
+                    </button>
+                  }
+                </div>
+              }
+              <div class="mt-1">
+                @if (row.affectedPictureIds(); as pictureIds) {
+                  @if (pictureIds.length > 0) {
+                    <div class="small">
+                      <ng-container i18n>Affected pictures:</ng-container>&ngsp;
+                      @for (pictureId of pictureIds; track pictureId; let last = $last) {
+                        <a [routerLink]="['/moder/pictures', pictureId]">{{ pictureId }}</a
+                        >{{ last ? '' : ', ' }}
+                      }
+                    </div>
+                  } @else {
+                    <div class="small text-muted" i18n>No affected pictures found.</div>
+                  }
+                } @else {
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    [disabled]="row.affectedPicturesLoading()"
+                    (click)="loadAffectedPictures(row)"
+                  >
+                    <i class="bi bi-images me-1" aria-hidden="true"></i>
+                    <ng-container i18n>View affected pictures</ng-container>
+                  </button>
+                }
+              </div>
+              <div class="mt-1">
+                @if (row.cleanupCandidates(); as candidates) {
+                  @if (candidates.length > 0) {
+                    <div class="small">
+                      <ng-container i18n>Also mentioned in (review manually):</ng-container>
+                      <ul class="list-unstyled mb-0">
+                        @for (item of candidates; track item.candidate.id) {
+                          <li>
+                            @if (
+                              item.candidate.entityType ===
+                              CleanupCandidateEntityType.GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_COPYRIGHTS_TEXT_PICTURE
+                            ) {
+                              <i class="bi bi-image me-1" aria-hidden="true"></i>
+                              <a [routerLink]="['/moder/pictures', item.candidate.entityId]">{{
+                                '#' + item.candidate.entityId
+                              }}</a
+                              >&ngsp;
+                              <span class="text-muted" i18n>(copyrights text)</span>
+                            } @else if (
+                              item.candidate.entityType ===
+                              CleanupCandidateEntityType.GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_COMMENT
+                            ) {
+                              <i class="bi bi-chat me-1" aria-hidden="true"></i>
+                              @if (getCommentLink$(item.candidate.entityId) | async; as link) {
+                                <a [routerLink]="link.route">{{ link.preview }}</a>
+                              } @else {
+                                <span class="text-muted">{{ '#' + item.candidate.entityId }}</span
+                                >&ngsp;
+                                <span class="text-muted" i18n>(comment not found)</span>
+                              }
+                            }
+                            @if (item.candidate.resolveTime) {
+                              <span class="badge text-bg-secondary ms-1" i18n>resolved</span>
+                            } @else {
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-secondary ms-1 py-0"
+                                [disabled]="item.resolving()"
+                                (click)="resolveCleanupCandidate(row, item)"
+                              >
+                                <ng-container i18n>Mark resolved</ng-container>
+                              </button>
+                            }
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                } @else {
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    [disabled]="row.cleanupCandidatesLoading()"
+                    (click)="loadCleanupCandidates(row)"
+                  >
+                    <i class="bi bi-search me-1" aria-hidden="true"></i>
+                    <ng-container i18n>View cleanup candidates</ng-container>
+                  </button>
+                }
+              </div>
+            </td>
+            <td class="text-nowrap">{{ timestampToDate(row.objection.createTime) | date: 'short' }}</td>
+            <td>
+              @if (row.objection.hitCount) {
+                <span class="badge text-bg-danger">{{ row.objection.hitCount }}</span>
+                @if (row.objection.lastHitTime) {
+                  <div class="small text-muted text-nowrap">
+                    {{ timestampToDate(row.objection.lastHitTime) | date: 'short' }}
+                  </div>
+                }
+              } @else {
+                <span class="text-muted">0</span>
+              }
+            </td>
+            <td class="text-nowrap">
+              @if (isAdmin$ | async) {
+                @if (row.objection.hitCount) {
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-success me-1"
+                    [disabled]="row.acknowledging()"
+                    (click)="acknowledge(row)"
+                  >
+                    <ng-container i18n>Mark reviewed</ng-container>
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  [disabled]="row.deleting()"
+                  (click)="delete(row)"
+                >
+                  <ng-container i18n>Delete</ng-container>
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="text-muted" colspan="7" i18n>No entries.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (data.paginator) {
+    <app-paginator [data]="data.paginator" />
+  }
+}
+
+@if (isAdmin$ | async) {
+  <div class="card card-body mb-4" style="max-width: 40rem">
+    <h2 class="h5" i18n>Add entry manually</h2>
+    <form [formGroup]="createForm" (ngSubmit)="create()">
+      <div class="mb-2">
+        <label class="form-label" for="gdpr-objection-names" i18n>Names (one spelling per line)</label>
+        <textarea id="gdpr-objection-names" class="form-control" rows="2" formControlName="names"></textarea>
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="gdpr-objection-reference" i18n>Case reference</label>
+        <input id="gdpr-objection-reference" type="text" class="form-control" formControlName="reference" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="gdpr-objection-contact-email" i18n>Contact e-mail</label>
+        <input id="gdpr-objection-contact-email" type="email" class="form-control" formControlName="contactEmail" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="gdpr-objection-note" i18n>Note</label>
+        <textarea id="gdpr-objection-note" class="form-control" rows="2" formControlName="note"></textarea>
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="gdpr-objection-source-text" i18n
+          >Original request text (kept internal-only)</label
+        >
+        <textarea id="gdpr-objection-source-text" class="form-control" rows="4" formControlName="sourceText"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="creating()">Add to suppression list</button>
+    </form>
+  </div>
+}

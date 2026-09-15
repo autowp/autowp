@@ -45,6 +45,7 @@ const (
 	PictureTableSourceURLColName             = "source_url"
 	PictureTableChangeSourceURLUserIDColName = "change_source_url_user_id"
 	PictureTableChangeSourceURLDateColName   = "change_source_url_date"
+	PictureTableAuthorSuppressionIDColName   = "author_suppression_id"
 
 	PicturesTableIdentityLength = 6
 )
@@ -73,6 +74,7 @@ var (
 		PictureTableChangeSourceURLUserIDColName,
 	)
 	PictureTableChangeSourceURLDateCol = PictureTable.Col(PictureTableChangeSourceURLDateColName)
+	PictureTableAuthorSuppressionIDCol = PictureTable.Col(PictureTableAuthorSuppressionIDColName)
 )
 
 type PictureRow struct {
@@ -100,4 +102,5 @@ type PictureRow struct {
 	SourceURL             sql.NullString `db:"source_url"`
 	ChangeSourceURLUserID sql.NullInt64  `db:"change_source_url_user_id"`
 	ChangeSourceURLDate   sql.NullTime   `db:"change_source_url_date"`
+	AuthorSuppressionID   sql.NullInt32  `db:"author_suppression_id"`
 }

@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/civil"
+	"github.com/autowp/goautowp/compliance"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/sampler"
 	"github.com/autowp/goautowp/image/storage"
@@ -110,6 +111,7 @@ type Repository struct {
 	imageStorage          *storage.Storage
 	textStorageRepository *textstorage.Repository
 	itemsRepository       *items.Repository
+	complianceRepository  *compliance.Repository
 	perspectiveCache      map[int32][]int32
 	perspectiveCacheMutex sync.Mutex
 	dfConfig              config.DuplicateFinderConfig
@@ -185,6 +187,7 @@ func NewRepository(
 	imageStorage *storage.Storage,
 	textStorageRepository *textstorage.Repository,
 	itemsRepository *items.Repository,
+	complianceRepository *compliance.Repository,
 	dfConfig config.DuplicateFinderConfig,
 	beforePictureDeleted func(id int64) error,
 	afterPictureAccepted func(ctx context.Context) error,
@@ -196,6 +199,7 @@ func NewRepository(
 		imageStorage:          imageStorage,
 		textStorageRepository: textStorageRepository,
 		itemsRepository:       itemsRepository,
+		complianceRepository:  complianceRepository,
 		perspectiveCache:      make(map[int32][]int32),
 		perspectiveCacheMutex: sync.Mutex{},
 		dfConfig:              dfConfig,
@@ -890,6 +894,62 @@ func (s *Repository) Normalize(ctx context.Context, id int64) error {
 	return nil
 }
 
+// StripAuthorEXIF removes EXIF metadata (Artist/Copyright, and everything else) from the stored
+// original image of each picture in pictureIDs. Part of the GDPR SuppressAuthor flow: served
+// formatted variants already strip metadata (defaults.yaml `strip: true`), but the archived
+// original itself is directly reachable (the gallery download control links straight to it) and
+// still carries whatever the uploader's camera/software wrote into Artist/Copyright.
+// authorNames should be every localized spelling of the person's name (see
+// items.Repository.ItemLanguageList), not just one resolved name - the stored EXIF/IPTC/XMP may
+// carry whichever language variant the uploader/camera happened to write. Only pictures whose
+// stored original actually mentions one of them anywhere in its metadata are rewritten - unrelated
+// metadata (camera model, other legitimate credits) on pictures that merely lost this author's
+// catalogue link is left alone.
+// Each image is a separate S3 round trip plus an ImageMagick decode/re-encode, so an author
+// credited on thousands of pictures can take much longer than any request timeout - callers run
+// this in the background (see ItemsGRPCServer.SuppressAuthor) rather than awaiting it inline. A
+// single image's failure (missing object, corrupt file, ...) is logged and does not abort the
+// rest of the batch; a summary is logged when done since there is no other progress channel for
+// a background admin action like this one.
+func (s *Repository) StripAuthorEXIF(ctx context.Context, pictureIDs []int64, authorNames []string) error {
+	if len(pictureIDs) == 0 {
+		return nil
+	}
+
+	var imageIDs []int64
+
+	err := s.db.Select(schema.PictureTableImageIDCol).
+		From(schema.PictureTable).
+		Where(schema.PictureTableIDCol.In(pictureIDs), schema.PictureTableImageIDCol.IsNotNull()).
+		ScanValsContext(ctx, &imageIDs)
+	if err != nil {
+		return err
+	}
+
+	stripped, failed := 0, 0
+
+	for _, imageID := range imageIDs {
+		matched, stripErr := s.imageStorage.StripEXIFIfContains(ctx, int(imageID), authorNames)
+		if stripErr != nil {
+			failed++
+
+			logging.Warnf("StripAuthorEXIF: image %d: %s", imageID, stripErr.Error())
+
+			continue
+		}
+
+		if matched {
+			stripped++
+		}
+	}
+
+	logging.Infof(
+		"StripAuthorEXIF: done, %d/%d images stripped, %d failed", stripped, len(imageIDs), failed,
+	)
+
+	return nil
+}
+
 func (s *Repository) Flop(ctx context.Context, id int64) error {
 	if id == 0 {
 		return sql.ErrNoRows
@@ -1166,6 +1226,122 @@ func (s *Repository) DeletePictureItem(
 	}
 
 	return affected > 0, nil
+}
+
+// DeletePictureItemsByItemAndType removes every picture_item link of the given type pointing at
+// itemID (e.g. clearing all AUTHOR credits for a person, see the GDPR SuppressAuthor flow). Returns
+// the affected picture ids.
+func (s *Repository) DeletePictureItemsByItemAndType(
+	ctx context.Context, itemID int64, pictureItemType schema.PictureItemType,
+) ([]int64, error) {
+	ctx = context.WithoutCancel(ctx)
+
+	var pictureIDs []int64
+
+	err := s.db.Select(schema.PictureItemTablePictureIDCol).
+		From(schema.PictureItemTable).
+		Where(
+			schema.PictureItemTableItemIDCol.Eq(itemID),
+			schema.PictureItemTableTypeCol.Eq(pictureItemType),
+		).
+		ScanValsContext(ctx, &pictureIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(pictureIDs) == 0 {
+		return nil, nil
+	}
+
+	_, err = s.db.Delete(schema.PictureItemTable).Where(
+		schema.PictureItemTableItemIDCol.Eq(itemID),
+		schema.PictureItemTableTypeCol.Eq(pictureItemType),
+	).Executor().ExecContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, pictureID := range pictureIDs {
+		if err = s.updateContentCount(ctx, pictureID); err != nil {
+			return nil, err
+		}
+	}
+
+	return pictureIDs, nil
+}
+
+// SetAuthorSuppression flags pictureIDs as having had their author credit removed under the GDPR
+// SuppressAuthor flow, linking to objectionID. Exposed publicly only as a plain "author withheld"
+// boolean (see Picture.author_withheld / picture-extractor.go) - never the objection id itself -
+// so a moderator or the picture's owner who does not know about the case sees why the author
+// field is empty instead of innocently re-adding it.
+func (s *Repository) SetAuthorSuppression(ctx context.Context, pictureIDs []int64, objectionID int64) error {
+	if len(pictureIDs) == 0 {
+		return nil
+	}
+
+	ctx = context.WithoutCancel(ctx)
+
+	_, err := s.db.Update(schema.PictureTable).
+		Set(goqu.Record{schema.PictureTableAuthorSuppressionIDColName: objectionID}).
+		Where(schema.PictureTableIDCol.In(pictureIDs)).
+		Executor().ExecContext(ctx)
+
+	return err
+}
+
+// PicturesSuppressedByObjection returns ids of pictures whose author credit was removed under the
+// given GDPR case (picture.author_suppression_id) - the /moder/gdpr-objections reverse lookup.
+func (s *Repository) PicturesSuppressedByObjection(ctx context.Context, objectionID int64) ([]int64, error) {
+	var ids []int64
+
+	err := s.db.Select(schema.PictureTableIDCol).
+		From(schema.PictureTable).
+		Where(schema.PictureTableAuthorSuppressionIDCol.Eq(objectionID)).
+		Order(schema.PictureTableIDCol.Asc()).
+		ScanValsContext(ctx, &ids)
+
+	return ids, err
+}
+
+// FindPicturesWithCopyrightsTextContaining returns ids of pictures whose free-text copyrights
+// block (EXIF Copyright-tag derived, see processEXIF) contains any of names as a case-insensitive
+// substring. Callers pass every localized spelling of a person's name (see
+// items.Repository.ItemLanguageList), not just one resolved name, since the copyrights text may
+// quote whichever language variant the uploader/camera happened to write. Used by the GDPR
+// SuppressAuthor flow to surface existing copyrights text that a moderator should review/edit by
+// hand - that field is freeform and may legitimately mention several names, so it is never
+// auto-edited, only reported.
+func (s *Repository) FindPicturesWithCopyrightsTextContaining(ctx context.Context, names []string) ([]int64, error) {
+	conditions := make([]goqu.Expression, 0, len(names))
+
+	for _, name := range names {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+
+		conditions = append(conditions, goqu.L("? ILIKE ?", schema.TextstorageTextTableTextCol, "%"+name+"%"))
+	}
+
+	if len(conditions) == 0 {
+		return nil, nil
+	}
+
+	var ids []int64
+
+	err := s.db.Select(schema.PictureTableIDCol).
+		Distinct().
+		From(schema.PictureTable).
+		Join(
+			schema.TextstorageTextTable,
+			goqu.On(schema.PictureTableCopyrightsTextIDCol.Eq(schema.TextstorageTextTableIDCol)),
+		).
+		Where(goqu.Or(conditions...)).
+		Order(schema.PictureTableIDCol.Asc()).
+		ScanValsContext(ctx, &ids)
+
+	return ids, err
 }
 
 func (s *Repository) CreatePictureItem(
@@ -3023,12 +3199,28 @@ func (s *Repository) processEXIF(
 	set := goqu.Record{}
 
 	if len(extractedEXIF.copyrights) > 0 && !skipCopyrightsText {
-		textID, err := s.textStorageRepository.CreateText(ctx, extractedEXIF.copyrights, userID)
+		objection, blocked, err := s.complianceRepository.FindInText(ctx, extractedEXIF.copyrights)
 		if err != nil {
 			return err
 		}
 
-		set[schema.PictureTableCopyrightsTextIDColName] = textID
+		if blocked {
+			logging.Warnf(
+				"processEXIF: picture %d EXIF copyrights text withheld (matches gdpr_objection %d)",
+				pictureID, objection.ID,
+			)
+
+			if err = s.complianceRepository.RecordHit(ctx, objection.ID); err != nil {
+				return err
+			}
+		} else {
+			textID, err := s.textStorageRepository.CreateText(ctx, extractedEXIF.copyrights, userID)
+			if err != nil {
+				return err
+			}
+
+			set[schema.PictureTableCopyrightsTextIDColName] = textID
+		}
 	}
 
 	if extractedEXIF.gpsInfo != nil {

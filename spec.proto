@@ -42,6 +42,23 @@ service Autowp {
   rpc CreateContentReport(CreateContentReportRequest) returns (google.protobuf.Empty) {}
   rpc GetContentReports(ContentReportsRequest) returns (ContentReportsResponse) {}
   rpc ResolveContentReport(ResolveContentReportRequest) returns (google.protobuf.Empty) {}
+  rpc CreateGdprObjection(CreateGdprObjectionRequest) returns (google.protobuf.Empty) {}
+  rpc GetGdprObjections(GetGdprObjectionsRequest) returns (GdprObjectionsResponse) {}
+  rpc DeleteGdprObjection(DeleteGdprObjectionRequest) returns (google.protobuf.Empty) {}
+  rpc GetGdprObjectionSourceText(GetGdprObjectionSourceTextRequest) returns (GdprObjectionSourceText) {}
+  // AcknowledgeGdprObjectionHit clears an entry's hit counter after a moderator reviewed a
+  // reoccurrence, so it stops contributing to the moderator-menu badge count.
+  rpc AcknowledgeGdprObjectionHit(AcknowledgeGdprObjectionHitRequest) returns (google.protobuf.Empty) {}
+  // GetGdprObjectionAffectedPictures returns ids of pictures this case's author-suppression was
+  // applied to (picture.author_suppression_id), for the suppression-list page's reverse lookup.
+  rpc GetGdprObjectionAffectedPictures(GetGdprObjectionAffectedPicturesRequest)
+      returns (GetGdprObjectionAffectedPicturesResponse) {}
+  // GetGdprObjectionCleanupCandidates / ResolveGdprObjectionCleanupCandidate manage the
+  // moderator-review queue of content (copyrights text, comments) found to mention a case's name
+  // but not handled automatically - see migration 55.
+  rpc GetGdprObjectionCleanupCandidates(GetGdprObjectionCleanupCandidatesRequest)
+      returns (GetGdprObjectionCleanupCandidatesResponse) {}
+  rpc ResolveGdprObjectionCleanupCandidate(ResolveGdprObjectionCleanupCandidateRequest) returns (google.protobuf.Empty) {}
 }
 
 service Forums {
@@ -226,6 +243,11 @@ service Items {
       get: "/v3/items/brand-icons"
     };
   }
+  // SuppressAuthor is the one-click GDPR erasure/objection action on a person item's moderator
+  // card: it unlinks the person from every picture it is credited AUTHOR of, discards any pending
+  // EXIF author suggestions for it, and adds it to the gdpr_objection suppression list so the name
+  // is not silently reintroduced later. Admin-only.
+  rpc SuppressAuthor(SuppressAuthorRequest) returns (SuppressAuthorResponse) {}
 }
 
 service Mosts {
@@ -1092,6 +1114,102 @@ message ResolveContentReportRequest {
   string resolution = 3;
 }
 
+// GdprObjection is an internal, moderator/admin-only record that a named person objected to (or
+// requested erasure of) processing of their personal data - e.g. a photo-author credit removed
+// under GDPR Art. 17/21. It is never exposed through public endpoints; it exists only to warn
+// staff before the same name is reintroduced as an author credit.
+message GdprObjection {
+  int64 id = 1;
+  // Every known spelling recorded for this case (a person may be catalogued under several
+  // localized name variants - see items.Repository.ItemLanguageList - all of which resolve to
+  // this same case).
+  repeated string names = 2;
+  string reference = 3;
+  string contact_email = 4;
+  string note = 5;
+  google.protobuf.Timestamp create_time = 6;
+  int64 hit_count = 7;
+  google.protobuf.Timestamp last_hit_time = 8;
+  // Whether an original-request text is attached (fetched separately via
+  // GetGdprObjectionSourceText, never inlined here - see migration 53's source_text_id comment).
+  bool has_source_text = 9;
+}
+
+message CreateGdprObjectionRequest {
+  repeated string names = 1;
+  string reference = 2;
+  string contact_email = 3;
+  string note = 4;
+  string source_text = 5;
+}
+
+message GetGdprObjectionSourceTextRequest {
+  int64 id = 1;
+}
+
+message GdprObjectionSourceText {
+  string text = 1;
+}
+
+message GetGdprObjectionsRequest {
+  int32 page = 1;
+  // Restrict to entries whose name was matched again since last acknowledged (hit_count > 0).
+  bool hits_only = 2;
+}
+
+message GdprObjectionsResponse {
+  repeated GdprObjection items = 1;
+  Pages paginator = 2;
+}
+
+message DeleteGdprObjectionRequest {
+  int64 id = 1;
+}
+
+message AcknowledgeGdprObjectionHitRequest {
+  int64 id = 1;
+}
+
+message GetGdprObjectionAffectedPicturesRequest {
+  int64 id = 1;
+}
+
+message GetGdprObjectionAffectedPicturesResponse {
+  repeated int64 picture_ids = 1;
+}
+
+enum GdprObjectionCleanupCandidateEntityType {
+  GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_UNSPECIFIED = 0;
+  // A picture whose freeform EXIF-derived copyrights text mentions the case's name.
+  GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_COPYRIGHTS_TEXT_PICTURE = 1;
+  // A visitor comment that mentions the case's name.
+  GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_COMMENT = 2;
+}
+
+// GdprObjectionCleanupCandidate is content found (by a site-wide text search at SuppressAuthor
+// time) to mention a case's name but not something that gets touched automatically - see
+// migration 55. Never auto-resolved; a moderator reviews each one and marks it resolved once
+// they've decided what, if anything, to do with the underlying picture/comment.
+message GdprObjectionCleanupCandidate {
+  int64 id = 1;
+  GdprObjectionCleanupCandidateEntityType entity_type = 2;
+  int64 entity_id = 3;
+  google.protobuf.Timestamp found_time = 4;
+  google.protobuf.Timestamp resolve_time = 5;
+}
+
+message GetGdprObjectionCleanupCandidatesRequest {
+  int64 objection_id = 1;
+}
+
+message GetGdprObjectionCleanupCandidatesResponse {
+  repeated GdprObjectionCleanupCandidate items = 1;
+}
+
+message ResolveGdprObjectionCleanupCandidateRequest {
+  int64 id = 1;
+}
+
 message DeleteTrafficWhitelistItemRequest {
   string ip_address = 1 [(google.api.field_info).format = IPV4_OR_IPV6];
 }
@@ -1619,6 +1737,23 @@ message AltName {
 
 message ItemID {
   int64 id = 1;
+}
+
+message SuppressAuthorRequest {
+  int64 item_id = 1;
+  string reference = 2;
+  string contact_email = 3;
+  string note = 4;
+  string source_text = 5;
+}
+
+message SuppressAuthorResponse {
+  int64 unlinked_pictures_count = 1;
+  int64 gdpr_objection_id = 2;
+  // EXIF/copyrights-text/comment cleanup all runs in the background after this response is sent
+  // (an author credited on thousands of pictures, or a site-wide text search over millions of
+  // comments, can easily exceed any request timeout) - see GetGdprObjectionCleanupCandidates for
+  // the copyrights-text/comment candidates once that background pass has found them.
 }
 
 message UpdateItemRequest {
@@ -2153,6 +2288,11 @@ message Picture {
   string source_url = 51;
   int64 change_source_url_user_id = 52;
   google.protobuf.Timestamp change_source_url_date = 53;
+  // True when this picture's author credit was removed under a GDPR objection/erasure request
+  // (see the Items.SuppressAuthor RPC). Deliberately just a flag: which objection, and who the
+  // author was, stay server-side/admin-only (gdpr_objection table) - this only tells a moderator
+  // or the picture's owner *why* the author field is empty, so they do not re-add it.
+  bool author_withheld = 54;
 }
 
 message PictureAuthorSuggestion {

@@ -608,6 +608,10 @@ export class PictureComponent implements OnInit {
     (this.pictureItemsData() ?? []).filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT),
   );
 
+  protected readonly hasAuthorCredit = computed(() =>
+    (this.pictureItemsData() ?? []).some((item) => item.type === PictureItemType.PICTURE_ITEM_AUTHOR),
+  );
+
   protected linksResource!: ResourceRef<ItemLink[] | undefined>;
 
   // Same reasoning as ownerData above.

@@ -18,6 +18,13 @@ export const routes: Routes = [
   },
   {
     canActivate: [moderGuard],
+    loadComponent: () =>
+      import('./gdpr-objections/gdpr-objections.component').then((m) => m.ModerGdprObjectionsComponent),
+    path: 'gdpr-objections',
+    title: $localize`GDPR suppression list`,
+  },
+  {
+    canActivate: [moderGuard],
     loadComponent: () => import('./item-parent/item-parent.component').then((m) => m.ModerItemParentComponent),
     path: 'item-parent/:item_id/:parent_id',
   },

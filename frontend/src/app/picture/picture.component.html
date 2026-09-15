@@ -180,6 +180,12 @@
           }
         }
       }
+      @if (!hasAuthorCredit() && picture.authorWithheld) {
+        <p class="text-muted small">
+          <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
+          <ng-container i18n>Author information withheld at the photographer's request.</ng-container>
+        </p>
+      }
       <p>
         <app-license-badge [license]="picture.license" [sourceUrl]="picture.sourceUrl" />
       </p>

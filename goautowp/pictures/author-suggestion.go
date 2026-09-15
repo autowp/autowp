@@ -134,6 +134,17 @@ func (s *Repository) PictureAuthorSuggestions(
 	return rows, err
 }
 
+// DeleteAuthorSuggestionsByItem removes every advisory author-suggestion candidate pointing at
+// itemID, across all pictures. Used by the GDPR SuppressAuthor flow so a moderator on some other
+// inbox picture doesn't keep seeing a suggestion chip for a suppressed author.
+func (s *Repository) DeleteAuthorSuggestionsByItem(ctx context.Context, itemID int64) error {
+	_, err := s.db.Delete(schema.PictureAuthorSuggestionTable).
+		Where(schema.PictureAuthorSuggestionTableItemIDCol.Eq(itemID)).
+		Executor().ExecContext(ctx)
+
+	return err
+}
+
 // PictureOwnerAndStatus returns the owner id and status of a picture. found is false when no such
 // picture exists.
 func (s *Repository) PictureOwnerAndStatus(

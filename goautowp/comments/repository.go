@@ -1508,6 +1508,39 @@ func (s *Repository) MessagePage(
 	return row.ItemID, row.TypeID, int32(math.Ceil(float64(count+1) / float64(perPage))), nil
 }
 
+// FindCommentsContaining returns ids of non-deleted comments (any type - pictures, forums, items,
+// ...) whose text contains any of names as a case-insensitive substring. Callers pass every
+// localized spelling of a person's name, in every word order (see compliance.NamePermutations).
+// Used by the GDPR SuppressAuthor flow to surface visitor comments that named a suppressed
+// author, for moderator review via the existing report/moderation tooling - comments are
+// third-party speech, so this only ever surfaces candidates, never edits or deletes anything.
+func (s *Repository) FindCommentsContaining(ctx context.Context, names []string) ([]int64, error) {
+	conditions := make([]goqu.Expression, 0, len(names))
+
+	for _, name := range names {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+
+		conditions = append(conditions, goqu.L("? ILIKE ?", schema.CommentMessageTableMessageCol, "%"+name+"%"))
+	}
+
+	if len(conditions) == 0 {
+		return nil, nil
+	}
+
+	var ids []int64
+
+	err := s.db.Select(schema.CommentMessageTableIDCol).
+		From(schema.CommentMessageTable).
+		Where(schema.CommentMessageTableDeletedCol.IsFalse(), goqu.Or(conditions...)).
+		Order(schema.CommentMessageTableIDCol.Asc()).
+		ScanValsContext(ctx, &ids)
+
+	return ids, err
+}
+
 func (s *Repository) Message(
 	ctx context.Context, messageID int64, fetchMessage bool, fetchVote bool, canViewIP bool,
 ) (*schema.CommentMessageRow, error) {

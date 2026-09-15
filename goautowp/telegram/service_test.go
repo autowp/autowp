@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
+	"github.com/autowp/goautowp/compliance"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/i18nbundle"
@@ -79,11 +80,14 @@ func TestInboxCommand(t *testing.T) {
 		},
 		i18n,
 	)
+	complianceRepo := compliance.NewRepository(goquDB, textStorageRepo)
+
 	picturesRepo := pictures.NewRepository(
 		goquDB,
 		imageStorage,
 		textStorageRepo,
 		itemRepo,
+		complianceRepo,
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
 		func(context.Context) error { return nil },

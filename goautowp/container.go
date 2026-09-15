@@ -15,6 +15,7 @@ import (
 	"github.com/autowp/goautowp/attrs"
 	"github.com/autowp/goautowp/ban"
 	"github.com/autowp/goautowp/comments"
+	"github.com/autowp/goautowp/compliance"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/contentreport"
 	"github.com/autowp/goautowp/email"
@@ -73,6 +74,7 @@ type Container struct {
 	duplicateFinder              *DuplicateFinder
 	donationsGrpcServer          *DonationsGRPCServer
 	contentReports               *contentreport.Repository
+	complianceRepository         *compliance.Repository
 	emailSender                  email.Sender
 	events                       *Events
 	feedback                     *feedback.Repository
@@ -974,6 +976,24 @@ func (s *Container) logRepositoryLocked(ctx context.Context) (*log.Repository, e
 	return s.logRepository, nil
 }
 
+func (s *Container) complianceRepositoryLocked(ctx context.Context) (*compliance.Repository, error) {
+	if s.complianceRepository == nil {
+		db, err := s.goquDBLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		textStorageRepository, err := s.textStorageRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.complianceRepository = compliance.NewRepository(db, textStorageRepository)
+	}
+
+	return s.complianceRepository, nil
+}
+
 func (s *Container) picturesRepositoryLocked(ctx context.Context) (*pictures.Repository, error) {
 	if s.picturesRepository == nil {
 		db, err := s.goquDBLocked(ctx)
@@ -996,6 +1016,11 @@ func (s *Container) picturesRepositoryLocked(ctx context.Context) (*pictures.Rep
 			return nil, err
 		}
 
+		complianceRepository, err := s.complianceRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		cfg := s.Config()
 
 		redisClient, err := s.redisLocked()
@@ -1004,7 +1029,7 @@ func (s *Container) picturesRepositoryLocked(ctx context.Context) (*pictures.Rep
 		}
 
 		s.picturesRepository = pictures.NewRepository(
-			db, is, textStorageRepository, itemsRepository, cfg.DuplicateFinder,
+			db, is, textStorageRepository, itemsRepository, complianceRepository, cfg.DuplicateFinder,
 			func(id int64) error {
 				commentsRepository, err := s.commentsRepositoryLocked(ctx)
 				if err != nil {
@@ -1699,6 +1724,21 @@ func (s *Container) grpcServerLocked(ctx context.Context) (*GRPCServer, error) {
 			return nil, err
 		}
 
+		complianceRepository, err := s.complianceRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		picturesRepository, err := s.picturesRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		events, err := s.eventsLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.grpcServer = NewGRPCServer(
 			auth,
 			cfg.Recaptcha,
@@ -1706,6 +1746,9 @@ func (s *Container) grpcServerLocked(ctx context.Context) (*GRPCServer, error) {
 			ipExtractor,
 			fb,
 			contentReports,
+			complianceRepository,
+			picturesRepository,
+			events,
 			cfg.Captcha,
 		)
 	}
@@ -1999,6 +2042,16 @@ func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer
 			return nil, err
 		}
 
+		complianceRepository, err := s.complianceRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		commentsRepository, err := s.commentsRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.itemsGrpcServer = NewItemsGRPCServer(
 			repo,
 			itemParentLanguageRepository,
@@ -2021,6 +2074,8 @@ func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer
 			catalogue,
 			s.Config().FileStorage,
 			itemOfDayCached,
+			complianceRepository,
+			commentsRepository,
 		)
 	}
 
@@ -2237,6 +2292,11 @@ func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*PicturesGRPC
 			return nil, err
 		}
 
+		complianceRepository, err := s.complianceRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		s.picturesGrpcServer = NewPicturesGRPCServer(
 			repository,
 			auth,
@@ -2255,6 +2315,7 @@ func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*PicturesGRPC
 			catalogue,
 			itemOfDayCached,
 			inboxBrandsCached,
+			complianceRepository,
 		)
 	}
 

@@ -275,10 +275,11 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 				Month: int32(util.NullByteToScalar(row.TakenMonth)),
 				Day:   int32(util.NullByteToScalar(row.TakenDay)),
 			},
-			DpiX:      util.NullInt32ToScalar(row.DPIX),
-			DpiY:      util.NullInt32ToScalar(row.DPIY),
-			License:   extractPictureLicense(row.LicenseID),
-			SourceUrl: util.NullStringToString(row.SourceURL),
+			DpiX:           util.NullInt32ToScalar(row.DPIX),
+			DpiY:           util.NullInt32ToScalar(row.DPIY),
+			License:        extractPictureLicense(row.LicenseID),
+			SourceUrl:      util.NullStringToString(row.SourceURL),
+			AuthorWithheld: row.AuthorSuppressionID.Valid,
 		}
 
 		if row.ChangeStatusUserID.Valid {

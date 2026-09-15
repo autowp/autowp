@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/autowp/goautowp/compliance"
 	"github.com/autowp/goautowp/config"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/items"
@@ -86,11 +87,14 @@ func repositoryWithCallbacks(
 		imageStorage,
 	)
 
+	complianceRepo := compliance.NewRepository(goquDB, textStorage)
+
 	return goquDB, NewRepository(
 		goquDB,
 		imageStorage,
 		textStorage,
 		itemsRepo,
+		complianceRepo,
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
 		func(context.Context) error { return nil },

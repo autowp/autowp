@@ -12,6 +12,7 @@ import (
 
 	"cloud.google.com/go/civil"
 	"github.com/autowp/goautowp/comments"
+	"github.com/autowp/goautowp/compliance"
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/hosts"
 	"github.com/autowp/goautowp/image/sampler"
@@ -75,6 +76,7 @@ type PicturesGRPCServer struct {
 	catalogue             *Catalogue
 	itemOfDayCached       *ItemOfDayCached
 	inboxBrandsCached     *InboxBrandsCached
+	complianceRepository  *compliance.Repository
 }
 
 func NewPicturesGRPCServer(
@@ -95,6 +97,7 @@ func NewPicturesGRPCServer(
 	catalogue *Catalogue,
 	itemOfDayCached *ItemOfDayCached,
 	inboxBrandsCached *InboxBrandsCached,
+	complianceRepository *compliance.Repository,
 ) *PicturesGRPCServer {
 	return &PicturesGRPCServer{
 		repository:            repository,
@@ -116,6 +119,7 @@ func NewPicturesGRPCServer(
 		catalogue:             catalogue,
 		itemOfDayCached:       itemOfDayCached,
 		inboxBrandsCached:     inboxBrandsCached,
+		complianceRepository:  complianceRepository,
 	}
 }
 
@@ -841,6 +845,21 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+
+		if pictureItemType == schema.PictureItemTypeAuthor {
+			item, itemErr := s.itemRepository.Item(
+				ctx,
+				&query.ItemListOptions{ItemID: in.GetItemId(), Language: EventsDefaultLanguage},
+				&items.ItemFields{NameOnly: true},
+			)
+			if itemErr != nil {
+				return nil, status.Error(codes.Internal, itemErr.Error())
+			}
+
+			if err = recordGdprObjectionHitIfMatched(ctx, s.complianceRepository, item.NameOnly); err != nil {
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+		}
 	}
 
 	err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId())
@@ -934,6 +953,21 @@ func (s *PicturesGRPCServer) AcceptReplacePicture(
 	}
 
 	ctx = context.WithoutCancel(ctx)
+
+	// GDPR: a suppressed author's slot must stay suppressed across a replace - the outgoing
+	// picture is about to be queued for removal, taking its author_suppression_id (and the public
+	// "author withheld" notice) with it, so the incoming one inherits it. The independent
+	// EXIF/link-time checks (processEXIF, CreatePictureItem) still protect the new file on its own
+	// upload, but only when its own EXIF or a moderator's typed name actually matches - this keeps
+	// the flag itself, and thus the public notice, continuous even when it doesn't.
+	if replacePicture.AuthorSuppressionID.Valid {
+		err = s.repository.SetAuthorSuppression(
+			ctx, []int64{pic.ID}, int64(replacePicture.AuthorSuppressionID.Int32),
+		)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
 
 	// statuses
 	if pic.Status != schema.PictureStatusAccepted {
