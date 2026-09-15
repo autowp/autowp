@@ -26,10 +26,9 @@ const (
 // CreateGdprObjection, GetGdprObjections, DeleteGdprObjection, AcknowledgeGdprObjectionHit and
 // GetGdprObjectionAffectedPictures manage the internal suppression list of people who objected to
 // / requested erasure of their name being used as a public photo-author credit (GDPR Art. 17/21).
-// Viewing (GetGdprObjections, GetGdprObjectionSourceText, GetGdprObjectionAffectedPictures) is
-// open to RoleModer, since they're the ones performing the catalogue actions this list exists to
-// warn against and need to be able to check it themselves. Mutating the list (Create/Delete/
-// Acknowledge) stays RoleAdmin - those are the actual compliance decisions, not lookups.
+// All of it - viewing and mutating alike - is RoleModer: moderators are the ones who actually run
+// into a suppressed name day to day (creating a person, linking an author, renaming one) and need
+// to be able to act on it themselves rather than escalating every time.
 
 func (s *GRPCServer) CreateGdprObjection(
 	ctx context.Context, in *CreateGdprObjectionRequest,
@@ -39,7 +38,7 @@ func (s *GRPCServer) CreateGdprObjection(
 		return nil, s.auth.GRPCError(err)
 	}
 
-	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
@@ -146,10 +145,6 @@ func (s *GRPCServer) GetGdprObjections(
 		return nil, s.auth.GRPCError(err)
 	}
 
-	// Viewing is open to any moderator: they are the ones actually performing CreateItem/
-	// CreatePictureItem/renames, so they need to be able to check "have we seen this name
-	// before" themselves rather than escalating every time. Mutating the list (Create/Delete/
-	// Acknowledge) and SuppressAuthor stay RoleAdmin - those are compliance actions, not lookups.
 	if !util.Contains(userCtx.Roles, users.RoleModer) {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
@@ -191,7 +186,7 @@ func (s *GRPCServer) DeleteGdprObjection(
 		return nil, s.auth.GRPCError(err)
 	}
 
-	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
@@ -243,7 +238,7 @@ func (s *GRPCServer) AcknowledgeGdprObjectionHit(
 		return nil, s.auth.GRPCError(err)
 	}
 
-	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 

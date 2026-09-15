@@ -43,6 +43,7 @@ var (
 	errInvalidItemParentCombination    = errors.New(
 		"that type of parent is not allowed for this type",
 	)
+	errNotAPerson     = errors.New("item is not a person")
 	errGroupRequired  = errors.New("only groups can have children")
 	errSelfParent     = errors.New("self parent forbidden")
 	errNoRowsReturned = errors.New("no rows returned")
@@ -3144,6 +3145,99 @@ func (s *Repository) CreateItem(
 	}
 
 	return itemID, nil
+}
+
+// DeletePersonItem permanently removes a person item, as the last step of the GDPR SuppressAuthor
+// flow (items-grpc.go): by that point every AUTHOR picture_item link and author-suggestion for it
+// is already gone, and keeping the item row itself around - still fully catalogued, still
+// findable by name in person-search - is exactly what lets a moderator who doesn't know about the
+// case relink it as an author again.
+//
+// Most of item's referencing tables have ON DELETE CASCADE (item_language,
+// item_language_cache, item_parent_cache, item_point, item_vehicle_type, log_event_item, of_day,
+// picture_author_suggestion, telegram_brand, user_item_subscribe) and are cleared automatically
+// by the final DELETE. log_event_item cascading is deliberate: it severs the item link but leaves
+// the log_event row itself (the audit message text) alone - that is history, not data about the
+// now-deleted item. The rest have no cascade and are cleared explicitly first, in a transaction
+// with the final delete so this never leaves a half-cleared item behind.
+//
+// Refuses anything but a Person: the object graph a vehicle/brand/museum/etc. sits in (deep
+// item_parent hierarchies, specs, logos, ...) is not something this cleanup is scoped for.
+func (s *Repository) DeletePersonItem(ctx context.Context, itemID int64) error {
+	var itemTypeID schema.ItemTableItemTypeID
+
+	found, err := s.db.Select(schema.ItemTableItemTypeIDCol).
+		From(schema.ItemTable).
+		Where(schema.ItemTableIDCol.Eq(itemID)).
+		ScanValContext(ctx, &itemTypeID)
+	if err != nil {
+		return err
+	}
+
+	if !found {
+		return ErrItemNotFound
+	}
+
+	if itemTypeID != schema.ItemTableItemTypeIDPerson {
+		return fmt.Errorf("%w: %d", errNotAPerson, itemID)
+	}
+
+	ctx = context.WithoutCancel(ctx)
+
+	return s.db.WithTx(func(tx *goqu.TxDatabase) error {
+		noActionDeletes := []struct {
+			cond  goqu.Expression
+			table exp.IdentifierExpression
+		}{
+			{table: schema.AttrsUserValuesTable, cond: schema.AttrsUserValuesTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsUserValuesFloatTable, cond: schema.AttrsUserValuesFloatTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsUserValuesIntTable, cond: schema.AttrsUserValuesIntTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsUserValuesListTable, cond: schema.AttrsUserValuesListTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsUserValuesStringTable, cond: schema.AttrsUserValuesStringTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsValuesTable, cond: schema.AttrsValuesTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsValuesFloatTable, cond: schema.AttrsValuesFloatTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsValuesIntTable, cond: schema.AttrsValuesIntTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsValuesListTable, cond: schema.AttrsValuesListTableItemIDCol.Eq(itemID)},
+			{table: schema.AttrsValuesStringTable, cond: schema.AttrsValuesStringTableItemIDCol.Eq(itemID)},
+			{table: schema.BrandAliasTable, cond: schema.BrandAliasTableItemIDCol.Eq(itemID)},
+			{table: schema.ItemLinkTable, cond: schema.ItemLinkTableItemIDCol.Eq(itemID)},
+			{table: schema.PictureItemTable, cond: schema.PictureItemTableItemIDCol.Eq(itemID)},
+			{
+				table: schema.ItemParentTable,
+				cond: goqu.Or(
+					schema.ItemParentTableItemIDCol.Eq(itemID),
+					schema.ItemParentTableParentIDCol.Eq(itemID),
+				),
+			},
+			{
+				table: schema.ItemParentLanguageTable,
+				cond: goqu.Or(
+					schema.ItemParentLanguageTableItemIDCol.Eq(itemID),
+					schema.ItemParentLanguageTableParentIDCol.Eq(itemID),
+				),
+			},
+		}
+
+		for _, d := range noActionDeletes {
+			if _, err := tx.Delete(d.table).Where(d.cond).Executor().ExecContext(ctx); err != nil {
+				return err
+			}
+		}
+
+		// Self-referencing FK: a person should never legitimately be another item's engine, but
+		// clear it defensively rather than let an unexpected row block the delete below.
+		_, err := tx.Update(schema.ItemTable).
+			Set(goqu.Record{schema.ItemTableEngineItemIDColName: nil}).
+			Where(schema.ItemTableEngineItemIDCol.Eq(itemID)).
+			Executor().ExecContext(ctx)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.Delete(schema.ItemTable).Where(schema.ItemTableIDCol.Eq(itemID)).Executor().ExecContext(ctx)
+
+		return err
+	})
 }
 
 func (s *Repository) SpecExists(ctx context.Context, specID int32) (bool, error) {

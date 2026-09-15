@@ -1037,6 +1037,18 @@
           <context context-type="linenumber">40,41</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">76,79</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">108,111</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">176,179</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/alpha/alpha.component.html</context>
           <context context-type="linenumber">37,43</context>
         </context-group>
@@ -3689,7 +3701,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">216,218</context>
+          <context context-type="linenumber">151,153</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7584542878042672566" datatype="html">
@@ -3891,7 +3903,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">207,209</context>
+          <context context-type="linenumber">142,144</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/area/area.component.html</context>
@@ -4127,8 +4139,8 @@ All values entered here are displayed on the site, in the specifications, are us
           <context context-type="linenumber">46,50</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">131,135</context>
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">47,52</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/bulk-edit-modal/bulk-edit-modal.component.html</context>
@@ -4216,7 +4228,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">197,200</context>
+          <context context-type="linenumber">217,220</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
@@ -6468,7 +6480,7 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">133,136</context>
+          <context context-type="linenumber">145,148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="440835464741256121" datatype="html">
@@ -6611,11 +6623,11 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">228,229</context>
+          <context context-type="linenumber">248,249</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">99,101</context>
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">20,21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4388879716045736175" datatype="html">
@@ -6626,11 +6638,11 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">232,233</context>
+          <context context-type="linenumber">252,253</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">108,109</context>
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">24,25</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/upload/index/index.component.html</context>
@@ -6655,120 +6667,127 @@ licence stated there.
         <source>View original request</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">75,78</context>
+          <context context-type="linenumber">81,84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5208514121773007678" datatype="html">
         <source>Affected pictures:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">84,85</context>
+          <context context-type="linenumber">90,91</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1790021971578762105" datatype="html">
         <source>No affected pictures found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">91,94</context>
+          <context context-type="linenumber">97,100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8428910023435284247" datatype="html">
         <source>View affected pictures</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">101,104</context>
+          <context context-type="linenumber">113,116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1282154386082930059" datatype="html">
         <source>Also mentioned in (review manually):</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">109,111</context>
+          <context context-type="linenumber">121,123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5844404198314672549" datatype="html">
         <source>(copyrights text)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">122,124</context>
+          <context context-type="linenumber">134,136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3054692242041944023" datatype="html">
         <source>resolved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">137,139</context>
+          <context context-type="linenumber">149,151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3486318045815416322" datatype="html">
         <source>Mark resolved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">145,147</context>
+          <context context-type="linenumber">157,159</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6779643850210173408" datatype="html">
+        <source>No cleanup candidates found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">165,168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5731769731667362511" datatype="html">
         <source>View cleanup candidates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">161,164</context>
+          <context context-type="linenumber">181,184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3071620290019453863" datatype="html">
         <source>Mark reviewed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">188,191</context>
+          <context context-type="linenumber">208,211</context>
         </context-group>
       </trans-unit>
       <trans-unit id="430662670077088259" datatype="html">
         <source>No entries.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">204,210</context>
+          <context context-type="linenumber">224,230</context>
         </context-group>
       </trans-unit>
       <trans-unit id="503153018057897371" datatype="html">
         <source>Add entry manually</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">217,219</context>
+          <context context-type="linenumber">237,239</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8991051995049340943" datatype="html">
         <source>Names (one spelling per line)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">220,221</context>
+          <context context-type="linenumber">240,241</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7137878719164647615" datatype="html">
         <source>Case reference</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">224,225</context>
+          <context context-type="linenumber">244,245</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">95,96</context>
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">16,17</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7728784723903620710" datatype="html">
         <source>Original request text (kept internal-only)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">237,239</context>
+          <context context-type="linenumber">257,259</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">113,116</context>
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">29,32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1182948153957603954" datatype="html">
         <source>Add to suppression list</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">241,245</context>
+          <context context-type="linenumber">261,265</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6137649443564269922" datatype="html">
@@ -7257,7 +7276,7 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">184,186</context>
+          <context context-type="linenumber">119,121</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/utils/translations.ts</context>
@@ -7478,6 +7497,41 @@ licence stated there.
           <context context-type="linenumber">29,32</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="8193527273644698864" datatype="html">
+        <source>GDPR: suppress author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">2,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="574093740280189528" datatype="html">
+        <source>Unlinks this person from every picture it is credited author of, drops any pending EXIF author suggestions for it, and adds it to the internal suppression list so the name is not silently reintroduced.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">5,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8672414248556534507" datatype="html">
+        <source>Suppress author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">11,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8729398902641287119" datatype="html">
+        <source>Confirm suppress author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
+          <context context-type="linenumber">39,43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="779193610822771115" datatype="html">
+        <source>Author unlinked from <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> picture(s) and added to the GDPR suppression list. Stored-file metadata cleanup and a search for other mentions (copyrights text / comments) are running in the background and may take a while - check the GDPR suppression list page for results.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="6080149201171598832" datatype="html">
         <source>Database id: <x id="INTERPOLATION" equiv-text="{{ item.id }}"/></source>
         <context-group purpose="location">
@@ -7514,60 +7568,32 @@ licence stated there.
           <context context-type="linenumber">65,69</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8193527273644698864" datatype="html">
-        <source>GDPR: suppress author</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">77,80</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="574093740280189528" datatype="html">
-        <source>Unlinks this person from every picture it is credited author of, drops any pending EXIF author suggestions for it, and adds it to the internal suppression list so the name is not silently reintroduced.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">80,84</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="8672414248556534507" datatype="html">
-        <source>Suppress author</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">90,93</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="8729398902641287119" datatype="html">
-        <source>Confirm suppress author</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">123,126</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="8252591585673168867" datatype="html">
         <source>Meta</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">143,145</context>
+          <context context-type="linenumber">78,80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7519832501831015388" datatype="html">
         <source>Name and description</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">150,152</context>
+          <context context-type="linenumber">85,87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5190421211409047645" datatype="html">
         <source>Logotype</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">158,160</context>
+          <context context-type="linenumber">93,95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2904068797291466876" datatype="html">
         <source>Catalogue</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">171,173</context>
+          <context context-type="linenumber">106,108</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/select-parent/select-parent.component.html</context>
@@ -7578,14 +7604,14 @@ licence stated there.
         <source>Tree</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
-          <context context-type="linenumber">193,195</context>
+          <context context-type="linenumber">128,130</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="779193610822771115" datatype="html">
-        <source>Author unlinked from <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> picture(s) and added to the GDPR suppression list. Stored-file metadata cleanup and a search for other mentions (copyrights text / comments) are running in the background and may take a while - check the GDPR suppression list page for results.</source>
+      <trans-unit id="3387422732252707037" datatype="html">
+        <source>GDPR</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/item/item.component.ts</context>
-          <context context-type="linenumber">312</context>
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">165,170</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2456433949573962818" datatype="html">

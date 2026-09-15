@@ -1,6 +1,7 @@
 package goautowp
 
 import (
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"slices"
@@ -12,6 +13,7 @@ import (
 	"github.com/autowp/goautowp/items"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
+	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/metadata"
@@ -23,6 +25,116 @@ import (
 const tokenWithInvalidSignature = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9." +
 	"eyJhdWQiOiJkZWZhdWx0Iiwic3ViIjoiMSJ9." +
 	"yuzUurjlDfEKchYseIrHQ1D5_RWnSuMxM-iK9FDNlQBBw8kCz3H-94xHvyd9pAA6Ry2-YkGi1v6Y3AHIpkDpcQ"
+
+// TestSuppressAuthor exercises the GDPR erasure/objection flow end to end: unlink the author from
+// every picture, record the suppression case, and delete the person item itself (so it can't be
+// found in person-search and relinked by a moderator who doesn't know about the case).
+func TestSuppressAuthor(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	kc := cnt.Keycloak()
+
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
+	personName := fmt.Sprintf("Suppress Author %d", random.Int())
+	personID := createItem(t, conn, cnt, &Item{
+		Name:       personName,
+		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+	})
+	vehicleID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	pictureID := CreatePicture(
+		t, cnt, "./test/test.jpg", PicturePostForm{ItemID: vehicleID}, adminToken.AccessToken,
+	)
+
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken)
+
+	picturesClient := NewPicturesClient(conn)
+	_, err = picturesClient.CreatePictureItem(apiCtx, &CreatePictureItemRequest{
+		PictureId: pictureID,
+		ItemId:    personID,
+		Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+	})
+	require.NoError(t, err)
+
+	itemsClient := NewItemsClient(conn)
+
+	reference := fmt.Sprintf("TEST-%d", random.Int())
+
+	res, err := itemsClient.SuppressAuthor(apiCtx, &SuppressAuthorRequest{
+		ItemId:       personID,
+		Reference:    reference,
+		ContactEmail: "requester@example.com",
+		Note:         "test note",
+	})
+	require.NoError(t, err)
+	require.Equal(t, int64(1), res.GetUnlinkedPicturesCount())
+	require.NotZero(t, res.GetGdprObjectionId())
+
+	db, err := cnt.GoquDB(ctx)
+	require.NoError(t, err)
+
+	// The AUTHOR link is gone.
+	pictureItemExists, err := db.Select(goqu.V(true)).
+		From(schema.PictureItemTable).
+		Where(
+			schema.PictureItemTablePictureIDCol.Eq(pictureID),
+			schema.PictureItemTableItemIDCol.Eq(personID),
+			schema.PictureItemTableTypeCol.Eq(schema.PictureItemTypeAuthor),
+		).
+		ScanValContext(ctx, new(bool))
+	require.NoError(t, err)
+	require.False(t, pictureItemExists)
+
+	// The picture is flagged as author-suppressed, pointing at the case just created.
+	var authorSuppressionID sql.NullInt32
+
+	found, err := db.Select(schema.PictureTableAuthorSuppressionIDCol).
+		From(schema.PictureTable).
+		Where(schema.PictureTableIDCol.Eq(pictureID)).
+		ScanValContext(ctx, &authorSuppressionID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.True(t, authorSuppressionID.Valid)
+	require.Equal(t, res.GetGdprObjectionId(), int64(authorSuppressionID.Int32))
+
+	// The case itself, and the person's name, were recorded.
+	var gotReference string
+
+	found, err = db.Select(schema.GdprObjectionTableReferenceCol).
+		From(schema.GdprObjectionTable).
+		Where(schema.GdprObjectionTableIDCol.Eq(res.GetGdprObjectionId())).
+		ScanValContext(ctx, &gotReference)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, reference, gotReference)
+
+	nameExists, err := db.Select(goqu.V(true)).
+		From(schema.GdprObjectionNameTable).
+		Where(
+			schema.GdprObjectionNameTableObjectionIDCol.Eq(res.GetGdprObjectionId()),
+			schema.GdprObjectionNameTableNameCol.Eq(personName),
+		).
+		ScanValContext(ctx, new(bool))
+	require.NoError(t, err)
+	require.True(t, nameExists)
+
+	// The person item itself is gone - it must not be findable/relinkable afterwards.
+	itemExists, err := db.Select(goqu.V(true)).
+		From(schema.ItemTable).
+		Where(schema.ItemTableIDCol.Eq(personID)).
+		ScanValContext(ctx, new(bool))
+	require.NoError(t, err)
+	require.False(t, itemExists)
+}
 
 func TestTopCategoriesList(t *testing.T) {
 	t.Parallel()

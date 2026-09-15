@@ -16968,6 +16968,22 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated">作者已从 <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> 张照片中解除关联,并已加入 GDPR 屏蔽名单。存储文件的元数据清理以及对其他提及内容（版权文本／评论）的搜索正在后台运行,可能需要一些时间——请在 GDPR 屏蔽名单页面查看结果。</target>
       </trans-unit>
+      <trans-unit id="6779643850210173408" datatype="html">
+        <source>No cleanup candidates found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">165,168</context>
+        </context-group>
+        <target state="translated">未找到待清理候选项。</target>
+      </trans-unit>
+      <trans-unit id="3387422732252707037" datatype="html">
+        <source>GDPR</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">165,170</context>
+        </context-group>
+        <target state="translated">GDPR</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

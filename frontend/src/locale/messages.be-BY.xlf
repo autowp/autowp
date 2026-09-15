@@ -16964,6 +16964,22 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated">Аўтара адвязана ад <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> фота і дададзена ў спіс блакіроўкі GDPR. Ачыстка метаданых захаваных файлаў і пошук іншых згадак (тэкст копірайту / каментары) выконваюцца ў фонавым рэжыме і могуць заняць час — вынікі глядзіце на старонцы suppression list GDPR.</target>
       </trans-unit>
+      <trans-unit id="6779643850210173408" datatype="html">
+        <source>No cleanup candidates found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">165,168</context>
+        </context-group>
+        <target state="translated">Кандыдатаў на ачыстку не знойдзена.</target>
+      </trans-unit>
+      <trans-unit id="3387422732252707037" datatype="html">
+        <source>GDPR</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">165,170</context>
+        </context-group>
+        <target state="translated">GDPR</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,0 +1,51 @@
+<div class="card card-body mb-4 border-danger">
+  <h2 class="h5" i18n>GDPR: suppress author</h2>
+  <p class="text-muted small">
+    <ng-container i18n
+      >Unlinks this person from every picture it is credited author of, drops any pending EXIF author suggestions for
+      it, and adds it to the internal suppression list so the name is not silently reintroduced.</ng-container
+    >
+  </p>
+  @if (!showSuppressAuthorForm()) {
+    <button type="button" class="btn btn-outline-danger align-self-start" (click)="showSuppressAuthorForm.set(true)">
+      <ng-container i18n>Suppress author</ng-container>
+    </button>
+  } @else {
+    <form [formGroup]="suppressAuthorForm" (ngSubmit)="suppressAuthor()">
+      <div class="mb-2">
+        <label class="form-label" for="suppress-author-reference" i18n>Case reference</label>
+        <input id="suppress-author-reference" type="text" class="form-control" formControlName="reference" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="suppress-author-contact-email" i18n>Contact e-mail</label>
+        <input id="suppress-author-contact-email" type="email" class="form-control" formControlName="contactEmail" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="suppress-author-note" i18n>Note</label>
+        <textarea id="suppress-author-note" class="form-control" rows="2" formControlName="note"></textarea>
+      </div>
+      <div class="mb-2">
+        <label class="form-label" for="suppress-author-source-text" i18n
+          >Original request text (kept internal-only)</label
+        >
+        <textarea
+          id="suppress-author-source-text"
+          class="form-control"
+          rows="4"
+          formControlName="sourceText"
+        ></textarea>
+      </div>
+      <button type="submit" class="btn btn-danger me-2" [disabled]="suppressingAuthor()">
+        <ng-container i18n>Confirm suppress author</ng-container>
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        [disabled]="suppressingAuthor()"
+        (click)="showSuppressAuthorForm.set(false)"
+      >
+        <ng-container i18n>Cancel</ng-container>
+      </button>
+    </form>
+  }
+</div>

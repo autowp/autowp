@@ -16974,6 +16974,22 @@ Utilisez le même bouton, le même formulaire ou la même adresse pour signaler 
         </context-group>
         <target state="translated">L'auteur a été dissocié de <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> photo(s) et ajouté à la liste de suppression RGPD. Le nettoyage des métadonnées des fichiers stockés et la recherche d'autres mentions (texte de copyright / commentaires) s'exécutent en arrière-plan et peuvent prendre du temps - consultez la page de la liste de suppression RGPD pour les résultats.</target>
       </trans-unit>
+      <trans-unit id="6779643850210173408" datatype="html">
+        <source>No cleanup candidates found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">165,168</context>
+        </context-group>
+        <target state="translated">Aucun candidat au nettoyage trouvé.</target>
+      </trans-unit>
+      <trans-unit id="3387422732252707037" datatype="html">
+        <source>GDPR</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">165,170</context>
+        </context-group>
+        <target state="translated">RGPD</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

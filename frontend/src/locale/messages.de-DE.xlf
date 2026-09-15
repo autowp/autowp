@@ -17336,6 +17336,22 @@ Getriebe wird nicht berücksichtigt</target>
         </context-group>
         <target state="translated">Der Autor wurde von <x id="unlinkedPicturesCount" equiv-text="response.unlinkedPicturesCount"/> Bild(ern) getrennt und der GDPR-Sperrliste hinzugefügt. Die Bereinigung der Metadaten der gespeicherten Dateien und die Suche nach weiteren Erwähnungen (Copyright-Text / Kommentare) laufen im Hintergrund und können eine Weile dauern - die Ergebnisse finden Sie auf der GDPR-Sperrlisten-Seite.</target>
       </trans-unit>
+      <trans-unit id="6779643850210173408" datatype="html">
+        <source>No cleanup candidates found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">165,168</context>
+        </context-group>
+        <target state="translated">Keine Bereinigungskandidaten gefunden.</target>
+      </trans-unit>
+      <trans-unit id="3387422732252707037" datatype="html">
+        <source>GDPR</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/items/item/item.component.html</context>
+          <context context-type="linenumber">165,170</context>
+        </context-group>
+        <target state="translated">GDPR</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

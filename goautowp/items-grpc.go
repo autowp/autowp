@@ -2659,9 +2659,9 @@ const (
 // SuppressAuthor is the one-click GDPR erasure/objection action on a person item's moderator
 // card: unlink it from every picture it is credited AUTHOR of, drop any pending EXIF author
 // suggestions for it, and add it to the suppression list so the name is not silently reintroduced
-// (see compliance.Repository and warnIfGdprObjection). Admin-only: this is a destructive,
-// legally-motivated action, not routine moderation.
-func (s *ItemsGRPCServer) SuppressAuthor(
+// (see compliance.Repository and warnIfGdprObjection). RoleModer, same as the rest of this
+// tooling: moderators are the ones who run into a suppressed name day to day.
+func (s *ItemsGRPCServer) SuppressAuthor( //nolint: maintidx
 	ctx context.Context, in *SuppressAuthorRequest,
 ) (*SuppressAuthorResponse, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
@@ -2669,7 +2669,7 @@ func (s *ItemsGRPCServer) SuppressAuthor(
 		return nil, s.auth.GRPCError(err)
 	}
 
-	if !util.Contains(userCtx.Roles, users.RoleAdmin) {
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
 		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
@@ -2847,6 +2847,14 @@ func (s *ItemsGRPCServer) SuppressAuthor(
 	}
 
 	if err = s.itemOfDayCached.FlushItemOfDayCache(ctx, in.GetItemId()); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// The item itself must go too: keeping it around, still fully catalogued and still findable
+	// by name in person-search, is exactly what would let a moderator who doesn't know about this
+	// case relink it as an author again. Last step, after the event log entry above, so that
+	// entry's log_event_item row can still be created against a not-yet-deleted item.
+	if err = s.repository.DeletePersonItem(ctx, in.GetItemId()); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

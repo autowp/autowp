@@ -78,7 +78,7 @@ export class ModerGdprObjectionsComponent implements OnInit {
 
   protected readonly CleanupCandidateEntityType = GdprObjectionCleanupCandidateEntityType;
 
-  protected readonly isAdmin$ = this.#auth.hasRole$(Role.ADMIN);
+  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
   protected readonly hitsOnly = new FormControl<boolean>(false, {nonNullable: true});
 

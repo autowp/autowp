@@ -61,7 +61,7 @@
               @if (row.objection.hasSourceText) {
                 <div class="mt-1">
                   @if (row.sourceText() !== null) {
-                    <pre class="small text-break text-wrap border rounded p-2 bg-body-secondary">{{
+                    <pre class="small text-break border rounded p-2 bg-body-secondary" style="white-space: pre-wrap">{{
                       row.sourceText()
                     }}</pre>
                   } @else {
@@ -71,7 +71,13 @@
                       [disabled]="row.sourceTextLoading()"
                       (click)="loadSourceText(row)"
                     >
-                      <i class="bi bi-envelope me-1" aria-hidden="true"></i>
+                      @if (row.sourceTextLoading()) {
+                        <span class="spinner-border spinner-border-sm me-1" role="status">
+                          <span class="visually-hidden" i18n>Loading…</span>
+                        </span>
+                      } @else {
+                        <i class="bi bi-envelope me-1" aria-hidden="true"></i>
+                      }
                       <ng-container i18n>View original request</ng-container>
                     </button>
                   }
@@ -97,7 +103,13 @@
                     [disabled]="row.affectedPicturesLoading()"
                     (click)="loadAffectedPictures(row)"
                   >
-                    <i class="bi bi-images me-1" aria-hidden="true"></i>
+                    @if (row.affectedPicturesLoading()) {
+                      <span class="spinner-border spinner-border-sm me-1" role="status">
+                        <span class="visually-hidden" i18n>Loading…</span>
+                      </span>
+                    } @else {
+                      <i class="bi bi-images me-1" aria-hidden="true"></i>
+                    }
                     <ng-container i18n>View affected pictures</ng-container>
                   </button>
                 }
@@ -149,6 +161,8 @@
                         }
                       </ul>
                     </div>
+                  } @else {
+                    <div class="small text-muted" i18n>No cleanup candidates found.</div>
                   }
                 } @else {
                   <button
@@ -157,7 +171,13 @@
                     [disabled]="row.cleanupCandidatesLoading()"
                     (click)="loadCleanupCandidates(row)"
                   >
-                    <i class="bi bi-search me-1" aria-hidden="true"></i>
+                    @if (row.cleanupCandidatesLoading()) {
+                      <span class="spinner-border spinner-border-sm me-1" role="status">
+                        <span class="visually-hidden" i18n>Loading…</span>
+                      </span>
+                    } @else {
+                      <i class="bi bi-search me-1" aria-hidden="true"></i>
+                    }
                     <ng-container i18n>View cleanup candidates</ng-container>
                   </button>
                 }
@@ -177,7 +197,7 @@
               }
             </td>
             <td class="text-nowrap">
-              @if (isAdmin$ | async) {
+              @if (isModer$ | async) {
                 @if (row.objection.hitCount) {
                   <button
                     type="button"
@@ -212,7 +232,7 @@
   }
 }
 
-@if (isAdmin$ | async) {
+@if (isModer$ | async) {
   <div class="card card-body mb-4" style="max-width: 40rem">
     <h2 class="h5" i18n>Add entry manually</h2>
     <form [formGroup]="createForm" (ngSubmit)="create()">
