@@ -45,7 +45,10 @@ spec:
         - name: frontend-assets-copy
           image: {{ include "autowp.frontend.image" . }}
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy | quote }}
-          command: ["sh", "-c", "cp -a /app/browser/. /srv/browser/ && cp /app/3rdpartylicenses.txt /srv/licenses/frontend-third-party-licenses.txt"]
+          # -r, not -a: the destination emptyDir is owned by root while this container runs as
+          # uid 101, so -a's attempt to preserve ownership/timestamps/mode always fails with
+          # "Operation not permitted" (harmless - exit status stays 0 - but noisy).
+          command: ["sh", "-c", "cp -r /app/browser/. /srv/browser/ && cp /app/3rdpartylicenses.txt /srv/licenses/frontend-third-party-licenses.txt"]
           volumeMounts:
             - mountPath: /srv/browser
               name: frontend-assets
