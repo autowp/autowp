@@ -52,6 +52,7 @@ interface CleanupCandidateInList {
 
 interface ObjectionInList {
   readonly acknowledging: WritableSignal<boolean>;
+  readonly affectedPictureIdentities: WritableSignal<null | string[]>;
   readonly affectedPictureIds: WritableSignal<null | string[]>;
   readonly affectedPicturesLoading: WritableSignal<boolean>;
   readonly cleanupCandidates: WritableSignal<CleanupCandidateInList[] | null>;
@@ -110,6 +111,7 @@ export class ModerGdprObjectionsComponent implements OnInit {
     map((response) => ({
       objections: (response.items ?? []).map((objection): ObjectionInList => ({
         acknowledging: signal(false),
+        affectedPictureIdentities: signal(null),
         affectedPictureIds: signal(null),
         affectedPicturesLoading: signal(false),
         cleanupCandidates: signal(null),
@@ -274,22 +276,24 @@ export class ModerGdprObjectionsComponent implements OnInit {
         next: (response) => {
           row.affectedPicturesLoading.set(false);
           row.affectedPictureIds.set(response.pictureIds);
+          row.affectedPictureIdentities.set(response.pictureIdentities);
         },
       });
   }
 
   // Requesters who ask what was published under their name (GDPR Art. 15) want links they can
   // actually open, not the /moder/pictures ids shown above - those are moderator-only and would
-  // 404 (or worse, expose the admin UI) for an outside visitor. window.location.origin matches
-  // whichever language domain the moderator is currently on.
-  protected copyAffectedPictureLinks(pictureIds: string[]): void {
+  // 404 (or worse, expose the admin UI) for an outside visitor. The public route is
+  // /picture/:identity, not :id - an id-based link 404s, since Picture.Identity isn't the id.
+  // window.location.origin matches whichever language domain the moderator is currently on.
+  protected copyAffectedPictureLinks(pictureIdentities: string[]): void {
     const window = this.#window;
     if (!window) {
       return;
     }
 
     const origin = window.location.origin;
-    const links = pictureIds.map((pictureId) => `${origin}/picture/${pictureId}`).join('\n');
+    const links = pictureIdentities.map((identity) => `${origin}/picture/${identity}`).join('\n');
 
     window.navigator.clipboard.writeText(links).then(
       () => {

@@ -134,6 +134,21 @@ func TestSuppressAuthor(t *testing.T) {
 		ScanValContext(ctx, new(bool))
 	require.NoError(t, err)
 	require.False(t, itemExists)
+
+	// The affected-pictures lookup used to answer GDPR Art. 15 access requests returns the
+	// picture's identity, not just its id - the public route is /picture/:identity, and an
+	// id-based link there 404s.
+	pic, err := picturesClient.GetPicture(apiCtx, &PicturesRequest{Options: &PictureListOptions{Id: pictureID}})
+	require.NoError(t, err)
+	require.NotEmpty(t, pic.GetIdentity())
+
+	autowpClient := NewAutowpClient(conn)
+	affected, err := autowpClient.GetGdprObjectionAffectedPictures(
+		apiCtx, &GetGdprObjectionAffectedPicturesRequest{Id: res.GetGdprObjectionId()},
+	)
+	require.NoError(t, err)
+	require.Equal(t, []int64{pictureID}, affected.GetPictureIds())
+	require.Equal(t, []string{pic.GetIdentity()}, affected.GetPictureIdentities())
 }
 
 func TestTopCategoriesList(t *testing.T) {

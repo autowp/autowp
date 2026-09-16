@@ -327,12 +327,15 @@ func (s *GRPCServer) GetGdprObjectionAffectedPictures(
 		return nil, status.Error(codes.InvalidArgument, "invalid id")
 	}
 
-	pictureIDs, err := s.picturesRepository.PicturesSuppressedByObjection(ctx, in.GetId())
+	pictureIDs, pictureIdentities, err := s.picturesRepository.PicturesSuppressedByObjection(ctx, in.GetId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &GetGdprObjectionAffectedPicturesResponse{PictureIds: pictureIDs}, nil
+	return &GetGdprObjectionAffectedPicturesResponse{
+		PictureIds:        pictureIDs,
+		PictureIdentities: pictureIdentities,
+	}, nil
 }
 
 func (s *GRPCServer) GetGdprObjectionCleanupCandidates(

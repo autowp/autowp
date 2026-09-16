@@ -1290,18 +1290,37 @@ func (s *Repository) SetAuthorSuppression(ctx context.Context, pictureIDs []int6
 	return err
 }
 
-// PicturesSuppressedByObjection returns ids of pictures whose author credit was removed under the
-// given GDPR case (picture.author_suppression_id) - the /moder/gdpr-objections reverse lookup.
-func (s *Repository) PicturesSuppressedByObjection(ctx context.Context, objectionID int64) ([]int64, error) {
-	var ids []int64
+// PicturesSuppressedByObjection returns ids and identities of pictures whose author credit was
+// removed under the given GDPR case (picture.author_suppression_id) - the /moder/gdpr-objections
+// reverse lookup. Identity is returned alongside id because the public picture route is
+// /picture/:identity, not /picture/:id - a moderator handing a GDPR Art. 15 requester an
+// id-based link would send them to a 404.
+func (s *Repository) PicturesSuppressedByObjection(
+	ctx context.Context, objectionID int64,
+) ([]int64, []string, error) {
+	var rows []struct {
+		ID       int64  `db:"id"`
+		Identity string `db:"identity"`
+	}
 
-	err := s.db.Select(schema.PictureTableIDCol).
+	err := s.db.Select(schema.PictureTableIDCol, schema.PictureTableIdentityCol).
 		From(schema.PictureTable).
 		Where(schema.PictureTableAuthorSuppressionIDCol.Eq(objectionID)).
 		Order(schema.PictureTableIDCol.Asc()).
-		ScanValsContext(ctx, &ids)
+		ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return ids, err
+	ids := make([]int64, len(rows))
+	identities := make([]string, len(rows))
+
+	for i, row := range rows {
+		ids[i] = row.ID
+		identities[i] = row.Identity
+	}
+
+	return ids, identities, nil
 }
 
 // PictureAuthorSuppressed reports whether a picture's author credit was withheld under a GDPR

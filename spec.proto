@@ -1176,6 +1176,8 @@ message GetGdprObjectionAffectedPicturesRequest {
 
 message GetGdprObjectionAffectedPicturesResponse {
   repeated int64 picture_ids = 1;
+  // Same order as picture_ids - the public picture route is /picture/:identity, not :id.
+  repeated string picture_identities = 2;
 }
 
 enum GdprObjectionCleanupCandidateEntityType {
