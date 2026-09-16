@@ -769,6 +769,7 @@ func (s *Repository) PictureSelect(
 		aliasTable.Col(schema.PictureTableSourceURLColName),
 		aliasTable.Col(schema.PictureTableChangeSourceURLUserIDColName),
 		aliasTable.Col(schema.PictureTableChangeSourceURLDateColName),
+		aliasTable.Col(schema.PictureTableAuthorSuppressionIDColName),
 	)
 
 	groupBy := !options.IsIDUnique()

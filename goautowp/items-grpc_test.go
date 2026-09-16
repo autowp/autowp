@@ -142,6 +142,10 @@ func TestSuppressAuthor(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, pic.GetIdentity())
 
+	// The public picture page shows "Author information withheld ..." instead of no credit at
+	// all when author_suppression_id is set - Picture.author_withheld must reflect that.
+	require.True(t, pic.GetAuthorWithheld())
+
 	autowpClient := NewAutowpClient(conn)
 	affected, err := autowpClient.GetGdprObjectionAffectedPictures(
 		apiCtx, &GetGdprObjectionAffectedPicturesRequest{Id: res.GetGdprObjectionId()},
