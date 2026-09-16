@@ -1042,11 +1042,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">116,119</context>
+          <context context-type="linenumber">118,121</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">184,187</context>
+          <context context-type="linenumber">186,189</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">212,215</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/alpha/alpha.component.html</context>
@@ -4228,7 +4232,7 @@ All values entered here are displayed on the site, in the specifications, are us
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">225,228</context>
+          <context context-type="linenumber">254,257</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/pictures/item/item.component.html</context>
@@ -6480,7 +6484,7 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">153,156</context>
+          <context context-type="linenumber">155,158</context>
         </context-group>
       </trans-unit>
       <trans-unit id="440835464741256121" datatype="html">
@@ -6623,7 +6627,7 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">256,257</context>
+          <context context-type="linenumber">285,286</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
@@ -6638,7 +6642,7 @@ licence stated there.
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">260,261</context>
+          <context context-type="linenumber">289,290</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
@@ -6681,98 +6685,112 @@ licence stated there.
         <source>Copy public links</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">101,103</context>
+          <context context-type="linenumber">102,105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1790021971578762105" datatype="html">
         <source>No affected pictures found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">105,108</context>
+          <context context-type="linenumber">107,110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8428910023435284247" datatype="html">
         <source>View affected pictures</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">121,124</context>
+          <context context-type="linenumber">123,126</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1282154386082930059" datatype="html">
         <source>Also mentioned in (review manually):</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">129,131</context>
+          <context context-type="linenumber">131,133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5844404198314672549" datatype="html">
         <source>(copyrights text)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">142,144</context>
+          <context context-type="linenumber">144,146</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3054692242041944023" datatype="html">
         <source>resolved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">157,159</context>
+          <context context-type="linenumber">159,161</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3486318045815416322" datatype="html">
         <source>Mark resolved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">165,167</context>
+          <context context-type="linenumber">167,169</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6779643850210173408" datatype="html">
         <source>No cleanup candidates found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">173,176</context>
+          <context context-type="linenumber">175,178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5731769731667362511" datatype="html">
         <source>View cleanup candidates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">189,192</context>
+          <context context-type="linenumber">191,194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6043532808284695676" datatype="html">
+        <source>Picture ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">201,203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6783810562210006018" datatype="html">
+        <source>Attach picture</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">217,220</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3071620290019453863" datatype="html">
         <source>Mark reviewed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">216,219</context>
+          <context context-type="linenumber">245,248</context>
         </context-group>
       </trans-unit>
       <trans-unit id="430662670077088259" datatype="html">
         <source>No entries.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">232,238</context>
+          <context context-type="linenumber">261,267</context>
         </context-group>
       </trans-unit>
       <trans-unit id="503153018057897371" datatype="html">
         <source>Add entry manually</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">245,247</context>
+          <context context-type="linenumber">274,276</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8991051995049340943" datatype="html">
         <source>Names (one spelling per line)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">248,249</context>
+          <context context-type="linenumber">277,278</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7137878719164647615" datatype="html">
         <source>Case reference</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">252,253</context>
+          <context context-type="linenumber">281,282</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
@@ -6783,7 +6801,7 @@ licence stated there.
         <source>Original request text (kept internal-only)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">265,267</context>
+          <context context-type="linenumber">294,296</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/items/item/gdpr/gdpr.component.html</context>
@@ -6794,28 +6812,28 @@ licence stated there.
         <source>Add to suppression list</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
-          <context context-type="linenumber">269,273</context>
+          <context context-type="linenumber">298,302</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6137649443564269922" datatype="html">
         <source>(empty)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.ts</context>
-          <context context-type="linenumber">253</context>
+          <context context-type="linenumber">262</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9159548695547081005" datatype="html">
         <source>Links copied to clipboard.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.ts</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">305</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3409791352888768254" datatype="html">
         <source>Could not copy to clipboard.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.ts</context>
-          <context context-type="linenumber">289</context>
+          <context context-type="linenumber">308</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6162691442834560200" datatype="html">

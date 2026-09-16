@@ -16972,6 +16972,22 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated">Паказаць кандыдатаў на ачыстку</target>
       </trans-unit>
+      <trans-unit id="6043532808284695676" datatype="html">
+        <source>Picture ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">201,203</context>
+        </context-group>
+        <target state="translated">ID фота</target>
+      </trans-unit>
+      <trans-unit id="6783810562210006018" datatype="html">
+        <source>Attach picture</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">217,220</context>
+        </context-group>
+        <target state="translated">Дадаць фота</target>
+      </trans-unit>
       <trans-unit id="4100023054527262582" datatype="html">
         <source><x id="count" equiv-text="candidateCount"/> possible mention(s) elsewhere (copyrights text / comments) were found for manual review on the GDPR suppression list page.</source>
         <context-group purpose="location">

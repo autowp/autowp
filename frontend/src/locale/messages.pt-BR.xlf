@@ -16981,6 +16981,22 @@ Use o mesmo botão, formulário ou o mesmo endereço para denunciar material que
         </context-group>
         <target state="translated">Ver candidatos à limpeza</target>
       </trans-unit>
+      <trans-unit id="6043532808284695676" datatype="html">
+        <source>Picture ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">201,203</context>
+        </context-group>
+        <target state="translated">ID da foto</target>
+      </trans-unit>
+      <trans-unit id="6783810562210006018" datatype="html">
+        <source>Attach picture</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">217,220</context>
+        </context-group>
+        <target state="translated">Anexar foto</target>
+      </trans-unit>
       <trans-unit id="4100023054527262582" datatype="html">
         <source><x id="count" equiv-text="candidateCount"/> possible mention(s) elsewhere (copyrights text / comments) were found for manual review on the GDPR suppression list page.</source>
         <context-group purpose="location">
