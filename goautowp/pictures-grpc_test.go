@@ -545,6 +545,73 @@ func TestCreatePictureItemAuthorByOwner(t *testing.T) {
 	require.ErrorContains(t, err, "PermissionDenied")
 }
 
+func TestCreatePictureItemBlockedWhenAuthorSuppressed(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	kc := cnt.Keycloak()
+
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
+	suppressedPersonID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("Suppressed Author %d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+	})
+	otherPersonID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("Other Author %d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+	})
+	vehicleID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	pictureID := CreatePicture(
+		t, cnt, "./test/test.jpg", PicturePostForm{ItemID: vehicleID}, adminToken.AccessToken,
+	)
+
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken)
+
+	picturesClient := NewPicturesClient(conn)
+	_, err = picturesClient.CreatePictureItem(apiCtx, &CreatePictureItemRequest{
+		PictureId: pictureID,
+		ItemId:    suppressedPersonID,
+		Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+	})
+	require.NoError(t, err)
+
+	itemsClient := NewItemsClient(conn)
+	_, err = itemsClient.SuppressAuthor(apiCtx, &SuppressAuthorRequest{
+		ItemId:       suppressedPersonID,
+		Reference:    fmt.Sprintf("TEST-%d", random.Int()),
+		ContactEmail: "requester@example.com",
+		Note:         "test note",
+	})
+	require.NoError(t, err)
+
+	// The picture is now flagged author-suppressed - re-adding *any* author, not just the
+	// suppressed one, must be refused.
+	_, err = picturesClient.CreatePictureItem(apiCtx, &CreatePictureItemRequest{
+		PictureId: pictureID,
+		ItemId:    otherPersonID,
+		Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+	})
+	require.Error(t, err)
+	require.Equal(t, codes.FailedPrecondition, status.Code(err))
+
+	// A non-author link is unaffected.
+	_, err = picturesClient.CreatePictureItem(apiCtx, &CreatePictureItemRequest{
+		PictureId: pictureID,
+		ItemId:    vehicleID,
+		Type:      PictureItemType_PICTURE_ITEM_CONTENT,
+	})
+	require.NoError(t, err)
+}
+
 func TestPictureCrop(t *testing.T) {
 	t.Parallel()
 
@@ -1187,6 +1254,83 @@ func TestUpdatePictureCopyrights(t *testing.T) {
 	text, err = textStorageRepository.Text(ctx, pic2.GetCopyrightsTextId())
 	require.NoError(t, err)
 	require.Equal(t, "Third", text)
+}
+
+func TestUpdatePictureCopyrightsRecordsGdprObjectionHit(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig(".")
+	kc := cnt.Keycloak()
+	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken)
+
+	itemID := createItem(t, conn, cnt, &Item{
+		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
+		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	})
+
+	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
+		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
+
+	suppressedName := fmt.Sprintf("Copyright Suppressed %d", random.Int())
+
+	autowpClient := NewAutowpClient(conn)
+	_, err = autowpClient.CreateGdprObjection(apiCtx, &CreateGdprObjectionRequest{
+		Names:        []string{suppressedName},
+		Reference:    fmt.Sprintf("TEST-%d", random.Int()),
+		ContactEmail: "requester@example.com",
+		Note:         "test note",
+	})
+	require.NoError(t, err)
+
+	db, err := cnt.GoquDB(ctx)
+	require.NoError(t, err)
+
+	var objectionID int64
+
+	found, err := db.Select(schema.GdprObjectionNameTableObjectionIDCol).
+		From(schema.GdprObjectionNameTable).
+		Where(schema.GdprObjectionNameTableNameCol.Eq(suppressedName)).
+		ScanValContext(ctx, &objectionID)
+	require.NoError(t, err)
+	require.True(t, found)
+
+	picturesClient := NewPicturesClient(conn)
+	_, err = picturesClient.UpdatePicture(apiCtx, &UpdatePictureRequest{
+		Picture: &Picture{
+			Id:         pictureID,
+			Copyrights: "Photo by " + suppressedName,
+		},
+		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"copyrights"}},
+	})
+	require.NoError(t, err)
+
+	var hitCount int32
+
+	found, err = db.Select(schema.GdprObjectionTableHitCountCol).
+		From(schema.GdprObjectionTable).
+		Where(schema.GdprObjectionTableIDCol.Eq(objectionID)).
+		ScanValContext(ctx, &hitCount)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, int32(1), hitCount)
+
+	candidateExists, err := db.Select(goqu.V(true)).
+		From(schema.GdprObjectionCleanupCandidateTable).
+		Where(
+			schema.GdprObjectionCleanupCandidateTableObjectionIDCol.Eq(objectionID),
+			schema.GdprObjectionCleanupCandidateTableEntityTypeCol.Eq(
+				schema.GdprObjectionCleanupCandidateEntityTypeCopyrightsTextPicture,
+			),
+			schema.GdprObjectionCleanupCandidateTableEntityIDCol.Eq(pictureID),
+		).
+		ScanValContext(ctx, new(bool))
+	require.NoError(t, err)
+	require.True(t, candidateExists)
 }
 
 func TestGetPicturesHasCopyrightsFilter(t *testing.T) {

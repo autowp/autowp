@@ -825,6 +825,20 @@ func (s *PicturesGRPCServer) CreatePictureItem(
 	pictureItemType := convertPictureItemType(in.GetType())
 	ctx = context.WithoutCancel(ctx)
 
+	if pictureItemType == schema.PictureItemTypeAuthor {
+		suppressed, suppErr := s.repository.PictureAuthorSuppressed(ctx, in.GetPictureId())
+		if suppErr != nil {
+			return nil, status.Error(codes.Internal, suppErr.Error())
+		}
+
+		if suppressed {
+			return nil, status.Error(
+				codes.FailedPrecondition,
+				"author info for this picture was withheld under a GDPR request and cannot be re-added",
+			)
+		}
+	}
+
 	success, err := s.repository.CreatePictureItem(
 		ctx, in.GetPictureId(), in.GetItemId(), pictureItemType, in.GetPerspectiveId(), userCtx.UserID,
 	)
@@ -2168,9 +2182,37 @@ func (s *PicturesGRPCServer) setPictureCopyrights(
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
+
+		if err = recordGdprObjectionTextHitIfMatched(ctx, s.complianceRepository, pictureID, copyrights); err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
 	}
 
 	return nil
+}
+
+// recordGdprObjectionTextHitIfMatched is recordGdprObjectionHitIfMatched's counterpart for
+// freeform text rather than a bare name field: a moderator (or anyone with edit rights) hand-typing
+// a suppressed name into a picture's copyrights text is exactly the kind of silent reappearance the
+// suppression list exists to catch, so every edit - not just the one-time sweep SuppressAuthor
+// kicks off - is checked. Never blocks the save, for the same namesake reason
+// recordGdprObjectionHitIfMatched doesn't: it bumps the hit counter and files the picture as a
+// cleanup candidate for a human to look at, exactly like the async post-suppression text scan does.
+func recordGdprObjectionTextHitIfMatched(
+	ctx context.Context, complianceRepository *compliance.Repository, pictureID int64, text string,
+) error {
+	objection, matched, err := complianceRepository.FindInText(ctx, text)
+	if err != nil || !matched {
+		return err
+	}
+
+	if err = complianceRepository.RecordHit(ctx, objection.ID); err != nil {
+		return err
+	}
+
+	return complianceRepository.AddCleanupCandidates(
+		ctx, objection.ID, schema.GdprObjectionCleanupCandidateEntityTypeCopyrightsTextPicture, []int64{pictureID},
+	)
 }
 
 func (s *PicturesGRPCServer) setPicturePoint(

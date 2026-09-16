@@ -16867,6 +16867,30 @@ Use the same button or email address to report material that infringes a tradema
         </context-group>
         <target state="translated">תמונות מושפעות:</target>
       </trans-unit>
+      <trans-unit id="6838795332205295640" datatype="html">
+        <source>Copy public links</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.html</context>
+          <context context-type="linenumber">101,103</context>
+        </context-group>
+        <target state="translated">העתק קישורים ציבוריים</target>
+      </trans-unit>
+      <trans-unit id="9159548695547081005" datatype="html">
+        <source>Links copied to clipboard.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.ts</context>
+          <context context-type="linenumber">288</context>
+        </context-group>
+        <target state="translated">הקישורים הועתקו ללוח.</target>
+      </trans-unit>
+      <trans-unit id="3409791352888768254" datatype="html">
+        <source>Could not copy to clipboard.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/gdpr-objections/gdpr-objections.component.ts</context>
+          <context context-type="linenumber">289</context>
+        </context-group>
+        <target state="translated">לא ניתן להעתיק ללוח.</target>
+      </trans-unit>
       <trans-unit id="1790021971578762105" datatype="html">
         <source>No affected pictures found.</source>
         <context-group purpose="location">

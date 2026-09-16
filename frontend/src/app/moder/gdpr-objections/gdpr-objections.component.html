@@ -92,6 +92,14 @@
                         <a [routerLink]="['/moder/pictures', pictureId]">{{ pictureId }}</a
                         >{{ last ? '' : ', ' }}
                       }
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary ms-2"
+                        (click)="copyAffectedPictureLinks(pictureIds)"
+                      >
+                        <i class="bi bi-clipboard me-1" aria-hidden="true"></i>
+                        <ng-container i18n>Copy public links</ng-container>
+                      </button>
                     </div>
                   } @else {
                     <div class="small text-muted" i18n>No affected pictures found.</div>

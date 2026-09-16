@@ -23,6 +23,7 @@ import {AutowpClient, CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth.service';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
+import {browserWindow} from '@utils/browser-window';
 import {timestampToDate} from '@utils/timestamp';
 import {
   BehaviorSubject,
@@ -75,6 +76,7 @@ export class ModerGdprObjectionsComponent implements OnInit {
   readonly #commentsClient = inject(CommentsClient);
   readonly #toasts = inject(ToastsService);
   readonly #auth = inject(AuthService);
+  readonly #window = browserWindow();
 
   protected readonly CleanupCandidateEntityType = GdprObjectionCleanupCandidateEntityType;
 
@@ -274,6 +276,29 @@ export class ModerGdprObjectionsComponent implements OnInit {
           row.affectedPictureIds.set(response.pictureIds);
         },
       });
+  }
+
+  // Requesters who ask what was published under their name (GDPR Art. 15) want links they can
+  // actually open, not the /moder/pictures ids shown above - those are moderator-only and would
+  // 404 (or worse, expose the admin UI) for an outside visitor. window.location.origin matches
+  // whichever language domain the moderator is currently on.
+  protected copyAffectedPictureLinks(pictureIds: string[]): void {
+    const window = this.#window;
+    if (!window) {
+      return;
+    }
+
+    const origin = window.location.origin;
+    const links = pictureIds.map((pictureId) => `${origin}/picture/${pictureId}`).join('\n');
+
+    window.navigator.clipboard.writeText(links).then(
+      () => {
+        this.#toasts.success($localize`Links copied to clipboard.`);
+      },
+      () => {
+        this.#toasts.error($localize`Could not copy to clipboard.`);
+      },
+    );
   }
 
   protected loadCleanupCandidates(row: ObjectionInList): void {

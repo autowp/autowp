@@ -1304,6 +1304,21 @@ func (s *Repository) PicturesSuppressedByObjection(ctx context.Context, objectio
 	return ids, err
 }
 
+// PictureAuthorSuppressed reports whether a picture's author credit was withheld under a GDPR
+// case (picture.author_suppression_id is set). Used to block CreatePictureItem from re-attaching
+// *any* author to it, not just the specific name that was suppressed - an empty author field on
+// such a picture is a deliberate outcome, not a gap to fill in.
+func (s *Repository) PictureAuthorSuppressed(ctx context.Context, pictureID int64) (bool, error) {
+	var suppressed bool
+
+	_, err := s.db.Select(goqu.L("? IS NOT NULL", schema.PictureTableAuthorSuppressionIDCol)).
+		From(schema.PictureTable).
+		Where(schema.PictureTableIDCol.Eq(pictureID)).
+		ScanValContext(ctx, &suppressed)
+
+	return suppressed, err
+}
+
 // FindPicturesWithCopyrightsTextContaining returns ids of pictures whose free-text copyrights
 // block (EXIF Copyright-tag derived, see processEXIF) contains any of names as a case-insensitive
 // substring. Callers pass every localized spelling of a person's name (see
