@@ -149,6 +149,66 @@ func TestSuppressAuthor(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []int64{pictureID}, affected.GetPictureIds())
 	require.Equal(t, []string{pic.GetIdentity()}, affected.GetPictureIdentities())
+
+	// A moderator can manually attach a picture the SuppressAuthor-time site-wide search missed
+	// (e.g. spotted by hand in the inbox with the name in its copyrights text) to the same case.
+	extraPictureID := CreatePicture(
+		t, cnt, "./test/test.jpg", PicturePostForm{ItemID: vehicleID}, adminToken.AccessToken,
+	)
+
+	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &AddGdprObjectionCleanupCandidateRequest{
+		ObjectionId: res.GetGdprObjectionId(),
+		PictureId:   extraPictureID,
+	})
+	require.NoError(t, err)
+
+	candidates, err := autowpClient.GetGdprObjectionCleanupCandidates(
+		apiCtx, &GetGdprObjectionCleanupCandidatesRequest{ObjectionId: res.GetGdprObjectionId()},
+	)
+	require.NoError(t, err)
+
+	found = false
+
+	for _, candidate := range candidates.GetItems() {
+		if candidate.GetEntityId() == extraPictureID &&
+			candidate.GetEntityType() ==
+				GdprObjectionCleanupCandidateEntityType_GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_COPYRIGHTS_TEXT_PICTURE {
+			found = true
+
+			break
+		}
+	}
+
+	require.True(t, found, "manually attached picture should appear as a cleanup candidate")
+
+	// Re-adding the same picture is a no-op, not a duplicate row.
+	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &AddGdprObjectionCleanupCandidateRequest{
+		ObjectionId: res.GetGdprObjectionId(),
+		PictureId:   extraPictureID,
+	})
+	require.NoError(t, err)
+
+	candidates, err = autowpClient.GetGdprObjectionCleanupCandidates(
+		apiCtx, &GetGdprObjectionCleanupCandidatesRequest{ObjectionId: res.GetGdprObjectionId()},
+	)
+	require.NoError(t, err)
+
+	matches := 0
+
+	for _, candidate := range candidates.GetItems() {
+		if candidate.GetEntityId() == extraPictureID {
+			matches++
+		}
+	}
+
+	require.Equal(t, 1, matches)
+
+	// A nonexistent picture is rejected.
+	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &AddGdprObjectionCleanupCandidateRequest{
+		ObjectionId: res.GetGdprObjectionId(),
+		PictureId:   0,
+	})
+	require.Error(t, err)
 }
 
 func TestTopCategoriesList(t *testing.T) {

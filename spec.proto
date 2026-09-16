@@ -59,6 +59,10 @@ service Autowp {
   rpc GetGdprObjectionCleanupCandidates(GetGdprObjectionCleanupCandidatesRequest)
       returns (GetGdprObjectionCleanupCandidatesResponse) {}
   rpc ResolveGdprObjectionCleanupCandidate(ResolveGdprObjectionCleanupCandidateRequest) returns (google.protobuf.Empty) {}
+  // AddGdprObjectionCleanupCandidate manually attaches a picture to a case's cleanup-candidate
+  // queue - for content the SuppressAuthor-time site-wide search missed (a spelling variant, or a
+  // picture uploaded/found afterwards) that a moderator has since found and confirmed by hand.
+  rpc AddGdprObjectionCleanupCandidate(AddGdprObjectionCleanupCandidateRequest) returns (google.protobuf.Empty) {}
 }
 
 service Forums {
@@ -1210,6 +1214,11 @@ message GetGdprObjectionCleanupCandidatesResponse {
 
 message ResolveGdprObjectionCleanupCandidateRequest {
   int64 id = 1;
+}
+
+message AddGdprObjectionCleanupCandidateRequest {
+  int64 objection_id = 1;
+  int64 picture_id = 2;
 }
 
 message DeleteTrafficWhitelistItemRequest {

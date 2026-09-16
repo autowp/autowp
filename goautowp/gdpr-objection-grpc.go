@@ -2,10 +2,14 @@ package goautowp
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/autowp/goautowp/compliance"
+	"github.com/autowp/goautowp/pictures"
+	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
@@ -390,6 +394,79 @@ func (s *GRPCServer) ResolveGdprObjectionCleanupCandidate(
 
 	if !ok {
 		return nil, status.Error(codes.NotFound, "not found")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+// AddGdprObjectionCleanupCandidate manually attaches a picture to a case's cleanup-candidate
+// queue - for content the SuppressAuthor-time site-wide search (FindPicturesWithCopyrightsTextContaining)
+// missed, e.g. a spelling variant of the name, that a moderator has since found by hand (searching
+// the inbox, say) and wants tracked against this case alongside the automatically found hits.
+// Reuses AddCleanupCandidates, so re-adding an already-recorded picture is a no-op.
+func (s *GRPCServer) AddGdprObjectionCleanupCandidate(
+	ctx context.Context, in *AddGdprObjectionCleanupCandidateRequest,
+) (*emptypb.Empty, error) {
+	userCtx, err := s.auth.ValidateGRPC(ctx)
+	if err != nil {
+		return nil, s.auth.GRPCError(err)
+	}
+
+	if !util.Contains(userCtx.Roles, users.RoleModer) {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
+	if in.GetObjectionId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid objection_id")
+	}
+
+	if in.GetPictureId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid picture_id")
+	}
+
+	row, found, err := s.complianceRepository.Get(ctx, in.GetObjectionId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if !found {
+		return nil, status.Error(codes.NotFound, "objection not found")
+	}
+
+	if _, err = s.picturesRepository.Picture(
+		ctx, &query.PictureListOptions{ID: in.GetPictureId()}, nil, pictures.OrderByNone,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Error(codes.NotFound, "picture not found")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if err = s.complianceRepository.AddCleanupCandidates(
+		ctx,
+		in.GetObjectionId(),
+		schema.GdprObjectionCleanupCandidateEntityTypeCopyrightsTextPicture,
+		[]int64{in.GetPictureId()},
+	); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	names, err := s.complianceRepository.Names(ctx, in.GetObjectionId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = s.events.Add(ctx, Event{
+		UserID: userCtx.UserID,
+		Message: fmt.Sprintf(
+			"GDPR: фото #%d вручную добавлено в cleanup candidates по %q (suppression list, реф. %q)",
+			in.GetPictureId(), strings.Join(names, " / "), row.Reference,
+		),
+		Pictures: []int64{in.GetPictureId()},
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil

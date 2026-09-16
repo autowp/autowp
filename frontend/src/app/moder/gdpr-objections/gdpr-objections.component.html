@@ -191,6 +191,33 @@
                     <ng-container i18n>View cleanup candidates</ng-container>
                   </button>
                 }
+                @if (isModer$ | async) {
+                  <form class="d-flex gap-1 mt-1" (ngSubmit)="addCleanupCandidate(row)">
+                    <input
+                      type="text"
+                      inputmode="numeric"
+                      class="form-control form-control-sm"
+                      style="max-width: 8rem"
+                      placeholder="Picture ID"
+                      i18n-placeholder
+                      [formControl]="row.addCandidatePictureId"
+                    />
+                    <button
+                      type="submit"
+                      class="btn btn-sm btn-outline-secondary"
+                      [disabled]="row.addingCandidate() || !row.addCandidatePictureId.value.trim()"
+                    >
+                      @if (row.addingCandidate()) {
+                        <span class="spinner-border spinner-border-sm me-1" role="status">
+                          <span class="visually-hidden" i18n>Loading…</span>
+                        </span>
+                      } @else {
+                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
+                      }
+                      <ng-container i18n>Attach picture</ng-container>
+                    </button>
+                  </form>
+                }
               </div>
             </td>
             <td class="text-nowrap">{{ timestampToDate(row.objection.createTime) | date: 'short' }}</td>

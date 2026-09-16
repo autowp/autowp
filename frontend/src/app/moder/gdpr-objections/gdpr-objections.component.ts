@@ -8,6 +8,7 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} fr
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   AcknowledgeGdprObjectionHitRequest,
+  AddGdprObjectionCleanupCandidateRequest,
   CommentMessageFields,
   CreateGdprObjectionRequest,
   DeleteGdprObjectionRequest,
@@ -52,6 +53,8 @@ interface CleanupCandidateInList {
 
 interface ObjectionInList {
   readonly acknowledging: WritableSignal<boolean>;
+  readonly addCandidatePictureId: FormControl<string>;
+  readonly addingCandidate: WritableSignal<boolean>;
   readonly affectedPictureIdentities: WritableSignal<null | string[]>;
   readonly affectedPictureIds: WritableSignal<null | string[]>;
   readonly affectedPicturesLoading: WritableSignal<boolean>;
@@ -111,6 +114,8 @@ export class ModerGdprObjectionsComponent implements OnInit {
     map((response) => ({
       objections: (response.items ?? []).map((objection): ObjectionInList => ({
         acknowledging: signal(false),
+        addCandidatePictureId: new FormControl<string>('', {nonNullable: true}),
+        addingCandidate: signal(false),
         affectedPictureIdentities: signal(null),
         affectedPictureIds: signal(null),
         affectedPicturesLoading: signal(false),
@@ -345,6 +350,36 @@ export class ModerGdprObjectionsComponent implements OnInit {
           this.#toasts.handleError(error);
         },
         next: () => {
+          row.cleanupCandidates.set(null);
+          this.loadCleanupCandidates(row);
+        },
+      });
+  }
+
+  // Covers pictures the SuppressAuthor-time site-wide search missed - a spelling variant, or one
+  // found/uploaded afterwards - that a moderator spots by hand (e.g. searching the inbox) and
+  // wants tracked against the case alongside the automatically found hits.
+  protected addCleanupCandidate(row: ObjectionInList): void {
+    const pictureId = row.addCandidatePictureId.value.trim();
+
+    if (row.addingCandidate() || !/^\d+$/.test(pictureId)) {
+      return;
+    }
+
+    row.addingCandidate.set(true);
+
+    this.#autowpClient
+      .addGdprObjectionCleanupCandidate(
+        new AddGdprObjectionCleanupCandidateRequest({objectionId: row.objection.id, pictureId}),
+      )
+      .subscribe({
+        error: (error: unknown) => {
+          row.addingCandidate.set(false);
+          this.#toasts.handleError(error);
+        },
+        next: () => {
+          row.addingCandidate.set(false);
+          row.addCandidatePictureId.setValue('');
           row.cleanupCandidates.set(null);
           this.loadCleanupCandidates(row);
         },
