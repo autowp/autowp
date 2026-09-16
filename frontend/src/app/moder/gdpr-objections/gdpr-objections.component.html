@@ -222,7 +222,7 @@
             </td>
             <td class="text-nowrap">{{ timestampToDate(row.objection.createTime) | date: 'short' }}</td>
             <td>
-              @if (row.objection.hitCount) {
+              @if (row.objection.hitCount !== '0') {
                 <span class="badge text-bg-danger">{{ row.objection.hitCount }}</span>
                 @if (row.objection.lastHitTime) {
                   <div class="small text-muted text-nowrap">
@@ -235,7 +235,7 @@
             </td>
             <td class="text-nowrap">
               @if (isModer$ | async) {
-                @if (row.objection.hitCount) {
+                @if (row.objection.hitCount !== '0') {
                   <button
                     type="button"
                     class="btn btn-sm btn-outline-success me-1"
