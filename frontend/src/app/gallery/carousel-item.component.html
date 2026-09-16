@@ -6,7 +6,7 @@
         class="full"
         [src]="item.imageGalleryFull.src"
         [class.crop-mode]="cropModeAvailable() && cropMode()"
-        [ngStyle]="fullStyle"
+        [style]="fullStyle"
         (load)="fullLoaded()"
       />
     }
@@ -17,7 +17,7 @@
       class="crop"
       [src]="item.imageGallery.src"
       [class.crop-mode]="cropModeAvailable() && cropMode()"
-      [ngStyle]="cropStyle()"
+      [style]="cropStyle()"
       (load)="cropLoaded()"
     />
   }

@@ -1,7 +1,6 @@
 import type {AfterViewInit} from '@angular/core';
 import type {Picture, PictureItem} from '@grpc/spec.pb';
 
-import {NgStyle} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -79,7 +78,7 @@ function maxBounds(bounds: Dimension, max: Dimension): Dimension {
 
 @Component({
   selector: 'app-gallery-carousel-item',
-  imports: [NgStyle, AreaComponent, RouterLink, NgMathPipesModule],
+  imports: [AreaComponent, RouterLink, NgMathPipesModule],
   templateUrl: './carousel-item.component.html',
   styleUrl: './carousel-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,7 +1,7 @@
 import type {AfterViewInit} from '@angular/core';
 
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
-import {ChangeDetectionStrategy, Component, computed, input, output, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, model, viewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
 import {RemarkModule} from 'ngx-remark';
@@ -24,8 +24,7 @@ import {RemarkModule} from 'ngx-remark';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarkdownEditComponent implements AfterViewInit {
-  readonly text = input.required<string>();
-  readonly textChange = output<string>();
+  readonly text = model.required<string>();
 
   protected readonly control = computed(() => new FormControl<string>(this.text(), {nonNullable: true}));
 
@@ -39,6 +38,6 @@ export class MarkdownEditComponent implements AfterViewInit {
   }
 
   protected onChange(value: string) {
-    this.textChange.emit(value);
+    this.text.set(value);
   }
 }
