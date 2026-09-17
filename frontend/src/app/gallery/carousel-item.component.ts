@@ -25,7 +25,16 @@ import {AreaComponent} from './area.component';
 
 interface Area {
   pictureItem: PictureItem;
-  styles: Record<string, number>;
+  styles: Record<string, string>;
+}
+
+function boundsToStyle(bounds: Bounds): Record<string, string> {
+  return {
+    height: `${bounds.height}px`,
+    left: `${bounds.left}px`,
+    top: `${bounds.top}px`,
+    width: `${bounds.width}px`,
+  };
 }
 
 interface Bounds {
@@ -142,7 +151,7 @@ export class CarouselItemComponent implements AfterViewInit {
     return undefined;
   });
 
-  protected readonly cropStyle = computed<Record<string, number>>((): Record<string, number> => {
+  protected readonly cropStyle = computed<Record<string, string>>((): Record<string, string> => {
     const item = this.item();
     if (!item.image || !item.imageGallery) {
       return {};
@@ -155,12 +164,7 @@ export class CarouselItemComponent implements AfterViewInit {
     }
 
     if (this.cropMode()) {
-      return {
-        'height.px': offsetBounds.height,
-        'left.px': offsetBounds.left,
-        'top.px': offsetBounds.top,
-        'width.px': offsetBounds.width,
-      };
+      return boundsToStyle(offsetBounds);
     }
 
     if (full) {
@@ -177,19 +181,19 @@ export class CarouselItemComponent implements AfterViewInit {
           width: full.width,
         },
       );
-      return {
-        'height.px': (bounds.height * item.image.cropHeight) / ih,
-        'left.px': offsetBounds.left + (item.image.cropLeft * bounds.width) / iw,
-        'top.px': offsetBounds.top + (item.image.cropTop * bounds.height) / ih,
-        'width.px': (bounds.width * item.image.cropWidth) / iw,
-      };
+      return boundsToStyle({
+        height: (bounds.height * item.image.cropHeight) / ih,
+        left: offsetBounds.left + (item.image.cropLeft * bounds.width) / iw,
+        top: offsetBounds.top + (item.image.cropTop * bounds.height) / ih,
+        width: (bounds.width * item.image.cropWidth) / iw,
+      });
     }
 
     return {};
   });
 
-  protected readonly fullStyle = computed<Record<string, number> | undefined>(
-    (): Record<string, number> | undefined => {
+  protected readonly fullStyle = computed<Record<string, string> | undefined>(
+    (): Record<string, string> | undefined => {
       const item = this.item();
       if (!item.image) {
         return undefined;
@@ -238,12 +242,7 @@ export class CarouselItemComponent implements AfterViewInit {
         return undefined;
       }
 
-      return {
-        'height.px': refBounds.height,
-        'left.px': refBounds.left,
-        'top.px': refBounds.top,
-        'width.px': refBounds.width,
-      };
+      return boundsToStyle(refBounds);
     },
   );
 
@@ -285,12 +284,12 @@ export class CarouselItemComponent implements AfterViewInit {
     return (item.pictureItems?.items ?? []).map((pictureItem) => {
       return {
         pictureItem: pictureItem,
-        styles: {
-          'height.px': (pictureItem.cropHeight * areaBounds.height) / ih,
-          'left.px': areaBounds.left + (pictureItem.cropLeft * areaBounds.width) / iw,
-          'top.px': areaBounds.top + (pictureItem.cropTop * areaBounds.height) / ih,
-          'width.px': (pictureItem.cropWidth * areaBounds.width) / iw,
-        },
+        styles: boundsToStyle({
+          height: (pictureItem.cropHeight * areaBounds.height) / ih,
+          left: areaBounds.left + (pictureItem.cropLeft * areaBounds.width) / iw,
+          top: areaBounds.top + (pictureItem.cropTop * areaBounds.height) / ih,
+          width: (pictureItem.cropWidth * areaBounds.width) / iw,
+        }),
       };
     });
   });

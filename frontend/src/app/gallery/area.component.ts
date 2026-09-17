@@ -18,7 +18,7 @@ import {browserWindow} from '@utils/browser-window';
 export class AreaComponent implements AfterViewInit {
   readonly #window = browserWindow();
 
-  readonly styles = input.required<Record<string, number> | undefined>({});
+  readonly styles = input.required<Record<string, string> | undefined>({});
   readonly area = input.required<PictureItem>();
 
   readonly #windowHeight = signal<number>(0);
@@ -26,8 +26,8 @@ export class AreaComponent implements AfterViewInit {
   protected readonly placement = computed<'bottom' | 'top'>(() => {
     const winHeight = this.#windowHeight();
     const styles = this.styles();
-    const nodeOffset = styles?.['top.px'] ?? 0;
-    const nodeHeight = styles?.['height.px'] ?? 0;
+    const nodeOffset = parseFloat(styles?.['top'] ?? '0');
+    const nodeHeight = parseFloat(styles?.['height'] ?? '0');
     const winCenter = winHeight / 2;
     const nodeCenter = nodeOffset + nodeHeight / 2;
 
