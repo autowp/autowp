@@ -48,9 +48,10 @@ go test ./... -run TestName            # single test
 go test ./items/...                    # single package
 ```
 
-Integration-style tests need real Postgres/Redis/RabbitMQ/Keycloak/MinIO backing services. Bring
-them up with the local `docker-compose.yml` (in `goautowp/`, distinct from the root one), wait for
-them, then run migrations and the full suite:
+Integration-style tests need real Postgres/Redis/RabbitMQ/Keycloak/S3 backing services (S3 is
+RustFS, kept under the historical `minio` service name/hostname). Bring them up with the local
+`docker-compose.yml` (in `goautowp/`, distinct from the root one), wait for them, then run
+migrations and the full suite:
 
 ```sh
 docker compose up -d

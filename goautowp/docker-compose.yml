@@ -1,31 +1,18 @@
 name: autowp
 services:
   createbuckets:
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    image: amazon/aws-cli:2.37.4
     container_name: autowp_test_createbuckets
     depends_on:
       - minio
-    entrypoint: >
-      /bin/sh -c "
-      while ! /usr/bin/mc alias set autowp http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
-        do echo 'Wait minio to startup...' && sleep 1;
-      done;
-      /usr/bin/mc mb autowp/format;
-      /usr/bin/mc anonymous set download autowp/format;
-      /usr/bin/mc mb autowp/user;
-      /usr/bin/mc anonymous set download autowp/user;
-      /usr/bin/mc mb autowp/brand;
-      /usr/bin/mc anonymous set download autowp/brand;
-      /usr/bin/mc mb autowp/picture;
-      /usr/bin/mc anonymous set download autowp/picture;
-      /usr/bin/mc mb autowp/files;
-      /usr/bin/mc anonymous set download autowp/files;
-      /usr/bin/mc mb autowp/test;
-      /usr/bin/mc anonymous set download autowp/test;
-      /usr/bin/mc mb autowp/naming;
-      /usr/bin/mc anonymous set download autowp/naming;
-      exit 0;
-      "
+    volumes:
+      - ./test/createbuckets.sh:/createbuckets.sh:ro
+    environment:
+      AWS_ENDPOINT_URL: "http://minio:9000"
+      AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
+      AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      AWS_DEFAULT_REGION: "us-east-1"
+    entrypoint: ["/createbuckets.sh", format, user, brand, picture, files, test, naming]
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.4
@@ -51,17 +38,21 @@ services:
     restart: always
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    # RustFS (S3-compatible, Apache-2.0) under the historical "minio" service name/hostname that the
+    # goautowp configs point to: MinIO images are no longer anonymously pullable.
+    image: rustfs/rustfs:1.0.0
     container_name: goautowp_test_minio
     volumes:
-      - ./minio/data:/data
+      - s3-data:/data
     environment:
-      MINIO_ROOT_USER: "AKIAIOSFODNN7EXAMPLE"
-      MINIO_ROOT_PASSWORD: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      RUSTFS_ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
+      RUSTFS_SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
     ports:
       - '0.0.0.0:9001:9001'
       - '0.0.0.0:19000:9000'
-    command: server --console-address ":9001" /data
     restart: always
     deploy:
       resources:
@@ -71,7 +62,6 @@ services:
         reservations:
           cpus: "0.25"
           memory: 16M
-    privileged: true
 
   nginx:
     image: nginx:1-alpine
@@ -132,3 +122,6 @@ services:
           memory: 128M
     expose:
       - '6379'
+
+volumes:
+  s3-data:
