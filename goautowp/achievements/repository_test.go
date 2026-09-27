@@ -60,7 +60,7 @@ func createRepository(t *testing.T) (*Repository, *goqu.Database) {
 		i18n,
 	)
 
-	repo := NewRepository(goquDB, usersRepository, messagingRepository, hostsManager)
+	repo := NewRepository(goquDB, usersRepository, messagingRepository, hostsManager, i18n)
 
 	return repo, goquDB
 }
@@ -120,6 +120,34 @@ func TestGrantIsIdempotent(t *testing.T) {
 	).CountContext(ctx)
 	require.NoError(t, err)
 	require.Equal(t, int64(1), count)
+}
+
+func TestGrantMessageNamesAchievement(t *testing.T) {
+	t.Parallel()
+
+	repo, db := createRepository(t)
+	ctx := t.Context()
+	userID := createRandomUser(t, db)
+
+	_, err := db.Update(schema.UserTable).
+		Set(goqu.Record{schema.UserTableLanguageColName: "ru"}).
+		Where(schema.UserTableIDCol.Eq(userID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	granted, err := repo.Grant(ctx, userID, schema.AchievementIDCommentatorBronze)
+	require.NoError(t, err)
+	require.True(t, granted)
+
+	var contents string
+
+	success, err := db.Select(schema.PersonalMessageTable.Col(schema.PersonalMessageTableContentsColName)).
+		From(schema.PersonalMessageTable).
+		Where(schema.PersonalMessageTableToUserIDCol.Eq(userID)).
+		ScanValContext(ctx, &contents)
+	require.NoError(t, err)
+	require.True(t, success)
+	require.Contains(t, contents, "«Бронзовый комментатор»")
 }
 
 func TestGrantSkipsDeletedUser(t *testing.T) {

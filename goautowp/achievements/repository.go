@@ -7,16 +7,20 @@ import (
 
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/hosts"
+	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/messaging"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/users"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 const (
 	achievementGrantedMessageID     = "pm/achievement-granted"
 	achievementMessageProfileURLKey = "ProfileURL"
+	achievementMessageNameKey       = "Achievement"
+	achievementNameMessageIDPrefix  = "achievement/"
 
 	topPicturesContributorLimit = 10
 )
@@ -90,6 +94,7 @@ type Repository struct {
 	usersRepository     *users.Repository
 	messagingRepository *messaging.Repository
 	hostManager         *hosts.Manager
+	i18n                *i18nbundle.I18n
 }
 
 func NewRepository(
@@ -97,12 +102,14 @@ func NewRepository(
 	usersRepository *users.Repository,
 	messagingRepository *messaging.Repository,
 	hostManager *hosts.Manager,
+	i18n *i18nbundle.I18n,
 ) *Repository {
 	return &Repository{
 		db:                  db,
 		usersRepository:     usersRepository,
 		messagingRepository: messagingRepository,
 		hostManager:         hostManager,
+		i18n:                i18n,
 	}
 }
 
@@ -142,7 +149,7 @@ func (s *Repository) Grant(ctx context.Context, userID int64, achievementID int3
 
 	granted := affected > 0
 	if granted {
-		if err := s.notifyGranted(ctx, user); err != nil {
+		if err := s.notifyGranted(ctx, user, achievementID); err != nil {
 			return granted, err
 		}
 	}
@@ -361,7 +368,7 @@ func (s *Repository) AchievementCounts(ctx context.Context) ([]schema.Achievemen
 
 // notifyGranted takes the already-fetched user (Grant just looked it up to check
 // Deleted) rather than re-querying.
-func (s *Repository) notifyGranted(ctx context.Context, user *schema.UsersRow) error {
+func (s *Repository) notifyGranted(ctx context.Context, user *schema.UsersRow, achievementID int32) error {
 	uri, err := s.hostManager.URIByLanguage(user.Language)
 	if err != nil {
 		return err
@@ -369,11 +376,47 @@ func (s *Repository) notifyGranted(ctx context.Context, user *schema.UsersRow) e
 
 	profileURL := frontend.UserURL(uri, user.ID, user.Identity) + "#achievements"
 
+	name, err := s.achievementName(ctx, achievementID, user.Language)
+	if err != nil {
+		return err
+	}
+
 	return s.messagingRepository.CreateMessageFromTemplate(
 		ctx, 0, user.ID, achievementGrantedMessageID,
-		map[string]interface{}{achievementMessageProfileURLKey: profileURL},
+		map[string]interface{}{
+			achievementMessageProfileURLKey: profileURL,
+			achievementMessageNameKey:       name,
+		},
 		user.Language,
 	)
+}
+
+// achievementName is the achievement's localized display name - the same wording the frontend's
+// getAchievementTranslation shows on the profile - falling back to the achievement table's
+// (English) label for a code the i18n bundle has no message for.
+func (s *Repository) achievementName(ctx context.Context, achievementID int32, lang string) (string, error) {
+	var row schema.AchievementRow
+
+	success, err := s.db.Select(schema.AchievementTableCodeCol, schema.AchievementTableLabelCol).
+		From(schema.AchievementTable).
+		Where(schema.AchievementTableIDCol.Eq(achievementID)).
+		ScanStructContext(ctx, &row)
+	if err != nil {
+		return "", err
+	}
+
+	if !success {
+		return "", sql.ErrNoRows
+	}
+
+	name, err := s.i18n.Localizer(lang).Localize(&i18n.LocalizeConfig{
+		DefaultMessage: &i18n.Message{ID: achievementNameMessageIDPrefix + row.Code},
+	})
+	if err != nil {
+		return row.Label, nil //nolint:nilerr // untranslated code: the English label is still meaningful
+	}
+
+	return name, nil
 }
 
 // incrementAndGrant atomically bumps the persisted user_achievement_progress counter for

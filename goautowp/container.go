@@ -2500,8 +2500,13 @@ func (s *Container) achievementsRepositoryLocked(ctx context.Context) (*achievem
 			return nil, err
 		}
 
+		i18n, err := s.i18nLocked()
+		if err != nil {
+			return nil, err
+		}
+
 		s.achievementsRepository = achievements.NewRepository(
-			db, usersRepository, messagingRepository, s.hostsManagerLocked(),
+			db, usersRepository, messagingRepository, s.hostsManagerLocked(), i18n,
 		)
 	}
 
