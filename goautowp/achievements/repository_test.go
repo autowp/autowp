@@ -316,6 +316,46 @@ func TestUserAchievements(t *testing.T) {
 	require.Equal(t, int64(5), result.Progress[0].Current)
 }
 
+func TestUserAchievementsHidesSupersededTiers(t *testing.T) {
+	t.Parallel()
+
+	repo, db := createRepository(t)
+	ctx := t.Context()
+	userID := createRandomUser(t, db)
+
+	for _, achievementID := range []int32{
+		schema.AchievementIDCommentatorBronze,
+		schema.AchievementIDCommentatorSilver,
+		schema.AchievementIDCommentatorGold,
+		schema.AchievementIDSpecMasterBronze,
+		schema.AchievementIDVeteran,
+	} {
+		granted, err := repo.Grant(ctx, userID, achievementID)
+		require.NoError(t, err)
+		require.True(t, granted)
+	}
+
+	_, err := db.Insert(schema.UserAchievementProgressTable).Rows(goqu.Record{
+		schema.UserAchievementProgressTableUserIDColName:    userID,
+		schema.UserAchievementProgressTableMetricColName:    string(MetricCommentator),
+		schema.UserAchievementProgressTableCountColName:     10000,
+		schema.UserAchievementProgressTableUpdatedAtColName: goqu.Func("NOW"),
+	}).Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	result, err := repo.UserAchievements(ctx, userID)
+	require.NoError(t, err)
+
+	codes := make([]string, 0, len(result.Earned))
+	for _, row := range result.Earned {
+		codes = append(codes, row.Code)
+	}
+
+	require.Equal(t, []string{"spec-master-bronze", "commentator-gold", "veteran"}, codes)
+	require.Len(t, result.Progress, 1)
+	require.Equal(t, "commentator-platinum", result.Progress[0].Code)
+}
+
 func TestAchievementCounts(t *testing.T) {
 	t.Parallel()
 

@@ -313,7 +313,8 @@ func (s *Repository) Progress(
 // UserAchievementsResult is what powers the public profile page — no auth; any visitor
 // may request it for any user. Earned and Progress are both keyed by achievement code so
 // the frontend can use one code -> icon/name lookup for both earned badges and in-progress
-// ones.
+// ones. Earned lists only the highest earned tier of each tiered series — a Gold
+// Commentator badge already implies Bronze and Silver, so showing those too is just noise.
 type UserAchievementsResult struct {
 	Earned   []schema.UserAchievementCodeRow
 	Progress []SeriesProgress
@@ -342,7 +343,39 @@ func (s *Repository) UserAchievements(ctx context.Context, userID int64) (*UserA
 		return nil, err
 	}
 
-	return &UserAchievementsResult{Earned: earned, Progress: progress}, nil
+	return &UserAchievementsResult{Earned: withoutSupersededTiers(earned, earnedCodes), Progress: progress}, nil
+}
+
+// withoutSupersededTiers drops every earned tier that a higher earned tier of the same
+// series supersedes, keeping the original order of what remains.
+func withoutSupersededTiers(
+	earned []schema.UserAchievementCodeRow, earnedCodes map[string]bool,
+) []schema.UserAchievementCodeRow {
+	superseded := make(map[string]bool)
+
+	for _, tiers := range tieredSeries {
+		for i := len(tiers) - 1; i > 0; i-- {
+			if !earnedCodes[tiers[i].code] {
+				continue
+			}
+
+			for _, lower := range tiers[:i] {
+				superseded[lower.code] = true
+			}
+
+			break // highest earned tier found; every lower one is already marked
+		}
+	}
+
+	result := make([]schema.UserAchievementCodeRow, 0, len(earned))
+
+	for _, row := range earned {
+		if !superseded[row.Code] {
+			result = append(result, row)
+		}
+	}
+
+	return result
 }
 
 // AchievementCounts powers the /achievements catalog page's "N users have earned this"
