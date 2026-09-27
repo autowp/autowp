@@ -79,8 +79,16 @@ export class CatalogueVehiclesPicturesPictureComponent {
   //
   // `id` is suffixed with the brand/path/type route params read once at construction time - see
   // the identical note on CatalogueVehiclesComponent.catalogueResource in ../../vehicles.component.ts.
+  //
+  // brand/path/type are params (though resolveCatalogue$ reads them from the route itself) so that
+  // navigating to a picture of another item within this reused component instance (e.g. a picture
+  // thumbnail in the comments) drops the previous item's catalogue data immediately. Otherwise
+  // identity() changes synchronously while catalogueData() still holds the old item, and
+  // pictureResource fetches the new identity under the old itemID - a NOT_FOUND that reports a
+  // 404 which sticks even after the catalogue catches up.
   protected readonly catalogueResource = rxResource({
     id: `catalogue-vehicles-pictures-picture-catalogue-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}`,
+    params: () => ({brand: this.#catname(), path: this.#pathParam(), type: this.#typeParam()}),
     stream: (): Observable<CatalogueData> => this.#catalogueService.resolveCatalogue$(this.#route),
   });
 
