@@ -67,6 +67,7 @@ export class AccountInboxPicturesComponent implements OnInit {
                 authorSuggestions: true,
                 commentsCount: true,
                 image: true,
+                imageGalleryFull: true,
                 moderVote: true,
                 nameHtml: true,
                 nameText: true,
