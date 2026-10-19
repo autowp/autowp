@@ -6,6 +6,7 @@ import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {inject, Service} from '@angular/core';
 import {GrpcDataEvent, GrpcMetadata, GrpcStatusEvent} from '@ngx-grpc/common';
 import {GRPC_CLIENT_FACTORY} from '@ngx-grpc/core';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {catchError, EMPTY, of, switchMap, throwError} from 'rxjs';
 import {base64ToUint8Array, concatUint8Arrays, uint8ArrayToBase64} from 'uint8array-extras';
 
@@ -169,13 +170,14 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
 
           // Check whethere there are grpc specific response headers
           if (GRPC_STATUS_HEADER in responseHeaders) {
-            grpcStatusCode = Number(responseHeaders[GRPC_STATUS_HEADER]);
+            grpcStatusCode = numericEnumValue(
+              StatusCode,
+              Number(responseHeaders[GRPC_STATUS_HEADER]),
+              StatusCode.UNKNOWN,
+            );
             if (GRPC_MESSAGE_HEADER in responseHeaders) {
               grpcStatusMessage = responseHeaders[GRPC_MESSAGE_HEADER];
             }
-            // grpcStatusCode is Number(header value) - a raw wire-protocol number, not our
-            // StatusCode enum - comparing it against a known status constant is legitimate.
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
             if (grpcStatusCode !== StatusCode.OK) {
               return of(this.handleError_(new RpcError(grpcStatusCode, grpcStatusMessage || '', initialMetadata)));
             }
@@ -243,7 +245,11 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
                   // to RpcError below) holds only the caller-facing metadata - the keys are
                   // dynamic HTTP header names by nature, not a code smell to design around here.
                   if (GRPC_STATUS_HEADER in trailers) {
-                    grpcStatusCode = /** @type {!StatusCode} */ Number(trailers[GRPC_STATUS_HEADER]);
+                    grpcStatusCode = numericEnumValue(
+                      StatusCode,
+                      Number(trailers[GRPC_STATUS_HEADER]),
+                      StatusCode.UNKNOWN,
+                    );
                     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete trailers[GRPC_STATUS_HEADER];
                   }

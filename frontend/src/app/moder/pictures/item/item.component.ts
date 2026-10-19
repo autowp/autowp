@@ -365,7 +365,7 @@ export class ModerPicturesItemComponent {
     return found;
   }
 
-  protected addItem(id: string, item: Item, type: number) {
+  protected addItem(id: string, item: Item, type: PictureItemType) {
     this.pictureItemLoading.set(true);
     this.#picturesClient
       .createPictureItem(
@@ -391,7 +391,7 @@ export class ModerPicturesItemComponent {
       });
   }
 
-  protected moveItem(id: string, type: number, srcItemId: string, dstItemId: string) {
+  protected moveItem(id: string, type: PictureItemType, srcItemId: string, dstItemId: string) {
     this.pictureItemLoading.set(true);
     this.#picturesClient
       .setPictureItemItemID(

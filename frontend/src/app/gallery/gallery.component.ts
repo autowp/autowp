@@ -274,6 +274,10 @@ export class GalleryComponent implements OnInit {
     return state;
   }
 
+  protected isNearby(index: number, current: number): boolean {
+    return Math.abs(index - current) <= 1;
+  }
+
   protected useCircleIndicator(state: GalleryState): boolean {
     return state.items.length <= MAX_INDICATORS;
   }

@@ -26,7 +26,7 @@ export interface CatalogueListItem {
   engineVehicles?: Item[];
   hasText: boolean;
   id: string;
-  itemTypeId: number;
+  itemTypeId: ItemType;
   nameDefault: string;
   nameHtml: string;
   picturesRouterLink: null | string[];

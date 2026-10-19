@@ -9,6 +9,7 @@ import {
   PictureItem,
   PictureItemListOptions,
   PictureItemsRequest,
+  PictureItemType,
   PictureListOptions,
   PicturesRequest,
   UpdatePictureItemRequest,
@@ -18,6 +19,7 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {catchError, distinctUntilChanged, EMPTY, map, switchMap, tap} from 'rxjs';
 
 import type {JcropCrop} from '../../../../jcrop/jcrop.component.js';
@@ -42,7 +44,7 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
 
   #id = '';
   #itemID = '';
-  #type = 0;
+  #type = PictureItemType.PICTURE_ITEM_UNKNOWN;
   #sub?: Subscription;
   protected aspect = '';
   protected resolution = '';
@@ -83,7 +85,11 @@ export class ModerPicturesItemAreaComponent implements OnDestroy, OnInit {
           this.#route.queryParamMap.pipe(
             map((params) => ({
               item_id: params.get('item_id') ?? '',
-              type: parseInt(params.get('type') ?? '', 10),
+              type: numericEnumValue(
+                PictureItemType,
+                parseInt(params.get('type') ?? '', 10),
+                PictureItemType.PICTURE_ITEM_UNKNOWN,
+              ),
             })),
             distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
             map((params) => ({params, picture})),

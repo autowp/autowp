@@ -8,6 +8,7 @@ import {MessagingGetMessagesRequest} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {PastTimeIndicatorComponent} from '@utils/past-time-indicator/past-time-indicator.component';
 import {UserTextComponent} from '@utils/user-text/user-text.component';
@@ -68,23 +69,23 @@ export class AccountMessagesComponent {
   }> = combineLatest([this.folder$, this.page$, this.#userId$, this.#change$, this.#messageService.changed$]).pipe(
     debounceTime(50),
     switchMap(([folder, page, userId]) => {
-      let pageId = 0;
+      let pageId: PageId | undefined;
 
       switch (folder) {
         case 'dialog':
-          pageId = 49;
+          pageId = PageId.ACCOUNT_MESSAGES_DIALOG;
           this.pageName.set($localize`Personal messages`);
           break;
         case 'inbox':
-          pageId = 128;
+          pageId = PageId.ACCOUNT_MESSAGES;
           this.pageName.set($localize`Inbox`);
           break;
         case 'sent':
-          pageId = 80;
+          pageId = PageId.ACCOUNT_MESSAGES_SENT;
           this.pageName.set($localize`Sent`);
           break;
         case 'system':
-          pageId = 81;
+          pageId = PageId.ACCOUNT_MESSAGES_SYSTEM;
           this.pageName.set($localize`System messages`);
           break;
       }

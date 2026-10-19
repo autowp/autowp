@@ -38,7 +38,7 @@ export class GrpcWebStreamParser {
   #result: Message[] = [];
   #streamPos = 0;
   #state: State = State.INIT;
-  #frame: FrameType = 0;
+  #frame: FrameType = FrameType.DATA;
   #length = 0;
   #countLengthBytes = 0;
   #messageBuffer: null | Uint8Array = null;

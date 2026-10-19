@@ -43,6 +43,7 @@ import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {parseStringToGrpcDate} from '@services/utils';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {getModalComponentRef} from '@utils/modal-component-ref';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {getPerspectiveTranslation, getVehicleTypeTranslation} from '@utils/translations';
 import {
   BehaviorSubject,
@@ -521,7 +522,13 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
       this.lost.set(!!params.get('lost'));
       this.gps.set(params.get('gps') ? true : null);
       this.similar.set(!!params.get('similar'));
-      this.order.set(params.get('order') ? parseInt(params.get('order') ?? '', 10) : 1);
+      this.order.set(
+        numericEnumValue(
+          PicturesRequest.Order,
+          parseInt(params.get('order') ?? '', 10),
+          PicturesRequest.Order.ORDER_CREATED_AT_DESC,
+        ),
+      );
       this.addedFrom.setValue(params.get('added_from') ?? '');
 
       this.#selected = [];

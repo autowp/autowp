@@ -25,6 +25,7 @@ import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, combineLatest, distinctUntilChanged, EMPTY, forkJoin, map, of, shareReplay, switchMap} from 'rxjs';
 
@@ -54,8 +55,10 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
   protected readonly loading = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
 
-  readonly #itemTypeID$: Observable<number> = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('item_type_id') ?? '', 10)),
+  readonly #itemTypeID$: Observable<ItemType> = this.#route.queryParamMap.pipe(
+    map((params) =>
+      numericEnumValue(ItemType, parseInt(params.get('item_type_id') ?? '', 10), ItemType.ITEM_TYPE_UNKNOWN),
+    ),
     distinctUntilChanged(),
     shareReplay({bufferSize: 1, refCount: false}),
   );
@@ -93,12 +96,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
         .map((i) => i.item)
         .filter((i): i is Item => !!i)
         .filter((item) => {
-          // itemTypeID is Observable<number> (parsed from a query param, not branded ItemType),
-          // so indexing allowedItemTypeCombinations (a Record<ItemType, ItemType[]>) with it
-          // needs an explicit cast - confirmed with `npx tsc --noEmit` directly: removing the
-          // cast reintroduces a real TS7053 error, despite eslint calling it unnecessary here.
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-          return item.itemTypeId && allowedItemTypeCombinations[itemTypeID as ItemType].includes(item.itemTypeId);
+          return item.itemTypeId && allowedItemTypeCombinations[itemTypeID].includes(item.itemTypeId);
         }),
     ),
   );
@@ -166,7 +164,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit {
     });
   }
 
-  protected submit(item: Item, itemTypeID: number, event: ItemMetaFormResult) {
+  protected submit(item: Item, itemTypeID: ItemType, event: ItemMetaFormResult) {
     this.loading.set(true);
 
     const newItem = itemMetaFormResultsToAPIItem(event);

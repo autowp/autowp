@@ -12,6 +12,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {getItemTypeTranslation} from '@utils/translations';
 import {
   catchError,
@@ -54,7 +55,9 @@ export class ModerItemsNewComponent {
   protected readonly sending = signal(false);
 
   readonly #itemTypeID$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('item_type_id') ?? '', 10)),
+    map((params) =>
+      numericEnumValue(ItemType, parseInt(params.get('item_type_id') ?? '', 10), ItemType.ITEM_TYPE_UNKNOWN),
+    ),
     distinctUntilChanged(),
     shareReplay({bufferSize: 1, refCount: false}),
     tap((itemTypeID) => {
@@ -118,7 +121,7 @@ export class ModerItemsNewComponent {
     }),
   );
 
-  protected submit(itemTypeID: number, event: ItemMetaFormResult) {
+  protected submit(itemTypeID: ItemType, event: ItemMetaFormResult) {
     if (this.sending()) {
       return;
     }

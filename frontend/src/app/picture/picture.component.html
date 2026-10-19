@@ -359,17 +359,11 @@
             </a>
           </li>
         }
-        @if (authenticated(); as canEditSpecs) {
+        @if (authenticated()) {
           @if (pictureItemsData(); as pictureItems) {
             @for (pictureItem of pictureItems; track pictureItem.itemId) {
               @if (pictureItem.item; as item) {
-                @if (
-                  canEditSpecs &&
-                  (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY ||
-                    item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE ||
-                    item.itemTypeId === ItemType.ITEM_TYPE_ENGINE ||
-                    item.itemTypeId === ItemType.ITEM_TYPE_TWINS)
-                ) {
+                @if (specsItemTypes.has(item.itemTypeId)) {
                   <li>
                     <a [routerLink]="['/cars/specifications-editor']" [queryParams]="{item_id: pictureItem.itemId}"
                       ><i class="bi bi-pencil-fill me-1" aria-hidden="true"></i>

@@ -56,12 +56,13 @@ export class UsersRatingComponent implements OnInit {
   protected readonly rating = toSignal(
     this.#route.paramMap.pipe(
       map((params) => {
-        switch (params.get('rating')) {
+        const rating = params.get('rating');
+        switch (rating) {
           case Rating.COMMENT_LIKES:
           case Rating.PICTURE_LIKES:
           case Rating.PICTURES:
           case Rating.SPECS:
-            return params.get('rating') as Rating;
+            return rating;
           default:
             return Rating.SPECS;
         }

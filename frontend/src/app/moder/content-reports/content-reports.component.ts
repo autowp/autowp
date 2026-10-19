@@ -19,6 +19,7 @@ import {AutowpClient, CommentsClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {timestampToDate} from '@utils/timestamp';
 import {
   BehaviorSubject,
@@ -73,14 +74,23 @@ export class ModerContentReportsComponent implements OnInit {
   );
 
   readonly #status$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('status') ?? '', 10) || ContentReportStatus.CONTENT_REPORT_STATUS_OPEN),
+    map((params) =>
+      numericEnumValue(
+        ContentReportStatus,
+        parseInt(params.get('status') ?? '', 10) || ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
+        ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
+      ),
+    ),
     distinctUntilChanged(),
   );
 
   readonly #entityType$ = this.#route.queryParamMap.pipe(
-    map(
-      (params) =>
-        parseInt(params.get('entity_type') ?? '', 10) || ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED,
+    map((params) =>
+      numericEnumValue(
+        ContentReportEntityType,
+        parseInt(params.get('entity_type') ?? '', 10),
+        ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED,
+      ),
     ),
     distinctUntilChanged(),
   );

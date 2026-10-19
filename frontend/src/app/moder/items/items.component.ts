@@ -29,6 +29,7 @@ import {PageId} from '@services/page-id';
 import {SpecService} from '@services/spec';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {CatalogueListItemComponent} from '@utils/list-item/list-item.component';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {getVehicleTypeTranslation} from '@utils/translations';
 import {
   catchError,
@@ -179,7 +180,11 @@ export class ModerItemsComponent implements OnInit {
     map((params) => ({
       ancestorID: parseInt(params.get('ancestor_id') ?? '', 10) || null,
       fromYear: parseInt(params.get('from_year') ?? '', 10) || null,
-      itemTypeID: parseInt(params.get('item_type_id') ?? '', 10) || ItemType.ITEM_TYPE_UNKNOWN,
+      itemTypeID: numericEnumValue(
+        ItemType,
+        parseInt(params.get('item_type_id') ?? '', 10),
+        ItemType.ITEM_TYPE_UNKNOWN,
+      ),
       listMode: !!params.get('list'),
       name: (params.get('name') ?? '').trim(),
       nameExclude: (params.get('name_exclude') ?? '').trim(),

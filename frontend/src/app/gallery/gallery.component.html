@@ -17,7 +17,7 @@
       }
       <div class="carousel-inner">
         @for (item of gallery.items; track $index) {
-          @if (item && $index >= gallery.current - 1 && gallery.current + 1 >= $index) {
+          @if (item && isNearby($index, gallery.current)) {
             <app-gallery-carousel-item
               class="carousel-item"
               [class.active]="current() === item.identity"

@@ -647,4 +647,10 @@ export class PictureComponent implements OnInit {
   protected readonly PictureStatus = PictureStatus;
   protected readonly ContentReportEntityType = ContentReportEntityType;
   protected readonly ItemType = ItemType;
+  protected readonly specsItemTypes = new Set([
+    ItemType.ITEM_TYPE_CATEGORY,
+    ItemType.ITEM_TYPE_ENGINE,
+    ItemType.ITEM_TYPE_TWINS,
+    ItemType.ITEM_TYPE_VEHICLE,
+  ]);
 }

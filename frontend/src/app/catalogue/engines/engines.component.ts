@@ -195,7 +195,7 @@ export class CatalogueEnginesComponent {
                 engineVehicles: item.item?.engineVehicles,
                 hasText: !!item.item?.hasText,
                 id: item.item?.id ?? '',
-                itemTypeId: item.item?.itemTypeId ?? 0,
+                itemTypeId: item.item?.itemTypeId ?? ItemType.ITEM_TYPE_UNKNOWN,
                 nameDefault: item.item?.nameDefault ?? '',
                 nameHtml: item.item?.nameHtml ?? '',
                 picturesRouterLink: routerLink.concat(['pictures']),
