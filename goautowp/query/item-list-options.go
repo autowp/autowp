@@ -446,6 +446,7 @@ func (s *ItemListOptions) applyJoins(
 				idCol, AppendItemParentCacheAlias(alias, "d"), sqSelect,
 			)
 		}
+
 		if err != nil {
 			return nil, false, err
 		}
