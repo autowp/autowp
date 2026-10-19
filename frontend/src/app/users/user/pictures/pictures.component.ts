@@ -101,7 +101,6 @@ export class UsersUserPicturesComponent implements OnInit {
               nameOnly: true,
             }),
             language: this.#languageService.language,
-            limit: 3000,
             options: new ItemListOptions({
               descendant: new ItemParentCacheListOptions({
                 pictureItemsByItemId: new PictureItemListOptions({

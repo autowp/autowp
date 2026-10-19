@@ -269,29 +269,80 @@ func TestGetUserPicturesBrands(t *testing.T) {
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	res2, _, err := repository.List(ctx, &query.ItemListOptions{
-		Language: schema.EnglishLanguageCode,
-		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
-			PictureItemsByItemID: &query.PictureItemListOptions{
-				Pictures: &query.PictureListOptions{
-					OwnerID: userID,
-					Status:  schema.PictureStatusAccepted,
-				},
-			},
-		},
-		TypeID:     []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
-		Limit:      10,
-		SortByName: true,
-	}, &ItemFields{
-		NameOnly:                true,
-		DescendantPicturesCount: true,
-		ChildsCount:             true,
-	}, OrderByNone, true)
+	// The same picture linked both to the vehicle and its brand is still one picture.
+	_, err = goquDB.Insert(schema.PictureItemTable).Rows(goqu.Record{
+		schema.PictureItemTablePictureIDColName: pictureID,
+		schema.PictureItemTableItemIDColName:    brandID,
+	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
-	require.NotEmpty(t, res2)
 
-	for _, i := range res2 {
-		require.Equal(t, int32(1), i.DescendantPicturesCount)
+	otherUserID := createRandomUser(ctx, t, goquDB)
+	for _, picture := range []struct {
+		ownerID int64
+		status  schema.PictureStatus
+		itemID  int64
+	}{
+		{ownerID: otherUserID, status: schema.PictureStatusAccepted, itemID: vehicleID},
+		{ownerID: userID, status: schema.PictureStatusInbox, itemID: vehicleID},
+		{ownerID: userID, status: schema.PictureStatusAccepted, itemID: brandID},
+	} {
+		var additionalPictureID int64
+
+		_, err := goquDB.Insert(schema.PictureTable).Rows(goqu.Record{
+			schema.PictureTableIdentityColName: uuid.NewString()[:10],
+			schema.PictureTableStatusColName:   picture.status,
+			schema.PictureTableIPColName:       "127.0.0.1",
+			schema.PictureTableOwnerIDColName:  picture.ownerID,
+		}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &additionalPictureID)
+		require.NoError(t, err)
+
+		_, err = goquDB.Insert(schema.PictureItemTable).Rows(goqu.Record{
+			schema.PictureItemTablePictureIDColName: additionalPictureID,
+			schema.PictureItemTableItemIDColName:    picture.itemID,
+		}).Executor().ExecContext(ctx)
+		require.NoError(t, err)
+	}
+
+	for _, test := range []struct {
+		name        string
+		limit       uint32
+		excludeSelf bool
+		count       int32
+	}{
+		{name: "aggregated", count: 2},
+		{name: "paginated", limit: 10, count: 2},
+		{name: "aggregated exclude self", excludeSelf: true, count: 1},
+		{name: "paginated exclude self", limit: 10, excludeSelf: true, count: 1},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			options := &query.ItemListOptions{
+				Language: schema.EnglishLanguageCode,
+				ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+					ExcludeSelf: test.excludeSelf,
+					PictureItemsByItemID: &query.PictureItemListOptions{
+						Pictures: &query.PictureListOptions{
+							OwnerID: userID,
+							Status:  schema.PictureStatusAccepted,
+						},
+					},
+				},
+				TypeID:     []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+				Limit:      test.limit,
+				SortByName: true,
+			}
+			res, _, err := repository.List(ctx, options, &ItemFields{
+				NameOnly:                true,
+				DescendantPicturesCount: true,
+				ChildsCount:             true,
+			}, OrderByNone, true)
+			require.NoError(t, err)
+			require.Len(t, res, 1)
+			require.Equal(t, brandID, res[0].ID)
+			require.Equal(t, test.count, res[0].DescendantPicturesCount)
+			require.False(t, options.AggregateDescendantPictures, "caller options must not be mutated")
+		})
 	}
 }
 

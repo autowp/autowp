@@ -103,12 +103,19 @@ func (s DescendantTwinsGroupsCountColumn) GroupByExpr() interface{} {
 	return nil
 }
 
-type DescendantPicturesCountColumn struct{}
+type DescendantPicturesCountColumn struct {
+	Preaggregated bool
+}
 
 func (s DescendantPicturesCountColumn) SelectExpr(
 	alias string,
 	_ string,
 ) (AliaseableExpression, error) {
+	if s.Preaggregated {
+		return goqu.MAX(goqu.T(query.AppendItemParentCacheAlias(alias, "d")).
+			Col(query.DescendantPicturesCountColumn)), nil
+	}
+
 	piTableAlias := query.AppendPictureItemAlias(
 		query.AppendItemParentCacheAlias(alias, "d"), "i",
 	)

@@ -46,6 +46,7 @@ type ItemListOptions struct {
 	ItemParentChild              *ItemParentListOptions
 	ItemParentParent             *ItemParentListOptions
 	ItemParentCacheDescendant    *ItemParentCacheListOptions
+	AggregateDescendantPictures  bool
 	ItemParentCacheAncestor      *ItemParentCacheListOptions
 	NoParents                    bool
 	Catname                      string
@@ -433,11 +434,18 @@ func (s *ItemListOptions) applyJoins(
 	if s.ItemParentCacheDescendant != nil {
 		groupBy = true
 
-		sqSelect, err = s.ItemParentCacheDescendant.JoinToParentIDAndApply(
-			idCol,
-			AppendItemParentCacheAlias(alias, "d"),
-			sqSelect,
-		)
+		if s.AggregateDescendantPictures {
+			sqSelect, err = s.ItemParentCacheDescendant.JoinPictureCountsToParentID(
+				idCol,
+				AppendItemParentCacheAlias(alias, "d"),
+				sqSelect,
+				s,
+			)
+		} else {
+			sqSelect, err = s.ItemParentCacheDescendant.JoinToParentIDAndApply(
+				idCol, AppendItemParentCacheAlias(alias, "d"), sqSelect,
+			)
+		}
 		if err != nil {
 			return nil, false, err
 		}

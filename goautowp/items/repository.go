@@ -582,6 +582,27 @@ func (s *Repository) Item(
 	return res[0], nil
 }
 
+// Preaggregate owner-specific counts when pagination and other descendant aggregates
+// do not need the individual picture/parent joins in the outer query.
+func canAggregateDescendantPictures(options *query.ItemListOptions, fields *ItemFields, orderBy OrderBy) bool {
+	if options.Limit > 0 || orderBy != OrderByNone || fields == nil {
+		return false
+	}
+
+	if !fields.DescendantPicturesCount || fields.DescendantsParentsCount || fields.NewDescendantsParentsCount {
+		return false
+	}
+
+	descendant := options.ItemParentCacheDescendant
+	if descendant == nil || descendant.ParentIDExpr != nil || descendant.PictureItemsByItemID == nil {
+		return false
+	}
+
+	pictures := descendant.PictureItemsByItemID.Pictures
+
+	return pictures != nil && pictures.OwnerID > 0
+}
+
 func (s *Repository) List( //nolint:maintidx
 	ctx context.Context, options *query.ItemListOptions, fields *ItemFields, orderBy OrderBy,
 	pagination bool,
@@ -598,6 +619,11 @@ func (s *Repository) List( //nolint:maintidx
 
 	if options.SortByName && (fields == nil || !fields.NameOnly) {
 		return nil, nil, fmt.Errorf("%w: NameOnly for SortByName", errFieldsIsRequired)
+	}
+
+	if canAggregateDescendantPictures(options, fields, orderBy) {
+		options = options.Clone()
+		options.AggregateDescendantPictures = true
 	}
 
 	sqSelect, err := options.Select(s.db, alias)
@@ -658,7 +684,7 @@ func (s *Repository) List( //nolint:maintidx
 			wrappedColumnsExpr = append(wrappedColumnsExpr, expr.As(mapItem.key))
 		}
 
-		wrapperColumns := s.columnsByFields(fields)
+		wrapperColumns := s.columnsByFields(fields, options.AggregateDescendantPictures)
 		wrapperColumnsExpr := make([]interface{}, 0, len(wrapperColumns))
 		groupByColumnsExpr := make([]interface{}, 0, len(wrapperColumns))
 
@@ -729,7 +755,7 @@ func (s *Repository) List( //nolint:maintidx
 			sqSelect = sqSelect.Order(orderByExpr...)
 		}
 
-		columns := s.columnsByFields(fields)
+		columns := s.columnsByFields(fields, options.AggregateDescendantPictures)
 
 		res := make([]interface{}, 0, len(columns))
 
@@ -3473,7 +3499,7 @@ func (s *Repository) SetItemLogo(ctx context.Context, itemID int64, file io.Read
 	return nil
 }
 
-func (s *Repository) columnsByFields(fields *ItemFields) map[string]Column {
+func (s *Repository) columnsByFields(fields *ItemFields, aggregateDescendantPictures bool) map[string]Column {
 	columns := map[string]Column{
 		schema.ItemTableIDColName:               s.idColumn,
 		schema.ItemTableCatnameColName:          s.catnameColumn,
@@ -3580,7 +3606,7 @@ func (s *Repository) columnsByFields(fields *ItemFields) map[string]Column {
 	}
 
 	if fields.DescendantPicturesCount {
-		columns[colDescendantPicturesCount] = s.descendantPicturesCountColumn
+		columns[colDescendantPicturesCount] = &DescendantPicturesCountColumn{Preaggregated: aggregateDescendantPictures}
 	}
 
 	if fields.InboxPicturesCount {
@@ -3926,7 +3952,7 @@ func (s *Repository) needsItemLanguageCache(fields *ItemFields, orderBy OrderBy)
 		return false
 	}
 
-	columns := s.columnsByFields(fields)
+	columns := s.columnsByFields(fields, false)
 	_, nameOnly := columns[colNameOnly]
 	_, nameDefault := columns[colNameDefault]
 

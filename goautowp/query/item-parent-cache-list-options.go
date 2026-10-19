@@ -7,8 +7,82 @@ import (
 )
 
 const (
-	ItemParentCacheAlias = "ipc"
+	ItemParentCacheAlias          = "ipc"
+	DescendantPicturesCountColumn = "pictures_count"
 )
+
+// JoinPictureCountsToParentID bounds both sides of the ancestor lookup before counting:
+// selected picture items on one side, and matching parent items on the other.
+func (s *ItemParentCacheListOptions) JoinPictureCountsToParentID(
+	srcCol exp.IdentifierExpression,
+	alias string,
+	sqSelect *goqu.SelectDataset,
+	parentOptions *ItemListOptions,
+) (*goqu.SelectDataset, error) {
+	piAlias := AppendPictureItemAlias(alias, "i")
+	piTable := goqu.T(piAlias)
+
+	piSelect, err := s.PictureItemsByItemID.apply(
+		piAlias,
+		goqu.From(schema.PictureItemTable.As(piAlias)).SetDialect(sqSelect.Dialect()),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	piSelect = piSelect.Select(
+		piTable.Col(schema.PictureItemTableItemIDColName),
+		piTable.Col(schema.PictureItemTablePictureIDColName),
+	).Distinct()
+
+	// The CTE is referenced by both the item-id selection and the picture count, so
+	// PostgreSQL materializes the owner's picture selection once.
+	selectedAlias := alias + "_selected_pictures"
+	selectedTable := goqu.T(selectedAlias)
+	selectedItems := goqu.From(selectedTable).SetDialect(sqSelect.Dialect()).
+		Select(selectedTable.Col(schema.PictureItemTableItemIDColName)).Distinct()
+
+	parentsOptions := parentOptions.Clone()
+	parentsOptions.Alias = ""
+	parentsOptions.ItemParentCacheDescendant = nil
+	parentsOptions.AggregateDescendantPictures = false
+	parentsAlias := AppendItemAlias(alias, "parents")
+
+	parents, err := parentsOptions.Select(goqu.New(sqSelect.Dialect().Dialect(), nil), parentsAlias)
+	if err != nil {
+		return nil, err
+	}
+
+	parents = parents.Select(goqu.T(parentsAlias).Col(schema.ItemTableIDColName)).Distinct()
+	cacheOptions := s.Clone()
+	cacheOptions.PictureItemsByItemID = nil
+
+	counts, err := cacheOptions.apply(
+		alias,
+		goqu.From(schema.ItemParentCacheTable.As(alias)).SetDialect(sqSelect.Dialect()),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	parentIDCol := goqu.T(alias).Col(schema.ItemParentCacheTableParentIDColName)
+	itemIDCol := goqu.T(alias).Col(schema.ItemParentCacheTableItemIDColName)
+	// Batch the indexed item lookup, but keep parent candidates as a relation:
+	// an array used as a non-index filter would be searched again for every cache row.
+	counts = counts.With(selectedAlias, piSelect).Where(
+		goqu.L("? = ANY(ARRAY?)", itemIDCol, selectedItems),
+	).Join(parents.As(parentsAlias), goqu.On(
+		parentIDCol.Eq(goqu.T(parentsAlias).Col(schema.ItemTableIDColName)),
+	)).Join(selectedTable, goqu.On(
+		itemIDCol.Eq(selectedTable.Col(schema.PictureItemTableItemIDColName)),
+	)).Select(
+		parentIDCol,
+		goqu.COUNT(goqu.DISTINCT(selectedTable.Col(schema.PictureItemTablePictureIDColName))).
+			As(DescendantPicturesCountColumn),
+	).GroupBy(parentIDCol)
+
+	return sqSelect.Join(counts.As(alias), goqu.On(srcCol.Eq(parentIDCol))), nil
+}
 
 func AppendItemParentCacheAlias(alias string, suffix string) string {
 	return alias + "_" + ItemParentCacheAlias + suffix
