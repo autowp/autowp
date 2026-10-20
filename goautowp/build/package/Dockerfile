@@ -50,7 +50,9 @@ RUN apt-get update -qqy && \
         "${USER}" \
      && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    # The Ubuntu image includes an unused Pebble binary with its own Go runtime.
+    rm -f /usr/bin/pebble
 
 COPY etc/ImageMagick-7/policy.xml /etc/ImageMagick-7/policy.xml
 
