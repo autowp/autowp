@@ -14,6 +14,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import vhost from 'vhost';
 
+import {createPictureRedirect} from './picture-redirect';
 import {RenderQueue, RenderShedError} from './render-queue';
 import {SsrPageCache, ssrPageCacheOptionsFromEnv} from './ssr-cache';
 
@@ -100,6 +101,7 @@ const app = express();
 // has to be turned off on whichever app ends up handling the request.
 app.disable('x-powered-by');
 const angularApp = new AngularNodeAppEngine();
+const pictureRedirect = createPictureRedirect(environment.ssrGrpcHost);
 
 // Shared by every locale's vhost app - entries are keyed by host, so they can't bleed across.
 // The budget is per worker, so the configured one is split between them: each has its own copy of
@@ -205,7 +207,11 @@ for (const lang of environment.languages) {
       // The queue wraps only the render itself, inside the cache: a page the cache can answer
       // costs nothing to serve and must not wait behind renders, and requests collapsed onto one
       // in-flight render take one slot between them rather than one each.
-      .handle(req, () => renderQueue.run(() => angularApp.handle(req)))
+      .handle(req, async () => {
+        const redirect = await pictureRedirect(req);
+
+        return redirect ?? renderQueue.run(() => angularApp.handle(req));
+      })
       .then((response) => {
         if (response) {
           // Absent on the paths the cache doesn't handle at all, i.e. anything but GET.

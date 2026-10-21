@@ -68,7 +68,6 @@ export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClient
  * GrpcClient implementation based on grpc-web
  */
 export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
-  readonly #parser = new GrpcWebStreamParser();
   readonly #withCredentials: boolean;
 
   constructor(
@@ -89,7 +88,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
     reqclss: GrpcMessageClass<Q>,
     resclss: GrpcMessageClass<S>,
   ): Observable<GrpcEvent<S>> {
-    const headers = new HttpHeaders({
+    let headers = new HttpHeaders({
       ...metadata.toObject(),
       'Content-Type': 'application/grpc-web-text',
       'Accept': 'application/grpc-web-text',
@@ -102,13 +101,13 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
       const deadline = Number(headers.get('deadline')); // in ms
       const currentTime = new Date().getTime();
       let timeout = Math.ceil(deadline - currentTime);
-      headers.delete('deadline');
+      headers = headers.delete('deadline');
       if (timeout === Infinity) {
         // grpc-timeout header defaults to infinity if not set.
         timeout = 0;
       }
       if (timeout > 0) {
-        headers.set('grpc-timeout', timeout + 'm');
+        headers = headers.set('grpc-timeout', timeout + 'm');
         // Also set timeout on the xhr request to terminate the HTTP request
         // if the server doesn't respond within the deadline. We use 110% of
         // grpc-timeout for this to allow the server to terminate the connection
@@ -193,7 +192,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
 
           let messages;
           try {
-            messages = this.#parser.parse(byteSource);
+            messages = new GrpcWebStreamParser().parse(byteSource);
           } catch (error) {
             return of(
               this.handleError_(
