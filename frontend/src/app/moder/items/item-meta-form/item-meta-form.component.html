@@ -1,4 +1,4 @@
-@if (form$ | async; as form) {
+@if (form(); as form) {
   <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="doSubmit(form)">
     @if (form.controls.name; as name) {
       <div class="mb-3 row">
@@ -419,7 +419,7 @@
             "
             [formControl]="isConcept"
           >
-            @for (option of isConceptOptions$ | async; track option.value) {
+            @for (option of isConceptOptions(); track option.value) {
               <option [ngValue]="option.value">{{ option.name }}</option>
             }
           </select>
@@ -462,7 +462,7 @@
     @if (form.controls.items; as control) {
       <div class="mb-3 row">
         <div class="col-md-2 col-form-label text-end" i18n>Vehicles</div>
-        @if (items$ | async; as items) {
+        @if (itemsData(); as items) {
           <div class="col-md-10">
             @for (child of items; track child.id) {
               <div class="checkbox">
@@ -479,7 +479,7 @@
     @if (form.controls.pictures; as control) {
       <div class="mb-3 row">
         <div class="col-md-2 col-form-label text-end" i18n>Pictures</div>
-        @if (pictures$ | async; as data) {
+        @if (picturesData(); as data) {
           <div class="col-md-10 multicheckbox-pictures row">
             @for (picture of data; track picture) {
               <div class="col-md-3 mb-4">

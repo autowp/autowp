@@ -68,13 +68,11 @@ export class PulseComponent implements OnInit {
   // unguarded read here would throw even while the error is already being shown inline.
   protected readonly dataData = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
-  protected readonly legend$ = toObservable(this.dataData).pipe(
-    map((response) =>
-      (response?.legend ?? []).map((item) => ({
-        color: item.color,
-        user$: this.#usersService.getUser$(item.userId),
-      })),
-    ),
+  protected readonly legend = computed(() =>
+    (this.dataData()?.legend ?? []).map((item) => ({
+      color: item.color,
+      user$: this.#usersService.getUser$(item.userId),
+    })),
   );
 
   protected readonly labels = computed(() => this.dataData()?.labels);

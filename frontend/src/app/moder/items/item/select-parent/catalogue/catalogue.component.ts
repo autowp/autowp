@@ -39,7 +39,6 @@ export class ModerItemsItemSelectParentCatalogueComponent {
   readonly selected = output<string>();
 
   readonly itemID = input.required<string>();
-  protected readonly itemID$ = toObservable(this.itemID);
 
   readonly itemTypeID = input.required<ItemType>();
   readonly #itemTypeID$ = toObservable(this.itemTypeID);

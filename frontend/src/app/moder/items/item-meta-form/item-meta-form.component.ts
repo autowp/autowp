@@ -4,8 +4,16 @@ import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  untracked,
+} from '@angular/core';
 import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {LatLng} from '@grpc/google/type/latlng.pb';
 import {Item, ItemType, PictureFields, PictureListOptions, PicturesRequest} from '@grpc/spec.pb';
@@ -18,7 +26,7 @@ import {VehicleTypeService} from '@services/vehicle-type';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {getVehicleTypeTranslation} from '@utils/translations';
-import {combineLatest, map, shareReplay} from 'rxjs';
+import {map, shareReplay} from 'rxjs';
 import {sprintf} from 'sprintf-js';
 
 import {VehicleTypesModalComponent} from '../../../components/vehicle-types-modal/vehicle-types-modal.component';
@@ -191,39 +199,35 @@ export class ItemMetaFormComponent {
   readonly sending = input<boolean>(false);
 
   readonly disableIsGroup = input<boolean>(false);
-  readonly #disableIsGroup$ = toObservable(this.disableIsGroup);
 
   readonly parentIsConcept = input<null | ParentIsConcept>(null);
-  readonly #parentIsConcept$ = toObservable(this.parentIsConcept);
 
   readonly item = input.required<Item>();
-  protected readonly item$ = toObservable(this.item);
 
   readonly vehicleTypeIDs = input.required<string[]>();
 
   readonly items = input<Item[]>([]);
   // items has a default value ([]), so the input itself is never nullish - only its length varies.
-  protected readonly items$ = toObservable(this.items).pipe(map((items) => (items.length ? items : null)));
+  protected readonly itemsData = computed(() => (this.items().length ? this.items() : null));
 
   readonly pictures = input<PictureItem[]>([]);
   // pictures has a default value ([]), so the input itself is never nullish.
-  readonly pictures$ = toObservable(this.pictures).pipe(
-    map((pictures) =>
-      pictures.length > 0
-        ? pictures.map((p) => ({
-            picture$: this.#picturesClient.getPicture(
-              new PicturesRequest({
-                fields: new PictureFields({nameText: true, thumbMedium: true}),
-                language: this.#languageService.language,
-                options: new PictureListOptions({id: p.pictureId}),
-              }),
-            ),
-            pictureItem: p,
-            selected: false,
-          }))
-        : null,
-    ),
-  );
+  readonly picturesData = computed(() => {
+    const pictures = this.pictures();
+    return pictures.length > 0
+      ? pictures.map((p) => ({
+          picture$: this.#picturesClient.getPicture(
+            new PicturesRequest({
+              fields: new PictureFields({nameText: true, thumbMedium: true}),
+              language: this.#languageService.language,
+              options: new PictureListOptions({id: p.pictureId}),
+            }),
+          ),
+          pictureItem: p,
+          selected: false,
+        }))
+      : null;
+  });
 
   readonly #vehicleTypes$: Observable<VehicleType[]> = this.#vehicleTypeService.getTypesPlain$().pipe(
     map((types) =>
@@ -295,22 +299,20 @@ export class ItemMetaFormComponent {
     },
   ];
 
-  protected readonly isConceptOptions$ = this.#parentIsConcept$.pipe(
-    map((parentIsConcept) => [
-      {
-        name: $localize`no`,
-        value: false,
-      },
-      {
-        name: $localize`yes`,
-        value: true,
-      },
-      {
-        name: localizeInherited(parentIsConcept),
-        value: isConceptInherited,
-      },
-    ]),
-  );
+  protected readonly isConceptOptions = computed(() => [
+    {
+      name: $localize`no`,
+      value: false,
+    },
+    {
+      name: $localize`yes`,
+      value: true,
+    },
+    {
+      name: localizeInherited(this.parentIsConcept()),
+      value: isConceptInherited,
+    },
+  ]);
 
   protected readonly specs$ = this.#specService.specs$.pipe(
     map((specs) =>
@@ -331,16 +333,17 @@ export class ItemMetaFormComponent {
     ),
   );
 
-  protected readonly form$: Observable<FormGroup<Form>> = combineLatest([
-    // item is a required input(), always defined here.
-    this.item$,
-    toObservable(this.vehicleTypeIDs),
-    this.#disableIsGroup$,
-    this.items$,
-    this.pictures$,
-  ]).pipe(
+  // All form configuration comes from inputs; rebuild once when those inputs change.
+
+  protected readonly form = computed<FormGroup<Form>>(() => {
+    const item = this.item();
+    const vehicleTypeIDs = this.vehicleTypeIDs();
+    const disableIsGroup = this.disableIsGroup();
+    const items = this.itemsData();
+    const pictures = this.picturesData();
+    // Form controls use signals internally. Do not make user edits dependencies of this computed.
     // eslint-disable-next-line sonarjs/cognitive-complexity
-    map(([item, vehicleTypeIDs, disableIsGroup, items, pictures]) => {
+    return untracked(() => {
       const elements: Form = {
         name: new FormControl(item.name, {
           nonNullable: true,
@@ -429,8 +432,8 @@ export class ItemMetaFormComponent {
         });
       }
       return new FormGroup<Form>(elements);
-    }),
-  );
+    });
+  });
 
   constructor() {
     const date = new Date(Date.UTC(2000, 1, 1, 0, 0, 0, 0));

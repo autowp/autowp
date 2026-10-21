@@ -1,4 +1,4 @@
-@if (itemParent$ | async; as itemParent) {
+@if (itemParent(); as itemParent) {
   @if (item$ | async; as item) {
     <app-moder-items-item-select-parent-tree-item
       [item]="item"

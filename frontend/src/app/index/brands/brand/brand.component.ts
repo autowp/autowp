@@ -1,7 +1,7 @@
 import type {TopBrandsListItem} from '@grpc/spec.pb';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -33,7 +33,8 @@ export class IndexBrandsBrandComponent {
     ),
   );
 
-  protected popoverTitle(name: string): string {
+  protected readonly popoverTitle = computed(() => {
+    const name = this.brand().name;
     return $localize`New ${name} vehicles`;
-  }
+  });
 }

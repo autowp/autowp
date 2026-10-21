@@ -2,7 +2,7 @@ import type {Item, ItemParent} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, forwardRef, inject, input, output, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, output, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {ItemListOptions, ItemParentListOptions, ItemParentsRequest, ItemParentType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -61,9 +61,7 @@ export class ModerItemsItemSelectParentTreeItemComponent {
     map((response) => response.items ?? []),
   );
 
-  protected isDisabled(item: Item): boolean {
-    return item.id === this.disableItemID();
-  }
+  protected readonly isDisabled = computed(() => this.item().id === this.disableItemID());
 
   protected onSelect(itemID: string) {
     this.selected.emit(itemID);

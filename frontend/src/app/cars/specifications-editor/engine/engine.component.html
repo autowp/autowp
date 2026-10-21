@@ -1,6 +1,6 @@
 <h2 i18n>Engine from catalogue</h2>
 
-@if (item$ | async; as item) {
+@if (item(); as item) {
   @if (isAllowedEditEngine$ | async) {
     <div>
       @if (engine$ | async; as engine) {

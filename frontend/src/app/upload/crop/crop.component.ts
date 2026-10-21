@@ -1,8 +1,6 @@
 import type {Picture} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output, viewChild} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
 import {Image} from '@grpc/spec.pb';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
@@ -12,7 +10,7 @@ import {cropSummary, JcropComponent} from '../../jcrop/jcrop.component';
 
 @Component({
   selector: 'app-upload-crop',
-  imports: [AsyncPipe, JcropComponent],
+  imports: [JcropComponent],
   templateUrl: './crop.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,7 +21,6 @@ export class UploadCropComponent {
   readonly changed = output();
 
   readonly picture = input.required<Picture>();
-  readonly picture$ = toObservable(this.picture);
 
   protected readonly minSize: [number, number] = [400, 300];
   protected readonly jcrop = viewChild(JcropComponent);

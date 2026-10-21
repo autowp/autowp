@@ -4,7 +4,7 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
-import {rxResource, toObservable} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {ItemLink, ItemLinkListOptions, ItemLinkRequest, ItemLinksRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -27,7 +27,6 @@ export class ModerItemsItemLinksComponent implements OnInit {
   readonly #injector = inject(Injector);
 
   readonly item = input.required<Item>();
-  protected readonly item$ = toObservable(this.item);
 
   protected readonly loadingNumber = signal(false);
 

@@ -18,13 +18,13 @@
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 </ng-template>
-@if (brand$ | async; as brand) {
+@if (brand(); as brand) {
   <app-name-count
     [routerLink]="brand.catname"
     [name]="brand.name"
     [count]="brand.itemsCount - brand.newItemsCount"
     [newCount]="brand.newItemsCount"
     [popover]="popover"
-    [popoverTitle]="popoverTitle(brand.name)"
+    [popoverTitle]="popoverTitle()"
   />
 }

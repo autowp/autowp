@@ -1,4 +1,4 @@
-@if (itemParent$ | async; as itemParent) {
+@if (itemParent(); as itemParent) {
   <div>
     @if (itemParent.type === ItemParentType.ITEM_TYPE_TUNING) {
       <span class="text-muted" i18n>Related</span>

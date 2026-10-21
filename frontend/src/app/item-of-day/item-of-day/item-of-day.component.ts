@@ -1,12 +1,12 @@
-import type {Item, ItemOfDayPicture, User} from '@grpc/spec.pb';
+import type {Item, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, ErrorHandler, inject, input} from '@angular/core';
+import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
-import {map, switchMap} from 'rxjs';
+import {catchError, of, switchMap} from 'rxjs';
 
 import {UserComponent} from '../../user/user/user.component';
 
@@ -18,18 +18,29 @@ import {UserComponent} from '../../user/user/user.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemOfDayComponent {
+  readonly #errorHandler = inject(ErrorHandler);
   readonly item$ = input.required<Observable<Item>>();
-  protected readonly _item$: Observable<Item> = toObservable(this.item$).pipe(switchMap((item$) => item$));
-
-  protected readonly itemOfDayPictures$?: Observable<null | {
-    first: ItemOfDayPicture[];
-    others: ItemOfDayPicture[];
-  }> = this._item$.pipe(
-    map((item) => ({
-      first: (item.itemOfDayPictures ?? []).slice(0, 1),
-      others: (item.itemOfDayPictures ?? []).slice(1, 5),
-    })),
+  protected readonly item = toSignal(
+    toObservable(this.item$).pipe(
+      switchMap((item$) =>
+        item$.pipe(
+          catchError((error: unknown) => {
+            this.#errorHandler.handleError(error);
+            return of(undefined);
+          }),
+        ),
+      ),
+    ),
   );
+
+  protected readonly itemOfDayPictures = computed(() => {
+    const item = this.item();
+    if (!item) {
+      return null;
+    }
+    const pictures = item.itemOfDayPictures ?? [];
+    return {first: pictures.slice(0, 1), others: pictures.slice(1, 5)};
+  });
 
   public readonly user$ = input.required<Observable<null | User>>();
 

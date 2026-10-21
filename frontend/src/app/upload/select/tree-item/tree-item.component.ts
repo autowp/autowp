@@ -1,8 +1,7 @@
 import type {ItemParent} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
-import {rxResource, toObservable} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {ItemFields, ItemParentFields, ItemParentListOptions, ItemParentsRequest, ItemParentType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -11,7 +10,7 @@ import {errorMessage} from 'app/grpc';
 
 @Component({
   selector: 'app-upload-select-tree-item',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink],
   templateUrl: './tree-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,7 +19,6 @@ export class UploadSelectTreeItemComponent {
   readonly #languageService = inject(LanguageService);
 
   readonly item = input.required<ItemParent>();
-  protected readonly item$ = toObservable(this.item);
 
   protected open = false;
 

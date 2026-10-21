@@ -1,7 +1,7 @@
 import type {BrandIcons, BrandsListItem} from '@grpc/spec.pb';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {NewItemsRequest} from '@grpc/spec.pb';
@@ -36,7 +36,5 @@ export class BrandsItemComponent {
     ),
   );
 
-  protected cssClass(item: BrandsListItem): string {
-    return item.catname.replace(/\./g, '_');
-  }
+  protected readonly cssClass = computed(() => this.brand().catname.replace(/\./g, '_'));
 }

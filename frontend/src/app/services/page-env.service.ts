@@ -1,6 +1,6 @@
 import type {Observable} from 'rxjs';
 
-import {computed, inject, Service, signal} from '@angular/core';
+import {computed, effect, inject, Service, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {Title} from '@angular/platform-browser';
 import {of, switchMap} from 'rxjs';
@@ -30,17 +30,24 @@ export class PageEnvService {
 
   public readonly pageEnv = signal<null | PageEnv>(null);
   readonly #pageEnv = toObservable(this.pageEnv);
-  public readonly layoutParams = computed<LayoutParams>(() => {
-    const data = this.pageEnv();
+  public readonly layoutParams = computed<LayoutParams>(
+    () => {
+      const data = this.pageEnv();
 
-    return {
-      isAdminPage: data?.layout?.isAdminPage ?? false,
-      isGalleryPage: data?.layout?.isGalleryPage ?? false,
-    };
-  });
+      return {
+        isAdminPage: data?.layout?.isAdminPage ?? false,
+        isGalleryPage: data?.layout?.isGalleryPage ?? false,
+      };
+    },
+    {
+      equal: (previous, current) =>
+        previous.isAdminPage === current.isAdminPage && previous.isGalleryPage === current.isGalleryPage,
+    },
+  );
 
   public constructor() {
-    this.#pageEnv.subscribe((data) => {
+    effect(() => {
+      const data = this.pageEnv();
       if (data?.title) {
         this.#titleService.setTitle(data.title);
       }

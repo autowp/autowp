@@ -13,7 +13,7 @@
       <h4>{{ item.nameDefault }}</h4>
     }
     @if (item.previewPictures) {
-      @if (havePhoto(item) && item.previewPictures.largeFormat) {
+      @if (havePhoto() && item.previewPictures.largeFormat) {
         <div class="row">
           @for (picture of item.previewPictures.pictures.slice(0, 1); track picture) {
             <div class="col-12 col-lg-6">
@@ -57,7 +57,7 @@
           </div>
         </div>
       }
-      @if (havePhoto(item) && !item.previewPictures.largeFormat) {
+      @if (havePhoto() && !item.previewPictures.largeFormat) {
         <div class="row">
           @for (picture of item.previewPictures.pictures; track picture) {
             <div [class]="thumbnailColClass()">
@@ -80,7 +80,7 @@
         </div>
       }
     }
-    @if (!havePhoto(item) && canHavePhoto(item)) {
+    @if (!havePhoto() && canHavePhoto()) {
       <div class="row">
         <div class="col-6 col-lg-3">
           <div class="no-photo rounded w-100 border border-light mb-4" i18n-title title="No photos available">

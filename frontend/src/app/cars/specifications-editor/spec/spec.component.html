@@ -1,4 +1,4 @@
-@if (item$ | async; as item) {
+@if (item(); as item) {
   @if (form$ | async; as form) {
     <form class="spec-editor-form" (submit)="saveSpecs(item, form)">
       <table class="table table-condensed">

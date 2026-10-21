@@ -3,7 +3,7 @@ import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
@@ -71,16 +71,17 @@ export class ModerItemsItemCatalogueComponent {
     .hasRole$(Role.CARS_MODER)
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
 
-  protected readonly organizeTypeId$ = this.item$.pipe(
-    map((item) => (item.itemTypeId === ItemType.ITEM_TYPE_BRAND ? ItemType.ITEM_TYPE_VEHICLE : item.itemTypeId)),
+  protected readonly organizeTypeId = computed(() => {
+    const type = this.item().itemTypeId;
+    return type === ItemType.ITEM_TYPE_BRAND ? ItemType.ITEM_TYPE_VEHICLE : type;
+  });
+
+  protected readonly canHaveParentBrand = computed(() =>
+    [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(this.item().itemTypeId),
   );
 
-  protected readonly canHaveParentBrand$ = this.item$.pipe(
-    map((item) => [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)),
-  );
-
-  protected readonly canHaveParents$ = this.item$.pipe(
-    map((item) => ![ItemType.ITEM_TYPE_FACTORY, ItemType.ITEM_TYPE_TWINS].includes(item.itemTypeId)),
+  protected readonly canHaveParents = computed(
+    () => ![ItemType.ITEM_TYPE_FACTORY, ItemType.ITEM_TYPE_TWINS].includes(this.item().itemTypeId),
   );
 
   protected readonly itemsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>

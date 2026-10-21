@@ -18,7 +18,7 @@
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 </ng-template>
-@if (factory$ | async; as factory) {
+@if (factory(); as factory) {
   <app-name-count
     [routerLink]="['/factories', factory.id]"
     [name]="factory.name"

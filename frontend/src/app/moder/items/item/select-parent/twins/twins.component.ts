@@ -1,8 +1,7 @@
 import type {Item} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -24,7 +23,7 @@ import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-ite
 
 @Component({
   selector: 'app-moder-items-item-select-parent-twins',
-  imports: [RouterLink, PaginatorComponent, ModerItemsItemSelectParentTreeItemComponent, AsyncPipe],
+  imports: [RouterLink, PaginatorComponent, ModerItemsItemSelectParentTreeItemComponent],
   templateUrl: './twins.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -36,7 +35,6 @@ export class ModerItemsItemSelectParentTwinsComponent {
   readonly selected = output<string>();
 
   readonly itemID = input.required<string>();
-  protected readonly itemID$ = toObservable(this.itemID);
 
   protected readonly brandID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('brand_id'))), {
     requireSync: true,

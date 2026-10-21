@@ -2,7 +2,7 @@ import type {Item, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
@@ -35,8 +35,8 @@ export class ModerItemsItemPicturesComponent {
   readonly item = input.required<Item>();
   protected readonly item$ = toObservable(this.item);
 
-  protected readonly canUseTurboGroupCreator$ = this.item$.pipe(
-    map((item) => [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)),
+  protected readonly canUseTurboGroupCreator = computed(() =>
+    [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(this.item().itemTypeId),
   );
 
   protected readonly picturesChunks$: Observable<Picture[][]> = this.item$.pipe(

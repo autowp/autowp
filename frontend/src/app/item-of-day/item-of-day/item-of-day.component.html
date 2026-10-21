@@ -1,4 +1,4 @@
-@if (_item$ | async; as item) {
+@if (item(); as item) {
   <h2>
     <span [innerHtml]="item.nameHtml"></span>&ngsp;
     <small>
@@ -23,7 +23,7 @@
   </h2>
 }
 
-@if (itemOfDayPictures$ | async; as pictures) {
+@if (itemOfDayPictures(); as pictures) {
   <div class="row">
     <div class="col-sm-6">
       @for (picture of pictures.first; track picture) {
@@ -80,7 +80,7 @@
   </div>
 }
 
-@if (_item$ | async; as item) {
+@if (item(); as item) {
   <p>
     @if (item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
       <span>

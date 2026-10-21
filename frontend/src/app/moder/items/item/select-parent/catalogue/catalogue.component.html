@@ -34,7 +34,7 @@
           <app-moder-items-item-select-parent-tree
             [itemParent]="item"
             [order]="ItemParentsRequest.Order.AUTO"
-            [disableItemID]="(itemID$ | async) || ''"
+            [disableItemID]="itemID() || ''"
             (selected)="onSelect($event)"
           />
         </li>

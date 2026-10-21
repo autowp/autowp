@@ -1,4 +1,4 @@
-@if (item$ | async; as item) {
+@if (item(); as item) {
   @if (item.childsCount > 0) {
     <div>
       @if (open()) {
@@ -41,7 +41,7 @@
       }
     </div>
   }
-  @if ((!item.childsCount || item.childsCount <= 0) && !isDisabled(item)) {
+  @if ((!item.childsCount || item.childsCount <= 0) && !isDisabled()) {
     <span>
       @if (typeID() === ItemParentType.ITEM_TYPE_TUNING) {
         <span i18n>Related</span>
@@ -53,7 +53,7 @@
       <a href="#" [innerHTML]="item.nameHtml" (click)="onSelect(item.id)"></a>
     </span>
   }
-  @if (isDisabled(item)) {
+  @if (isDisabled()) {
     <span>
       @if (typeID() === ItemParentType.ITEM_TYPE_TUNING) {
         <span i18n>Related</span>

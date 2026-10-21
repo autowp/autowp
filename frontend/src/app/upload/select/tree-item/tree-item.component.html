@@ -1,4 +1,4 @@
-@if (item$ | async; as item) {
+@if (item(); as item) {
   @if ((item.item?.childsCount || 0) > 0) {
     <div>
       <button type="button" class="btn btn-link toggle" (click)="open = !open">

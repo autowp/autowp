@@ -2,7 +2,7 @@ import type {ItemParent} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {
   ItemFields,
@@ -39,16 +39,11 @@ export class ModerPictureMoveItemComponent {
   readonly #languageService = inject(LanguageService);
 
   readonly item = input.required<ItemParent>();
-  protected readonly item$ = toObservable(this.item).pipe(
-    map((item) => ({
-      expanded: false,
-      row: item,
-    })),
-  );
+  protected readonly row = computed<ListItem>(() => ({expanded: false, row: this.item()}));
 
   readonly selected = output<PictureItemMoveSelection>();
 
-  protected readonly childs$: Observable<ItemParent[]> = this.item$.pipe(
+  protected readonly childs$: Observable<ItemParent[]> = toObservable(this.item).pipe(
     switchMap((item) =>
       this.#itemsClient.getItemParents(
         new ItemParentsRequest({
@@ -61,7 +56,7 @@ export class ModerPictureMoveItemComponent {
           language: this.#languageService.language,
           limit: 500,
           options: new ItemParentListOptions({
-            parentId: item.row.itemId,
+            parentId: item.itemId,
           }),
           order: ItemParentsRequest.Order.AUTO,
         }),

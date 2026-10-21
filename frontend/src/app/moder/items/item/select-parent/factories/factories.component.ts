@@ -1,6 +1,5 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemParentsRequest, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -13,7 +12,7 @@ import {ModerItemsItemSelectParentTreeItemComponent} from '../tree-item/tree-ite
 
 @Component({
   selector: 'app-moder-items-item-select-parent-factories',
-  imports: [ModerItemsItemSelectParentTreeItemComponent, PaginatorComponent, AsyncPipe],
+  imports: [ModerItemsItemSelectParentTreeItemComponent, PaginatorComponent],
   templateUrl: './factories.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -25,7 +24,6 @@ export class ModerItemsItemSelectParentFactoriesComponent {
   readonly selected = output<string>();
 
   readonly itemID = input.required<string>();
-  protected readonly itemID$ = toObservable(this.itemID);
 
   readonly #page = toSignal(
     this.#route.queryParamMap.pipe(

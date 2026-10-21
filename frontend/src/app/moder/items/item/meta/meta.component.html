@@ -1,4 +1,4 @@
-@if (item$ | async; as item) {
+@if (item(); as item) {
   <div class="card card-body">
     @if (loadingNumber()) {
       <ngb-progressbar type="success" class="mb-2" [striped]="true" [animated]="true" [value]="100" />

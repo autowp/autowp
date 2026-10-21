@@ -1,6 +1,6 @@
-@if (canUseTurboGroupCreator$ | async) {
+@if (canUseTurboGroupCreator()) {
   <p class="btn-group">
-    @if (item$ | async; as item) {
+    @if (item(); as item) {
       <a class="btn btn-secondary" i18n [routerLink]="['/moder/items/item', item.id, 'organize-pictures']"
         >Turbo group creator from pictures</a
       >

@@ -1,4 +1,4 @@
-@if (item$ | async; as item) {
+@if (item(); as item) {
   <div class="card card-body">
     @if (canMove$ | async; as canMove) {
       <div class="mb-3">
@@ -7,7 +7,7 @@
             class="btn btn-secondary"
             i18n
             [routerLink]="['/moder/items/item', item.id, 'organize']"
-            [queryParams]="{item_type_id: organizeTypeId$ | async}"
+            [queryParams]="{item_type_id: organizeTypeId()}"
             >Turbo group creator</a
           >
         }
@@ -29,7 +29,7 @@
           </tr>
         </thead>
         <tbody>
-          @if ((canHaveParents$ | async) || !canMove) {
+          @if (canHaveParents() || !canMove) {
             <tr>
               <td colspan="4">
                 <form class="car-add-parent" method="post">
@@ -55,7 +55,7 @@
                     >
                     <div ngbDropdown>
                       <button type="button" ngbDropdownToggle class="btn btn-secondary"></button>
-                      @if (canHaveParentBrand$ | async) {
+                      @if (canHaveParentBrand()) {
                         <div ngbDropdownMenu>
                           <ng-container>
                             <a

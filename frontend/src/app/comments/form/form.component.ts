@@ -2,13 +2,12 @@ import type {CommentsType} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {ChangeDetectionStrategy, Component, effect, inject, input, output, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {AddCommentRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {finalize, switchMap, take} from 'rxjs';
+import {defer, finalize} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -30,7 +29,6 @@ export class CommentsFormComponent {
   readonly canceled = output<null | string>();
 
   readonly resolve = input<boolean>(false);
-  readonly #resolve$ = toObservable(this.resolve);
 
   protected readonly invalidParams = signal<InvalidParams>({});
   protected readonly sending = signal(false);
@@ -55,21 +53,19 @@ export class CommentsFormComponent {
     this.invalidParams.set({});
     this.sending.set(true);
 
-    this.#resolve$
+    defer(() =>
+      this.#comments.add(
+        new AddCommentRequest({
+          itemId: this.itemID(),
+          message: this.form.message,
+          moderatorAttention: this.form.moderator_attention,
+          parentId: this.parentID(),
+          resolve: this.resolve(),
+          typeId: this.typeID(),
+        }),
+      ),
+    )
       .pipe(
-        take(1),
-        switchMap((resolve) =>
-          this.#comments.add(
-            new AddCommentRequest({
-              itemId: this.itemID(),
-              message: this.form.message,
-              moderatorAttention: this.form.moderator_attention,
-              parentId: this.parentID(),
-              resolve,
-              typeId: this.typeID(),
-            }),
-          ),
-        ),
         finalize(() => {
           this.sending.set(false);
         }),

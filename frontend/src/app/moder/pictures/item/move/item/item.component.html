@@ -1,4 +1,4 @@
-@if (item$ | async; as item) {
+@if (row(); as item) {
   @if (item.row.type === ItemParentType.ITEM_TYPE_TUNING) {
     <span class="text-muted" i18n>Related</span>
   } @else if (item.row.type === ItemParentType.ITEM_TYPE_SPORT) {

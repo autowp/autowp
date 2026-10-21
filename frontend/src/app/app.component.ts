@@ -6,14 +6,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  DestroyRef,
   effect,
   inject,
   PLATFORM_ID,
   Renderer2,
   signal,
 } from '@angular/core';
-import {rxResource, takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {NavigationEnd, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {environment} from '@environment/environment';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
@@ -87,7 +86,6 @@ export class AppComponent {
   readonly #keycloak = inject(Keycloak);
   readonly #itemsClient = inject(ItemsClient);
   readonly #document = inject(DOCUMENT);
-  readonly #destroyRef = inject(DestroyRef);
   readonly #window = browserWindow();
   readonly #isPrerendering = isPrerendering();
 
@@ -207,15 +205,14 @@ export class AppComponent {
       });
     }
 
-    toObservable(this.pageEnv.layoutParams)
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((params) => {
-        if (params.isGalleryPage) {
-          this.#renderer.addClass(this.#document.body, 'gallery');
-        } else {
-          this.#renderer.removeClass(this.#document.body, 'gallery');
-        }
-      });
+    effect(() => {
+      const params = this.pageEnv.layoutParams();
+      if (params.isGalleryPage) {
+        this.#renderer.addClass(this.#document.body, 'gallery');
+      } else {
+        this.#renderer.removeClass(this.#document.body, 'gallery');
+      }
+    });
 
     let searchHostname = 'wheelsage.org';
     for (const itemLanguage of this.languages) {

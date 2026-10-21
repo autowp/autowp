@@ -1,4 +1,4 @@
-@if (item$ | async; as item) {
+@if (item(); as item) {
   <div class="car item-list-item">
     <h3>
       <app-item-header
@@ -12,8 +12,8 @@
     @if (item.nameDefault) {
       <h4>{{ item.nameDefault }}</h4>
     }
-    @if (pictures$ | async; as pictures) {
-      @if ((havePhoto$ | async) && pictures.length > 4) {
+    @if (pictures(); as pictures) {
+      @if (havePhoto() && pictures.length > 4) {
         <div class="row">
           @for (picture of pictures.slice(0, 1); track picture) {
             <div class="col-12 col-lg-6">
@@ -57,7 +57,7 @@
           </div>
         </div>
       }
-      @if ((havePhoto$ | async) && pictures.length <= 4) {
+      @if (havePhoto() && pictures.length <= 4) {
         <div class="row">
           @for (picture of pictures; track picture) {
             <div class="col-6 col-lg-3">
@@ -80,7 +80,7 @@
         </div>
       }
     }
-    @if ((havePhoto$ | async) === false && (canHavePhoto$ | async)) {
+    @if (havePhoto() === false && canHavePhoto()) {
       <div class="row">
         <div class="col-6 col-lg-3">
           <div class="no-photo rounded w-100 border border-light mb-4" title="No photos available" i18n-title>
@@ -112,7 +112,7 @@
         </ul>
       </div>
     }
-    @if (parentRouterLink$ | async; as parentRouterLink) {
+    @if (parentRouterLink(); as parentRouterLink) {
       <ul class="list-inline">
         @if (item.hasText || item.childsCount) {
           <li class="list-inline-item">

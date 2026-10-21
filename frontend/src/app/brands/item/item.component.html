@@ -19,9 +19,9 @@
   }
 </ng-template>
 
-@if (brand$ | async; as brand) {
+@if (brand(); as brand) {
   <a
-    class="brandicon brandicon-{{ cssClass(brand) }}"
+    class="brandicon brandicon-{{ cssClass() }}"
     [routerLink]="['/', brand.catname]"
     [style.background-image]="'url(' + icons().image + ')'"
   ></a>

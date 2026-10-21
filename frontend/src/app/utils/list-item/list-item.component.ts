@@ -2,7 +2,7 @@ import type {Design, Image, Item, Picture, User} from '@grpc/spec.pb';
 import type {APIItemChildsCounts} from '@services/item';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth.service';
@@ -59,32 +59,21 @@ export class CatalogueListItemComponent {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  protected havePhoto(item: CatalogueListItem) {
-    for (const picture of item.previewPictures.pictures) {
-      if (picture.picture) {
-        return true;
-      }
-    }
-    return false;
-  }
+  protected readonly havePhoto = computed(() => this.item().previewPictures.pictures.some(({picture}) => !!picture));
 
-  protected canHavePhoto(item: CatalogueListItem) {
-    return [
+  protected readonly canHavePhoto = computed(() =>
+    [
       ItemType.ITEM_TYPE_BRAND,
       ItemType.ITEM_TYPE_ENGINE,
       ItemType.ITEM_TYPE_FACTORY,
       ItemType.ITEM_TYPE_MUSEUM,
       ItemType.ITEM_TYPE_VEHICLE,
-    ].includes(item.itemTypeId);
-  }
+    ].includes(this.item().itemTypeId),
+  );
 
-  protected thumbnailColClass() {
-    if (this.item().previewPictures.pictures.length === 3) {
-      return 'col-sm-4';
-    }
-
-    return 'col-6 col-lg-3';
-  }
+  protected readonly thumbnailColClass = computed(() =>
+    this.item().previewPictures.pictures.length === 3 ? 'col-sm-4' : 'col-6 col-lg-3',
+  );
 
   protected readonly ItemType = ItemType;
 }
