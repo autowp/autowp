@@ -135,6 +135,9 @@ npx stylelint "src/**/*.scss"
 
 Note: clear `frontend/dist` directory before run `ng lint` to prevent OOM during linting
 
+Run frontend builds and lint sequentially. Never run `ng build` / `npm run build` and
+`ng lint` / `npm run lint` at the same time.
+
 There is no unit test suite configured for the frontend (no `*.spec.ts` files, no `test` builder
 in `angular.json`) — don't assume Karma/Jest is set up.
 

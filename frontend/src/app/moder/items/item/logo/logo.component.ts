@@ -58,7 +58,7 @@ export class ModerItemsItemLogoComponent {
       .request('POST', '/api/item/' + this.item().id + '/logo', {
         body: formData,
         observe: 'events',
-        reportProgress: true,
+        reportDownloadProgress: true,
       })
       .pipe(
         catchError((response: unknown) => {

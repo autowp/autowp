@@ -256,7 +256,7 @@ export class UploadIndexComponent implements OnInit {
         this.#http.request<{id: string}>('POST', '/api/picture', {
           body: formData,
           observe: 'events',
-          reportProgress: true,
+          reportDownloadProgress: true,
         }),
       ),
       catchError((response: unknown) => {
