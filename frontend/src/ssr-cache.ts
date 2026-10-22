@@ -75,8 +75,8 @@ export class SsrPageCache {
   // recently used one - that's the one eviction drops.
   readonly #entries = new Map<string, CacheEntry>();
 
-  // Renders in progress, keyed the same way, so a burst of requests for one URL waits on one
-  // render instead of starting one each.
+  // Renders in progress are shared only within one visitor address. Successful public pages
+  // still enter the common cache, while IP-dependent denials cannot reach another visitor.
   readonly #inFlight = new Map<string, Promise<CachedPage | null>>();
 
   #bytes = 0;
@@ -103,12 +103,15 @@ export class SsrPageCache {
       return SsrPageCache.#toResponse(cached, 'HIT');
     }
 
-    let pending = this.#inFlight.get(key);
+    // A denied render depends on the visitor's IP. Share completed public pages as before,
+    // but never share an in-progress render between visitors with different addresses.
+    const renderKey = JSON.stringify([key, request.headers['x-forwarded-for'] ?? request.socket.remoteAddress]);
+    let pending = this.#inFlight.get(renderKey);
     if (!pending) {
       pending = this.#render(key, render);
-      this.#inFlight.set(key, pending);
+      this.#inFlight.set(renderKey, pending);
       pending = pending.finally(() => {
-        this.#inFlight.delete(key);
+        this.#inFlight.delete(renderKey);
       });
     }
 
@@ -143,6 +146,7 @@ export class SsrPageCache {
       // Angular's SSR never sets one, but a response that carries per-visitor state is not ours to
       // hand to the next visitor.
       !response.headers.has('set-cookie') &&
+      !/(?:^|,)\s*(?:private|no-store|no-cache)(?:\s*(?:=|,|$))/i.test(response.headers.get('cache-control') ?? '') &&
       page.body.byteLength > 0 &&
       page.body.byteLength <= Math.min(MAX_ENTRY_BYTES, this.#maxBytes)
     );

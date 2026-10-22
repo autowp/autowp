@@ -19,9 +19,8 @@ export class ForbiddenComponent implements OnInit {
   readonly #isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly #autowp = inject(AutowpClient);
 
-  // Browser-only: an IP ban is only ever visible to the browser's own direct calls - during SSR
-  // the backend sees this pod over loopback, not the visitor (see BanChecker.IsBanned). An empty
-  // ipAddress means "my own IP" (grpc.go GetIP), and GetIP is exempt from the ban interceptor.
+  // Fetch ban details in the browser, so IP-specific information never enters the shared
+  // HTML cache. An empty ipAddress means "my own IP"; GetIP remains reachable while banned.
   protected readonly ban = this.#isBrowser
     ? toSignal(
         this.#autowp.getIP(new GetIPRequest({fields: ['blacklist'], ipAddress: ''})).pipe(

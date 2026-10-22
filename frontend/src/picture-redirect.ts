@@ -59,6 +59,7 @@ export function createPictureRedirect(grpcHost: string): (request: Request) => P
       const metadata = new GrpcMetadata({
         deadline: String(Date.now() + 2000),
         [SSR_REQUEST_ID_HEADER]: request.get(SSR_REQUEST_ID_HEADER) ?? '',
+        'x-forwarded-for': request.get('x-forwarded-for') ?? '',
       });
       // Wait for completion so a non-OK trailer after the data frame cannot produce a redirect.
       const canonical = await lastValueFrom(

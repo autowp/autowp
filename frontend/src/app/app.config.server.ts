@@ -1,17 +1,19 @@
 import type {ApplicationConfig} from '@angular/core';
 
-import {HTTP_TRANSFER_CACHE_ORIGIN_MAP} from '@angular/common/http';
+import {HTTP_TRANSFER_CACHE_ORIGIN_MAP, provideHttpClient, withInterceptors} from '@angular/common/http';
 import {inject, mergeApplicationConfig, REQUEST} from '@angular/core';
 import {provideServerRendering, withRoutes} from '@angular/ssr';
 import {environment} from '@environment/environment';
+import {ssrForwardedForInterceptor} from '@utils/ssr-forwarded-for.interceptor';
+import {provideGrpcWebClient} from 'grpc-web-client/grpc-web-client';
 
-import {provideGrpcWebClient} from '../grpc-web-client/grpc-web-client';
 import {appConfig} from './app.config';
 import {serverRoutes} from './app.routes.server';
 
 const serverConfig: ApplicationConfig = {
   providers: [
     provideServerRendering(withRoutes(serverRoutes)),
+    provideHttpClient(withInterceptors([ssrForwardedForInterceptor(environment.ssrGrpcHost)])),
     provideGrpcWebClient({
       settings: {host: environment.ssrGrpcHost},
     }),

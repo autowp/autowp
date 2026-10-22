@@ -243,6 +243,10 @@ func (s *TrafficGRPCServer) CreateTrafficWhitelistItem(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	if err = s.traffic.Monitoring.ClearIP(ctx, ip); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &emptypb.Empty{}, nil
 }
 

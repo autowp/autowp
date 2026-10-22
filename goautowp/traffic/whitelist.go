@@ -2,12 +2,11 @@ package traffic
 
 import (
 	"context"
-	"encoding/hex"
 	"errors"
 	"net"
 	"strings"
+	"time"
 
-	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/doug-martin/goqu/v9"
 )
@@ -34,48 +33,73 @@ func NewWhitelist(db *goqu.Database) (*Whitelist, error) {
 
 // MatchAuto MatchAuto.
 func (s *Whitelist) MatchAuto(ctx context.Context, ip net.IP) (bool, string) {
-	ipText := ip.String()
-	ipWithDashes := strings.ReplaceAll(ipText, ".", "-")
+	match, desc, _ := matchCrawler(ctx, net.DefaultResolver, ip)
 
-	msnHost := "msnbot-" + ipWithDashes + ".search.msn.com."
-	yandexComHost := ipWithDashes + ".spider.yandex.com."
-	googlebotHost := "crawl-" + ipWithDashes + ".googlebot.com."
+	return match, desc
+}
 
-	isIPv6 := len(ip) == net.IPv6len
-	ip16 := ip.To16()
+type crawlerResolver interface {
+	LookupAddr(ctx context.Context, addr string) ([]string, error)
+	LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error)
+}
 
-	yandexComIPv6Host := hex.EncodeToString(
-		ip16[12:14],
-	) + "-" + hex.EncodeToString(
-		ip16[14:16],
-	) + ".spider.yandex.com."
+// A PTR alone is controlled by the address owner. The crawler's own DNS must
+// resolve the approved name back to that address before granting an exemption.
+const (
+	crawlerLookupTimeout = 3 * time.Second
+	crawlerYandex        = "yandex"
+)
 
-	hosts, err := net.DefaultResolver.LookupAddr(ctx, ipText)
+func matchCrawler(ctx context.Context, resolver crawlerResolver, ip net.IP) (bool, string, error) {
+	if ip == nil {
+		return false, "", nil
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, crawlerLookupTimeout)
+	defer cancel()
+
+	hosts, err := resolver.LookupAddr(ctx, ip.String())
 	if err != nil {
-		return false, ""
+		var dnsErr *net.DNSError
+		if errors.As(err, &dnsErr) && dnsErr.IsNotFound {
+			return false, "", nil
+		}
+
+		return false, "", err
 	}
 
 	for _, host := range hosts {
-		logging.Info(host + " ")
+		host = strings.ToLower(strings.TrimSuffix(host, "."))
+		crawler := ""
 
-		if host == msnHost {
-			return true, "msnbot autodetect"
+		for domain, name := range map[string]string{
+			"googlebot.com": "googlebot", "google.com": "google",
+			"search.msn.com": "bingbot", "yandex.ru": crawlerYandex, "yandex.net": crawlerYandex, "yandex.com": crawlerYandex,
+		} {
+			if strings.HasSuffix(host, "."+domain) {
+				crawler = name
+
+				break
+			}
 		}
 
-		if host == yandexComHost {
-			return true, "yandex.com autodetect"
+		if crawler == "" {
+			continue
 		}
 
-		if host == googlebotHost {
-			return true, "googlebot autodetect"
+		addresses, err := resolver.LookupIPAddr(ctx, host)
+		if err != nil {
+			return false, "", err
 		}
 
-		if isIPv6 && host == yandexComIPv6Host {
-			return true, "yandex.com ipv6 autodetect"
+		for _, address := range addresses {
+			if address.IP.Equal(ip) {
+				return true, crawler + " verified reverse/forward DNS", nil
+			}
 		}
 	}
 
-	return false, ""
+	return false, "", nil
 }
 
 // Add IP to whitelist.
@@ -144,4 +168,20 @@ func (s *Whitelist) Remove(ctx context.Context, ip net.IP) error {
 		Executor().ExecContext(ctx)
 
 	return err
+}
+
+// IPSet provides a snapshot for request monitoring without a database lookup per request.
+func (s *Whitelist) IPSet(ctx context.Context) (map[string]struct{}, error) {
+	var addresses []string
+	if err := s.db.Select(goqu.Func("HOST", schema.IPWhitelistTableIPCol)).
+		From(schema.IPWhitelistTable).ScanValsContext(ctx, &addresses); err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]struct{}, len(addresses))
+	for _, address := range addresses {
+		result[net.ParseIP(address).String()] = struct{}{}
+	}
+
+	return result, nil
 }

@@ -72,10 +72,8 @@ func NewBanChecker(repository banRepository) *BanChecker {
 // "not banned": the ban list is a spam control, not an authorization boundary, and failing closed
 // would turn a database hiccup into a site-wide outage.
 func (s *BanChecker) IsBanned(ctx context.Context, ip net.IP) bool {
-	// A loopback or unspecified peer is never a real client. What reaches us over loopback is the
-	// SSR frontend container, which shares this pod's network namespace and forwards no
-	// X-Forwarded-For, so realip resolves every server-side render to ::1 - a lookup that can only
-	// ever answer "not banned", once per gRPC call the render makes.
+	// Without a forwarded client address, loopback and unspecified peers are internal calls.
+	// SSR calls carrying X-Forwarded-For have already been resolved to the visitor by realip.
 	if ip == nil || ip.IsLoopback() || ip.IsUnspecified() {
 		return false
 	}

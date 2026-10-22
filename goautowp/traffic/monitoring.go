@@ -3,7 +3,9 @@ package traffic
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/autowp/goautowp/logging"
@@ -14,6 +16,8 @@ import (
 )
 
 // Monitoring Main Object.
+var errMonitoringChannelClosed = errors.New("monitoring AMQP delivery channel closed")
+
 type Monitoring struct {
 	db *goqu.Database
 }
@@ -51,6 +55,8 @@ func (s *Monitoring) Listen(
 		return err
 	}
 
+	defer util.Close(conn)
+
 	ch, err := conn.Channel()
 	if err != nil {
 		return err
@@ -85,7 +91,13 @@ func (s *Monitoring) Listen(
 	quit := false
 	for !quit {
 		select {
-		case msg := <-msgs:
+		case <-ctx.Done():
+			return ctx.Err()
+		case msg, ok := <-msgs:
+			if !ok {
+				return errMonitoringChannelClosed
+			}
+
 			if msg.ContentType != "application/json" {
 				logging.Errorf("unexpected mime `%s`", msg.ContentType)
 
@@ -113,37 +125,64 @@ func (s *Monitoring) Listen(
 
 	logging.Info("Disconnecting RabbitMQ")
 
-	return conn.Close()
+	return nil
 }
 
 // Add item to Monitoring.
 func (s *Monitoring) Add(ctx context.Context, ip net.IP, timestamp time.Time) error {
-	_, err := s.db.Insert(schema.IPMonitoringTable).Rows(
-		goqu.Record{
-			schema.IPMonitoringTableDayDateColName: timestamp,
-			schema.IPMonitoringTableHourColName: goqu.Func(
-				"EXTRACT",
-				goqu.L("HOUR FROM ?::timestamptz", timestamp),
-			),
-			schema.IPMonitoringTableTenminuteColName: goqu.L(
-				"FLOOR(EXTRACT(MINUTE FROM ?::timestamptz)/10)",
-				timestamp,
-			),
-			schema.IPMonitoringTableMinuteColName: goqu.Func(
-				"EXTRACT",
-				goqu.L("MINUTE FROM ?::timestamptz", timestamp),
-			),
-			schema.IPMonitoringTableIPColName:    ip.String(),
-			schema.IPMonitoringTableCountColName: 1,
-		}).
-		OnConflict(
-			goqu.DoUpdate(
-				"ip,day_date,hour,tenminute,minute",
-				goqu.C(schema.IPMonitoringTableCountColName).Set(
-					goqu.L(schema.IPMonitoringTableName+"."+schema.IPMonitoringTableCountColName+"+1"),
-				),
-			),
-		).Executor().ExecContext(ctx)
+	return s.AddCounts(ctx, []MonitoringCount{{IP: ip.String(), Timestamp: timestamp, Count: 1}})
+}
+
+// MonitoringCount is an aggregated minute of requests from one address.
+type MonitoringCount struct {
+	IP        string
+	Timestamp time.Time
+	Count     int64
+}
+
+// AddCounts persists a batch using the same counters as the legacy AMQP consumer.
+func (s *Monitoring) AddCounts(ctx context.Context, counts []MonitoringCount) error {
+	if len(counts) == 0 {
+		return nil
+	}
+
+	// Filter against the current whitelist inside the INSERT, including batches queued
+	// before an address was whitelisted and messages from the legacy AMQP consumer.
+	const fieldsPerCount = 3
+
+	rows := make([]string, 0, len(counts))
+
+	values := make([]interface{}, 0, len(counts)*fieldsPerCount)
+	for _, count := range counts {
+		rows = append(rows, "(?::inet, ?::timestamptz, ?::integer)")
+		values = append(values, count.IP, count.Timestamp, count.Count)
+	}
+
+	incoming := goqu.T("incoming")
+	seenAt := incoming.Col("seen_at")
+	selectCounts := s.db.From(goqu.L(
+		"(VALUES "+strings.Join(rows, ",")+") AS incoming(ip, seen_at, count)", values...,
+	)).Select(
+		incoming.Col(schema.IPMonitoringTableIPColName),
+		goqu.Cast(seenAt, "date"),
+		goqu.L("EXTRACT(HOUR FROM ?)", seenAt),
+		goqu.L("FLOOR(EXTRACT(MINUTE FROM ?)/10)", seenAt),
+		goqu.L("EXTRACT(MINUTE FROM ?)", seenAt),
+		incoming.Col(schema.IPMonitoringTableCountColName),
+	).Where(goqu.L("NOT EXISTS ?", s.db.From(schema.IPWhitelistTable).
+		Select(goqu.V(1)).Where(schema.IPWhitelistTableIPCol.Eq(incoming.Col(schema.IPMonitoringTableIPColName)))))
+
+	_, err := s.db.Insert(schema.IPMonitoringTable).Cols(
+		schema.IPMonitoringTableIPColName,
+		schema.IPMonitoringTableDayDateColName,
+		schema.IPMonitoringTableHourColName,
+		schema.IPMonitoringTableTenminuteColName,
+		schema.IPMonitoringTableMinuteColName,
+		schema.IPMonitoringTableCountColName,
+	).FromQuery(selectCounts).OnConflict(goqu.DoUpdate(
+		"ip,day_date,hour,tenminute,minute",
+		goqu.Record{schema.IPMonitoringTableCountColName: goqu.L("ip_monitoring.count + EXCLUDED.count")},
+	)).Executor().ExecContext(ctx)
 
 	return err
 }
@@ -230,7 +269,11 @@ func (s *Monitoring) ListByBanProfile(
 
 	err := s.db.Select(schema.IPMonitoringTableIPCol).
 		From(schema.IPMonitoringTable).
-		Where(schema.IPMonitoringTableDayDateCol.Eq(goqu.L("CURRENT_DATE"))).
+		Where(
+			schema.IPMonitoringTableDayDateCol.Eq(goqu.L("CURRENT_DATE")),
+			goqu.L("NOT EXISTS ?", s.db.From(schema.IPWhitelistTable).Select(goqu.V(1)).
+				Where(schema.IPWhitelistTableIPCol.Eq(schema.IPMonitoringTableIPCol))),
+		).
 		GroupBy(group...).
 		Having(goqu.SUM(schema.IPMonitoringTableCountCol).Gt(profile.Limit)).
 		Limit(numberOfRecordsToScanForAutoban).

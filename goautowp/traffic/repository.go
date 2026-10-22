@@ -12,16 +12,12 @@ import (
 )
 
 const (
-	autowhitelistLimit  = 1000
-	banByUserID         = 9
-	hoursInDay          = 24
-	halfDay             = time.Hour * hoursInDay / 2
-	hourlyLimitDuration = time.Hour * 5 * hoursInDay
-	dailyLimitDuration  = time.Hour * 10 * hoursInDay
-	dailyLimit          = 10000
-	hourlyLimit         = 3600
-	tenMinsLimit        = 1200
-	oneMinLimit         = 700
+	autowhitelistLimit = 1000
+	banByUserID        = 9
+	dailyLimit         = 1000000
+	hourlyLimit        = 200000
+	tenMinsLimit       = 50000
+	oneMinLimit        = 10000
 )
 
 // Repository Main Object.
@@ -45,13 +41,13 @@ var AutobanProfiles = []AutobanProfile{
 		Limit:  dailyLimit,
 		Reason: "daily limit",
 		Group:  []interface{}{},
-		Time:   dailyLimitDuration,
+		Time:   time.Hour,
 	},
 	{
 		Limit:  hourlyLimit,
 		Reason: "hourly limit",
 		Group:  []interface{}{schema.IPMonitoringTableHourCol},
-		Time:   hourlyLimitDuration,
+		Time:   time.Hour,
 	},
 	{
 		Limit:  tenMinsLimit,
@@ -60,7 +56,7 @@ var AutobanProfiles = []AutobanProfile{
 			schema.IPMonitoringTableHourCol,
 			schema.IPMonitoringTableTenminuteCol,
 		},
-		Time: time.Hour * hoursInDay,
+		Time: time.Hour,
 	},
 	{
 		Limit:  oneMinLimit,
@@ -70,7 +66,7 @@ var AutobanProfiles = []AutobanProfile{
 			schema.IPMonitoringTableTenminuteCol,
 			schema.IPMonitoringTableMinuteCol,
 		},
-		Time: halfDay,
+		Time: time.Hour,
 	},
 }
 
@@ -118,6 +114,12 @@ func (s *Repository) AutoBanByProfile(ctx context.Context, profile AutobanProfil
 	}
 
 	for _, ip := range ips {
+		if err := s.AutoWhitelistIP(ctx, ip); err != nil {
+			logging.Errorf("autoban: skip %s: crawler verification failed: %v", ip, err)
+
+			continue
+		}
+
 		exists, err := s.Whitelist.Exists(ctx, ip)
 		if err != nil {
 			return err
@@ -127,11 +129,26 @@ func (s *Repository) AutoBanByProfile(ctx context.Context, profile AutobanProfil
 			continue
 		}
 
-		logging.Infof("%s %v", profile.Reason, ip)
+		active, err := s.Ban.Exists(ctx, ip)
+		if err != nil {
+			return err
+		}
+
+		if active {
+			continue
+		}
 
 		if err := s.Ban.Add(ctx, ip, profile.Time, banByUserID, profile.Reason); err != nil {
 			return err
 		}
+
+		logging.Warnf(
+			"autoban: ip=%s reason=%q threshold=%d duration=%s",
+			ip,
+			profile.Reason,
+			profile.Limit,
+			profile.Time,
+		)
 	}
 
 	return nil
@@ -172,18 +189,25 @@ func (s *Repository) AutoWhitelistIP(ctx context.Context, ip net.IP) error {
 		return err
 	}
 
-	match, desc := s.Whitelist.MatchAuto(ctx, ip)
+	if inWhitelist {
+		if err := s.Ban.Remove(ctx, ip); err != nil {
+			return err
+		}
+
+		return s.Monitoring.ClearIP(ctx, ip)
+	}
+
+	match, desc, err := matchCrawler(ctx, net.DefaultResolver, ip)
+	if err != nil {
+		return err
+	}
 
 	if !match {
 		return nil
 	}
 
-	if inWhitelist {
-		logging.Info(ipText + ": already in whitelist, skip")
-	} else {
-		if err = s.Whitelist.Add(ctx, ip, desc); err != nil {
-			return err
-		}
+	if err = s.Whitelist.Add(ctx, ip, desc); err != nil {
+		return err
 	}
 
 	if err = s.Ban.Remove(ctx, ip); err != nil {

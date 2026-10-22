@@ -37,6 +37,8 @@ type Auth struct {
 	repository  *users.Repository
 }
 
+type authenticatedUserKey struct{}
+
 type UserContext struct {
 	UserID int64
 	Roles  []string
@@ -58,6 +60,10 @@ func NewAuth(
 }
 
 func (s *Auth) ValidateREST(ctx *gin.Context) (UserContext, error) {
+	if user, ok := ctx.Request.Context().Value(authenticatedUserKey{}).(UserContext); ok {
+		return user, nil
+	}
+
 	header := ctx.GetHeader(authorizationHeader)
 
 	if len(header) == 0 {
@@ -77,6 +83,10 @@ func (s *Auth) ValidateREST(ctx *gin.Context) (UserContext, error) {
 }
 
 func (s *Auth) ValidateGRPC(ctx context.Context) (UserContext, error) {
+	if user, ok := ctx.Value(authenticatedUserKey{}).(UserContext); ok {
+		return user, nil
+	}
+
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return UserContext{}, errMissingMetadata

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/netip"
 	"sync"
 	"time"
 
@@ -103,6 +102,7 @@ type Container struct {
 	telegramService              *telegram.Service
 	textGrpcServer               *TextGRPCServer
 	traffic                      *traffic.Repository
+	trafficRecorder              *traffic.Recorder
 	trafficGrpcServer            *TrafficGRPCServer
 	votingsRepository            *votings.Repository
 	usersRepository              *users.Repository
@@ -1266,6 +1266,14 @@ func (s *Container) publicRouterLocked(ctx context.Context) (http.HandlerFunc, e
 
 	ginEngine.Use(BanGinMiddleware(banChecker)) //nolint: contextcheck
 
+	monitoringAuth, err := s.authLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	//nolint:contextcheck // Gin owns the context.
+	ginEngine.Use(monitoringGinMiddleware(s.trafficRecorder, monitoringAuth))
+
 	yoomoney.SetupRouter(ctx, ginEngine)
 
 	tg.SetupRouter(ginEngine) //nolint: contextcheck
@@ -1421,14 +1429,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 		return nil, err
 	}
 
-	trustedPeers := []netip.Prefix{
-		netip.MustParsePrefix(s.Config().TrustedNetwork),
-	}
-
-	opts := []realip.Option{
-		realip.WithTrustedPeers(trustedPeers),
-		realip.WithHeaders([]string{realip.XForwardedFor}),
-	}
+	opts := clientIPOptions(s.Config().TrustedNetwork)
 
 	logger := slog.Default()
 	loggerOpts := []grpclogging.Option{
@@ -1440,6 +1441,18 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 		return nil, err
 	}
 
+	traf, err := s.trafficLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	monitoringAuth, err := s.authLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	s.trafficRecorder = traffic.NewRecorder(ctx, traf.Monitoring, traf.Whitelist)
+
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			// Outermost, so what it times is the whole call - ban check and all - the same span the
@@ -1448,6 +1461,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 			grpclogging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.UnaryServerInterceptorOpts(opts...),
 			BanUnaryServerInterceptor(banChecker),
+			monitoringUnaryInterceptor(s.trafficRecorder, monitoringAuth),
 			// Innermost, so it wraps the handler itself: a panic that escapes becomes a logged
 			// codes.Internal for that one call instead of unwinding the serving goroutine.
 			recovery.UnaryServerInterceptor(recoveryOpts()...),
@@ -1456,6 +1470,11 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 			grpclogging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
 			realip.StreamServerInterceptorOpts(opts...),
 			BanStreamServerInterceptor(banChecker), //nolint: contextcheck
+			//nolint:contextcheck // Context comes from grpc.ServerStream.
+			monitoringStreamInterceptor(
+				s.trafficRecorder,
+				monitoringAuth,
+			),
 			recovery.StreamServerInterceptor(recoveryOpts()...),
 		),
 	)
