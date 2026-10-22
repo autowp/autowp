@@ -1,5 +1,5 @@
 import type {AbstractControl} from '@angular/forms';
-import type {Picture, PictureItem, Spec, VehicleType} from '@grpc/spec.pb';
+import type {Picture, PictureItem, Spec} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
@@ -16,7 +16,7 @@ import {
 } from '@angular/core';
 import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {LatLng} from '@grpc/google/type/latlng.pb';
-import {Item, ItemType, PictureFields, PictureListOptions, PicturesRequest} from '@grpc/spec.pb';
+import {Item, ItemType, PictureFields, PictureListOptions, PicturesRequest, VehicleType} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {BoolValue, Int32Value} from '@ngx-grpc/well-known-types';
@@ -231,10 +231,7 @@ export class ItemMetaFormComponent {
 
   readonly #vehicleTypes$: Observable<VehicleType[]> = this.#vehicleTypeService.getTypesPlain$().pipe(
     map((types) =>
-      types.map((type) => {
-        type.name = getVehicleTypeTranslation(type.name);
-        return type;
-      }),
+      types.map((type) => new VehicleType({...type.toObject(), name: getVehicleTypeTranslation(type.name)})),
     ),
     shareReplay({bufferSize: 1, refCount: false}),
   );

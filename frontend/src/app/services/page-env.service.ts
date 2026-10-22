@@ -1,9 +1,5 @@
-import type {Observable} from 'rxjs';
-
 import {computed, effect, inject, Service, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
 import {Title} from '@angular/platform-browser';
-import {of, switchMap} from 'rxjs';
 
 import type {PageId} from './page-id';
 
@@ -29,7 +25,6 @@ export class PageEnvService {
   readonly #titleService = inject(Title);
 
   public readonly pageEnv = signal<null | PageEnv>(null);
-  readonly #pageEnv = toObservable(this.pageEnv);
   public readonly layoutParams = computed<LayoutParams>(
     () => {
       const data = this.pageEnv();
@@ -58,14 +53,8 @@ export class PageEnvService {
     this.pageEnv.set(data);
   }
 
-  public isActive$(id: PageId): Observable<boolean> {
-    return this.#pageEnv.pipe(
-      switchMap((data) => {
-        if (!data?.pageId) {
-          return of(false);
-        }
-        return this.#pageService.isDescendant$(data.pageId, id);
-      }),
-    );
+  public isActive(id: PageId): boolean {
+    const pageId = this.pageEnv()?.pageId;
+    return !!pageId && this.#pageService.isDescendant(pageId, id);
   }
 }

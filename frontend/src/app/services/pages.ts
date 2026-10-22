@@ -3,7 +3,7 @@ import type {Page} from './page';
 import {PageId} from './page-id';
 
 // Page-id hierarchy used by PageService to find a page's ancestors (for menu-item active-state
-// highlighting via isDescendant$()), from the CMS's own page tree. Trimmed to the pages
+// highlighting via isDescendant()), from the CMS's own page tree. Trimmed to the pages
 // application code refers to (see PageId); the CMS's intermediate grouping nodes were spliced
 // out, their children lifted to the nearest kept ancestor, so every named ancestor -> descendant
 // relationship is preserved.

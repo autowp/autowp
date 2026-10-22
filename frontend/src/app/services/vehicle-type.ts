@@ -26,15 +26,16 @@ export class VehicleTypeService {
     return this.#types$;
   }
 
+  readonly #typesPlain$ = this.#types$.pipe(
+    map((types) => {
+      const result: VehicleType[] = [];
+      this.walkTypes(types, (type) => result.push(type));
+      return result;
+    }),
+    shareReplay({bufferSize: 1, refCount: false}),
+  );
+
   public getTypesPlain$(): Observable<VehicleType[]> {
-    return this.#types$.pipe(
-      map((types) => {
-        const result: VehicleType[] = [];
-        this.walkTypes(types, (type) => {
-          result.push(type);
-        });
-        return result;
-      }),
-    );
+    return this.#typesPlain$;
   }
 }

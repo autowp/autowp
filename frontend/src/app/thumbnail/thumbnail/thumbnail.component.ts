@@ -11,11 +11,10 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {UserService} from '@services/user';
-import {getPerspectiveTranslation} from '@utils/translations';
 import {APIPerspectiveService} from 'app/api/perspective/perspective.service';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserComponent} from 'app/user/user/user.component';
-import {catchError, EMPTY, map} from 'rxjs';
+import {catchError, EMPTY} from 'rxjs';
 
 interface ThumbnailAPIPicture extends Picture {
   selected?: boolean;
@@ -45,14 +44,7 @@ export class ThumbnailComponent implements OnInit {
 
   readonly showSimilar = input(true);
 
-  protected readonly perspectiveOptions$ = this.#perspectiveService.getPerspectives$().pipe(
-    map((options) =>
-      options.map((option) => ({
-        id: option.id,
-        name: getPerspectiveTranslation(option.name),
-      })),
-    ),
-  );
+  protected readonly perspectiveOptions$ = this.#perspectiveService.options$;
   protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER));
   protected readonly isAuthenticated = toSignal(this.#auth.authenticated$);
 
