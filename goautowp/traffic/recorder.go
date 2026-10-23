@@ -10,9 +10,11 @@ import (
 )
 
 const (
-	recorderMaxBuckets    = 10000
-	recorderBatchSize     = 500
-	recorderFlushInterval = 5 * time.Second
+	recorderMaxBuckets               = 10000
+	recorderBatchSize                = 500
+	recorderFlushInterval            = 5 * time.Second
+	recorderWhitelistRefreshInterval = time.Minute
+	recorderDatabaseTimeout          = 5 * time.Second
 )
 
 type countWriter interface {
@@ -40,12 +42,13 @@ type Recorder struct {
 }
 
 func NewRecorder(ctx context.Context, writer countWriter, whitelist whitelistReader) *Recorder {
-	r := &Recorder{writer: writer, whitelist: whitelist, counts: make(map[minuteKey]int64)}
+	recorder := &Recorder{writer: writer, whitelist: whitelist, counts: make(map[minuteKey]int64)}
 
-	r.refreshWhitelist(ctx)
-	go r.run(ctx)
+	recorder.refreshWhitelist(ctx)
+	go recorder.runWhitelistRefresh(ctx)
+	go recorder.run(ctx)
 
-	return r
+	return recorder
 }
 
 func (r *Recorder) Record(ip net.IP) {
@@ -73,9 +76,9 @@ func (r *Recorder) Record(ip net.IP) {
 	r.counts[key]++
 }
 
-// Refresh once per flush interval, retaining the last good snapshot on database errors.
+// Retain the last good snapshot on database errors.
 func (r *Recorder) refreshWhitelist(parent context.Context) {
-	ctx, cancel := context.WithTimeout(parent, recorderFlushInterval)
+	ctx, cancel := context.WithTimeout(parent, recorderDatabaseTimeout)
 	defer cancel()
 
 	snapshot, err := r.whitelist.IPSet(ctx)
@@ -108,7 +111,7 @@ func (r *Recorder) flush(parent context.Context) {
 
 	batch := make([]MonitoringCount, 0, recorderBatchSize)
 
-	ctx, cancel := context.WithTimeout(parent, recorderFlushInterval)
+	ctx, cancel := context.WithTimeout(parent, recorderDatabaseTimeout)
 	defer cancel()
 
 	write := func() {
@@ -138,11 +141,24 @@ func (r *Recorder) run(ctx context.Context) {
 	for {
 		select {
 		case <-ticker.C:
-			r.refreshWhitelist(ctx)
 			r.flush(ctx)
 		case <-ctx.Done():
 			r.flush(context.WithoutCancel(ctx))
 
+			return
+		}
+	}
+}
+
+func (r *Recorder) runWhitelistRefresh(ctx context.Context) {
+	ticker := time.NewTicker(recorderWhitelistRefreshInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			r.refreshWhitelist(ctx)
+		case <-ctx.Done():
 			return
 		}
 	}

@@ -116,6 +116,27 @@ func runWorker(wg *sync.WaitGroup, name string, fn func() error) {
 
 func (s *Application) Serve(ctx context.Context, options ServeOptions, quit chan bool) error {
 	wg := sync.WaitGroup{}
+	viewWG := sync.WaitGroup{}
+
+	viewCtx, stopViews := context.WithCancel(context.WithoutCancel(ctx))
+	defer func() {
+		stopViews()
+		viewWG.Wait()
+	}()
+
+	if options.GRPC || options.Public {
+		repository, err := s.container.PicturesRepository(ctx)
+		if err != nil {
+			return err
+		}
+
+		// Flush the last views only after the HTTP/gRPC workers have drained their requests.
+		runWorker(&viewWG, "picture-views", func() error {
+			repository.RunViewRecorder(viewCtx)
+
+			return nil
+		})
+	}
 
 	if options.DuplicateFinderAMQP {
 		runWorker(&wg, "duplicate-finder-amqp", func() error { return s.ListenDuplicateFinderAMQP(ctx, quit) })

@@ -108,6 +108,7 @@ type RatingFan struct {
 
 type Repository struct {
 	db                    *goqu.Database
+	viewRecorder          *viewRecorder
 	imageStorage          *storage.Storage
 	textStorageRepository *textstorage.Repository
 	itemsRepository       *items.Repository
@@ -194,7 +195,7 @@ func NewRepository(
 	afterPictureAcceptedAchievements func(ctx context.Context, ownerID sql.NullInt64, moderatorID int64) error,
 	afterPictureQueuedForRemoval func(ctx context.Context, moderatorID int64) error,
 ) *Repository {
-	return &Repository{
+	repository := &Repository{
 		db:                    db,
 		imageStorage:          imageStorage,
 		textStorageRepository: textStorageRepository,
@@ -209,6 +210,9 @@ func NewRepository(
 		afterPictureAcceptedAchievements: afterPictureAcceptedAchievements,
 		afterPictureQueuedForRemoval:     afterPictureQueuedForRemoval,
 	}
+	repository.viewRecorder = newViewRecorder(repository)
+
+	return repository
 }
 
 func (s *Repository) PictureViews(ctx context.Context, id int64) (int32, error) {
@@ -254,18 +258,10 @@ func (s *Repository) PictureViewsBatch(ctx context.Context, ids []int64) (map[in
 	return result, nil
 }
 
-func (s *Repository) IncView(ctx context.Context, id int64) error {
-	_, err := s.db.Insert(schema.PictureViewTable).
-		Rows(goqu.Record{
-			schema.PictureViewTablePictureIDColName: id,
-			schema.PictureViewTableViewsColName:     1,
-		}).
-		OnConflict(goqu.DoUpdate(schema.PictureViewTablePictureIDColName, goqu.Record{
-			schema.PictureViewTableViewsColName: goqu.L("? + 1", schema.PictureViewTableViewsCol),
-		})).
-		Executor().ExecContext(ctx)
-
-	return err
+// IncView buffers a view without retaining the request context.
+// RunViewRecorder persists accepted views using the service lifecycle context.
+func (s *Repository) IncView(_ context.Context, id int64) error {
+	return s.viewRecorder.record(id)
 }
 
 func (s *Repository) Status(ctx context.Context, id int64) (schema.PictureStatus, error) {

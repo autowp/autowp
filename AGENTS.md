@@ -207,6 +207,16 @@ in `angular.json`) — don't assume Karma/Jest is set up.
 
 ## Cross-cutting notes
 
+- **Cancellation during mutations** — an HTTP/gRPC client can disconnect or cancel its request at
+  any step, cancelling the request context and interrupting the remaining work. For every mutating
+  call, define the cancellation boundary: honour cancellation before starting the mutation, use a
+  transaction for changes that must roll back together, and ensure required follow-up work after a
+  committed change cannot be skipped by request cancellation. Where that work must finish, derive
+  a bounded context with `context.WithTimeout(context.WithoutCancel(ctx), timeout)` and release it
+  with `defer cancel()`. Do not detach an entire request indiscriminately or leave detached work
+  without a timeout. Background buffers/workers must use the service lifecycle context, not the
+  context of the request that happened to initialize them. Test cancellation between persistent
+  mutation steps when partial completion could leave inconsistent state.
 - Auth for both gRPC and REST is backed by Keycloak (`goautowp/auth.go`, `KeycloakConfig`); local
   dev/test Keycloak is provisioned via `goautowp/docker-compose.yml` with `test/realm.json`.
 - The `chart/` directory holds the Helm chart used to deploy both services together

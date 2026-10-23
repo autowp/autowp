@@ -2,7 +2,9 @@ package traffic
 
 import (
 	"context"
+	"errors"
 	"net"
+	"slices"
 	"sync"
 	"testing"
 	"testing/synctest"
@@ -11,12 +13,34 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type fakeCountWriter struct{ counts []MonitoringCount }
+var errTestWhitelistRead = errors.New("database unavailable")
+
+type fakeCountWriter struct {
+	mutex  sync.Mutex
+	counts []MonitoringCount
+}
 
 func (writer *fakeCountWriter) AddCounts(_ context.Context, counts []MonitoringCount) error {
+	writer.mutex.Lock()
+	defer writer.mutex.Unlock()
+
 	writer.counts = append(writer.counts, counts...)
 
 	return nil
+}
+
+func (writer *fakeCountWriter) snapshot() []MonitoringCount {
+	writer.mutex.Lock()
+	defer writer.mutex.Unlock()
+
+	return slices.Clone(writer.counts)
+}
+
+func pendingTrafficCounts(recorder *Recorder) int {
+	recorder.mutex.Lock()
+	defer recorder.mutex.Unlock()
+
+	return len(recorder.counts)
 }
 
 func TestRecorderAggregatesAndSkipsInternalPeers(t *testing.T) {
@@ -62,15 +86,120 @@ func TestRecorderAggregatesAndSkipsInternalPeers(t *testing.T) {
 }
 
 type fakeWhitelistReader struct {
+	mutex     sync.Mutex
 	addresses map[string]struct{}
 	calls     int
 	err       error
+	delay     time.Duration
 }
 
-func (reader *fakeWhitelistReader) IPSet(context.Context) (map[string]struct{}, error) {
+func (reader *fakeWhitelistReader) IPSet(ctx context.Context) (map[string]struct{}, error) {
+	reader.mutex.Lock()
 	reader.calls++
+	addresses, err, delay := reader.addresses, reader.err, reader.delay
+	reader.mutex.Unlock()
 
-	return reader.addresses, reader.err
+	if delay > 0 {
+		timer := time.NewTimer(delay)
+		defer timer.Stop()
+
+		select {
+		case <-timer.C:
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
+	}
+
+	return addresses, err
+}
+
+func (reader *fakeWhitelistReader) callCount() int {
+	reader.mutex.Lock()
+	defer reader.mutex.Unlock()
+
+	return reader.calls
+}
+
+func (reader *fakeWhitelistReader) setAddresses(addresses map[string]struct{}) {
+	reader.mutex.Lock()
+	defer reader.mutex.Unlock()
+
+	reader.addresses = addresses
+}
+
+func TestRecorderRefreshesWhitelistOncePerMinute(t *testing.T) {
+	t.Parallel()
+
+	synctest.Test(t, func(t *testing.T) {
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+
+		writer := &fakeCountWriter{}
+		whitelist := &fakeWhitelistReader{addresses: map[string]struct{}{"192.0.2.1": {}}}
+		recorder := NewRecorder(ctx, writer, whitelist)
+
+		synctest.Wait()
+		require.Equal(t, 1, whitelist.callCount())
+
+		recorder.Record(net.ParseIP("192.0.2.2"))
+		time.Sleep(59 * time.Second)
+		synctest.Wait()
+		require.Equal(t, 1, whitelist.callCount())
+		require.Len(t, writer.snapshot(), 1)
+
+		whitelist.setAddresses(map[string]struct{}{"192.0.2.1": {}, "192.0.2.2": {}})
+		time.Sleep(time.Second)
+		synctest.Wait()
+		require.Equal(t, 2, whitelist.callCount())
+		recorder.Record(net.ParseIP("192.0.2.2"))
+		require.Zero(t, pendingTrafficCounts(recorder))
+
+		whitelist.setAddresses(map[string]struct{}{})
+		time.Sleep(time.Minute)
+		synctest.Wait()
+		require.Equal(t, 3, whitelist.callCount())
+		recorder.Record(net.ParseIP("192.0.2.2"))
+		require.Equal(t, 1, pendingTrafficCounts(recorder))
+	})
+}
+
+func TestRecorderFlushDoesNotWaitForWhitelistRefresh(t *testing.T) {
+	t.Parallel()
+
+	synctest.Test(t, func(t *testing.T) {
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+
+		writer := &fakeCountWriter{}
+		whitelist := &fakeWhitelistReader{}
+		recorder := NewRecorder(ctx, writer, whitelist)
+
+		synctest.Wait()
+		whitelist.mutex.Lock()
+		whitelist.delay = 4 * time.Second
+		whitelist.mutex.Unlock()
+		time.Sleep(59 * time.Second)
+		recorder.Record(net.ParseIP("192.0.2.2"))
+		time.Sleep(time.Second)
+		synctest.Wait()
+		require.Equal(t, 2, whitelist.callCount())
+		require.Len(t, writer.snapshot(), 1)
+	})
+}
+
+func TestRecorderRetainsWhitelistOnRefreshError(t *testing.T) {
+	t.Parallel()
+
+	whitelist := &fakeWhitelistReader{addresses: map[string]struct{}{"192.0.2.1": {}}}
+	recorder := &Recorder{whitelist: whitelist, counts: make(map[minuteKey]int64)}
+	recorder.refreshWhitelist(t.Context())
+
+	whitelist.addresses = nil
+	whitelist.err = errTestWhitelistRead
+
+	recorder.refreshWhitelist(t.Context())
+	recorder.Record(net.ParseIP("192.0.2.1"))
+	require.Empty(t, recorder.counts)
 }
 
 func TestRecorderSkipsWhitelistedAddressesWithoutPerRequestQueries(t *testing.T) {
