@@ -12,12 +12,16 @@ import (
 )
 
 const (
-	autowhitelistLimit = 1000
-	banByUserID        = 9
-	dailyLimit         = 1000000
-	hourlyLimit        = 200000
-	tenMinsLimit       = 50000
-	oneMinLimit        = 10000
+	autowhitelistLimit  = 1000
+	banByUserID         = 9
+	hoursInDay          = 24
+	halfDay             = time.Hour * hoursInDay / 2
+	hourlyLimitDuration = time.Hour * 5 * hoursInDay
+	dailyLimitDuration  = time.Hour * 10 * hoursInDay
+	dailyLimit          = 200000
+	hourlyLimit         = 40000
+	tenMinsLimit        = 10000
+	oneMinLimit         = 2000
 )
 
 // Repository Main Object.
@@ -41,13 +45,13 @@ var AutobanProfiles = []AutobanProfile{
 		Limit:  dailyLimit,
 		Reason: "daily limit",
 		Group:  []interface{}{},
-		Time:   time.Hour,
+		Time:   dailyLimitDuration,
 	},
 	{
 		Limit:  hourlyLimit,
 		Reason: "hourly limit",
 		Group:  []interface{}{schema.IPMonitoringTableHourCol},
-		Time:   time.Hour,
+		Time:   hourlyLimitDuration,
 	},
 	{
 		Limit:  tenMinsLimit,
@@ -56,7 +60,7 @@ var AutobanProfiles = []AutobanProfile{
 			schema.IPMonitoringTableHourCol,
 			schema.IPMonitoringTableTenminuteCol,
 		},
-		Time: time.Hour,
+		Time: time.Hour * hoursInDay,
 	},
 	{
 		Limit:  oneMinLimit,
@@ -66,7 +70,7 @@ var AutobanProfiles = []AutobanProfile{
 			schema.IPMonitoringTableTenminuteCol,
 			schema.IPMonitoringTableMinuteCol,
 		},
-		Time: time.Hour,
+		Time: halfDay,
 	},
 }
 
