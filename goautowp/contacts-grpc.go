@@ -148,20 +148,13 @@ func (s *ContactsGRPCServer) GetContacts(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	items := make([]*Contact, len(userRows))
+	extractedUsers, err := s.userExtractor.ExtractRows(ctx, userRows, nil, userCtx.UserID, userCtx.Roles)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
-	for idx := range userRows {
-		user, err := s.userExtractor.Extract(
-			ctx,
-			&userRows[idx],
-			nil,
-			userCtx.UserID,
-			userCtx.Roles,
-		)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
+	items := make([]*Contact, len(extractedUsers))
+	for idx, user := range extractedUsers {
 		items[idx] = &Contact{
 			ContactUserId: user.GetId(),
 			User:          user,

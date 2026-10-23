@@ -3,13 +3,14 @@ package goautowp
 import (
 	"context"
 	"errors"
+	"maps"
+	"slices"
 	"time"
 
 	"github.com/autowp/goautowp/frontend"
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/pictures"
-	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
@@ -24,8 +25,23 @@ const (
 )
 
 type UserExtractor struct {
-	imageStorage       *storage.Storage
-	picturesRepository *pictures.Repository
+	imageStorage       userImageStorage
+	picturesRepository userPictureCounts
+}
+
+type userImageStorage interface {
+	Image(ctx context.Context, id int) (*storage.Image, error)
+	FormattedImages(ctx context.Context, ids []int, formatName string) (map[int]storage.Image, error)
+}
+
+type userPictureCounts interface {
+	AcceptedCountsByOwnerIDs(ctx context.Context, ids []int64) (map[int64]int32, error)
+}
+
+type userExtractionData struct {
+	avatars map[int]storage.Image
+	photos  map[int]storage.Image
+	counts  map[int64]int32
 }
 
 func NewUserExtractor(
@@ -44,6 +60,114 @@ func (s *UserExtractor) Extract(
 	fields *UserFields,
 	currentUserID int64,
 	currentUserRoles []string,
+) (*User, error) {
+	result, err := s.ExtractRows(ctx, []schema.UsersRow{*row}, fields, currentUserID, currentUserRoles)
+	if err != nil {
+		return nil, err
+	}
+
+	return result[0], nil
+}
+
+func (s *UserExtractor) ExtractRows(
+	ctx context.Context,
+	rows []schema.UsersRow,
+	fields *UserFields,
+	currentUserID int64,
+	currentUserRoles []string,
+) ([]*User, error) {
+	imageIDs := make(map[int]struct{})
+	userIDs := make(map[int64]struct{})
+
+	isAdmin := util.Contains(currentUserRoles, users.RoleAdmin)
+	for _, row := range rows {
+		if row.Deleted && !isAdmin {
+			continue
+		}
+
+		userIDs[row.ID] = struct{}{}
+		if row.Img != nil {
+			imageIDs[*row.Img] = struct{}{}
+		}
+	}
+
+	var (
+		data userExtractionData
+		err  error
+	)
+
+	data.avatars, err = s.formattedImages(ctx, slices.Sorted(maps.Keys(imageIDs)), "avatar")
+	if err != nil {
+		return nil, err
+	}
+
+	if fields.GetPhoto() {
+		data.photos, err = s.formattedImages(ctx, slices.Sorted(maps.Keys(data.avatars)), "photo")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if fields.GetPicturesAcceptedCount() && len(userIDs) > 0 {
+		data.counts, err = s.picturesRepository.AcceptedCountsByOwnerIDs(ctx, slices.Sorted(maps.Keys(userIDs)))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	result := make([]*User, 0, len(rows))
+	for idx := range rows {
+		user, err := s.extract(ctx, &rows[idx], fields, currentUserID, currentUserRoles, data)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, user)
+	}
+
+	return result, nil
+}
+
+func (s *UserExtractor) formattedImages(ctx context.Context, ids []int, format string) (map[int]storage.Image, error) {
+	if len(ids) == 0 {
+		return make(map[int]storage.Image), nil
+	}
+
+	images, err := s.imageStorage.FormattedImages(ctx, ids, format)
+	if !errors.Is(err, storage.ErrImageNotFound) {
+		return images, err
+	}
+
+	// Isolate stale image references using smaller batches. Healthy lists need just
+	// one query, and one missing image does not force individual reads for every user.
+	if len(ids) == 1 {
+		return make(map[int]storage.Image), nil
+	}
+
+	middle := len(ids) / 2
+
+	left, err := s.formattedImages(ctx, ids[:middle], format)
+	if err != nil {
+		return nil, err
+	}
+
+	right, err := s.formattedImages(ctx, ids[middle:], format)
+	if err != nil {
+		return nil, err
+	}
+
+	maps.Copy(left, right)
+
+	return left, nil
+}
+
+func (s *UserExtractor) extract(
+	ctx context.Context,
+	row *schema.UsersRow,
+	fields *UserFields,
+	currentUserID int64,
+	currentUserRoles []string,
+	data userExtractionData,
 ) (*User, error) {
 	identity := ""
 	if row.Identity != nil {
@@ -96,27 +220,18 @@ func (s *UserExtractor) Extract(
 		}
 
 		if row.Img != nil {
-			avatar, err := s.imageStorage.FormattedImage(ctx, *row.Img, "avatar")
-			// A missing image row (a stale users.img, or one deleted concurrently - e.g. account
-			// anonymisation racing this list) must not fail the whole call: return the user
-			// without an avatar.
-			if errors.Is(err, storage.ErrImageNotFound) {
-				logging.Warnf("user %d references missing image %d, skipping avatar: %v", row.ID, *row.Img, err)
-			} else if err != nil {
-				return nil, err
+			if avatar, ok := data.avatars[*row.Img]; ok {
+				user.Avatar = APIImageToGRPC(&avatar)
+			} else {
+				logging.Warnf("user %d references missing image %d, skipping avatar", row.ID, *row.Img)
 			}
 
-			user.Avatar = APIImageToGRPC(avatar)
-
-			if avatar != nil && fields.GetPhoto() {
-				photo, err := s.imageStorage.FormattedImage(ctx, *row.Img, "photo")
-				if errors.Is(err, storage.ErrImageNotFound) {
-					logging.Warnf("user %d references missing image %d, skipping photo: %v", row.ID, *row.Img, err)
-				} else if err != nil {
-					return nil, err
+			if user.GetAvatar() != nil && fields.GetPhoto() {
+				if photo, ok := data.photos[*row.Img]; ok {
+					user.Photo = APIImageToGRPC(&photo)
+				} else {
+					logging.Warnf("user %d references missing image %d, skipping photo", row.ID, *row.Img)
 				}
-
-				user.Photo = APIImageToGRPC(photo)
 			}
 		}
 
@@ -126,15 +241,7 @@ func (s *UserExtractor) Extract(
 		}
 
 		if fields.GetPicturesAcceptedCount() {
-			count, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{
-				Status:  schema.PictureStatusAccepted,
-				OwnerID: row.ID,
-			})
-			if err != nil {
-				return nil, err
-			}
-
-			user.PicturesAcceptedCount = int32(count) //nolint:gosec
+			user.PicturesAcceptedCount = data.counts[row.ID]
 		}
 
 		if fields.GetLastIp() && util.Contains(currentUserRoles, users.RoleModer) &&

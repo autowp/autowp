@@ -2,6 +2,7 @@ package goautowp
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"sync"
 
@@ -38,85 +39,82 @@ func (s *Catalogue) getVehicleTypesTree(
 	ctx context.Context,
 	parentID int64,
 ) ([]*VehicleType, error) {
-	sqSelect := s.pgDB.Select(schema.VehicleTypeTableIDCol, schema.VehicleTypeTableNameCol).
-		From(schema.VehicleTypeTable).
-		Order(schema.VehicleTypeTablePositionCol.Asc())
-
-	if parentID != 0 {
-		sqSelect = sqSelect.Where(schema.VehicleTypeTableParentIDCol.Eq(parentID))
-	} else {
-		sqSelect = sqSelect.Where(schema.VehicleTypeTableParentIDCol.IsNull())
+	var rows []struct {
+		ID       int64         `db:"id"`
+		Name     string        `db:"name"`
+		ParentID sql.NullInt64 `db:"parent_id"`
 	}
 
-	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
+	err := s.pgDB.Select(
+		schema.VehicleTypeTableIDCol, schema.VehicleTypeTableNameCol, schema.VehicleTypeTableParentIDCol,
+	).
+		From(schema.VehicleTypeTable).
+		Order(schema.VehicleTypeTablePositionCol.Asc()).
+		ScanStructsContext(ctx, &rows)
 	if err != nil {
 		return nil, err
 	}
-	defer util.Close(rows)
+
+	nodes := make(map[int64]*VehicleType, len(rows))
+	for _, row := range rows {
+		nodes[row.ID] = &VehicleType{Id: row.ID, Name: row.Name, Childs: []*VehicleType{}}
+	}
 
 	result := make([]*VehicleType, 0)
 
-	for rows.Next() {
-		var vType VehicleType
-
-		err = rows.Scan(&vType.Id, &vType.Name)
-		if err != nil {
-			return nil, err
+	for _, row := range rows {
+		node := nodes[row.ID]
+		if row.ParentID.Valid {
+			if parent := nodes[row.ParentID.Int64]; parent != nil {
+				parent.Childs = append(parent.Childs, node)
+			}
 		}
 
-		vType.Childs, err = s.getVehicleTypesTree(ctx, vType.GetId())
-		if err != nil {
-			return nil, err
+		if (parentID == 0 && !row.ParentID.Valid) ||
+			(parentID != 0 && row.ParentID.Valid && row.ParentID.Int64 == parentID) {
+			result = append(result, node)
 		}
-
-		result = append(result, &vType)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
 	}
 
 	return result, nil
 }
 
 func (s *Catalogue) getSpecs(ctx context.Context, parentID int32) ([]*Spec, error) {
-	sqSelect := s.pgDB.Select(schema.SpecTableIDCol, schema.SpecTableNameCol, schema.SpecTableShortNameCol).
-		From(schema.SpecTable).
-		Order(schema.SpecTableNameCol.Asc())
-
-	if parentID != 0 {
-		sqSelect = sqSelect.Where(schema.SpecTableParentIDCol.Eq(parentID))
-	} else {
-		sqSelect = sqSelect.Where(schema.SpecTableParentIDCol.IsNull())
+	var rows []struct {
+		ID        int32         `db:"id"`
+		Name      string        `db:"name"`
+		ShortName string        `db:"short_name"`
+		ParentID  sql.NullInt32 `db:"parent_id"`
 	}
 
-	rows, err := sqSelect.Executor().QueryContext(ctx) //nolint:sqlclosecheck
+	err := s.pgDB.Select(schema.SpecTableIDCol, schema.SpecTableNameCol,
+		schema.SpecTableShortNameCol, schema.SpecTableParentIDCol).
+		From(schema.SpecTable).
+		Order(schema.SpecTableNameCol.Asc()).
+		ScanStructsContext(ctx, &rows)
 	if err != nil {
 		return nil, err
 	}
-	defer util.Close(rows)
+
+	nodes := make(map[int32]*Spec, len(rows))
+	for _, row := range rows {
+		nodes[row.ID] = &Spec{Id: row.ID, Name: row.Name, ShortName: row.ShortName, Childs: []*Spec{}}
+	}
 
 	specs := make([]*Spec, 0)
 
-	for rows.Next() {
-		var spec Spec
-
-		err = rows.Scan(&spec.Id, &spec.Name, &spec.ShortName)
-		if err != nil {
-			return nil, err
+	for _, row := range rows {
+		node := nodes[row.ID]
+		if row.ParentID.Valid {
+			if parent := nodes[row.ParentID.Int32]; parent != nil {
+				parent.Childs = append(parent.Childs, node)
+			}
 		}
 
-		childs, err := s.getSpecs(ctx, spec.GetId())
-		if err != nil {
-			return nil, err
+		if (parentID == 0 && !row.ParentID.Valid) ||
+			(parentID != 0 && row.ParentID.Valid && row.ParentID.Int32 == parentID) {
+			specs = append(specs, node)
 		}
-
-		spec.Childs = childs
-		specs = append(specs, &spec)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
 	}
 
 	return specs, nil

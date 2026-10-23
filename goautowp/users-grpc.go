@@ -297,15 +297,9 @@ func (s *UsersGRPCServer) GetBlacklistedUsers(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*User, 0, len(rows))
-
-	for idx := range rows {
-		apiUser, err := s.userExtractor.Extract(ctx, &rows[idx], nil, userCtx.UserID, userCtx.Roles)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		result = append(result, apiUser)
+	result, err := s.userExtractor.ExtractRows(ctx, rows, nil, userCtx.UserID, userCtx.Roles)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &UsersResponse{Items: result}, nil
@@ -331,21 +325,9 @@ func (s *UsersGRPCServer) GetUsers(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*User, 0)
-
-	for idx := range rows {
-		apiUser, err := s.userExtractor.Extract(
-			ctx,
-			&rows[idx],
-			in.GetFields(),
-			userCtx.UserID,
-			userCtx.Roles,
-		)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		result = append(result, apiUser)
+	result, err := s.userExtractor.ExtractRows(ctx, rows, in.GetFields(), userCtx.UserID, userCtx.Roles)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	var paginator *Pages

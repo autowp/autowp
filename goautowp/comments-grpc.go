@@ -325,40 +325,24 @@ func (s *CommentsGRPCServer) GetCommentVotes(
 		return nil, status.Errorf(codes.NotFound, "not found")
 	}
 
-	result := make([]*CommentVote, 0)
+	rows := make([]schema.UsersRow, 0, len(votes.PositiveVotes)+len(votes.NegativeVotes))
+	rows = append(rows, votes.PositiveVotes...)
+	rows = append(rows, votes.NegativeVotes...)
 
-	for idx := range votes.PositiveVotes {
-		extracted, err := s.userExtractor.Extract(
-			ctx,
-			&votes.PositiveVotes[idx],
-			nil,
-			userCtx.UserID,
-			userCtx.Roles,
-		)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		result = append(result, &CommentVote{ //nolint:exhaustruct
-			Value: CommentVote_POSITIVE,
-			User:  extracted,
-		})
+	extractedUsers, err := s.userExtractor.ExtractRows(ctx, rows, nil, userCtx.UserID, userCtx.Roles)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	for idx := range votes.NegativeVotes {
-		extracted, err := s.userExtractor.Extract(
-			ctx,
-			&votes.NegativeVotes[idx],
-			nil,
-			userCtx.UserID,
-			userCtx.Roles,
-		)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+	result := make([]*CommentVote, 0, len(extractedUsers))
+	for idx, extracted := range extractedUsers {
+		value := CommentVote_POSITIVE
+		if idx >= len(votes.PositiveVotes) {
+			value = CommentVote_NEGATIVE
 		}
 
 		result = append(result, &CommentVote{ //nolint:exhaustruct
-			Value: CommentVote_NEGATIVE,
+			Value: value,
 			User:  extracted,
 		})
 	}
