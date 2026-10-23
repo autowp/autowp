@@ -81,6 +81,7 @@
             ],
             "assets": [
               "src/assets",
+              "src/robots.txt",
               "src/favicon.ico",
               "src/browserconfig.xml",
               "src/manifest.json",

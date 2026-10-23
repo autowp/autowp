@@ -180,6 +180,10 @@ for (const lang of environment.languages) {
   /**
    * Serve static files from /browser
    */
+  vhostApp.get('/robots.txt', (_req, res) => {
+    res.sendFile(join(browserDistFolder, 'robots.txt'), {maxAge: '1h'});
+  });
+
   vhostApp.use(
     express.static(browserDistFolder, {
       maxAge: '1y',

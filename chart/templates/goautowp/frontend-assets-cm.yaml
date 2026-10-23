@@ -94,6 +94,11 @@ data:
           add_header Cache-Control "public, immutable";
         }
 
+        location = /robots.txt {
+          try_files $uri =404;
+          expires 1h;
+        }
+
         location ~* \.(js|mjs|css|map|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|eot|xml|txt|webmanifest)$ {
           try_files $uri =404;
           expires 1y;

@@ -5,6 +5,8 @@ import (
 	"net"
 	"sync"
 	"testing"
+	"testing/synctest"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -74,33 +76,50 @@ func (reader *fakeWhitelistReader) IPSet(context.Context) (map[string]struct{}, 
 func TestRecorderSkipsWhitelistedAddressesWithoutPerRequestQueries(t *testing.T) {
 	t.Parallel()
 
-	writer := &fakeCountWriter{}
-	whitelist := &fakeWhitelistReader{addresses: map[string]struct{}{"192.0.2.1": {}}}
-	recorder := &Recorder{writer: writer, whitelist: whitelist, counts: make(map[minuteKey]int64)}
-	recorder.refreshWhitelist(t.Context())
+	synctest.Test(t, func(t *testing.T) {
+		writer := &fakeCountWriter{}
+		whitelist := &fakeWhitelistReader{addresses: map[string]struct{}{"192.0.2.1": {}}}
+		recorder := &Recorder{writer: writer, whitelist: whitelist, counts: make(map[minuteKey]int64)}
+		recorder.refreshWhitelist(t.Context())
 
-	for range 1000 {
-		recorder.Record(net.ParseIP("192.0.2.1"))
+		for i := range 1000 {
+			if i == 500 {
+				time.Sleep(time.Minute)
+			}
+
+			recorder.Record(net.ParseIP("192.0.2.1"))
+			recorder.Record(net.ParseIP("192.0.2.2"))
+		}
+
+		require.Equal(t, 1, whitelist.calls)
+		require.Len(t, recorder.counts, 2)
+
+		for key := range recorder.counts {
+			require.Equal(t, "192.0.2.2", key.ip)
+		}
+
+		recorder.flush(t.Context())
+
+		var total int64
+
+		for _, count := range writer.counts {
+			require.Equal(t, "192.0.2.2", count.IP)
+			total += count.Count
+		}
+
+		require.EqualValues(t, 1000, total)
+
 		recorder.Record(net.ParseIP("192.0.2.2"))
-	}
 
-	require.Equal(t, 1, whitelist.calls)
-	require.Len(t, recorder.counts, 1)
-	recorder.flush(t.Context())
-	require.Len(t, writer.counts, 1)
-	require.Equal(t, "192.0.2.2", writer.counts[0].IP)
-	require.EqualValues(t, 1000, writer.counts[0].Count)
+		whitelist.addresses = map[string]struct{}{"192.0.2.1": {}, "192.0.2.2": {}}
 
-	recorder.Record(net.ParseIP("192.0.2.2"))
+		recorder.refreshWhitelist(t.Context())
+		require.Empty(t, recorder.counts)
 
-	whitelist.addresses = map[string]struct{}{"192.0.2.1": {}, "192.0.2.2": {}}
+		whitelist.addresses = map[string]struct{}{}
 
-	recorder.refreshWhitelist(t.Context())
-	require.Empty(t, recorder.counts)
-
-	whitelist.addresses = map[string]struct{}{}
-
-	recorder.refreshWhitelist(t.Context())
-	recorder.Record(net.ParseIP("192.0.2.1"))
-	require.Len(t, recorder.counts, 1)
+		recorder.refreshWhitelist(t.Context())
+		recorder.Record(net.ParseIP("192.0.2.1"))
+		require.Len(t, recorder.counts, 1)
+	})
 }
