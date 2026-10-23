@@ -8,10 +8,14 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/jackc/pgtype"
 )
 
 var ErrWhitelistItemNotFound = errors.New("whitelist item not found")
+
+const whitelistItemsPerPage = 50
 
 // Whitelist Main Object.
 type Whitelist struct {
@@ -22,6 +26,20 @@ type Whitelist struct {
 type WhitelistItem struct {
 	IP          net.IP `db:"ip"          json:"ip"`
 	Description string `db:"description" json:"description"`
+}
+
+type whitelistItemRow struct {
+	IP          pgtype.Inet `db:"ip"`
+	Description string      `db:"description"`
+}
+
+func (row whitelistItemRow) item() *WhitelistItem {
+	item := &WhitelistItem{Description: row.Description}
+	if row.IP.IPNet != nil {
+		item.IP = row.IP.IPNet.IP
+	}
+
+	return item
 }
 
 // NewWhitelist constructor.
@@ -118,13 +136,13 @@ func (s *Whitelist) Add(ctx context.Context, ip net.IP, desc string) error {
 
 // Get whitelist item.
 func (s *Whitelist) Get(ctx context.Context, ip net.IP) (*WhitelistItem, error) {
-	var item WhitelistItem
+	var row whitelistItemRow
 
 	success, err := s.db.Select(schema.IPWhitelistTableIPCol, schema.IPWhitelistTableDescriptionCol).
 		From(schema.IPWhitelistTable).
 		Where(schema.IPWhitelistTableIPCol.Eq(ip.String())).
 		Executor().
-		ScanStructContext(ctx, &item)
+		ScanStructContext(ctx, &row)
 	if err != nil {
 		return nil, err
 	}
@@ -133,17 +151,48 @@ func (s *Whitelist) Get(ctx context.Context, ip net.IP) (*WhitelistItem, error) 
 		return nil, ErrWhitelistItemNotFound
 	}
 
-	return &item, nil
+	return row.item(), nil
 }
 
 // List whitelist items.
-func (s *Whitelist) List(ctx context.Context) ([]*WhitelistItem, error) {
-	result := make([]*WhitelistItem, 0)
+func (s *Whitelist) List(ctx context.Context, page int32) ([]*WhitelistItem, *util.Pages, error) {
+	var rows []whitelistItemRow
 
-	err := s.db.Select(schema.IPWhitelistTableIPCol, schema.IPWhitelistTableDescriptionCol).
-		From(schema.IPWhitelistTable).ScanStructsContext(ctx, &result)
+	paginator := util.Paginator{
+		SQLSelect: s.db.Select(schema.IPWhitelistTableIPCol, schema.IPWhitelistTableDescriptionCol).
+			From(schema.IPWhitelistTable).
+			Order(schema.IPWhitelistTableIPCol.Asc()),
+		CurrentPageNumber: page,
+		ItemCountPerPage:  whitelistItemsPerPage,
+	}
 
-	return result, err
+	pages, err := paginator.GetPages(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if pages.TotalItemCount == 0 {
+		pages.Current = 1
+
+		return []*WhitelistItem{}, pages, nil
+	}
+
+	sqlSelect, err := paginator.GetCurrentItems(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = sqlSelect.ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := make([]*WhitelistItem, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, row.item())
+	}
+
+	return result, pages, nil
 }
 
 // Exists whitelist already contains IP.

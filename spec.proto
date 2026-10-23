@@ -118,7 +118,7 @@ service Traffic {
       get: "/v3/traffic/top"
     };
   }
-  rpc GetTrafficWhitelistItems(google.protobuf.Empty) returns (TrafficWhitelistItems) {
+  rpc GetTrafficWhitelistItems(GetTrafficWhitelistItemsRequest) returns (TrafficWhitelistItems) {
     option (google.api.http) = {
       get: "/v3/traffic/whitelist"
     };
@@ -1248,8 +1248,13 @@ message TrafficBlacklistItem {
   string reason = 3;
 }
 
+message GetTrafficWhitelistItemsRequest {
+  int32 page = 1 [(google.api.field_behavior) = OPTIONAL];
+}
+
 message TrafficWhitelistItems {
   repeated TrafficWhitelistItem items = 1;
+  Pages paginator = 2;
 }
 
 message ForumsUserSummary {

@@ -138,14 +138,17 @@ func TestWhitelist(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, err = srv.GetTrafficWhitelistItems(
+	response, err := srv.GetTrafficWhitelistItems(
 		metadata.NewIncomingContext(
 			ctx,
 			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
 		),
-		&emptypb.Empty{},
+		&GetTrafficWhitelistItemsRequest{},
 	)
 	require.NoError(t, err)
+	require.NotNil(t, response.GetPaginator())
+	require.EqualValues(t, 1, response.GetPaginator().GetCurrent())
+	require.LessOrEqual(t, len(response.GetItems()), 50)
 
 	_, err = srv.DeleteTrafficWhitelistItem(
 		metadata.NewIncomingContext(

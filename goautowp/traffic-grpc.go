@@ -252,7 +252,7 @@ func (s *TrafficGRPCServer) CreateTrafficWhitelistItem(
 
 func (s *TrafficGRPCServer) GetTrafficWhitelistItems(
 	ctx context.Context,
-	_ *emptypb.Empty,
+	in *GetTrafficWhitelistItemsRequest,
 ) (*TrafficWhitelistItems, error) {
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
@@ -263,7 +263,7 @@ func (s *TrafficGRPCServer) GetTrafficWhitelistItems(
 		return nil, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
-	list, err := s.traffic.Whitelist.List(ctx)
+	list, pages, err := s.traffic.Whitelist.List(ctx, in.GetPage())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -278,5 +278,10 @@ func (s *TrafficGRPCServer) GetTrafficWhitelistItems(
 
 	return &TrafficWhitelistItems{
 		Items: result,
+		Paginator: &Pages{
+			PageCount:      pages.PageCount,
+			Current:        pages.Current,
+			TotalItemCount: pages.TotalItemCount,
+		},
 	}, nil
 }
