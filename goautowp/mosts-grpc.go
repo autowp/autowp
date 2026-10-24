@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 
+	"github.com/autowp/goautowp/items"
 	"github.com/autowp/goautowp/mosts"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 type MostsGRPCServer struct {
@@ -148,33 +150,41 @@ func (s *MostsGRPCServer) GetMenu(ctx context.Context, in *MostsMenuRequest) (*M
 func (s *MostsGRPCServer) extractItems(
 	ctx context.Context, list []mosts.ResultItem, unitID int64, fields *ItemFields, lang string, userCtx UserContext,
 ) ([]*MostsItem, error) {
-	result := make([]*MostsItem, len(list))
-	lookups := make([]func(context.Context) error, 0, len(list))
-
+	rows := make([]*items.Item, len(list))
 	for index, car := range list {
-		lookups = append(lookups, func(ctx context.Context) error {
-			extracted, err := s.extractor.Extract(ctx, car.Item, fields, lang, userCtx)
-			if err != nil {
-				return err
-			}
-
-			result[index] = &MostsItem{Item: extracted, ValueHtml: car.ValueHTML, UnitId: unitID}
-
-			return nil
-		})
+		rows[index] = car.Item
 	}
 
-	// A single card keeps its existing internal parallelism. For multiple cards,
-	// spend the shared item budget on cards and keep nested picture reads inline.
-	if len(lookups) == 1 {
-		if err := lookups[0](ctx); err != nil {
+	var previews []*PreviewPictures
+
+	if fields.GetPreviewPictures() != nil && len(rows) > 0 {
+		var err error
+
+		previews, err = s.extractor.extractPreviewPicturesBatch(ctx, rows, fields, lang, userCtx)
+		if err != nil {
 			return nil, err
 		}
-	} else {
+
+		fields, _ = proto.Clone(fields).(*ItemFields)
+		fields.PreviewPictures = nil
+	}
+
+	if len(rows) > 1 {
 		ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, 1)
-		if err := runItemLookups(ctx, lookups); err != nil {
-			return nil, err
+	}
+
+	extracted, err := s.extractor.extractRows(ctx, rows, fields, lang, userCtx, true)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*MostsItem, len(list))
+	for index, car := range list {
+		if previews != nil {
+			extracted[index].PreviewPictures = previews[index]
 		}
+
+		result[index] = &MostsItem{Item: extracted[index], ValueHtml: car.ValueHTML, UnitId: unitID}
 	}
 
 	return result, nil

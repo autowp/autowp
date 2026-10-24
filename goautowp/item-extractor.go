@@ -90,6 +90,29 @@ func runItemLookups(ctx context.Context, lookups []func(context.Context) error) 
 func (s *ItemExtractor) ExtractRows(
 	ctx context.Context, rows []*items.Item, fields *ItemFields, lang string, userCtx UserContext,
 ) ([]*Item, error) {
+	return s.extractRows(ctx, rows, fields, lang, userCtx, false)
+}
+
+func (s *ItemExtractor) Extract(
+	ctx context.Context, row *items.Item, fields *ItemFields, lang string, userCtx UserContext,
+) (*Item, error) {
+	result, err := s.ExtractRows(ctx, []*items.Item{row}, fields, lang, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result) == 0 {
+		return nil, errItemNotFound
+	}
+
+	return result[0], nil
+}
+
+// extractRows shares field preloads across the batch. Parallel row assembly
+// reuses the same bounded runner, so nested reads stay within the item budget.
+func (s *ItemExtractor) extractRows(
+	ctx context.Context, rows []*items.Item, fields *ItemFields, lang string, userCtx UserContext, parallel bool,
+) ([]*Item, error) {
 	if len(rows) == 0 {
 		return []*Item{}, nil
 	}
@@ -106,10 +129,7 @@ func (s *ItemExtractor) ExtractRows(
 		ids = append(ids, row.ID)
 	}
 
-	var (
-		err    error
-		result = make([]*Item, 0, len(rows))
-	)
+	result := make([]*Item, len(rows))
 
 	pictureItemRequest := fields.GetPictureItems()
 	itemParentChildsRequest := fields.GetItemParentChilds()
@@ -152,7 +172,8 @@ func (s *ItemExtractor) ExtractRows(
 		return nil, err
 	}
 
-	for _, row := range rows {
+	extractRow := func(ctx context.Context, index int) error {
+		row := rows[index]
 		resultRow := &Item{
 			AttrZoneId:                 batch.attrZones[row.ID],
 			ChildsCounts:               batch.childsCounts[row.ID],
@@ -229,30 +250,33 @@ func (s *ItemExtractor) ExtractRows(
 			}
 		}
 
-		err = s.extractPlain(ctx, fields, row, resultRow, lang, userCtx)
-		if err != nil {
-			return nil, err
+		if err := s.extractPlain(ctx, fields, row, resultRow, lang, userCtx); err != nil {
+			return err
 		}
 
-		result = append(result, resultRow)
+		result[index] = resultRow
+
+		return nil
+	}
+
+	if parallel && len(rows) > 1 {
+		rowLookups := make([]func(context.Context) error, 0, len(rows))
+		for index := range rows {
+			rowLookups = append(rowLookups, func(ctx context.Context) error { return extractRow(ctx, index) })
+		}
+
+		if err := runItemLookups(ctx, rowLookups); err != nil {
+			return nil, err
+		}
+	} else {
+		for index := range rows {
+			if err := extractRow(ctx, index); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return result, nil
-}
-
-func (s *ItemExtractor) Extract(
-	ctx context.Context, row *items.Item, fields *ItemFields, lang string, userCtx UserContext,
-) (*Item, error) {
-	result, err := s.ExtractRows(ctx, []*items.Item{row}, fields, lang, userCtx)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(result) == 0 {
-		return nil, errItemNotFound
-	}
-
-	return result[0], nil
 }
 
 func (s *ItemExtractor) preloadItemParentChilds(
@@ -1251,6 +1275,39 @@ func previewPictureFields(requested *PictureFields, thumbLarge bool) *PictureFie
 func (s *ItemExtractor) extractPreviewPictures(
 	ctx context.Context, fields *ItemFields, row *items.Item, lang string, userCtx UserContext,
 ) (*PreviewPictures, error) {
+	result, err := s.fetchPreviewPictures(ctx, fields, row)
+	if err != nil {
+		return nil, err
+	}
+
+	if result == nil {
+		return nil, nil //nolint:nilnil
+	}
+
+	pictureExtractor := s.container.PictureExtractor()
+
+	extractedPics, err := extractPreviewPictureBatches(
+		ctx,
+		result,
+		fields.GetPreviewPictures().GetPictures().GetFields(),
+		func(ctx context.Context, rows []*schema.PictureRow, fields *PictureFields) ([]*Picture, error) {
+			return pictureExtractor.ExtractRows(ctx, rows, fields, lang, userCtx)
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PreviewPictures{
+		LargeFormat:   result.LargeFormat,
+		Pictures:      extractedPics,
+		TotalPictures: result.TotalPictures,
+	}, nil
+}
+
+func (s *ItemExtractor) fetchPreviewPictures(
+	ctx context.Context, fields *ItemFields, row *items.Item,
+) (*PerspectivePictureFetcherResult, error) {
 	pps := fields.GetPreviewPictures()
 	if pps == nil {
 		return nil, nil //nolint: nilnil
@@ -1287,29 +1344,7 @@ func (s *ItemExtractor) extractPreviewPictures(
 		return nil, err
 	}
 
-	// if pps.GetRoute() {
-	//	for idx, picture := range result.Pictures {
-	//		if picture != nil {
-	//			pictures.Pictures[idx].Route = []string{"/picture", picture.Row.Identity}
-	//		}
-	//	}
-	// }
-
-	pictureExtractor := s.container.PictureExtractor()
-
-	extractedPics, err := extractPreviewPictureBatches(ctx, result, picturesRequest.GetFields(),
-		func(ctx context.Context, rows []*schema.PictureRow, fields *PictureFields) ([]*Picture, error) {
-			return pictureExtractor.ExtractRows(ctx, rows, fields, lang, userCtx)
-		})
-	if err != nil {
-		return nil, err
-	}
-
-	return &PreviewPictures{
-		LargeFormat:   result.LargeFormat,
-		Pictures:      extractedPics,
-		TotalPictures: result.TotalPictures,
-	}, nil
+	return result, nil
 }
 
 func extractPreviewPictureBatches(

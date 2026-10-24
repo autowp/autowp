@@ -104,6 +104,9 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 
 		// Compare with the original sequential card extraction, retaining the
 		// extractor's default internal parallelism and picture field selection.
+		individualQueries := &itemBatchQueryLogger{}
+		db.Logger(individualQueries)
+
 		for index, car := range list {
 			expected, err := extractor.Extract(ctx, car.Item, fields, lang, UserContext{})
 			require.NoError(t, err)
@@ -112,6 +115,17 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 			require.EqualValues(t, 42, actual[index].GetUnitId())
 			require.NotEmpty(t, actual[index].GetItem().GetNameHtml())
 		}
+
+		db.Logger(nil)
+
+		batchedQueries := &itemBatchQueryLogger{}
+		db.Logger(batchedQueries)
+
+		_, err = server.extractItems(ctx, list, 42, fields, lang, UserContext{})
+		require.NoError(t, err)
+		db.Logger(nil)
+		require.Less(t, batchedQueries.queries.Load(), individualQueries.queries.Load(),
+			"shared preview extraction must reduce SQL for the actual rating field set")
 	}
 
 	require.NotEmpty(t, actual[0].GetItem().GetRoute())
