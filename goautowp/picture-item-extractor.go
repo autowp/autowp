@@ -2,6 +2,8 @@ package goautowp
 
 import (
 	"context"
+	"maps"
+	"slices"
 
 	"github.com/autowp/goautowp/items"
 	"github.com/autowp/goautowp/pictures"
@@ -30,11 +32,15 @@ func (s *PictureItemExtractor) ExtractRows(
 		fields = &PictureItemFields{}
 	}
 
-	ids := make([]int64, 0, len(rows))
+	itemIDs := make(map[int64]struct{}, len(rows))
+	pictureIDs := make(map[int64]struct{}, len(rows))
 
 	for _, row := range rows {
-		ids = append(ids, row.ItemID)
+		itemIDs[row.ItemID] = struct{}{}
+		pictureIDs[row.PictureID] = struct{}{}
 	}
+
+	ids := slices.Sorted(maps.Keys(itemIDs))
 
 	itemRequest := fields.GetItem()
 
@@ -54,7 +60,7 @@ func (s *PictureItemExtractor) ExtractRows(
 
 	pictureRequest := fields.GetPicture()
 
-	pictureRows, err := s.preloadPictures(ctx, pictureRequest, ids, lang, userCtx)
+	pictureRows, err := s.preloadPictures(ctx, pictureRequest, slices.Sorted(maps.Keys(pictureIDs)), lang, userCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -152,11 +158,13 @@ func (s *PictureItemExtractor) preloadPictures(
 
 	extractor := s.container.PictureExtractor()
 
-	for _, row := range rows {
-		result[row.ID], err = extractor.Extract(ctx, row, fields, lang, userCtx)
-		if err != nil {
-			return nil, err
-		}
+	extracted, err := extractor.ExtractRows(ctx, rows, fields, lang, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, picture := range extracted {
+		result[picture.GetId()] = picture
 	}
 
 	return result, nil
@@ -207,11 +215,13 @@ func (s *PictureItemExtractor) preloadItems(
 
 	itemExtractor := s.container.ItemExtractor()
 
-	for _, row := range rows {
-		result[row.ID], err = itemExtractor.Extract(ctx, row, itemFields, lang, userCtx)
-		if err != nil {
-			return nil, err
-		}
+	extracted, err := itemExtractor.ExtractRows(ctx, rows, itemFields, lang, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range extracted {
+		result[item.GetId()] = item
 	}
 
 	return result, nil

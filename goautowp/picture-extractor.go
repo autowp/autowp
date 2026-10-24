@@ -119,11 +119,14 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	// The only ordering constraint is images -> formatted (format requests are keyed by image
 	// id), kept sequential inside a single task.
 	var (
-		stats     map[int64]comments.TopicStat
-		votesByID map[int64]*pictures.VoteSummary
-		viewsByID map[int64]int32
-		paths     map[int64][]*PathTreePictureItem
-		formatted = make(map[string]map[int]storage.Image, pictureImageFormatCount)
+		stats          map[int64]comments.TopicStat
+		votesByID      map[int64]*pictures.VoteSummary
+		viewsByID      map[int64]int32
+		moderVotes     map[int64]pictures.ModerVoteSummary
+		pictureItems   map[int64][]*PictureItem
+		moderVoteItems map[int64][]*PictureModerVote
+		paths          map[int64][]*PathTreePictureItem
+		formatted      = make(map[string]map[int]storage.Image, pictureImageFormatCount)
 	)
 
 	pictureIDs := make([]int64, 0, len(rows))
@@ -132,6 +135,51 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	}
 
 	preloadGroup, preloadCtx := errgroup.WithContext(ctx)
+	preloadGroup.SetLimit(pictureExtractorParallelism)
+
+	if fields.GetModerVote() || (fields.GetModerVoted() && userCtx.UserID != 0) {
+		preloadGroup.Go(func() error {
+			if fields.GetModerVote() {
+				var preloadErr error
+
+				moderVotes, preloadErr = picturesRepository.ModerVoteSummaries(preloadCtx, pictureIDs, userCtx.UserID)
+
+				return preloadErr
+			}
+
+			votedIDs, preloadErr := picturesRepository.ModerVotedPictureIDs(preloadCtx, pictureIDs, userCtx.UserID)
+			if preloadErr != nil {
+				return preloadErr
+			}
+
+			moderVotes = make(map[int64]pictures.ModerVoteSummary, len(votedIDs))
+			for _, id := range votedIDs {
+				moderVotes[id] = pictures.ModerVoteSummary{Voted: true}
+			}
+
+			return nil
+		})
+	}
+
+	if request := fields.GetPictureItem(); request != nil {
+		preloadGroup.Go(func() error {
+			var preloadErr error
+
+			pictureItems, preloadErr = s.preloadPictureItems(preloadCtx, pictureIDs, request, lang, userCtx)
+
+			return preloadErr
+		})
+	}
+
+	if request := fields.GetPictureModerVotes(); request != nil {
+		preloadGroup.Go(func() error {
+			var preloadErr error
+
+			moderVoteItems, preloadErr = s.preloadPictureModerVotes(preloadCtx, pictureIDs, request)
+
+			return preloadErr
+		})
+	}
 
 	if fields.GetCommentsCount() {
 		preloadGroup.Go(func() error {
@@ -226,11 +274,6 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 
 	if err = preloadGroup.Wait(); err != nil {
 		return nil, err
-	}
-
-	var pictureItemExtractor *PictureItemExtractor
-	if fields.GetPictureItem() != nil {
-		pictureItemExtractor = s.container.PictureItemExtractor()
 	}
 
 	var dfDistanceExtractor *DfDistanceExtractor
@@ -400,17 +443,8 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetModerVote() {
-			group.Go(func() error {
-				count, sum, err := picturesRepository.ModerVoteCount(groupCtx, row.ID)
-				if err != nil {
-					return err
-				}
-
-				resultRow.ModerVoteCount = count
-				resultRow.ModerVoteVote = sum
-
-				return nil
-			})
+			resultRow.ModerVoteCount = moderVotes[row.ID].Count
+			resultRow.ModerVoteVote = moderVotes[row.ID].Vote
 		}
 
 		if paths != nil {
@@ -419,42 +453,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 
 		pictureItemRequest := fields.GetPictureItem()
 		if pictureItemRequest != nil {
-			group.Go(func() error {
-				piOptions, err := convertPictureItemListOptions(pictureItemRequest.GetOptions())
-				if err != nil {
-					return err
-				}
-
-				if piOptions == nil {
-					piOptions = &query.PictureItemListOptions{}
-				}
-
-				piOptions.PictureID = row.ID
-
-				order := convertPictureItemsOrder(pictureItemRequest.GetOrder())
-
-				piRows, err := picturesRepository.PictureItems(groupCtx, piOptions, order, 0)
-				if err != nil {
-					return err
-				}
-
-				res, err := pictureItemExtractor.ExtractRows(
-					groupCtx,
-					piRows,
-					pictureItemRequest.GetFields(),
-					lang,
-					userCtx,
-				)
-				if err != nil {
-					return err
-				}
-
-				resultRow.PictureItems = &PictureItems{
-					Items: res,
-				}
-
-				return nil
-			})
+			resultRow.PictureItems = &PictureItems{Items: pictureItems[row.ID]}
 		}
 
 		dfDistanceRequest := fields.GetDfDistance()
@@ -617,46 +616,12 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetModerVoted() && userCtx.UserID != 0 {
-			group.Go(func() error {
-				moderVoted, err := picturesRepository.HasModerVote(groupCtx, row.ID, userCtx.UserID)
-				if err != nil {
-					return err
-				}
-
-				resultRow.ModerVoted = moderVoted
-
-				return nil
-			})
+			resultRow.ModerVoted = moderVotes[row.ID].Voted
 		}
 
 		pictureModerVoteRequest := fields.GetPictureModerVotes()
 		if pictureModerVoteRequest != nil {
-			group.Go(func() error {
-				pmvOptions := convertPictureModerVoteListOptions(pictureModerVoteRequest.GetOptions())
-				if pmvOptions == nil {
-					pmvOptions = &query.PictureModerVoteListOptions{}
-				}
-
-				pmvOptions.PictureID = row.ID
-
-				pmvRows, err := picturesRepository.PictureModerVotes(groupCtx, pmvOptions)
-				if err != nil {
-					return err
-				}
-
-				pmvExtractor := NewPictureModerVoteExtractor()
-
-				res, err := pmvExtractor.ExtractRows(pmvRows)
-				if err != nil {
-					return err
-				}
-
-				resultRow.PictureModerVotes = &PictureModerVotes{
-					Items: res,
-				}
-
-				return nil
-			})
+			resultRow.PictureModerVotes = &PictureModerVotes{Items: moderVoteItems[row.ID]}
 		}
 
 		replaceableRequest := fields.GetReplaceable()
