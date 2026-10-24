@@ -1624,37 +1624,52 @@ func (s *Repository) Specifications( //nolint: maintidx
 func (s *Repository) ZoneItemsActualValues(
 	ctx context.Context, zoneID int64, itemIDs []int64,
 ) (map[int64]map[int64]Value, error) {
-	floatRows, err := s.zoneItemsFloatValuesRows(ctx, zoneID, itemIDs)
-	if err != nil {
-		return nil, err
+	var floatValues, intValues, stringValues, listValues map[int64]map[int64]Value
+
+	lookups := []func(context.Context) error{
+		func(ctx context.Context) error {
+			rows, err := s.zoneItemsFloatValuesRows(ctx, zoneID, itemIDs)
+			if err != nil {
+				return err
+			}
+
+			floatValues = s.floatValuesRowsToMap(rows)
+
+			return nil
+		},
+		func(ctx context.Context) error {
+			rows, err := s.zoneItemsIntValuesRows(ctx, zoneID, itemIDs)
+			if err != nil {
+				return err
+			}
+
+			intValues, err = s.intValuesRowsToMap(ctx, rows)
+
+			return err
+		},
+		func(ctx context.Context) error {
+			rows, err := s.zoneItemsStringValuesRows(ctx, zoneID, itemIDs)
+			if err != nil {
+				return err
+			}
+
+			stringValues = s.stringValuesRowsToMap(rows)
+
+			return nil
+		},
+		func(ctx context.Context) error {
+			rows, err := s.zoneItemsListValuesRows(ctx, zoneID, itemIDs)
+			if err != nil {
+				return err
+			}
+
+			listValues, err = s.listValuesRowsToMap(ctx, rows)
+
+			return err
+		},
 	}
 
-	floatValues := s.floatValuesRowsToMap(floatRows)
-
-	intRows, err := s.zoneItemsIntValuesRows(ctx, zoneID, itemIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	intValues, err := s.intValuesRowsToMap(ctx, intRows)
-	if err != nil {
-		return nil, err
-	}
-
-	stringRows, err := s.zoneItemsStringValuesRows(ctx, zoneID, itemIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	stringValues := s.stringValuesRowsToMap(stringRows)
-
-	listRows, err := s.zoneItemsListValuesRows(ctx, zoneID, itemIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	listValues, err := s.listValuesRowsToMap(ctx, listRows)
-	if err != nil {
+	if err := runActualValueLookups(ctx, lookups); err != nil {
 		return nil, err
 	}
 
@@ -1691,67 +1706,7 @@ func (s *Repository) ItemsActualValues(
 	ctx context.Context,
 	itemIDs []int64,
 ) (map[int64]map[int64]Value, error) {
-	floatRows, err := s.zoneItemsFloatValuesRows(ctx, 0, itemIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	floatValues := s.floatValuesRowsToMap(floatRows)
-
-	intRows, err := s.zoneItemsIntValuesRows(ctx, 0, itemIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	intValues, err := s.intValuesRowsToMap(ctx, intRows)
-	if err != nil {
-		return nil, err
-	}
-
-	stringRows, err := s.zoneItemsStringValuesRows(ctx, 0, itemIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	stringValues := s.stringValuesRowsToMap(stringRows)
-
-	listRows, err := s.zoneItemsListValuesRows(ctx, 0, itemIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	listValues, err := s.listValuesRowsToMap(ctx, listRows)
-	if err != nil {
-		return nil, err
-	}
-
-	values := intValues
-
-	for itemID, attrs := range stringValues {
-		if _, ok := values[itemID]; ok {
-			maps.Copy(values[itemID], attrs)
-		} else {
-			values[itemID] = attrs
-		}
-	}
-
-	for itemID, attrs := range floatValues {
-		if _, ok := values[itemID]; ok {
-			maps.Copy(values[itemID], attrs)
-		} else {
-			values[itemID] = attrs
-		}
-	}
-
-	for itemID, attrs := range listValues {
-		if _, ok := values[itemID]; ok {
-			maps.Copy(values[itemID], attrs)
-		} else {
-			values[itemID] = attrs
-		}
-	}
-
-	return values, nil
+	return s.ZoneItemsActualValues(ctx, 0, itemIDs)
 }
 
 type Contributor struct {

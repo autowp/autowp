@@ -25,6 +25,8 @@ func newAttrsValuesTestServer(t *testing.T) (*AttrsGRPCServer, *goqu.Database, *
   INSERT INTO attrs_attributes SELECT id, 'Attribute ' || id, NULL, id, NULL, true, 2, NULL, id
    FROM generate_series(1, 7) id;
   INSERT INTO attrs_attributes VALUES (8, 'Empty', NULL, 1, NULL, false, NULL::integer, NULL::bigint, 8);
+  CREATE TEMP TABLE attrs_zone_attributes (attribute_id bigint, zone_id bigint);
+  INSERT INTO attrs_zone_attributes VALUES (1, 1), (2, 1), (3, 2), (4, 1), (5, 1), (6, 1), (7, 2), (8, 1);
   CREATE TEMP TABLE attrs_values (attribute_id bigint, item_id bigint, update_date timestamptz);
   INSERT INTO attrs_values SELECT id, 10, '2020-01-01'::timestamptz + id * interval '1 day'
    FROM generate_series(1, 8) id;
@@ -137,6 +139,11 @@ func TestAttrsValuesConcurrentReads(t *testing.T) {
 
 			db.Logger(nil)
 			require.EqualValues(t, 4, maximum.Load())
+
+			if index == 0 {
+				require.EqualValues(t, 5, seen.Load(), "one list query and four typed batches")
+			}
+
 			require.True(t, proto.Equal(cold, actual))
 
 			for _, lang := range []string{"en", "ru"} {
@@ -265,7 +272,8 @@ func TestAttrsValuesCancellationAndErrors(t *testing.T) {
 			require.Contains(t, status.Convert(err).Message(), "value")
 			require.False(t, result.ProtoReflect().IsValid())
 			require.NoError(t, ctx.Err())
-			require.Zero(t, pool.Stats().InUse)
+			// The driver releases a connection asynchronously after canceling SQL.
+			require.Eventually(t, func() bool { return pool.Stats().InUse == 0 }, time.Second, time.Millisecond)
 		})
 	}
 }

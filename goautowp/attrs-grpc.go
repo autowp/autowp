@@ -297,37 +297,17 @@ func (s *AttrsGRPCServer) GetValues(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	res := make([]*AttrValue, len(rows))
-
-	lookups := make([]func(context.Context) error, 0, len(rows))
-
-	for idx, row := range rows {
-		lookups = append(lookups, func(ctx context.Context) error {
-			value, valueText, err := s.repository.ActualValueText(
-				ctx,
-				row.AttributeID,
-				row.ItemID,
-				in.GetLanguage(),
-			)
-			if err != nil {
-				return err
-			}
-
-			extractedValue := extractAttrValue(value)
-
-			res[idx] = &AttrValue{
-				AttributeId: row.AttributeID,
-				ItemId:      row.ItemID,
-				Value:       &extractedValue,
-				ValueText:   valueText,
-			}
-
-			return nil
-		})
+	values, err := s.repository.ActualValuesText(ctx, rows, in.GetLanguage())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if err := runItemLookups(ctx, lookups); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	res := make([]*AttrValue, len(rows))
+	for index, row := range rows {
+		value := extractAttrValue(values[index].Value)
+		res[index] = &AttrValue{
+			AttributeId: row.AttributeID, ItemId: row.ItemID, Value: &value, ValueText: values[index].Text,
+		}
 	}
 
 	return &AttrValuesResponse{
