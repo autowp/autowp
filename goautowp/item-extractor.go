@@ -544,14 +544,17 @@ func (s *ItemExtractor) extractPlain(
 		})
 	}
 
+	var relatedPictures *relatedGroupPictures
+
 	if fields.GetRelatedGroupPictures() {
-		lookups = append(lookups, func(ctx context.Context) error {
-			var err error
-
-			resultRow.RelatedGroupPictures, err = s.extractRelatedGroupsPictures(ctx, fields, row, lang)
-
+		data, relatedLookups, err := s.prepareRelatedGroupPictures(ctx, row, lang)
+		if err != nil {
 			return err
-		})
+		}
+
+		relatedPictures = data
+
+		lookups = append(lookups, relatedLookups...)
 	}
 
 	var dayPictures *itemOfDayPictures
@@ -582,6 +585,13 @@ func (s *ItemExtractor) extractPlain(
 	}
 
 	resultRow.Logo, resultRow.Logo120, resultRow.Brandicon = logos.logo, logos.logo120, logos.brandicon
+
+	if relatedPictures != nil {
+		resultRow.RelatedGroupPictures, err = relatedPictures.extract(lang)
+		if err != nil {
+			return err
+		}
+	}
 
 	if dayPictures != nil {
 		resultRow.ItemOfDayPictures, err = dayPictures.extract(row, lang)
@@ -955,6 +965,14 @@ func (s *ItemExtractor) orientedPictureList(
 	return result, nil
 }
 
+type relatedGroupPictures struct {
+	cars      []*items.Item
+	previews  map[int64]*schema.PictureRow
+	images    map[int]storage.Image
+	paths     map[int64]*items.CataloguePathResult
+	formatter *items.ItemNameFormatter
+}
+
 func (s *ItemExtractor) extractRelatedGroupsPictures(
 	ctx context.Context, fields *ItemFields, row *items.Item, lang string,
 ) ([]*RelatedGroupPicture, error) {
@@ -962,97 +980,165 @@ func (s *ItemExtractor) extractRelatedGroupsPictures(
 		return nil, nil
 	}
 
+	data, lookups, err := s.prepareRelatedGroupPictures(ctx, row, lang)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
+	}
+
+	return data.extract(lang)
+}
+
+func (s *ItemExtractor) prepareRelatedGroupPictures(
+	ctx context.Context, row *items.Item, lang string,
+) (*relatedGroupPictures, []func(context.Context) error, error) {
 	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	groups, err := itemRepository.RelatedCarGroups(ctx, row.ID)
-	if err != nil {
-		return nil, err
-	}
+	data := &relatedGroupPictures{}
+	groupsReady := make(chan struct{})
 
-	carPictures := make([]*RelatedGroupPicture, 0, len(groups))
-	if len(groups) == 0 {
-		return carPictures, nil
-	}
+	var (
+		groups map[int64][]int64
+		ids    []int64
+	)
 
-	ids := slices.Collect(maps.Keys(groups))
-
-	cars, _, err := itemRepository.List(ctx, &query.ItemListOptions{ItemIDs: ids, Language: lang},
-		&items.ItemFields{NameText: true}, items.OrderByAge, false)
-	if err != nil {
-		return nil, err
-	}
-
-	pictureRepository, err := s.container.PicturesRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	// A single-child group looks under the representative; merged groups look
-	// under all their children, preserving the old ancestor selection.
-	ancestors := make(map[int64][]int64, len(cars))
-	for _, car := range cars {
-		ancestors[car.ID] = []int64{car.ID}
-		if len(groups[car.ID]) > 1 {
-			ancestors[car.ID] = groups[car.ID]
+	waitForGroups := func(ctx context.Context) error {
+		select {
+		case <-groupsReady:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
 		}
 	}
 
-	previews, err := pictureRepository.RelatedGroupPreviews(ctx, ancestors)
-	if err != nil {
-		return nil, err
-	}
+	// The producer precedes its consumers, including when nested lookups run
+	// sequentially. Catalogue paths overlap the entire preview loading chain.
+	lookups := []func(context.Context) error{
+		func(ctx context.Context) error {
+			var err error
 
-	imageIDs := make([]int, 0, len(previews))
-	seen := make(map[int]bool)
-
-	for _, preview := range previews {
-		if preview.ImageID.Valid {
-			id := int(preview.ImageID.Int64)
-			if !seen[id] {
-				seen[id] = true
-				imageIDs = append(imageIDs, id)
+			groups, err = itemRepository.RelatedCarGroups(ctx, row.ID)
+			if err != nil {
+				return err
 			}
-		}
+
+			ids = slices.Collect(maps.Keys(groups))
+
+			close(groupsReady)
+
+			return nil
+		},
+		func(ctx context.Context) error {
+			if err := waitForGroups(ctx); err != nil {
+				return err
+			}
+
+			if len(groups) == 0 {
+				return nil
+			}
+
+			cars, _, err := itemRepository.List(ctx, &query.ItemListOptions{ItemIDs: ids, Language: lang},
+				&items.ItemFields{NameText: true}, items.OrderByAge, false)
+			if err != nil {
+				return err
+			}
+
+			pictureRepository, err := s.container.PicturesRepository(ctx)
+			if err != nil {
+				return err
+			}
+
+			// A single-child group looks under the representative; merged groups look
+			// under all their children, preserving the old ancestor selection.
+			ancestors := make(map[int64][]int64, len(cars))
+			for _, car := range cars {
+				ancestors[car.ID] = []int64{car.ID}
+				if len(groups[car.ID]) > 1 {
+					ancestors[car.ID] = groups[car.ID]
+				}
+			}
+
+			previews, err := pictureRepository.RelatedGroupPreviews(ctx, ancestors)
+			if err != nil {
+				return err
+			}
+
+			imageIDs := make([]int, 0, len(previews))
+			seen := make(map[int]bool)
+
+			for _, preview := range previews {
+				if preview.ImageID.Valid {
+					id := int(preview.ImageID.Int64)
+					if !seen[id] {
+						seen[id] = true
+						imageIDs = append(imageIDs, id)
+					}
+				}
+			}
+
+			imageStorage, err := s.container.ImageStorage(ctx)
+			if err != nil {
+				return err
+			}
+
+			data.images = make(map[int]storage.Image)
+			if len(imageIDs) > 0 {
+				data.images, err = imageStorage.FormattedImages(ctx, imageIDs, pictureThumbLargeFormat)
+				if err != nil {
+					return err
+				}
+			}
+
+			i18nBundle, err := s.container.I18n()
+			if err != nil {
+				return err
+			}
+
+			data.cars = cars
+			data.previews = previews
+			data.formatter = items.NewItemNameFormatter(i18nBundle)
+
+			return nil
+		},
+		func(ctx context.Context) error {
+			if err := waitForGroups(ctx); err != nil {
+				return err
+			}
+
+			if len(groups) == 0 {
+				return nil
+			}
+
+			var err error
+
+			data.paths, err = itemRepository.FirstCataloguePaths(ctx, ids)
+
+			return err
+		},
 	}
 
-	imageStorage, err := s.container.ImageStorage(ctx)
-	if err != nil {
-		return nil, err
-	}
+	return data, lookups, nil
+}
 
-	images := make(map[int]storage.Image)
-	if len(imageIDs) > 0 {
-		images, err = imageStorage.FormattedImages(ctx, imageIDs, pictureThumbLargeFormat)
-		if err != nil {
-			return nil, err
-		}
-	}
+func (data *relatedGroupPictures) extract(lang string) ([]*RelatedGroupPicture, error) {
+	carPictures := make([]*RelatedGroupPicture, 0, len(data.cars))
 
-	paths, err := itemRepository.FirstCataloguePaths(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	i18nBundle, err := s.container.I18n()
-	if err != nil {
-		return nil, err
-	}
-
-	itemNameFormatter := items.NewItemNameFormatter(i18nBundle)
-
-	for _, car := range cars {
+	for _, car := range data.cars {
 		src := ""
 
-		if preview := previews[car.ID]; preview != nil && preview.ImageID.Valid {
-			image := images[int(preview.ImageID.Int64)]
+		if preview := data.previews[car.ID]; preview != nil && preview.ImageID.Valid {
+			image := data.images[int(preview.ImageID.Int64)]
 			src = image.Src()
 		}
 
 		var route []string
-		if path := paths[car.ID]; path != nil {
+		if path := data.paths[car.ID]; path != nil {
 			route = append([]string{"/", path.BrandCatname, path.CarCatname}, path.Path...)
 		}
 
@@ -1072,7 +1158,7 @@ func (s *ItemExtractor) extractRelatedGroupsPictures(
 			EndMonth:               util.NullInt16ToScalar(car.EndMonth),
 		}
 
-		formattedName, err := itemNameFormatter.FormatHTML(formatterOptions, lang)
+		formattedName, err := data.formatter.FormatHTML(formatterOptions, lang)
 		if err != nil {
 			return nil, err
 		}
