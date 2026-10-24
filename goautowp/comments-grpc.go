@@ -124,10 +124,23 @@ func convertModeratorAttention(
 	return 0, fmt.Errorf("%w: `%v`", errUnknownModeratorAttention, value)
 }
 
+type commentMessageState struct {
+	isNew    map[int64]bool
+	userVote map[int64]int32
+}
+
 func extractMessage(
 	ctx context.Context, row *schema.CommentMessageRow, repository *comments.Repository,
 	picturesRepository *pictures.Repository, userID int64, roles []string, canViewIP bool,
 	fields *CommentMessageFields,
+) (*CommentMessage, error) {
+	return extractMessageWithState(ctx, row, repository, picturesRepository, userID, roles, canViewIP, fields, nil)
+}
+
+func extractMessageWithState(
+	ctx context.Context, row *schema.CommentMessageRow, repository *comments.Repository,
+	picturesRepository *pictures.Repository, userID int64, roles []string, canViewIP bool,
+	fields *CommentMessageFields, state *commentMessageState,
 ) (*CommentMessage, error) {
 	canRemove := util.Contains(roles, users.RoleCommentsModer)
 	isModer := util.Contains(roles, users.RoleModer)
@@ -151,7 +164,9 @@ func extractMessage(
 
 	isNew := false
 
-	if fields.GetIsNew() && userID > 0 {
+	if state != nil && state.isNew != nil {
+		isNew = state.isNew[row.ID]
+	} else if fields.GetIsNew() && userID > 0 {
 		lookups = append(lookups, func(ctx context.Context) error {
 			var err error
 
@@ -202,7 +217,9 @@ func extractMessage(
 			vote = row.Vote
 		}
 
-		if fields.GetUserVote() && userID != 0 {
+		if state != nil && state.userVote != nil {
+			userVote = state.userVote[row.ID]
+		} else if fields.GetUserVote() && userID != 0 {
 			lookups = append(lookups, func(ctx context.Context) error {
 				var err error
 
@@ -915,22 +932,9 @@ func (s *CommentsGRPCServer) GetMessages(
 			return nil, err
 		}
 
-		for _, row := range rows {
-			msg, err := extractMessage(
-				ctx,
-				row,
-				s.repository,
-				s.picturesRepository,
-				userCtx.UserID,
-				userCtx.Roles,
-				canViewIP,
-				fields,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			msgs = append(msgs, msg)
+		msgs, err = s.extractMessages(ctx, rows, userCtx, canViewIP, fields)
+		if err != nil {
+			return nil, err
 		}
 
 		if userCtx.UserID > 0 && in.GetItemId() > 0 && in.GetTypeId() > 0 {
@@ -960,4 +964,66 @@ func (s *CommentsGRPCServer) GetMessages(
 			TotalItemCount: pages.TotalItemCount,
 		},
 	}, nil
+}
+
+func (s *CommentsGRPCServer) extractMessages(
+	ctx context.Context, rows []*schema.CommentMessageRow, userCtx UserContext,
+	canViewIP bool, fields *CommentMessageFields,
+) ([]*CommentMessage, error) {
+	state := &commentMessageState{}
+
+	var reads []func(context.Context) error
+	if fields.GetIsNew() && userCtx.UserID > 0 {
+		reads = append(reads, func(ctx context.Context) error {
+			var err error
+
+			state.isNew, err = s.repository.NewMessages(ctx, userCtx.UserID, rows)
+
+			return err
+		})
+	}
+
+	if fields.GetUserVote() && userCtx.UserID != 0 {
+		ids := make([]int64, 0, len(rows))
+		for _, row := range rows {
+			if !row.Deleted || util.Contains(userCtx.Roles, users.RoleCommentsModer) {
+				ids = append(ids, row.ID)
+			}
+		}
+
+		reads = append(reads, func(ctx context.Context) error {
+			var err error
+
+			state.userVote, err = s.repository.UserVotes(ctx, userCtx.UserID, ids)
+
+			return err
+		})
+	}
+
+	if err := runItemLookups(ctx, reads); err != nil {
+		return nil, err
+	}
+
+	msgs := make([]*CommentMessage, len(rows))
+
+	lookups := make([]func(context.Context) error, 0, len(rows))
+	for index, row := range rows {
+		lookups = append(lookups, func(ctx context.Context) error {
+			msg, err := extractMessageWithState(ctx, row, s.repository, s.picturesRepository,
+				userCtx.UserID, userCtx.Roles, canViewIP, fields, state)
+			if err != nil {
+				return err
+			}
+
+			msgs[index] = msg
+
+			return nil
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
+	}
+
+	return msgs, nil
 }

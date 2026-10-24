@@ -344,58 +344,24 @@ func (s *AttrsGRPCServer) GetUserValues(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	res := make([]*AttrUserValue, len(rows))
-
-	lookups := make([]func(context.Context) error, 0, len(rows))
-
-	for idx, row := range rows {
-		lookups = append(lookups, func(ctx context.Context) error {
-			var (
-				err       error
-				value     attrs.Value
-				valueText string
-			)
-
-			if in.GetFields().GetValueText() {
-				value, valueText, err = s.repository.UserValueText(
-					ctx,
-					row.AttributeID,
-					row.ItemID,
-					row.UserID,
-					in.GetLanguage(),
-				)
-				if err != nil {
-					return err
-				}
-			} else {
-				value, err = s.repository.UserValue(ctx, row.AttributeID, row.ItemID, row.UserID)
-				if err != nil {
-					return err
-				}
-			}
-
-			extractedValue := extractAttrValue(value)
-
-			var updateDate *timestamppb.Timestamp
-			if row.UpdateDate.Valid {
-				updateDate = timestamppb.New(row.UpdateDate.Time)
-			}
-
-			res[idx] = &AttrUserValue{
-				AttributeId: row.AttributeID,
-				ItemId:      row.ItemID,
-				UserId:      row.UserID,
-				Value:       &extractedValue,
-				ValueText:   valueText,
-				UpdateTime:  updateDate,
-			}
-
-			return nil
-		})
+	values, err := s.repository.UserValues(ctx, rows, in.GetLanguage(), in.GetFields().GetValueText())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if err := runItemLookups(ctx, lookups); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	res := make([]*AttrUserValue, len(rows))
+	for index, row := range rows {
+		extracted := extractAttrValue(values[index].Value)
+
+		var updateDate *timestamppb.Timestamp
+		if row.UpdateDate.Valid {
+			updateDate = timestamppb.New(row.UpdateDate.Time)
+		}
+
+		res[index] = &AttrUserValue{
+			AttributeId: row.AttributeID, ItemId: row.ItemID, UserId: row.UserID,
+			Value: &extracted, ValueText: values[index].Text, UpdateTime: updateDate,
+		}
 	}
 
 	return &AttrUserValuesResponse{

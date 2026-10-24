@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"maps"
+	"slices"
 	"time"
 
 	"github.com/autowp/goautowp/logging"
@@ -25,7 +27,15 @@ type actualValueRequest struct {
 	index       int
 	itemID      int64
 	attributeID int64
+	userID      int64
 	typeID      schema.AttrsAttributeTypeID
+}
+
+type typedValueRow[T any] struct {
+	ItemID      int64 `db:"item_id"`
+	AttributeID int64 `db:"attribute_id"`
+	UserID      int64 `db:"user_id"`
+	Value       T     `db:"value"`
 }
 
 func runActualValueLookups(ctx context.Context, lookups []func(context.Context) error) error {
@@ -45,11 +55,27 @@ func runActualValueLookups(ctx context.Context, lookups []func(context.Context) 
 	return group.Wait()
 }
 
-// ActualValuesText preserves ActualValueText semantics, including SQL NULLs,
-// missing typed rows, TEXT attributes and list ordering. Specification-table
-// batches deliberately omit NULLs and therefore cannot be used here directly.
+// ActualValuesText preserves typed values, SQL NULLs and list ordering.
 func (s *Repository) ActualValuesText(
 	ctx context.Context, rows []schema.AttrsValueRow, lang string,
+) ([]ValueText, error) {
+	requests := make([]schema.AttrsUserValueRow, len(rows))
+	for index, row := range rows {
+		requests[index] = schema.AttrsUserValueRow{ItemID: row.ItemID, AttributeID: row.AttributeID}
+	}
+
+	return s.valuesText(ctx, requests, lang, true, false)
+}
+
+// UserValues batches typed user values and optionally formats them.
+func (s *Repository) UserValues(
+	ctx context.Context, rows []schema.AttrsUserValueRow, lang string, withText bool,
+) ([]ValueText, error) {
+	return s.valuesText(ctx, rows, lang, withText, true)
+}
+
+func (s *Repository) valuesText(
+	ctx context.Context, rows []schema.AttrsUserValueRow, lang string, withText bool, userValues bool,
 ) ([]ValueText, error) {
 	result := make([]ValueText, len(rows))
 	groups := make(map[string][]actualValueRequest)
@@ -85,8 +111,25 @@ func (s *Repository) ActualValuesText(
 			continue
 		}
 
+		if userValues {
+			switch table {
+			case schema.AttrsValuesStringTableName:
+				table = schema.AttrsUserValuesStringTableName
+			case schema.AttrsValuesIntTableName:
+				table = schema.AttrsUserValuesIntTableName
+			case schema.AttrsValuesFloatTableName:
+				table = schema.AttrsUserValuesFloatTableName
+			case schema.AttrsValuesListTableName:
+				table = schema.AttrsUserValuesListTableName
+			}
+		}
+
 		groups[table] = append(groups[table], actualValueRequest{
-			index: index, itemID: row.ItemID, attributeID: row.AttributeID, typeID: attribute.TypeID.AttributeTypeID,
+			index:       index,
+			itemID:      row.ItemID,
+			attributeID: row.AttributeID,
+			typeID:      attribute.TypeID.AttributeTypeID,
+			userID:      row.UserID,
 		})
 	}
 
@@ -99,6 +142,10 @@ func (s *Repository) ActualValuesText(
 
 	if err := runActualValueLookups(ctx, lookups); err != nil {
 		return nil, err
+	}
+
+	if !withText {
+		return result, nil
 	}
 
 	for index, row := range rows {
@@ -117,56 +164,56 @@ func (s *Repository) loadActualValueGroup(
 	ctx context.Context, table string, requests []actualValueRequest, result []ValueText,
 ) error {
 	switch table {
-	case schema.AttrsValuesStringTableName:
-		rows, err := scanActualValueRows[schema.AttrsValuesStringRow](ctx, s.db, table, requests, false)
+	case schema.AttrsValuesStringTableName, schema.AttrsUserValuesStringTableName:
+		rows, err := scanActualValueRows[typedValueRow[sql.NullString]](ctx, s.db, table, requests, false)
 		if err != nil {
 			return err
 		}
 
-		values := make(map[[2]int64]sql.NullString, len(rows))
+		values := make(map[[3]int64]sql.NullString, len(rows))
 
 		for _, row := range rows {
-			values[[2]int64{row.ItemID, row.AttributeID}] = row.Value
+			values[[3]int64{row.ItemID, row.AttributeID, row.UserID}] = row.Value
 		}
 
 		for _, request := range requests {
-			value, found := values[[2]int64{request.itemID, request.attributeID}]
+			value, found := values[[3]int64{request.itemID, request.attributeID, request.userID}]
 			result[request.index].Value = Value{
 				Valid: found, Type: request.typeID, IsEmpty: !value.Valid, StringValue: value.String,
 			}
 		}
-	case schema.AttrsValuesFloatTableName:
-		rows, err := scanActualValueRows[schema.AttrsValuesFloatRow](ctx, s.db, table, requests, false)
+	case schema.AttrsValuesFloatTableName, schema.AttrsUserValuesFloatTableName:
+		rows, err := scanActualValueRows[typedValueRow[sql.NullFloat64]](ctx, s.db, table, requests, false)
 		if err != nil {
 			return err
 		}
 
-		values := make(map[[2]int64]sql.NullFloat64, len(rows))
+		values := make(map[[3]int64]sql.NullFloat64, len(rows))
 
 		for _, row := range rows {
-			values[[2]int64{row.ItemID, row.AttributeID}] = row.Value
+			values[[3]int64{row.ItemID, row.AttributeID, row.UserID}] = row.Value
 		}
 
 		for _, request := range requests {
-			value, found := values[[2]int64{request.itemID, request.attributeID}]
+			value, found := values[[3]int64{request.itemID, request.attributeID, request.userID}]
 			result[request.index].Value = Value{
 				Valid: found, Type: request.typeID, IsEmpty: !value.Valid, FloatValue: value.Float64,
 			}
 		}
-	case schema.AttrsValuesIntTableName:
-		rows, err := scanActualValueRows[schema.AttrsValuesIntRow](ctx, s.db, table, requests, false)
+	case schema.AttrsValuesIntTableName, schema.AttrsUserValuesIntTableName:
+		rows, err := scanActualValueRows[typedValueRow[sql.NullInt32]](ctx, s.db, table, requests, false)
 		if err != nil {
 			return err
 		}
 
-		values := make(map[[2]int64]sql.NullInt32, len(rows))
+		values := make(map[[3]int64]sql.NullInt32, len(rows))
 
 		for _, row := range rows {
-			values[[2]int64{row.ItemID, row.AttributeID}] = row.Value
+			values[[3]int64{row.ItemID, row.AttributeID, row.UserID}] = row.Value
 		}
 
 		for _, request := range requests {
-			value, found := values[[2]int64{request.itemID, request.attributeID}]
+			value, found := values[[3]int64{request.itemID, request.attributeID, request.userID}]
 
 			extracted := Value{Valid: found, Type: request.typeID, IsEmpty: !value.Valid}
 			if request.typeID == schema.AttrsAttributeTypeIDBoolean {
@@ -184,21 +231,21 @@ func (s *Repository) loadActualValueGroup(
 
 			result[request.index].Value = extracted
 		}
-	case schema.AttrsValuesListTableName:
-		rows, err := scanActualValueRows[schema.AttrsValuesListRow](ctx, s.db, table, requests, true)
+	case schema.AttrsValuesListTableName, schema.AttrsUserValuesListTableName:
+		rows, err := scanActualValueRows[typedValueRow[sql.NullInt64]](ctx, s.db, table, requests, true)
 		if err != nil {
 			return err
 		}
 
-		values := make(map[[2]int64][]sql.NullInt64)
+		values := make(map[[3]int64][]sql.NullInt64)
 
 		for _, row := range rows {
-			key := [2]int64{row.ItemID, row.AttributeID}
+			key := [3]int64{row.ItemID, row.AttributeID, row.UserID}
 			values[key] = append(values[key], row.Value)
 		}
 
 		for _, request := range requests {
-			list := values[[2]int64{request.itemID, request.attributeID}]
+			list := values[[3]int64{request.itemID, request.attributeID, request.userID}]
 
 			value := Value{Type: request.typeID, ListValue: make([]int64, 0, len(list))}
 			for _, entry := range list {
@@ -222,20 +269,33 @@ func (s *Repository) loadActualValueGroup(
 func scanActualValueRows[T any](
 	ctx context.Context, db *goqu.Database, table string, requests []actualValueRequest, ordered bool,
 ) ([]T, error) {
-	itemIDs := make([]int64, 0, len(requests))
+	itemIDs := make(map[int64]struct{})
 
-	attributeIDs := make([]int64, 0, len(requests))
+	attributeIDs := make(map[int64]struct{})
+	userIDs := make(map[int64]struct{})
+
 	for _, request := range requests {
-		itemIDs = append(itemIDs, request.itemID)
-		attributeIDs = append(attributeIDs, request.attributeID)
+		itemIDs[request.itemID] = struct{}{}
+		attributeIDs[request.attributeID] = struct{}{}
+		userIDs[request.userID] = struct{}{}
 	}
 
 	source := goqu.T(table)
 
 	query := db.From(source).Select(source.Col(schema.AttrsValuesTableItemIDColName),
 		source.Col(schema.AttrsValuesTableAttributeIDColName), source.Col(schema.AttrsValuesStringTableValueColName)).
-		Where(source.Col(schema.AttrsValuesTableItemIDColName).In(itemIDs),
-			source.Col(schema.AttrsValuesTableAttributeIDColName).In(attributeIDs))
+		Where(source.Col(schema.AttrsValuesTableItemIDColName).In(slices.Collect(maps.Keys(itemIDs))),
+			source.Col(schema.AttrsValuesTableAttributeIDColName).In(slices.Collect(maps.Keys(attributeIDs))))
+
+	switch table {
+	case schema.AttrsUserValuesStringTableName, schema.AttrsUserValuesIntTableName,
+		schema.AttrsUserValuesFloatTableName, schema.AttrsUserValuesListTableName:
+		query = query.SelectAppend(source.Col(schema.AttrsUserValuesTypeTableUserIDColName)).
+			Where(source.Col(schema.AttrsUserValuesTypeTableUserIDColName).In(slices.Collect(maps.Keys(userIDs))))
+	default:
+		query = query.SelectAppend(goqu.L("0").As(schema.AttrsUserValuesTypeTableUserIDColName))
+	}
+
 	if ordered {
 		query = query.Order(source.Col(schema.AttrsValuesListTableOrderingColName).Asc())
 	}

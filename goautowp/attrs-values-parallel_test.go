@@ -140,9 +140,7 @@ func TestAttrsValuesConcurrentReads(t *testing.T) {
 			db.Logger(nil)
 			require.EqualValues(t, 4, maximum.Load())
 
-			if index == 0 {
-				require.EqualValues(t, 5, seen.Load(), "one list query and four typed batches")
-			}
+			require.EqualValues(t, 5, seen.Load(), "one list query and four typed batches")
 
 			require.True(t, proto.Equal(cold, actual))
 
