@@ -8,6 +8,7 @@ import (
 	"html"
 	"maps"
 	"math"
+	"slices"
 	"strings"
 
 	"github.com/autowp/goautowp/comments"
@@ -16,7 +17,6 @@ import (
 	"github.com/autowp/goautowp/pictures"
 	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/textstorage"
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
 	"github.com/jackc/pgtype"
@@ -125,12 +125,24 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		return nil, err
 	}
 
+	var commentsRepository *comments.Repository
+
+	if fields.GetSubscribed() && userCtx.UserID > 0 {
+		commentsRepository, err = s.container.CommentsRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// These preloads are independent of each other - each is its own round trip to Postgres or
 	// S3, writing its own map that the row loop below reads - so fan them out and wait once.
 	// The only ordering constraint is images -> formatted (format requests are keyed by image
 	// id), kept sequential inside a single task.
 	var (
 		stats          map[int64]comments.TopicStat
+		subscribed     map[int64]bool
+		copyrights     map[int32]string
+		rightsVotes    map[int64]pictures.ModerVoteCounts
 		votesByID      map[int64]*pictures.VoteSummary
 		viewsByID      map[int64]int32
 		moderVotes     map[int64]pictures.ModerVoteSummary
@@ -141,12 +153,53 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	)
 
 	pictureIDs := make([]int64, 0, len(rows))
+	inboxIDs := make(map[int64]struct{})
+	textIDs := make(map[int32]struct{})
+
 	for _, row := range rows {
 		pictureIDs = append(pictureIDs, row.ID)
+		if fields.GetRights() && row.Status == schema.PictureStatusInbox {
+			inboxIDs[row.ID] = struct{}{}
+		}
+
+		if fields.GetCopyrights() && row.CopyrightsTextID.Valid {
+			textIDs[row.CopyrightsTextID.Int32] = struct{}{}
+		}
 	}
 
 	preloadGroup, preloadCtx := errgroup.WithContext(ctx)
 	preloadGroup.SetLimit(pictureExtractionParallelism(ctx))
+
+	if fields.GetSubscribed() && userCtx.UserID > 0 {
+		preloadGroup.Go(func() error {
+			var err error
+
+			subscribed, err = commentsRepository.SubscribedTopics(preloadCtx, userCtx.UserID,
+				schema.CommentMessageTypeIDPictures, pictureIDs)
+
+			return err
+		})
+	}
+
+	if fields.GetRights() {
+		preloadGroup.Go(func() error {
+			var err error
+
+			rightsVotes, err = picturesRepository.ModerVoteCountsBatch(preloadCtx, slices.Collect(maps.Keys(inboxIDs)))
+
+			return err
+		})
+	}
+
+	if fields.GetCopyrights() {
+		preloadGroup.Go(func() error {
+			var err error
+
+			copyrights, err = textstorageRepository.Texts(preloadCtx, slices.Collect(maps.Keys(textIDs)))
+
+			return err
+		})
+	}
 
 	if fields.GetModerVote() || (fields.GetModerVoted() && userCtx.UserID != 0) {
 		preloadGroup.Go(func() error {
@@ -292,24 +345,8 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		dfDistanceExtractor = s.container.DfDistanceExtractor()
 	}
 
-	var commentsRepository *comments.Repository
-
-	if fields.GetSubscribed() && userCtx.UserID > 0 {
-		commentsRepository, err = s.container.CommentsRepository(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Everything a row needs beyond what was preloaded above is independent of everything else it
-	// needs - a vote count knows nothing about a thumbnail - and all of it is a round trip to
-	// Postgres, to text storage or to S3. Run sequentially, as this used to be, a picture page's
-	// worth of them added up: copyrights, votes, moderator votes, subscription, the replaced
-	// picture and its own extraction, one after another. They now go out together, bounded so a
-	// listing of two dozen pictures cannot put a multiple of that on the connection pool at once.
-	//
-	// Each task writes its own field of its own row, and reads only what was preloaded before the
-	// loop, so no two of them touch the same memory.
+	// Remaining reads share one bounded queue across all pictures. Batched maps
+	// are complete before this loop and can be read without synchronization.
 	group, groupCtx := errgroup.WithContext(ctx)
 	group.SetLimit(pictureExtractionParallelism(ctx))
 
@@ -529,21 +566,8 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			})
 		}
 
-		if fields.GetCopyrights() {
-			group.Go(func() error {
-				if row.CopyrightsTextID.Valid {
-					copyrights, err := textstorageRepository.Text(groupCtx, row.CopyrightsTextID.Int32)
-					if err != nil && !errors.Is(err, textstorage.ErrTextNotFound) {
-						return err
-					}
-
-					if err == nil {
-						resultRow.Copyrights = copyrights
-					}
-				}
-
-				return nil
-			})
+		if fields.GetCopyrights() && row.CopyrightsTextID.Valid {
+			resultRow.Copyrights = copyrights[row.CopyrightsTextID.Int32]
 		}
 
 		if fields.GetAuthorSuggestions() &&
@@ -668,34 +692,21 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetRights() {
-			group.Go(func() error {
-				canAccept, err := picturesRepository.CanAccept(groupCtx, row)
-				if err != nil {
-					return err
-				}
-
-				canDelete, err := picturesRepository.CanDelete(groupCtx, row)
-				if err != nil {
-					return err
-				}
-
-				resultRow.Rights = &PictureRights{
-					Move: util.Contains(userCtx.Roles, users.RolePicturesModer),
-					Unaccept: (row.Status == schema.PictureStatusAccepted) &&
-						util.Contains(userCtx.Roles, users.RolePicturesModer),
-					Accept: canAccept && util.Contains(userCtx.Roles, users.RolePicturesModer),
-					Restore: (row.Status == schema.PictureStatusRemoving) &&
-						util.Contains(userCtx.Roles, users.RoleAdmin),
-					Normalize: (row.Status == schema.PictureStatusInbox) &&
-						util.Contains(userCtx.Roles, users.RolePicturesModer),
-					Flop: (row.Status == schema.PictureStatusInbox) &&
-						util.Contains(userCtx.Roles, users.RolePicturesModer),
-					Crop:   util.Contains(userCtx.Roles, users.RolePicturesModer),
-					Delete: canDelete,
-				}
-
-				return nil
-			})
+			resultRow.Rights = &PictureRights{
+				Move: util.Contains(userCtx.Roles, users.RolePicturesModer),
+				Unaccept: (row.Status == schema.PictureStatusAccepted) &&
+					util.Contains(userCtx.Roles, users.RolePicturesModer),
+				Accept: (row.Status == schema.PictureStatusInbox && rightsVotes[row.ID].Negative == 0) &&
+					util.Contains(userCtx.Roles, users.RolePicturesModer),
+				Restore: (row.Status == schema.PictureStatusRemoving) &&
+					util.Contains(userCtx.Roles, users.RoleAdmin),
+				Normalize: (row.Status == schema.PictureStatusInbox) &&
+					util.Contains(userCtx.Roles, users.RolePicturesModer),
+				Flop: (row.Status == schema.PictureStatusInbox) &&
+					util.Contains(userCtx.Roles, users.RolePicturesModer),
+				Crop:   util.Contains(userCtx.Roles, users.RolePicturesModer),
+				Delete: row.Status == schema.PictureStatusInbox && rightsVotes[row.ID].Positive == 0,
+			}
 		}
 
 		siblings := fields.GetSiblings()
@@ -790,17 +801,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetSubscribed() && userCtx.UserID > 0 {
-			group.Go(func() error {
-				subscribed, err := commentsRepository.IsSubscribed(groupCtx, userCtx.UserID,
-					schema.CommentMessageTypeIDPictures, row.ID)
-				if err != nil {
-					return err
-				}
-
-				resultRow.Subscribed = subscribed
-
-				return nil
-			})
+			resultRow.Subscribed = subscribed[row.ID]
 		}
 
 		if fields.GetPaginator() != nil {
