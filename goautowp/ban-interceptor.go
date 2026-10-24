@@ -11,6 +11,7 @@ import (
 	"github.com/autowp/goautowp/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/realip"
+	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,7 +31,8 @@ const (
 	// milliseconds earlier. The price is that a fresh ban (or unban) takes up to this long to be
 	// noticed by a pod that has already seen the address; bans are issued on a minutes-to-hours
 	// scale (see the autoban worker), so that lag doesn't change what they accomplish.
-	banCacheTTL = 10 * time.Second
+	banCacheTTL      = 10 * time.Second
+	banLookupTimeout = 5 * time.Second
 
 	// Cap on cached addresses, so a flood of distinct client IPs can't grow the map without bound.
 	// Reaching it drops the expired entries, and failing that the whole map - either way the next
@@ -57,6 +59,7 @@ type BanChecker struct {
 	ttl        time.Duration
 	mutex      sync.Mutex
 	entries    map[string]banCacheEntry
+	lookups    singleflight.Group
 }
 
 // NewBanChecker constructor.
@@ -84,21 +87,48 @@ func (s *BanChecker) IsBanned(ctx context.Context, ip net.IP) bool {
 		return banned
 	}
 
-	banned, err := s.repository.Exists(ctx, ip)
-	if err != nil {
-		// A canceled context means the caller already walked away (SSR gave up, browser navigated
-		// on) - that's a normal outcome under load, not a fault worth a line in the log each time.
-		if !errors.Is(err, context.Canceled) {
-			logging.Errorf("ban check failed: %s", err.Error())
-		}
-
-		// Deliberately not cached: a failed lookup says nothing about this address.
+	if ctx.Err() != nil {
 		return false
 	}
 
-	s.store(key, banned)
+	result := s.lookups.DoChan(key, func() (interface{}, error) {
+		// Another lookup may have populated the cache after the caller's first check.
+		if banned, ok := s.cached(key); ok {
+			return banned, nil
+		}
 
-	return banned
+		// Each waiter can leave independently. A canceled leader must not abort the
+		// shared read for everyone else, but the read still has a bounded lifetime.
+		lookupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), banLookupTimeout)
+		defer cancel()
+
+		banned, err := s.repository.Exists(lookupCtx, net.ParseIP(key))
+		if err != nil {
+			if !errors.Is(err, context.Canceled) {
+				logging.Errorf("ban check failed: %s", err.Error())
+			}
+
+			// A failed lookup is shared with current waiters, but never cached.
+			return false, err
+		}
+
+		s.store(key, banned)
+
+		return banned, nil
+	})
+
+	select {
+	case <-ctx.Done():
+		return false
+	case lookup := <-result:
+		if lookup.Err != nil {
+			return false
+		}
+
+		banned, ok := lookup.Val.(bool)
+
+		return ok && banned
+	}
 }
 
 func (s *BanChecker) cached(key string) (bool, bool) {
