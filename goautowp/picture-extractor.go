@@ -55,6 +55,17 @@ func NewPictureExtractor(container *Container) *PictureExtractor {
 	return &PictureExtractor{container: container}
 }
 
+// A preview splits this budget between its large and medium batches.
+type pictureExtractionParallelismKey struct{}
+
+func pictureExtractionParallelism(ctx context.Context) int {
+	if limit, ok := ctx.Value(pictureExtractionParallelismKey{}).(int); ok {
+		return limit
+	}
+
+	return pictureExtractorParallelism
+}
+
 func (s *PictureExtractor) Extract(
 	ctx context.Context,
 	row *schema.PictureRow,
@@ -135,7 +146,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	}
 
 	preloadGroup, preloadCtx := errgroup.WithContext(ctx)
-	preloadGroup.SetLimit(pictureExtractorParallelism)
+	preloadGroup.SetLimit(pictureExtractionParallelism(ctx))
 
 	if fields.GetModerVote() || (fields.GetModerVoted() && userCtx.UserID != 0) {
 		preloadGroup.Go(func() error {
@@ -300,7 +311,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	// Each task writes its own field of its own row, and reads only what was preloaded before the
 	// loop, so no two of them touch the same memory.
 	group, groupCtx := errgroup.WithContext(ctx)
-	group.SetLimit(pictureExtractorParallelism)
+	group.SetLimit(pictureExtractionParallelism(ctx))
 
 	for _, row := range rows {
 		resultRow := &Picture{

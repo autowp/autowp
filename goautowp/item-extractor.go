@@ -1132,12 +1132,33 @@ func (s *ItemExtractor) extractPreviewPictures(
 
 	pictureExtractor := s.container.PictureExtractor()
 
+	extractedPics, err := extractPreviewPictureBatches(ctx, result, picturesRequest.GetFields(),
+		func(ctx context.Context, rows []*schema.PictureRow, fields *PictureFields) ([]*Picture, error) {
+			return pictureExtractor.ExtractRows(ctx, rows, fields, lang, userCtx)
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	return &PreviewPictures{
+		LargeFormat:   result.LargeFormat,
+		Pictures:      extractedPics,
+		TotalPictures: result.TotalPictures,
+	}, nil
+}
+
+func extractPreviewPictureBatches(
+	ctx context.Context,
+	result *PerspectivePictureFetcherResult,
+	requestedFields *PictureFields,
+	extract func(context.Context, []*schema.PictureRow, *PictureFields) ([]*Picture, error),
+) ([]*NullPicture, error) {
 	// Two field sets rather than one mutated between pictures: only the first picture of a
 	// large-format item gets the large thumbnail, the rest get the medium one. Cloned because the
 	// message that arrived belongs to the caller's request, and because both are now alive at
 	// once - each is used for a whole batch.
-	thumbMediumFields := previewPictureFields(picturesRequest.GetFields(), false)
-	thumbLargeFields := previewPictureFields(picturesRequest.GetFields(), true)
+	thumbMediumFields := previewPictureFields(requestedFields, false)
+	thumbLargeFields := previewPictureFields(requestedFields, true)
 
 	// Which is what makes this two batches instead of a call per picture: extracting one at a time
 	// meant the picture extractor's preloads - names, images, formatted variants, routes - ran once
@@ -1166,33 +1187,61 @@ func (s *ItemExtractor) extractPreviewPictures(
 		mediumIdxs = append(mediumIdxs, idx)
 	}
 
-	if len(mediumRows) > 0 {
-		extracted, err := pictureExtractor.ExtractRows(ctx, mediumRows, thumbMediumFields, lang, userCtx)
-		if err != nil {
-			return nil, err
-		}
+	var lookups []func(context.Context) error
 
-		for idx, extractedPic := range extracted {
-			extractedPics[mediumIdxs[idx]] = &NullPicture{Kind: &NullPicture_Picture{Picture: extractedPic}}
-		}
+	if len(mediumRows) > 0 {
+		lookups = append(lookups, func(ctx context.Context) error {
+			extracted, err := extract(ctx, mediumRows, thumbMediumFields)
+			if err != nil {
+				return err
+			}
+
+			for idx, extractedPic := range extracted {
+				extractedPics[mediumIdxs[idx]] = &NullPicture{Kind: &NullPicture_Picture{Picture: extractedPic}}
+			}
+
+			return nil
+		})
 	}
 
 	if largeIdx >= 0 {
-		extracted, err := pictureExtractor.ExtractRows(
-			ctx, []*schema.PictureRow{result.Pictures[largeIdx].Row}, thumbLargeFields, lang, userCtx,
-		)
-		if err != nil {
-			return nil, err
-		}
+		lookups = append(lookups, func(ctx context.Context) error {
+			extracted, err := extract(ctx, []*schema.PictureRow{result.Pictures[largeIdx].Row}, thumbLargeFields)
+			if err != nil {
+				return err
+			}
 
-		extractedPics[largeIdx] = &NullPicture{Kind: &NullPicture_Picture{Picture: extracted[0]}}
+			extractedPics[largeIdx] = &NullPicture{Kind: &NullPicture_Picture{Picture: extracted[0]}}
+
+			return nil
+		})
 	}
 
-	return &PreviewPictures{
-		LargeFormat:   result.LargeFormat,
-		Pictures:      extractedPics,
-		TotalPictures: result.TotalPictures,
-	}, nil
+	// Keep a lone batch's full budget. When both buckets run, divide the existing
+	// picture budget between them instead of doubling their internal parallelism.
+	parallelism := pictureExtractionParallelism(ctx)
+	if len(lookups) < 2 || parallelism < 2 {
+		for _, lookup := range lookups {
+			if err := lookup(ctx); err != nil {
+				return nil, err
+			}
+		}
+
+		return extractedPics, nil
+	}
+
+	ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, parallelism/len(lookups))
+
+	group, batchCtx := errgroup.WithContext(ctx)
+	for _, lookup := range lookups {
+		group.Go(func() error { return lookup(batchCtx) })
+	}
+
+	if err := group.Wait(); err != nil {
+		return nil, err
+	}
+
+	return extractedPics, nil
 }
 
 func (s *ItemExtractor) extractIsCompilesItemOfDay(
