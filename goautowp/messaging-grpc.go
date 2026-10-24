@@ -7,6 +7,7 @@ import (
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
 	"github.com/autowp/goautowp/validation"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,7 +16,8 @@ import (
 )
 
 const (
-	messageMessageField = "message"
+	messageMessageField         = "message"
+	messagingSummaryParallelism = 4
 )
 
 type MessagingGRPCServer struct {
@@ -68,38 +70,40 @@ func (s *MessagingGRPCServer) GetMessagesSummary(
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	inbox, err := s.repository.GetInboxCount(ctx, userCtx.UserID)
-	if err != nil {
+	var response MessageSummary
+
+	group, queryCtx := errgroup.WithContext(ctx)
+	group.SetLimit(messagingSummaryParallelism)
+
+	// Each independent count owns one response field. Authorization has already
+	// completed, and the response is read only after all tasks have joined.
+	for _, lookup := range []struct {
+		count  func(context.Context, int64) (int32, error)
+		target *int32
+	}{
+		{count: s.repository.GetInboxCount, target: &response.InboxCount},
+		{count: s.repository.GetInboxNewCount, target: &response.InboxNewCount},
+		{count: s.repository.GetSentCount, target: &response.SentCount},
+		{count: s.repository.GetSystemCount, target: &response.SystemCount},
+		{count: s.repository.GetSystemNewCount, target: &response.SystemNewCount},
+	} {
+		group.Go(func() error {
+			count, err := lookup.count(queryCtx, userCtx.UserID)
+			if err != nil {
+				return err
+			}
+
+			*lookup.target = count
+
+			return nil
+		})
+	}
+
+	if err := group.Wait(); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	inboxNew, err := s.repository.GetInboxNewCount(ctx, userCtx.UserID)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	sent, err := s.repository.GetSentCount(ctx, userCtx.UserID)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	system, err := s.repository.GetSystemCount(ctx, userCtx.UserID)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	systemNew, err := s.repository.GetSystemNewCount(ctx, userCtx.UserID)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &MessageSummary{
-		InboxCount:     inbox,
-		InboxNewCount:  inboxNew,
-		SentCount:      sent,
-		SystemCount:    system,
-		SystemNewCount: systemNew,
-	}, nil
+	return &response, nil
 }
 
 func (s *MessagingGRPCServer) DeleteMessage(
