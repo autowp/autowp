@@ -2,7 +2,6 @@ package goautowp
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"html"
@@ -139,25 +138,39 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	// The only ordering constraint is images -> formatted (format requests are keyed by image
 	// id), kept sequential inside a single task.
 	var (
-		stats          map[int64]comments.TopicStat
-		subscribed     map[int64]bool
-		copyrights     map[int32]string
-		rightsVotes    map[int64]pictures.ModerVoteCounts
-		votesByID      map[int64]*pictures.VoteSummary
-		viewsByID      map[int64]int32
-		moderVotes     map[int64]pictures.ModerVoteSummary
-		pictureItems   map[int64][]*PictureItem
-		moderVoteItems map[int64][]*PictureModerVote
-		paths          map[int64][]*PathTreePictureItem
-		formatted      = make(map[string]map[int]storage.Image, pictureImageFormatCount)
+		stats             map[int64]comments.TopicStat
+		subscribed        map[int64]bool
+		copyrights        map[int32]string
+		rightsVotes       map[int64]pictures.ModerVoteCounts
+		acceptedStats     map[int64]pictures.RelatedAcceptedStat
+		authorSuggestions map[int64][]*PictureAuthorSuggestion
+		siblingsByID      map[int64]*PictureSiblings
+		votesByID         map[int64]*pictures.VoteSummary
+		viewsByID         map[int64]int32
+		moderVotes        map[int64]pictures.ModerVoteSummary
+		pictureItems      map[int64][]*PictureItem
+		moderVoteItems    map[int64][]*PictureModerVote
+		paths             map[int64][]*PathTreePictureItem
+		formatted         = make(map[string]map[int]storage.Image, pictureImageFormatCount)
 	)
 
 	pictureIDs := make([]int64, 0, len(rows))
 	inboxIDs := make(map[int64]struct{})
 	textIDs := make(map[int32]struct{})
+	acceptedIDs := make(map[int64]struct{})
+	authorIDs := make(map[int64]struct{})
 
 	for _, row := range rows {
 		pictureIDs = append(pictureIDs, row.ID)
+		if fields.GetAcceptedCount() || (fields.GetIsLast() && row.Status == schema.PictureStatusAccepted) {
+			acceptedIDs[row.ID] = struct{}{}
+		}
+
+		if fields.GetAuthorSuggestions() &&
+			(isModer || (userCtx.UserID != 0 && row.OwnerID.Valid && row.OwnerID.Int64 == userCtx.UserID)) {
+			authorIDs[row.ID] = struct{}{}
+		}
+
 		if fields.GetRights() && row.Status == schema.PictureStatusInbox {
 			inboxIDs[row.ID] = struct{}{}
 		}
@@ -196,6 +209,53 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			var err error
 
 			copyrights, err = textstorageRepository.Texts(preloadCtx, slices.Collect(maps.Keys(textIDs)))
+
+			return err
+		})
+	}
+
+	if fields.GetAcceptedCount() || fields.GetIsLast() {
+		preloadGroup.Go(func() error {
+			var err error
+
+			acceptedStats, err = picturesRepository.RelatedAcceptedStats(
+				preloadCtx,
+				slices.Collect(maps.Keys(acceptedIDs)),
+			)
+
+			return err
+		})
+	}
+
+	if fields.GetAuthorSuggestions() {
+		preloadGroup.Go(func() error {
+			var err error
+
+			authorSuggestions, err = s.preloadAuthorSuggestions(
+				preloadCtx,
+				picturesRepository,
+				slices.Collect(maps.Keys(authorIDs)),
+				lang,
+				userCtx,
+			)
+
+			return err
+		})
+	}
+
+	if request := fields.GetSiblings(); request != nil {
+		preloadGroup.Go(func() error {
+			var err error
+
+			nestedCtx := context.WithValue(preloadCtx, pictureExtractionParallelismKey{}, 1)
+			siblingsByID, err = s.preloadSiblings(
+				nestedCtx,
+				picturesRepository,
+				pictureIDs,
+				request.GetFields(),
+				lang,
+				userCtx,
+			)
 
 			return err
 		})
@@ -547,23 +607,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetAcceptedCount() {
-			group.Go(func() error {
-				acceptedCount, err := picturesRepository.Count(groupCtx, &query.PictureListOptions{
-					Status: schema.PictureStatusAccepted,
-					PictureItem: &query.PictureItemListOptions{
-						PictureItemByItemID: &query.PictureItemListOptions{
-							PictureID: row.ID,
-						},
-					},
-				})
-				if err != nil {
-					return err
-				}
-
-				resultRow.AcceptedCount = int32(acceptedCount) //nolint: gosec
-
-				return nil
-			})
+			resultRow.AcceptedCount = int32(acceptedStats[row.ID].Count) //nolint:gosec
 		}
 
 		if fields.GetCopyrights() && row.CopyrightsTextID.Valid {
@@ -572,16 +616,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 
 		if fields.GetAuthorSuggestions() &&
 			(isModer || (userCtx.UserID != 0 && row.OwnerID.Valid && row.OwnerID.Int64 == userCtx.UserID)) {
-			group.Go(func() error {
-				suggestions, err := s.extractAuthorSuggestions(groupCtx, picturesRepository, row.ID, lang, userCtx)
-				if err != nil {
-					return err
-				}
-
-				resultRow.AuthorSuggestions = suggestions
-
-				return nil
-			})
+			resultRow.AuthorSuggestions = authorSuggestions[row.ID]
 		}
 
 		if fields.GetExif() && row.ImageID.Valid {
@@ -624,30 +659,7 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 		}
 
 		if fields.GetIsLast() {
-			group.Go(func() error {
-				hasOtherPicture := true
-
-				if row.Status == schema.PictureStatusAccepted {
-					exists, err := picturesRepository.Exists(groupCtx, &query.PictureListOptions{
-						ExcludeID: row.ID,
-						Status:    schema.PictureStatusAccepted,
-						PictureItem: &query.PictureItemListOptions{
-							PictureItemByItemID: &query.PictureItemListOptions{
-								PictureID: row.ID,
-							},
-						},
-					})
-					if err != nil {
-						return err
-					}
-
-					hasOtherPicture = exists
-				}
-
-				resultRow.IsLast = !hasOtherPicture
-
-				return nil
-			})
+			resultRow.IsLast = row.Status == schema.PictureStatusAccepted && acceptedStats[row.ID].Others == 0
 		}
 
 		if fields.GetModerVoted() && userCtx.UserID != 0 {
@@ -709,91 +721,8 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 			}
 		}
 
-		siblings := fields.GetSiblings()
-		if siblings != nil {
-			group.Go(func() error {
-				resultRow.Siblings = &PictureSiblings{
-					Prev:    nil,
-					Next:    nil,
-					PrevNew: nil,
-					NextNew: nil,
-				}
-
-				sFields := siblings.GetFields()
-				scFields := convertPictureFields(sFields)
-
-				prevPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
-					IDLt: row.ID,
-				}, scFields, pictures.OrderByIDDesc)
-				if err != nil && !errors.Is(err, sql.ErrNoRows) {
-					return err
-				}
-
-				if err == nil {
-					resultRow.Siblings.Prev, err = s.Extract(groupCtx, prevPicture, sFields, lang, userCtx)
-					if err != nil {
-						return err
-					}
-				}
-
-				nextPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
-					IDGt: row.ID,
-				}, scFields, pictures.OrderByIDAsc)
-				if err != nil && !errors.Is(err, sql.ErrNoRows) {
-					return err
-				}
-
-				if err == nil {
-					resultRow.Siblings.Next, err = s.Extract(groupCtx, nextPicture, sFields, lang, userCtx)
-					if err != nil {
-						return err
-					}
-				}
-
-				prevNewPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
-					IDLt:   row.ID,
-					Status: schema.PictureStatusInbox,
-				}, scFields, pictures.OrderByIDDesc)
-				if err != nil && !errors.Is(err, sql.ErrNoRows) {
-					return err
-				}
-
-				if err == nil {
-					resultRow.Siblings.PrevNew, err = s.Extract(
-						groupCtx,
-						prevNewPicture,
-						sFields,
-						lang,
-						userCtx,
-					)
-					if err != nil {
-						return err
-					}
-				}
-
-				nextNewPicture, err := picturesRepository.Picture(groupCtx, &query.PictureListOptions{
-					IDGt:   row.ID,
-					Status: schema.PictureStatusInbox,
-				}, scFields, pictures.OrderByIDAsc)
-				if err != nil && !errors.Is(err, sql.ErrNoRows) {
-					return err
-				}
-
-				if err == nil {
-					resultRow.Siblings.NextNew, err = s.Extract(
-						groupCtx,
-						nextNewPicture,
-						sFields,
-						lang,
-						userCtx,
-					)
-					if err != nil {
-						return err
-					}
-				}
-
-				return nil
-			})
+		if fields.GetSiblings() != nil {
+			resultRow.Siblings = siblingsByID[row.ID]
 		}
 
 		if row.IP.Status == pgtype.Present && row.IP.IPNet != nil && util.Contains(userCtx.Roles, users.RoleModer) {
@@ -1014,22 +943,22 @@ func (s *PictureExtractor) preloadTopicsStat(
 	return stats, nil
 }
 
-// extractAuthorSuggestions loads the stored EXIF-derived author candidates for a picture and
+// preloadAuthorSuggestions loads the stored EXIF-derived author candidates for visible pictures and
 // resolves each to a localized Item for display in the upload grid.
-func (s *PictureExtractor) extractAuthorSuggestions(
+func (s *PictureExtractor) preloadAuthorSuggestions(
 	ctx context.Context,
 	picturesRepository *pictures.Repository,
-	pictureID int64,
+	pictureIDs []int64,
 	lang string,
 	userCtx UserContext,
-) ([]*PictureAuthorSuggestion, error) {
-	rows, err := picturesRepository.PictureAuthorSuggestions(ctx, pictureID)
+) (map[int64][]*PictureAuthorSuggestion, error) {
+	rows, err := picturesRepository.PictureAuthorSuggestionsBatch(ctx, pictureIDs)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(rows) == 0 {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 
 	itemsRepository, err := s.container.ItemsRepository(ctx)
@@ -1037,16 +966,16 @@ func (s *PictureExtractor) extractAuthorSuggestions(
 		return nil, err
 	}
 
-	ids := make([]int64, 0, len(rows))
+	idSet := make(map[int64]struct{}, len(rows))
 	for _, row := range rows {
-		ids = append(ids, row.ItemID)
+		idSet[row.ItemID] = struct{}{}
 	}
 
 	itemFields := &ItemFields{NameHtml: true, NameText: true}
 
 	itemRows, _, err := itemsRepository.List(
 		ctx,
-		&query.ItemListOptions{ItemIDs: ids},
+		&query.ItemListOptions{ItemIDs: slices.Collect(maps.Keys(idSet))},
 		convertItemFields(itemFields),
 		items.OrderByNone,
 		false,
@@ -1065,9 +994,9 @@ func (s *PictureExtractor) extractAuthorSuggestions(
 		itemByID[item.GetId()] = item
 	}
 
-	suggestions := make([]*PictureAuthorSuggestion, 0, len(rows))
+	suggestions := make(map[int64][]*PictureAuthorSuggestion)
 	for _, row := range rows {
-		suggestions = append(suggestions, &PictureAuthorSuggestion{
+		suggestions[row.PictureID] = append(suggestions[row.PictureID], &PictureAuthorSuggestion{
 			ItemId:   row.ItemID,
 			Item:     itemByID[row.ItemID],
 			Source:   row.Source,
