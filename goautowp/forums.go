@@ -468,11 +468,13 @@ func (s *Forums) Topics(
 		return nil, nil, err
 	}
 
+	lookups := make([]func(context.Context) error, 0, 2*len(rows))
 	for _, row := range rows {
-		err = s.prepareTopic(ctx, row, userID)
-		if err != nil {
-			return nil, nil, err
-		}
+		lookups = append(lookups, s.topicLookups(row, userID)...)
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, nil, err
 	}
 
 	pages, err := paginator.GetPages(ctx)
@@ -566,42 +568,54 @@ func (s *Forums) setStatus(ctx context.Context, id int64, status string) error {
 }
 
 func (s *Forums) prepareTopic(ctx context.Context, topic *ForumsTopic, userID int64) error {
+	return runItemLookups(ctx, s.topicLookups(topic, userID))
+}
+
+// Return leaf reads so Topics and single-topic requests share the same bounded
+// runner. Each lookup owns distinct fields, read only after all lookups finish.
+func (s *Forums) topicLookups(topic *ForumsTopic, userID int64) []func(context.Context) error {
 	if userID > 0 {
-		stat, err := s.commentsRepository.TopicStatForUser(
-			ctx, schema.CommentMessageTypeIDForums, topic.ID, userID,
-		)
-		if err != nil {
-			return err
+		return []func(context.Context) error{
+			func(ctx context.Context) error {
+				stat, err := s.commentsRepository.TopicStatForUser(
+					ctx, schema.CommentMessageTypeIDForums, topic.ID, userID,
+				)
+				if err != nil {
+					return err
+				}
+
+				topic.Messages = stat.Messages
+				topic.NewMessages = stat.NewMessages
+
+				return nil
+			},
+			func(ctx context.Context) error {
+				subscription, err := s.commentsRepository.IsSubscribed(
+					ctx, userID, schema.CommentMessageTypeIDForums, topic.ID,
+				)
+				if err != nil {
+					return err
+				}
+
+				topic.Subscription = subscription
+
+				return nil
+			},
 		}
-
-		topic.Messages = stat.Messages
-		topic.NewMessages = stat.NewMessages
-
-		topic.Subscription, err = s.commentsRepository.IsSubscribed(
-			ctx,
-			userID,
-			schema.CommentMessageTypeIDForums,
-			topic.ID,
-		)
-		if err != nil {
-			return err
-		}
-
-		return nil
 	}
 
-	messages, err := s.commentsRepository.TopicStat(
-		ctx,
-		schema.CommentMessageTypeIDForums,
-		topic.ID,
-	)
-	if err != nil {
-		return err
+	return []func(context.Context) error{
+		func(ctx context.Context) error {
+			messages, err := s.commentsRepository.TopicStat(ctx, schema.CommentMessageTypeIDForums, topic.ID)
+			if err != nil {
+				return err
+			}
+
+			topic.Messages = messages
+
+			return nil
+		},
 	}
-
-	topic.Messages = messages
-
-	return nil
 }
 
 func (s *Forums) topicsSelect(isModerator bool) *goqu.SelectDataset {
