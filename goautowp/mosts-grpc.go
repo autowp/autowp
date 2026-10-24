@@ -86,24 +86,12 @@ func (s *MostsGRPCServer) GetItems(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*MostsItem, 0)
-
-	for _, car := range list {
-		extracted, err := s.extractor.Extract(ctx, car.Item, &fields, lang, userCtx)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		result = append(result, &MostsItem{
-			Item:      extracted,
-			ValueHtml: car.ValueHTML,
-			UnitId:    unitID,
-		})
+	result, err := s.extractItems(ctx, list, unitID, &fields, lang, userCtx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &MostsItems{
-		Items: result,
-	}, nil
+	return &MostsItems{Items: result}, nil
 }
 
 func (s *MostsGRPCServer) GetMenu(ctx context.Context, in *MostsMenuRequest) (*MostsMenu, error) {
@@ -155,4 +143,39 @@ func (s *MostsGRPCServer) GetMenu(ctx context.Context, in *MostsMenuRequest) (*M
 		Ratings:      ratings,
 		VehicleTypes: vehicleTypes,
 	}, nil
+}
+
+func (s *MostsGRPCServer) extractItems(
+	ctx context.Context, list []mosts.ResultItem, unitID int64, fields *ItemFields, lang string, userCtx UserContext,
+) ([]*MostsItem, error) {
+	result := make([]*MostsItem, len(list))
+	lookups := make([]func(context.Context) error, 0, len(list))
+
+	for index, car := range list {
+		lookups = append(lookups, func(ctx context.Context) error {
+			extracted, err := s.extractor.Extract(ctx, car.Item, fields, lang, userCtx)
+			if err != nil {
+				return err
+			}
+
+			result[index] = &MostsItem{Item: extracted, ValueHtml: car.ValueHTML, UnitId: unitID}
+
+			return nil
+		})
+	}
+
+	// A single card keeps its existing internal parallelism. For multiple cards,
+	// spend the shared item budget on cards and keep nested picture reads inline.
+	if len(lookups) == 1 {
+		if err := lookups[0](ctx); err != nil {
+			return nil, err
+		}
+	} else {
+		ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, 1)
+		if err := runItemLookups(ctx, lookups); err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }
