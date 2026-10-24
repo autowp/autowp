@@ -90,6 +90,10 @@ func runItemLookups(ctx context.Context, lookups []func(context.Context) error) 
 func (s *ItemExtractor) ExtractRows(
 	ctx context.Context, rows []*items.Item, fields *ItemFields, lang string, userCtx UserContext,
 ) ([]*Item, error) {
+	if len(rows) == 0 {
+		return []*Item{}, nil
+	}
+
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
 
 	if fields == nil {
@@ -108,27 +112,43 @@ func (s *ItemExtractor) ExtractRows(
 	)
 
 	pictureItemRequest := fields.GetPictureItems()
-
-	pictureItemRows, err := s.preloadPictureItems(ctx, pictureItemRequest, ids, lang, userCtx)
-	if err != nil {
-		return nil, err
-	}
-
 	itemParentChildsRequest := fields.GetItemParentChilds()
 
-	itemParentChildRows, err := s.preloadItemParentChilds(
-		ctx,
-		itemParentChildsRequest,
-		ids,
-		lang,
-		userCtx,
-	)
+	batch, fieldLookups, err := s.prepareFieldLookups(ctx, rows, fields, userCtx)
 	if err != nil {
 		return nil, err
 	}
 
-	batch, err := s.preloadFields(ctx, rows, fields, userCtx)
-	if err != nil {
+	var (
+		pictureItemRows     map[int64][]*PictureItem
+		itemParentChildRows map[int64][]*ItemParent
+		lookups             []func(context.Context) error
+	)
+
+	if pictureItemRequest != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			pictureItemRows, err = s.preloadPictureItems(ctx, pictureItemRequest, ids, lang, userCtx)
+
+			return err
+		})
+	}
+
+	if itemParentChildsRequest != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			itemParentChildRows, err = s.preloadItemParentChilds(ctx, itemParentChildsRequest, ids, lang, userCtx)
+
+			return err
+		})
+	}
+
+	// Queue individual field reads alongside the relation branches, preserving
+	// their existing concurrency under the same limit and cancellation context.
+	lookups = append(lookups, fieldLookups...)
+	if err := runItemLookups(ctx, lookups); err != nil {
 		return nil, err
 	}
 

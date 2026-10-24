@@ -223,7 +223,13 @@ func blockItemExtractionQueries(t *testing.T, logger *itemBatchQueryLogger, coun
 	unblock := func() { once.Do(func() { close(release) }) }
 	t.Cleanup(unblock)
 
+	var observed atomic.Int64
+
 	logger.beforeQuery = func() {
+		if observed.Add(1) > int64(count) {
+			return
+		}
+
 		started <- struct{}{}
 
 		<-release

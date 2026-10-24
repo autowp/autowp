@@ -27,9 +27,26 @@ type itemBatchFields struct {
 func (s *ItemExtractor) preloadFields(
 	ctx context.Context, rows []*items.Item, fields *ItemFields, userCtx UserContext,
 ) (*itemBatchFields, error) {
+	result, lookups, err := s.prepareFieldLookups(ctx, rows, fields, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// prepareFieldLookups lets batch fields and relation preloads share one bounded
+// group, keeping fields parallel without creating a nested parallel group.
+func (s *ItemExtractor) prepareFieldLookups(
+	ctx context.Context, rows []*items.Item, fields *ItemFields, userCtx UserContext,
+) (*itemBatchFields, []func(context.Context) error, error) {
 	result := &itemBatchFields{}
 	if len(rows) == 0 {
-		return result, nil
+		return result, nil, nil
 	}
 
 	ids := make([]int64, 0, len(rows))
@@ -44,7 +61,7 @@ func (s *ItemExtractor) preloadFields(
 
 	repository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Tasks own separate maps; consumers only read them after every task has joined.
@@ -179,9 +196,5 @@ func (s *ItemExtractor) preloadFields(
 		})
 	}
 
-	if err := runItemLookups(ctx, lookups); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return result, lookups, nil
 }
