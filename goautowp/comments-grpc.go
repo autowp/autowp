@@ -147,12 +147,18 @@ func extractMessage(
 		return nil, err
 	}
 
+	var lookups []func(context.Context) error
+
 	isNew := false
+
 	if fields.GetIsNew() && userID > 0 {
-		isNew, err = repository.IsNewMessage(ctx, row.TypeID, row.ItemID, row.CreatedAt, userID)
-		if err != nil {
-			return nil, err
-		}
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			isNew, err = repository.IsNewMessage(ctx, row.TypeID, row.ItemID, row.CreatedAt, userID)
+
+			return err
+		})
 	}
 
 	authorID := row.AuthorID.Int64
@@ -179,10 +185,13 @@ func extractMessage(
 		}
 
 		if fields.GetRoute() {
-			route, err = repository.MessageRowRoute(ctx, row.TypeID, row.ItemID, row.ID)
-			if err != nil {
-				return nil, err
-			}
+			lookups = append(lookups, func(ctx context.Context) error {
+				var err error
+
+				route, err = repository.MessageRowRoute(ctx, row.TypeID, row.ItemID, row.ID)
+
+				return err
+			})
 		}
 
 		if fields.GetText() {
@@ -193,70 +202,83 @@ func extractMessage(
 			vote = row.Vote
 		}
 
-		if fields.GetUserVote() {
-			if userID != 0 {
+		if fields.GetUserVote() && userID != 0 {
+			lookups = append(lookups, func(ctx context.Context) error {
+				var err error
+
 				userVote, err = repository.UserVote(ctx, userID, row.ID)
-				if err != nil {
-					return nil, err
-				}
-			}
+
+				return err
+			})
 		}
 
 		if fields.GetReplies() {
-			paginator := repository.Paginator(comments.Request{
-				ItemID:       row.ItemID,
-				TypeID:       row.TypeID,
-				ParentID:     row.ID,
-				PerPage:      MaxReplies,
-				Order:        []exp.OrderedExpression{schema.CommentMessageTableDatetimeCol.Desc()},
-				FetchMessage: fields.GetPreview() || fields.GetText(),
-				FetchVote:    fields.GetVote(),
-				FetchIP:      canViewIP,
-			})
+			lookups = append(lookups, func(ctx context.Context) error {
+				paginator := repository.Paginator(comments.Request{
+					ItemID:       row.ItemID,
+					TypeID:       row.TypeID,
+					ParentID:     row.ID,
+					PerPage:      MaxReplies,
+					Order:        []exp.OrderedExpression{schema.CommentMessageTableDatetimeCol.Desc()},
+					FetchMessage: fields.GetPreview() || fields.GetText(),
+					FetchVote:    fields.GetVote(),
+					FetchIP:      canViewIP,
+				})
 
-			sqSelect, err := paginator.GetCurrentItems(ctx)
-			if err != nil {
-				return nil, err
-			}
-
-			rows := make([]*schema.CommentMessageRow, 0)
-
-			err = sqSelect.ScanStructsContext(ctx, &rows)
-			if err != nil {
-				return nil, err
-			}
-
-			replies = make([]*CommentMessage, 0)
-
-			for _, row := range rows {
-				msg, err := extractMessage(
-					ctx,
-					row,
-					repository,
-					picturesRepository,
-					userID,
-					roles,
-					canViewIP,
-					fields,
-				)
+				sqSelect, err := paginator.GetCurrentItems(ctx)
 				if err != nil {
-					return nil, err
+					return err
 				}
 
-				replies = append(replies, msg)
-			}
+				rows := make([]*schema.CommentMessageRow, 0)
+
+				err = sqSelect.ScanStructsContext(ctx, &rows)
+				if err != nil {
+					return err
+				}
+
+				replies = make([]*CommentMessage, 0)
+
+				for _, row := range rows {
+					msg, err := extractMessage(
+						ctx,
+						row,
+						repository,
+						picturesRepository,
+						userID,
+						roles,
+						canViewIP,
+						fields,
+					)
+					if err != nil {
+						return err
+					}
+
+					replies = append(replies, msg)
+				}
+
+				return nil
+			})
 		}
 
-		if fields.GetStatus() && isModer {
-			if row.TypeID == schema.CommentMessageTypeIDPictures {
+		if fields.GetStatus() && isModer && row.TypeID == schema.CommentMessageTypeIDPictures {
+			lookups = append(lookups, func(ctx context.Context) error {
 				ps, err := picturesRepository.Status(ctx, row.ItemID)
 				if err != nil {
-					return nil, err
+					return err
 				}
 
 				pictureStatus = extractPicturesStatus(ps)
-			}
+
+				return nil
+			})
 		}
+	}
+
+	// Reuse the bounded lookup runner. Recursive replies inherit its context
+	// marker and execute their reads inline, so depth cannot multiply concurrency.
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
 	}
 
 	ip := ""
