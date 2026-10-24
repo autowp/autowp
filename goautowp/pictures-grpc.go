@@ -508,19 +508,33 @@ func (s *PicturesGRPCServer) GetUserSummary(
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	acceptedCount, err := s.repository.Count(ctx, &query.PictureListOptions{
-		Status:  schema.PictureStatusAccepted,
-		OwnerID: userCtx.UserID,
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	var acceptedCount, inboxCount int
 
-	inboxCount, err := s.repository.Count(ctx, &query.PictureListOptions{
-		Status:  schema.PictureStatusInbox,
-		OwnerID: userCtx.UserID,
+	group, countCtx := errgroup.WithContext(ctx)
+
+	group.Go(func() error {
+		var err error
+
+		acceptedCount, err = s.repository.Count(countCtx, &query.PictureListOptions{
+			Status:  schema.PictureStatusAccepted,
+			OwnerID: userCtx.UserID,
+		})
+
+		return err
 	})
-	if err != nil {
+
+	group.Go(func() error {
+		var err error
+
+		inboxCount, err = s.repository.Count(countCtx, &query.PictureListOptions{
+			Status:  schema.PictureStatusInbox,
+			OwnerID: userCtx.UserID,
+		})
+
+		return err
+	})
+
+	if err := group.Wait(); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
