@@ -40,9 +40,10 @@ func (s *ItemParentExtractor) ExtractRows(
 	parentFields := fields.GetParent()
 
 	var (
-		itemsMap   map[int64]*Item
-		parentsMap map[int64]*Item
-		lookups    []func(context.Context) error
+		itemsMap           map[int64]*Item
+		parentsMap         map[int64]*Item
+		lookups            []func(context.Context) error
+		descendantPictures map[int64]*PicturesList
 	)
 
 	// Child and parent selections are independent. Share the existing lookup
@@ -72,6 +73,17 @@ func (s *ItemParentExtractor) ExtractRows(
 			var err error
 
 			parentsMap, err = s.prefetchItems(ctx, ids, lang, parentFields, userCtx)
+
+			return err
+		})
+	}
+
+	if request := fields.GetChildDescendantPictures(); request != nil && len(rows) > 0 {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, 1)
+			descendantPictures, err = s.preloadChildDescendantPictures(ctx, rows, request, lang, userCtx)
 
 			return err
 		})
@@ -154,15 +166,8 @@ func (s *ItemParentExtractor) ExtractRows(
 			}
 		}
 
-		resRow.ChildDescendantPictures, err = s.extractChildDescendantPictures(
-			ctx,
-			row,
-			fields,
-			lang,
-			userCtx,
-		)
-		if err != nil {
-			return nil, err
+		if fields.GetChildDescendantPictures() != nil {
+			resRow.ChildDescendantPictures = descendantPictures[row.ItemID]
 		}
 
 		res = append(res, resRow)
@@ -202,66 +207,4 @@ func (s *ItemParentExtractor) prefetchItems(
 	}
 
 	return itemsMap, nil
-}
-
-func (s *ItemParentExtractor) extractChildDescendantPictures(
-	ctx context.Context,
-	row *items.ItemParent,
-	fields *ItemParentFields,
-	lang string,
-	userCtx UserContext,
-) (*PicturesList, error) {
-	request := fields.GetChildDescendantPictures()
-	if request == nil {
-		return nil, nil //nolint: nilnil
-	}
-
-	picturesRepo, err := s.container.PicturesRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	pictureFields := convertPictureFields(request.GetFields())
-	pictureOrder := convertPicturesOrder(request.GetOrder())
-
-	pictureListOptions, err := convertPictureListOptions(request.GetOptions())
-	if err != nil {
-		return nil, err
-	}
-
-	if pictureListOptions == nil {
-		pictureListOptions = &query.PictureListOptions{}
-	}
-
-	if pictureListOptions.PictureItem == nil {
-		pictureListOptions.PictureItem = &query.PictureItemListOptions{}
-	}
-
-	if pictureListOptions.PictureItem.ItemParentCacheAncestor == nil {
-		pictureListOptions.PictureItem.ItemParentCacheAncestor = &query.ItemParentCacheListOptions{}
-	}
-
-	pictureListOptions.PictureItem.ItemParentCacheAncestor.ParentID = row.ItemID
-
-	pictureRows, _, err := picturesRepo.Pictures(
-		ctx,
-		pictureListOptions,
-		pictureFields,
-		pictureOrder,
-		false,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	extracted, err := s.container.PictureExtractor().ExtractRows(
-		ctx, pictureRows, request.GetFields(), lang, userCtx,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &PicturesList{
-		Items: extracted,
-	}, nil
 }

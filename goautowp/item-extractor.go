@@ -172,6 +172,13 @@ func (s *ItemExtractor) extractRows(
 		return nil, err
 	}
 
+	plainFields := fields
+	if fields.GetAltNames() || fields.GetOtherNames() {
+		plainFields, _ = proto.Clone(fields).(*ItemFields)
+		plainFields.AltNames = false
+		plainFields.OtherNames = false
+	}
+
 	extractRow := func(ctx context.Context, index int) error {
 		row := rows[index]
 		resultRow := &Item{
@@ -250,7 +257,15 @@ func (s *ItemExtractor) extractRows(
 			}
 		}
 
-		if err := s.extractPlain(ctx, fields, row, resultRow, lang, userCtx); err != nil {
+		if fields.GetAltNames() {
+			resultRow.AltNames = formatAltNames(batch.allNames[row.ID], lang)
+		}
+
+		if fields.GetOtherNames() {
+			resultRow.OtherNames = formatOtherNames(batch.allNames[row.ID], row.NameOnly)
+		}
+
+		if err := s.extractPlain(ctx, plainFields, row, resultRow, lang, userCtx); err != nil {
 			return err
 		}
 
@@ -1762,10 +1777,6 @@ func (s *ItemExtractor) extractAltNames(
 		return nil, nil
 	}
 
-	// alt names
-	altNames := make(map[string][]string)
-	altNames2 := make(map[string][]string)
-
 	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
@@ -1776,6 +1787,12 @@ func (s *ItemExtractor) extractAltNames(
 		return nil, err
 	}
 
+	return formatAltNames(langNames, lang), nil
+}
+
+func formatAltNames(langNames map[string]string, lang string) []*AltName {
+	altNames := make(map[string][]string)
+	altNames2 := make(map[string][]string)
 	currentLangName := ""
 
 	for clang, langName := range langNames {
@@ -1813,7 +1830,7 @@ func (s *ItemExtractor) extractAltNames(
 		})
 	}
 
-	return res, nil
+	return res
 }
 
 func (s *ItemExtractor) extractOtherNames(
@@ -1833,14 +1850,18 @@ func (s *ItemExtractor) extractOtherNames(
 		return nil, err
 	}
 
+	return formatOtherNames(rows, row.NameOnly), nil
+}
+
+func formatOtherNames(rows map[string]string, nameOnly string) []string {
 	otherNames := make([]string, 0, len(rows))
 	for _, name := range rows {
-		if row.NameOnly != name && !util.Contains(otherNames, name) {
+		if nameOnly != name && !util.Contains(otherNames, name) {
 			otherNames = append(otherNames, name)
 		}
 	}
 
-	return otherNames, nil
+	return otherNames
 }
 
 func (s *ItemExtractor) extractLocation(

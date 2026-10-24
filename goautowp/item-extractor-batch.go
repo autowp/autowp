@@ -13,6 +13,7 @@ import (
 // Nothing is cached across requests, so private subscriptions and moderator fields stay isolated.
 type itemBatchFields struct {
 	names                map[int64]string
+	allNames             map[int64]map[string]string
 	comments             map[int64]int32
 	specifications       map[int64]int32
 	languages            map[int64]int32
@@ -66,6 +67,16 @@ func (s *ItemExtractor) prepareFieldLookups(
 
 	// Tasks own separate maps; consumers only read them after every task has joined.
 	var lookups []func(context.Context) error
+
+	if fields.GetAltNames() || fields.GetOtherNames() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			result.allNames, err = repository.NamesBatch(ctx, ids)
+
+			return err
+		})
+	}
 
 	if fields.GetAttrZoneId() {
 		lookups = append(lookups, func(ctx context.Context) error {
