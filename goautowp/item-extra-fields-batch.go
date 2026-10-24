@@ -60,7 +60,8 @@ func (s *ItemExtractor) prepareLocationContributorLookups(
 }
 
 func itemPlainFields(fields *ItemFields) *ItemFields {
-	if !fields.GetAltNames() && !fields.GetOtherNames() && !fields.GetLocation() && !fields.GetSpecsContributors() {
+	if !fields.GetAltNames() && !fields.GetOtherNames() && !fields.GetLocation() && !fields.GetSpecsContributors() &&
+		!fields.GetDesign() && !fields.GetIsCompilesItemOfDay() && !fields.GetPublicRoutes() {
 		return fields
 	}
 
@@ -69,11 +70,26 @@ func itemPlainFields(fields *ItemFields) *ItemFields {
 	selected.OtherNames = false
 	selected.Location = false
 	selected.SpecsContributors = false
+	selected.Design = false
+	selected.IsCompilesItemOfDay = false
+	selected.PublicRoutes = false
 
 	return selected
 }
 
 func (data *itemBatchFields) applyExtraFields(row *items.Item, resultRow *Item, fields *ItemFields, lang string) {
+	if fields.GetDesign() {
+		resultRow.Design = data.designs[row.ID]
+	}
+
+	if fields.GetIsCompilesItemOfDay() {
+		resultRow.IsCompilesItemOfDay = data.complies[row.ID]
+	}
+
+	if fields.GetPublicRoutes() {
+		resultRow.PublicRoutes = data.publicRoutes[row.ID]
+	}
+
 	if fields.GetLocation() {
 		resultRow.Location = data.locations[row.ID]
 	}

@@ -134,7 +134,7 @@ func (s *ItemExtractor) extractRows(
 	pictureItemRequest := fields.GetPictureItems()
 	itemParentChildsRequest := fields.GetItemParentChilds()
 
-	batch, fieldLookups, err := s.prepareFieldLookups(ctx, rows, fields, userCtx)
+	batch, fieldLookups, err := s.prepareFieldLookups(ctx, rows, fields, lang, userCtx)
 	if err != nil {
 		return nil, err
 	}

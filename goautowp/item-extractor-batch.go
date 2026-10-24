@@ -15,6 +15,9 @@ import (
 type itemBatchFields struct {
 	names                map[int64]string
 	allNames             map[int64]map[string]string
+	designs              map[int64]*Design
+	complies             map[int64]bool
+	publicRoutes         map[int64][]*PublicRoute
 	locations            map[int64]*latlng.LatLng
 	contributors         map[int64][]*SpecsContributor
 	comments             map[int64]int32
@@ -31,7 +34,7 @@ type itemBatchFields struct {
 func (s *ItemExtractor) preloadFields(
 	ctx context.Context, rows []*items.Item, fields *ItemFields, userCtx UserContext,
 ) (*itemBatchFields, error) {
-	result, lookups, err := s.prepareFieldLookups(ctx, rows, fields, userCtx)
+	result, lookups, err := s.prepareFieldLookups(ctx, rows, fields, "", userCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +49,7 @@ func (s *ItemExtractor) preloadFields(
 // prepareFieldLookups lets batch fields and relation preloads share one bounded
 // group, keeping fields parallel without creating a nested parallel group.
 func (s *ItemExtractor) prepareFieldLookups(
-	ctx context.Context, rows []*items.Item, fields *ItemFields, userCtx UserContext,
+	ctx context.Context, rows []*items.Item, fields *ItemFields, lang string, userCtx UserContext,
 ) (*itemBatchFields, []func(context.Context) error, error) {
 	result := &itemBatchFields{}
 	if len(rows) == 0 {
@@ -70,6 +73,8 @@ func (s *ItemExtractor) prepareFieldLookups(
 
 	// Tasks own separate maps; consumers only read them after every task has joined.
 	var lookups []func(context.Context) error
+
+	lookups = append(lookups, s.prepareDesignRouteLookups(repository, rows, ids, fields, lang, result)...)
 
 	lookups = append(lookups, s.prepareLocationContributorLookups(repository, ids, fields, result)...)
 
