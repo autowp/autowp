@@ -92,27 +92,41 @@ func (s *UserExtractor) ExtractRows(
 	}
 
 	var (
-		data userExtractionData
-		err  error
+		data    userExtractionData
+		lookups []func(context.Context) error
 	)
 
-	data.avatars, err = s.formattedImages(ctx, slices.Sorted(maps.Keys(imageIDs)), "avatar")
-	if err != nil {
-		return nil, err
-	}
+	// Photos depend on the successfully loaded avatars, including missing-image
+	// recovery. Keep that chain together while counts load independently.
+	if len(imageIDs) > 0 {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
 
-	if fields.GetPhoto() {
-		data.photos, err = s.formattedImages(ctx, slices.Sorted(maps.Keys(data.avatars)), "photo")
-		if err != nil {
-			return nil, err
-		}
+			data.avatars, err = s.formattedImages(ctx, slices.Sorted(maps.Keys(imageIDs)), "avatar")
+			if err != nil {
+				return err
+			}
+
+			if fields.GetPhoto() {
+				data.photos, err = s.formattedImages(ctx, slices.Sorted(maps.Keys(data.avatars)), "photo")
+			}
+
+			return err
+		})
 	}
 
 	if fields.GetPicturesAcceptedCount() && len(userIDs) > 0 {
-		data.counts, err = s.picturesRepository.AcceptedCountsByOwnerIDs(ctx, slices.Sorted(maps.Keys(userIDs)))
-		if err != nil {
-			return nil, err
-		}
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			data.counts, err = s.picturesRepository.AcceptedCountsByOwnerIDs(ctx, slices.Sorted(maps.Keys(userIDs)))
+
+			return err
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
 	}
 
 	result := make([]*User, 0, len(rows))

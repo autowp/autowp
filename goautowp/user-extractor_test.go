@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"slices"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/autowp/goautowp/image/storage"
 	"github.com/autowp/goautowp/schema"
@@ -15,10 +17,11 @@ import (
 var errUserBatchTest = errors.New("user batch test error")
 
 type fakeBatchUserImages struct {
-	batches    map[string][][]int
-	imageCalls int
-	missing    map[int]bool
-	err        error
+	beforeBatch func(context.Context, []int, string) error
+	batches     map[string][][]int
+	imageCalls  int
+	missing     map[int]bool
+	err         error
 }
 
 func (s *fakeBatchUserImages) Image(_ context.Context, id int) (*storage.Image, error) {
@@ -31,7 +34,7 @@ func (s *fakeBatchUserImages) Image(_ context.Context, id int) (*storage.Image, 
 }
 
 func (s *fakeBatchUserImages) FormattedImages(
-	_ context.Context,
+	ctx context.Context,
 	ids []int,
 	format string,
 ) (map[int]storage.Image, error) {
@@ -40,6 +43,12 @@ func (s *fakeBatchUserImages) FormattedImages(
 	}
 
 	s.batches[format] = append(s.batches[format], slices.Clone(ids))
+	if s.beforeBatch != nil {
+		if err := s.beforeBatch(ctx, ids, format); err != nil {
+			return nil, err
+		}
+	}
+
 	if s.err != nil {
 		return nil, s.err
 	}
@@ -57,15 +66,22 @@ func (s *fakeBatchUserImages) FormattedImages(
 }
 
 type fakeUserPictureCounts struct {
-	ids    []int64
-	calls  int
-	counts map[int64]int32
-	err    error
+	beforeCount func(context.Context, []int64) error
+	ids         []int64
+	calls       int
+	counts      map[int64]int32
+	err         error
 }
 
-func (s *fakeUserPictureCounts) AcceptedCountsByOwnerIDs(_ context.Context, ids []int64) (map[int64]int32, error) {
+func (s *fakeUserPictureCounts) AcceptedCountsByOwnerIDs(ctx context.Context, ids []int64) (map[int64]int32, error) {
 	s.ids = slices.Clone(ids)
 	s.calls++
+
+	if s.beforeCount != nil {
+		if err := s.beforeCount(ctx, ids); err != nil {
+			return nil, err
+		}
+	}
 
 	return s.counts, s.err
 }
@@ -172,4 +188,123 @@ func TestUserExtractorPropagatesBatchErrors(t *testing.T) {
 		PicturesAcceptedCount: true,
 	}, 0, nil)
 	require.ErrorIs(t, err, errUserBatchTest)
+}
+
+func TestUserExtractorLoadsImagesAndCountsConcurrently(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
+
+	avatarStarted := make(chan struct{})
+	countsStarted := make(chan struct{})
+	avatarFinished := make(chan struct{})
+	images := &fakeBatchUserImages{beforeBatch: func(ctx context.Context, _ []int, format string) error {
+		if format == "photo" {
+			select {
+			case <-avatarFinished:
+				return nil
+			default:
+				return errUserBatchTest
+			}
+		}
+
+		close(avatarStarted)
+
+		select {
+		case <-countsStarted:
+			close(avatarFinished)
+
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}}
+	counts := &fakeUserPictureCounts{
+		counts: map[int64]int32{1: 10},
+		beforeCount: func(ctx context.Context, _ []int64) error {
+			close(countsStarted)
+
+			select {
+			case <-avatarStarted:
+				return nil
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+		},
+	}
+	extractor := &UserExtractor{imageStorage: images, picturesRepository: counts}
+	imageID := 7
+	result, err := extractor.ExtractRows(ctx, []schema.UsersRow{{ID: 1, Img: &imageID}},
+		&UserFields{Photo: true, PicturesAcceptedCount: true}, 0, nil)
+	require.NoError(t, err)
+	require.NoError(t, ctx.Err())
+	require.Len(t, result, 1)
+	require.NotNil(t, result[0].GetAvatar())
+	require.NotNil(t, result[0].GetPhoto())
+	require.EqualValues(t, 10, result[0].GetPicturesAcceptedCount())
+	require.Equal(t, [][]int{{imageID}}, images.batches["avatar"])
+	require.Equal(t, [][]int{{imageID}}, images.batches["photo"])
+	require.Equal(t, []int64{1}, counts.ids)
+}
+
+func TestUserExtractorCancelsFailedBatchSiblings(t *testing.T) {
+	t.Parallel()
+
+	for _, testCase := range []struct {
+		name       string
+		failImages bool
+	}{
+		{name: "images fail", failImages: true},
+		{name: "counts fail"},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+			defer cancel()
+
+			started := make(chan struct{})
+
+			var joined atomic.Bool
+
+			blocking := func(ctx context.Context) error {
+				close(started)
+				<-ctx.Done()
+				joined.Store(true)
+
+				return ctx.Err()
+			}
+			failing := func(ctx context.Context) error {
+				select {
+				case <-started:
+					return errUserBatchTest
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			}
+
+			imageLookup, countLookup := blocking, failing
+			if testCase.failImages {
+				imageLookup, countLookup = failing, blocking
+			}
+
+			images := &fakeBatchUserImages{beforeBatch: func(ctx context.Context, _ []int, _ string) error {
+				return imageLookup(ctx)
+			}}
+			counts := &fakeUserPictureCounts{beforeCount: func(ctx context.Context, _ []int64) error {
+				return countLookup(ctx)
+			}}
+			extractor := &UserExtractor{imageStorage: images, picturesRepository: counts}
+			imageID := 7
+			result, err := extractor.ExtractRows(ctx, []schema.UsersRow{{ID: 1, Img: &imageID}},
+				&UserFields{Photo: true, PicturesAcceptedCount: true}, 0, nil)
+			require.ErrorIs(t, err, errUserBatchTest)
+			require.NoError(t, ctx.Err(),
+				"sibling failure must cancel promptly without waiting for the parent deadline")
+			require.Nil(t, result)
+			require.True(t, joined.Load(), "all started batches must finish before returning")
+			require.Empty(t, images.batches["photo"], "failed avatar loads must not start photo loads")
+		})
+	}
 }
