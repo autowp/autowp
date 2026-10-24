@@ -3489,13 +3489,33 @@ func (s *ItemsGRPCServer) notifyItemSubscribers(
 func (s *ItemsGRPCServer) brandSections(
 	ctx context.Context, lang string, brandID int64, brandCatname string,
 ) ([]*BrandSection, error) {
-	// create groups array
-	sections, err := s.carSections(ctx, lang, brandID, brandCatname)
-	if err != nil {
-		return nil, fmt.Errorf("carSections(): %w", err)
+	sections, lookups := s.prepareCarSections(lang, brandID, brandCatname)
+	for index, lookup := range lookups {
+		lookups[index] = func(ctx context.Context) error {
+			if err := lookup(ctx); err != nil {
+				return fmt.Errorf("carSections(): %w", err)
+			}
+
+			return nil
+		}
 	}
 
-	otherGroups, err := s.otherGroups(ctx, brandID, brandCatname, lang)
+	other, otherLookups := s.prepareOtherGroupLookups(brandID)
+	for _, lookup := range otherLookups {
+		lookups = append(lookups, func(ctx context.Context) error {
+			if err := lookup(ctx); err != nil {
+				return fmt.Errorf("otherGroups(): %w", err)
+			}
+
+			return nil
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
+	}
+
+	otherGroups, err := s.formatOtherGroups(other, brandCatname, lang)
 	if err != nil {
 		return nil, fmt.Errorf("otherGroups(): %w", err)
 	}
@@ -3510,25 +3530,55 @@ func (s *ItemsGRPCServer) brandSections(
 	), nil
 }
 
+type brandOtherGroups struct {
+	hasConcepts bool
+	counts      pictures.BrandPictureCounts
+}
+
+func (s *ItemsGRPCServer) prepareOtherGroupLookups(brandID int64) (*brandOtherGroups, []func(context.Context) error) {
+	data := &brandOtherGroups{}
+	lookups := []func(context.Context) error{
+		func(ctx context.Context) error {
+			var err error
+
+			data.hasConcepts, err = s.repository.Exists(ctx, query.ItemListOptions{
+				ItemParentCacheAncestor: &query.ItemParentCacheListOptions{ParentID: brandID},
+				IsConcept:               true,
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			data.counts, err = s.picturesRepository.BrandCounts(ctx, brandID)
+
+			return err
+		},
+	}
+
+	return data, lookups
+}
+
 func (s *ItemsGRPCServer) otherGroups(
 	ctx context.Context, brandID int64, brandCatname string, lang string,
 ) ([]*BrandSection, error) {
-	var groups []*BrandSection
-
-	// concepts
-	hasConcepts, err := s.repository.Exists(ctx, query.ItemListOptions{
-		ItemParentCacheAncestor: &query.ItemParentCacheListOptions{
-			ParentID: brandID,
-		},
-		IsConcept: true,
-	})
-	if err != nil {
+	data, lookups := s.prepareOtherGroupLookups(brandID)
+	if err := runItemLookups(ctx, lookups); err != nil {
 		return nil, err
 	}
 
+	return s.formatOtherGroups(data, brandCatname, lang)
+}
+
+func (s *ItemsGRPCServer) formatOtherGroups(
+	data *brandOtherGroups, brandCatname string, lang string,
+) ([]*BrandSection, error) {
+	var groups []*BrandSection
+
 	localizer := s.i18n.Localizer(lang)
 
-	if hasConcepts {
+	if data.hasConcepts {
 		translated, err := localizer.Localize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
 				ID: "concepts and prototypes",
@@ -3544,19 +3594,14 @@ func (s *ItemsGRPCServer) otherGroups(
 		})
 	}
 
-	counts, err := s.picturesRepository.BrandCounts(ctx, brandID)
-	if err != nil {
-		return nil, err
-	}
-
 	groupTypes := []struct {
 		Count   int
 		Catname string
 		Name    string
 	}{
-		{Count: counts.Logotypes, Catname: frontend.BrandLogotypes, Name: "logotypes"},
-		{Count: counts.Mixed, Catname: frontend.BrandMixed, Name: "mixed"},
-		{Count: counts.Other, Catname: frontend.BrandOther, Name: "unsorted"},
+		{Count: data.counts.Logotypes, Catname: frontend.BrandLogotypes, Name: "logotypes"},
+		{Count: data.counts.Mixed, Catname: frontend.BrandMixed, Name: "mixed"},
+		{Count: data.counts.Other, Catname: frontend.BrandOther, Name: "unsorted"},
 	}
 
 	for _, groupType := range groupTypes {
@@ -3586,6 +3631,19 @@ func (s *ItemsGRPCServer) otherGroups(
 func (s *ItemsGRPCServer) carSections(
 	ctx context.Context, lang string, brandID int64, brandCatname string,
 ) ([]*BrandSection, error) {
+	sections, lookups := s.prepareCarSections(lang, brandID, brandCatname)
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
+	}
+
+	return sections, nil
+}
+
+// Return leaf lookups so brandSections can share one limit across all sections,
+// the concept check and picture counts, without creating nested parallel groups.
+func (s *ItemsGRPCServer) prepareCarSections(
+	lang string, brandID int64, brandCatname string,
+) ([]*BrandSection, []func(context.Context) error) {
 	sectionsPresets := []SectionPreset{
 		{
 			ItemTypeID: []schema.ItemTableItemTypeID{
@@ -3632,28 +3690,25 @@ func (s *ItemsGRPCServer) carSections(
 		},
 	}
 
-	sections := make([]*BrandSection, 0, len(sectionsPresets))
+	sections := make([]*BrandSection, len(sectionsPresets))
+	lookups := make([]func(context.Context) error, 0, len(sectionsPresets))
 
-	for _, sectionsPreset := range sectionsPresets {
-		sectionGroups, err := s.carSectionGroups(
-			ctx,
-			lang,
-			brandID,
-			brandCatname,
-			sectionsPreset,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("carSectionGroups(): %w", err)
-		}
+	for index, preset := range sectionsPresets {
+		sections[index] = &BrandSection{Name: preset.Name, RouterLink: preset.RouterLink}
 
-		sections = append(sections, &BrandSection{
-			Name:       sectionsPreset.Name,
-			RouterLink: sectionsPreset.RouterLink,
-			Groups:     sectionGroups,
+		lookups = append(lookups, func(ctx context.Context) error {
+			sectionGroups, err := s.carSectionGroups(ctx, lang, brandID, brandCatname, preset)
+			if err != nil {
+				return fmt.Errorf("carSectionGroups(): %w", err)
+			}
+
+			sections[index].Groups = sectionGroups
+
+			return nil
 		})
 	}
 
-	return sections, nil
+	return sections, lookups
 }
 
 func (s *ItemsGRPCServer) carSectionGroups(
