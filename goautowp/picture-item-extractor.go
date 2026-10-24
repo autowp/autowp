@@ -28,6 +28,10 @@ func (s *PictureItemExtractor) ExtractRows(
 	lang string,
 	userCtx UserContext,
 ) ([]*PictureItem, error) {
+	if len(rows) == 0 {
+		return []*PictureItem{}, nil
+	}
+
 	if fields == nil {
 		fields = &PictureItemFields{}
 	}
@@ -43,25 +47,53 @@ func (s *PictureItemExtractor) ExtractRows(
 	ids := slices.Sorted(maps.Keys(itemIDs))
 
 	itemRequest := fields.GetItem()
-
-	itemRows, err := s.preloadItems(ctx, itemRequest, ids, lang, userCtx)
-	if err != nil {
-		return nil, err
-	}
-
 	itemParentCacheAncestorRequest := fields.GetItemParentCacheAncestor()
-
-	itemParentCacheAncestorRows, err := s.preloadItemParentCache(
-		ctx, itemParentCacheAncestorRequest, ids, lang, userCtx,
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	pictureRequest := fields.GetPicture()
 
-	pictureRows, err := s.preloadPictures(ctx, pictureRequest, slices.Sorted(maps.Keys(pictureIDs)), lang, userCtx)
-	if err != nil {
+	var (
+		itemRows                    map[int64]*Item
+		itemParentCacheAncestorRows map[int64][]*ItemParentCache
+		pictureRows                 map[int64]*Picture
+		lookups                     []func(context.Context) error
+	)
+
+	// Independent maps are read only after joining. Reuse the item lookup runner
+	// so recursive item/picture-item extraction cannot multiply its parallel groups.
+	if itemRequest != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			itemRows, err = s.preloadItems(ctx, itemRequest, ids, lang, userCtx)
+
+			return err
+		})
+	}
+
+	if itemParentCacheAncestorRequest != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			itemParentCacheAncestorRows, err = s.preloadItemParentCache(
+				ctx, itemParentCacheAncestorRequest, ids, lang, userCtx,
+			)
+
+			return err
+		})
+	}
+
+	if pictureRequest != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			pictureRows, err = s.preloadPictures(
+				ctx, pictureRequest, slices.Sorted(maps.Keys(pictureIDs)), lang, userCtx,
+			)
+
+			return err
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
 		return nil, err
 	}
 
