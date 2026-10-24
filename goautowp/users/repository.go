@@ -8,6 +8,7 @@ import (
 	"io"
 	"math"
 	"net"
+	"slices"
 	"strings"
 	"time"
 
@@ -112,6 +113,7 @@ type Repository struct {
 	keycloakConfig  config.KeycloakConfig
 	messageInterval int64
 	imageStorage    *storage.Storage
+	visits          visitCache
 }
 
 // UserPreferences object.
@@ -1076,46 +1078,12 @@ func (s *Repository) NextMessageTime(ctx context.Context, userID int64) (time.Ti
 }
 
 func (s *Repository) RegisterVisit(ctx context.Context, userID int64, ip net.IP) error {
-	st := struct {
-		LastOnline sql.NullTime `db:"last_online"`
-		LastIP     *net.IP      `db:"last_ip"`
-	}{}
+	// Own the bytes while this call may wait behind another visit for the user.
+	ip = slices.Clone(ip)
 
-	success, err := s.db.Select(schema.UserTableLastOnlineCol, schema.UserTableLastIPCol).
-		From(schema.UserTable).
-		Where(schema.UserTableIDCol.Eq(userID)).
-		ScanStructContext(ctx, &st)
-	if err != nil {
-		return err
-	}
-
-	if !success {
-		return nil
-	}
-
-	set := goqu.Record{}
-
-	if !st.LastOnline.Valid ||
-		st.LastOnline.Time.Add(lastOnlineUpdateThreshold).Before(time.Now()) {
-		set[schema.UserTableLastOnlineColName] = goqu.Func("NOW")
-	}
-
-	if ip != nil && (st.LastIP == nil || !st.LastIP.Equal(ip)) {
-		set[schema.UserTableLastIPColName] = goqu.Func("INET", ip.String())
-	}
-
-	if len(set) > 0 {
-		_, err = s.db.Update(schema.UserTable).
-			Set(set).
-			Where(schema.UserTableIDCol.Eq(userID)).
-			Executor().
-			ExecContext(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return s.visits.register(ctx, userID, ip.String(), func(ctx context.Context) (time.Time, error) {
+		return s.registerVisit(ctx, userID, ip)
+	})
 }
 
 func (s *Repository) UserLanguage(ctx context.Context, userID int64) (string, error) {
@@ -1643,4 +1611,56 @@ func (s *Repository) fillContacts(ctx context.Context, rows []schema.UsersRow) e
 	}
 
 	return nil
+}
+
+func (s *Repository) registerVisit(ctx context.Context, userID int64, ip net.IP) (time.Time, error) {
+	st := struct {
+		LastOnline sql.NullTime `db:"last_online"`
+		LastIP     *net.IP      `db:"last_ip"`
+	}{}
+
+	success, err := s.db.Select(schema.UserTableLastOnlineCol, schema.UserTableLastIPCol).
+		From(schema.UserTable).
+		Where(schema.UserTableIDCol.Eq(userID)).
+		ScanStructContext(ctx, &st)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	if !success {
+		return time.Time{}, nil
+	}
+
+	now := time.Now()
+	until := st.LastOnline.Time.Add(lastOnlineUpdateThreshold)
+	set := goqu.Record{}
+
+	if !st.LastOnline.Valid ||
+		until.Before(now) {
+		set[schema.UserTableLastOnlineColName] = goqu.Func("NOW")
+		until = now.Add(lastOnlineUpdateThreshold)
+	}
+
+	if ip != nil && (st.LastIP == nil || !st.LastIP.Equal(ip)) {
+		set[schema.UserTableLastIPColName] = goqu.Func("INET", ip.String())
+	}
+
+	if len(set) > 0 {
+		_, err = s.db.Update(schema.UserTable).
+			Set(set).
+			Where(schema.UserTableIDCol.Eq(userID)).
+			Executor().
+			ExecContext(ctx)
+		if err != nil {
+			return time.Time{}, err
+		}
+	}
+
+	// A recent database timestamp keeps its existing deadline. In particular,
+	// an IP-only change must not postpone the next last_online update.
+	if maximum := now.Add(lastOnlineUpdateThreshold); until.After(maximum) {
+		until = maximum
+	}
+
+	return until, nil
 }
