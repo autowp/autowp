@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Repository) listSelect(
-	ctx context.Context, options *query.ItemListOptions, fields *ItemFields, orderBy OrderBy, pagination bool,
+	ctx context.Context, options *query.ItemListOptions, fields *ItemFields, orderBy OrderBy, pagination, first bool,
 ) (*goqu.SelectDataset, *util.Pages, error) {
 	var err error
 
@@ -70,9 +70,14 @@ func (s *Repository) listSelect(
 			}
 		}
 
-		sqSelect, err = paginator.GetCurrentItems(ctx)
-		if err != nil {
-			return nil, nil, err
+		if first {
+			// A first-match selection always uses page one; counting cannot change it.
+			sqSelect = sqSelect.Offset(0).Limit(1)
+		} else {
+			sqSelect, err = paginator.GetCurrentItems(ctx)
+			if err != nil {
+				return nil, nil, err
+			}
 		}
 
 		// implements deferred join pattern

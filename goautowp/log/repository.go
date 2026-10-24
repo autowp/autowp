@@ -95,22 +95,8 @@ func (s *Repository) Events(
 		return nil, nil, err
 	}
 
-	for idx, row := range rows {
-		err = s.db.Select(schema.LogEventItemTableItemIDCol).
-			From(schema.LogEventItemTable).
-			Where(schema.LogEventItemTableLogEventIDCol.Eq(row.ID)).
-			ScanValsContext(ctx, &rows[idx].Items)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		err = s.db.Select(schema.LogEventPictureTablePictureIDCol).
-			From(schema.LogEventPictureTable).
-			Where(schema.LogEventPictureTableLogEventIDCol.Eq(row.ID)).
-			ScanValsContext(ctx, &rows[idx].Pictures)
-		if err != nil {
-			return nil, nil, err
-		}
+	if err := s.preloadEventLinks(ctx, rows); err != nil {
+		return nil, nil, err
 	}
 
 	return rows, pages, nil

@@ -604,7 +604,7 @@ func canAggregateDescendantPictures(options *query.ItemListOptions, fields *Item
 func (s *Repository) List(
 	ctx context.Context, options *query.ItemListOptions, fields *ItemFields, orderBy OrderBy, pagination bool,
 ) ([]*Item, *util.Pages, error) {
-	selection, pages, err := s.listSelect(ctx, options, fields, orderBy, pagination)
+	selection, pages, err := s.listSelect(ctx, options, fields, orderBy, pagination, false)
 	if err != nil {
 		return nil, nil, err
 	}

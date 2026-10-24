@@ -2,11 +2,9 @@ package goautowp
 
 import (
 	"context"
-	"errors"
 
 	"github.com/autowp/goautowp/items"
 	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
 )
 
 type ItemParentExtractor struct {
@@ -44,6 +42,8 @@ func (s *ItemParentExtractor) ExtractRows(
 		parentsMap         map[int64]*Item
 		lookups            []func(context.Context) error
 		descendantPictures map[int64]*PicturesList
+		duplicateParents   map[int64]*Item
+		duplicateChildren  map[int64]*Item
 	)
 
 	// Child and parent selections are independent. Share the existing lookup
@@ -89,20 +89,40 @@ func (s *ItemParentExtractor) ExtractRows(
 		})
 	}
 
+	for _, selection := range []struct {
+		fields *ItemFields
+		parent bool
+		target *map[int64]*Item
+	}{
+		{fields.GetDuplicateParent(), true, &duplicateParents},
+		{fields.GetDuplicateChild(), false, &duplicateChildren},
+	} {
+		if selection.fields == nil || len(rows) == 0 {
+			continue
+		}
+
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, 1)
+			*selection.target, err = s.preloadDuplicates(ctx, rows, selection.fields, selection.parent, lang, userCtx)
+
+			return err
+		})
+	}
+
 	if err := runItemLookups(ctx, lookups); err != nil {
 		return nil, err
 	}
 
 	res := make([]*ItemParent, 0, len(rows))
 
-	itemExtractor := s.container.ItemExtractor()
-
-	itemRepository, err := s.container.ItemsRepository(ctx)
+	_, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, row := range rows {
+	for index, row := range rows {
 		resRow := &ItemParent{
 			ItemId:   row.ItemID,
 			ParentId: row.ParentID,
@@ -113,58 +133,8 @@ func (s *ItemParentExtractor) ExtractRows(
 		resRow.Item = itemsMap[row.ItemID]
 		resRow.Parent = parentsMap[row.ParentID]
 
-		duplicateParentFields := fields.GetDuplicateParent()
-		if duplicateParentFields != nil {
-			duplicateRow, err := itemRepository.Item(ctx, &query.ItemListOptions{
-				ExcludeID: row.ParentID,
-				ItemParentChild: &query.ItemParentListOptions{
-					ItemID: row.ItemID,
-					Type:   schema.ItemParentTypeDefault,
-				},
-				ItemParentCacheAncestor: &query.ItemParentCacheListOptions{
-					ParentID:  row.ParentID,
-					StockOnly: true,
-				},
-			}, convertItemFields(duplicateParentFields))
-			if err != nil && !errors.Is(err, items.ErrItemNotFound) {
-				return nil, err
-			}
-
-			if err == nil {
-				resRow.DuplicateParent, err = itemExtractor.Extract(
-					ctx, duplicateRow, duplicateParentFields, lang, userCtx,
-				)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
-
-		duplicateChildFields := fields.GetDuplicateChild()
-		if duplicateChildFields != nil {
-			duplicateRow, err := itemRepository.Item(ctx, &query.ItemListOptions{
-				ExcludeID: row.ItemID,
-				ItemParentParent: &query.ItemParentListOptions{
-					ParentID: row.ParentID,
-					Type:     row.Type,
-				},
-				ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
-					ItemID: row.ItemID,
-				},
-			}, convertItemFields(duplicateChildFields))
-			if err != nil && !errors.Is(err, items.ErrItemNotFound) {
-				return nil, err
-			}
-
-			if err == nil {
-				resRow.DuplicateChild, err = itemExtractor.Extract(
-					ctx, duplicateRow, duplicateChildFields, lang, userCtx,
-				)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
+		resRow.DuplicateParent = duplicateParents[int64(index)]
+		resRow.DuplicateChild = duplicateChildren[int64(index)]
 
 		if fields.GetChildDescendantPictures() != nil {
 			resRow.ChildDescendantPictures = descendantPictures[row.ItemID]

@@ -15,6 +15,20 @@ import (
 func (s *Repository) GroupedList(
 	ctx context.Context, groups map[int64]*query.ItemListOptions, fields *ItemFields, order OrderBy,
 ) (map[int64][]*Item, error) {
+	return s.groupedList(ctx, groups, fields, order, false)
+}
+
+// GroupedFirst matches Item's first-row selection for every group without
+// issuing a redundant count query for each first page.
+func (s *Repository) GroupedFirst(
+	ctx context.Context, groups map[int64]*query.ItemListOptions, fields *ItemFields,
+) (map[int64][]*Item, error) {
+	return s.groupedList(ctx, groups, fields, OrderByNone, true)
+}
+
+func (s *Repository) groupedList(
+	ctx context.Context, groups map[int64]*query.ItemListOptions, fields *ItemFields, order OrderBy, first bool,
+) (map[int64][]*Item, error) {
 	result := make(map[int64][]*Item, len(groups))
 
 	var combined *goqu.SelectDataset
@@ -22,7 +36,13 @@ func (s *Repository) GroupedList(
 	for _, id := range slices.Sorted(maps.Keys(groups)) {
 		result[id] = nil
 
-		selection, _, err := s.listSelect(ctx, groups[id].Clone(), fields, order, false)
+		options := groups[id].Clone()
+		if first {
+			options.Limit = 1
+			options.Page = 0
+		}
+
+		selection, _, err := s.listSelect(ctx, options, fields, order, false, first)
 		if err != nil {
 			return nil, err
 		}
