@@ -6,4 +6,5 @@ User-agent: facebookexternalhit
 User-agent: GPTBot
 User-agent: PerplexityBot
 User-agent: ShapBot
+User-agent: SemrushBot
 Crawl-delay: 1
