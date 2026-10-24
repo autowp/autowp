@@ -360,3 +360,38 @@ func TestRequestFormattedImageAgain(t *testing.T) {
 	require.NotEmpty(t, formattedImage.Src())
 }
 */
+
+// A retry must return the requested format even when other formats already exist.
+func TestFormatImageRetrySelectsRequestedFormat(t *testing.T) {
+	t.Parallel()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig("../../")
+	database, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, database.Close()) })
+
+	imageStorage, err := NewStorage(goqu.New("postgres", database), cfg.ImageStorage)
+	require.NoError(t, err)
+
+	imageID, err := imageStorage.AddImageFromFilepath(ctx, TestImageFile, "brand", GenerateOptions{})
+	require.NoError(t, err)
+
+	logo, err := imageStorage.FormattedImage(ctx, imageID, "logo")
+	require.NoError(t, err)
+	icon, err := imageStorage.FormattedImage(ctx, imageID, "icon")
+	require.NoError(t, err)
+	require.NotEqual(t, logo.id, icon.id)
+
+	// doFormatImage exercises the duplicate-insert/await-result path directly,
+	// without relying on the scheduler to make two generators overlap.
+	for _, format := range []string{"logo", "icon"} {
+		formatted, err := imageStorage.FormattedImage(ctx, imageID, format)
+		require.NoError(t, err)
+		retriedID, err := imageStorage.doFormatImage(ctx, imageID, format)
+		require.NoError(t, err)
+		require.Equal(t, formatted.id, retriedID, "retry must select format %s", format)
+	}
+
+	require.NoError(t, imageStorage.RemoveImage(ctx, imageID))
+}

@@ -23,7 +23,7 @@ import (
 
 const engineVehiclesGroupsLimit = 3
 
-// Bound independent lookups; recursive extraction and image generation stay sequential.
+// Bound parallel item branches; nested item lookups reuse their branch sequentially.
 const itemExtractorParallelism = 4
 
 var (
@@ -49,13 +49,39 @@ func NewItemExtractor(
 	return &ItemExtractor{container: container}
 }
 
+// itemLookupContextKey marks a branch that already occupies a parallel lookup slot.
+type itemLookupContextKey struct{}
+
 // runItemLookups cancels sibling reads on the first failure and joins all tasks.
+// Nested groups run inline: acquiring another slot while a parent waits could
+// deadlock, and creating a fresh group would multiply concurrency at every level.
 func runItemLookups(ctx context.Context, lookups []func(context.Context) error) error {
+	if ctx.Value(itemLookupContextKey{}) != nil {
+		for _, lookup := range lookups {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
+
+			if err := lookup(ctx); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	ctx = context.WithValue(ctx, itemLookupContextKey{}, true)
 	group, lookupCtx := errgroup.WithContext(ctx)
 	group.SetLimit(itemExtractorParallelism)
 
 	for _, lookup := range lookups {
-		group.Go(func() error { return lookup(lookupCtx) })
+		group.Go(func() error {
+			if err := lookupCtx.Err(); err != nil {
+				return err
+			}
+
+			return lookup(lookupCtx)
+		})
 	}
 
 	return group.Wait()
@@ -377,14 +403,22 @@ func (s *ItemExtractor) extractPlain(
 		return err
 	}
 
-	resultRow.Logo, resultRow.Logo120, resultRow.Brandicon, err = s.extractLogos(ctx, fields, row)
-	if err != nil {
-		return err
+	if fields.GetCanEditSpecs() {
+		resultRow.CanEditSpecs = util.Contains(itemTypeCanHaveSpecs, row.ItemTypeID) && userCtx.UserID != 0
 	}
 
-	// Each lookup owns separate result fields. Wait before recursive extraction so
-	// nested item/picture extractors cannot multiply this group's concurrency.
+	// Each branch owns separate result fields; results are consumed only after joining.
 	var lookups []func(context.Context) error
+
+	if row.LogoID.Valid {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.Logo, resultRow.Logo120, resultRow.Brandicon, err = s.extractLogos(ctx, fields, row)
+
+			return err
+		})
+	}
 
 	if fields.GetIsCompilesItemOfDay() {
 		lookups = append(lookups, func(ctx context.Context) error {
@@ -456,51 +490,77 @@ func (s *ItemExtractor) extractPlain(
 		})
 	}
 
-	if err := runItemLookups(ctx, lookups); err != nil {
-		return err
+	if fields.GetCategories() != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.Categories, err = s.extractCategories(ctx, fields, row, lang, userCtx)
+
+			return err
+		})
 	}
 
-	resultRow.Categories, err = s.extractCategories(ctx, fields, row, lang, userCtx)
-	if err != nil {
-		return err
+	if fields.GetTwins() != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.Twins, err = s.extractTwins(ctx, fields, row, lang, userCtx)
+
+			return err
+		})
 	}
 
-	resultRow.Twins, err = s.extractTwins(ctx, fields, row, lang, userCtx)
-	if err != nil {
-		return err
+	if fields.GetPreviewPictures() != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.PreviewPictures, err = s.extractPreviewPictures(ctx, fields, row, lang, userCtx)
+
+			return err
+		})
 	}
 
-	if fields.GetCanEditSpecs() {
-		resultRow.CanEditSpecs = util.Contains(itemTypeCanHaveSpecs, row.ItemTypeID) &&
-			userCtx.UserID != 0
+	if fields.GetEngineVehicles() != nil && row.ItemTypeID == schema.ItemTableItemTypeIDEngine {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.EngineVehicles, err = s.extractEngineVehicles(ctx, fields, row, lang, userCtx)
+
+			return err
+		})
 	}
 
-	resultRow.PreviewPictures, err = s.extractPreviewPictures(ctx, fields, row, lang, userCtx)
-	if err != nil {
-		return err
+	if fields.GetRelatedGroupPictures() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.RelatedGroupPictures, err = s.extractRelatedGroupsPictures(ctx, fields, row, lang)
+
+			return err
+		})
 	}
 
-	resultRow.EngineVehicles, err = s.extractEngineVehicles(ctx, fields, row, lang, userCtx)
-	if err != nil {
-		return err
+	if fields.GetItemOfDayPictures() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.ItemOfDayPictures, err = s.extractItemOfDayPictures(ctx, fields, row, lang)
+
+			return err
+		})
 	}
 
-	resultRow.RelatedGroupPictures, err = s.extractRelatedGroupsPictures(ctx, fields, row, lang)
-	if err != nil {
-		return err
+	if fields.GetSpecsContributors() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.SpecsContributors, err = s.extractSpecsContributors(ctx, fields, row)
+
+			return err
+		})
 	}
 
-	resultRow.ItemOfDayPictures, err = s.extractItemOfDayPictures(ctx, fields, row, lang)
-	if err != nil {
-		return err
-	}
-
-	resultRow.SpecsContributors, err = s.extractSpecsContributors(ctx, fields, row)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return runItemLookups(ctx, lookups)
 }
 
 func (s *ItemExtractor) extractSpecsContributors(

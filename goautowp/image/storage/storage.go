@@ -1497,7 +1497,10 @@ func (s *Storage) doFormatImage( //nolint: maintidx
 				schema.ImageFormattedTableImageFormattedIDCol, schema.ImageFormattedTableStatusCol,
 			).
 				From(schema.ImageFormattedTable).
-				Where(schema.ImageFormattedTableImageIDCol.Eq(imageID)).
+				Where(
+					schema.ImageFormattedTableImageIDCol.Eq(imageID),
+					schema.ImageFormattedTableFormatCol.Eq(formatName),
+				).
 				ScanStructContext(ctx, &fiRow)
 			if err != nil {
 				return 0, err

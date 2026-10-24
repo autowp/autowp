@@ -93,54 +93,76 @@ func TestRunItemLookupsHonorsCancellation(t *testing.T) {
 func TestRunItemLookupsBoundsConcurrency(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
+	for _, testCase := range []struct {
+		name   string
+		nested bool
+	}{
+		{name: "flat"},
+		{name: "nested", nested: true},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			t.Parallel()
 
-	const count = 2 * itemExtractorParallelism
+			ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+			defer cancel()
 
-	started := make(chan struct{}, count)
-	release := make(chan struct{})
+			const count = 2 * itemExtractorParallelism
 
-	var inFlight, peak atomic.Int32
+			started := make(chan struct{}, count)
+			release := make(chan struct{})
 
-	lookups := make([]func(context.Context) error, count)
-	for index := range lookups {
-		lookups[index] = func(ctx context.Context) error {
-			active := inFlight.Add(1)
-			defer inFlight.Add(-1)
+			var inFlight, peak atomic.Int32
 
-			for previous := peak.Load(); active > previous; previous = peak.Load() {
-				if peak.CompareAndSwap(previous, active) {
-					break
+			lookups := make([]func(context.Context) error, count)
+			for index := range lookups {
+				lookups[index] = func(ctx context.Context) error {
+					active := inFlight.Add(1)
+					defer inFlight.Add(-1)
+
+					for previous := peak.Load(); active > previous; previous = peak.Load() {
+						if peak.CompareAndSwap(previous, active) {
+							break
+						}
+					}
+
+					started <- struct{}{}
+
+					select {
+					case <-release:
+						return nil
+					case <-ctx.Done():
+						return ctx.Err()
+					}
 				}
 			}
 
-			started <- struct{}{}
+			done := make(chan error, 1)
 
-			select {
-			case <-release:
-				return nil
-			case <-ctx.Done():
-				return ctx.Err()
+			if testCase.nested {
+				outer := make([]func(context.Context) error, itemExtractorParallelism)
+				for index := range outer {
+					branch := lookups[index*2 : (index+1)*2]
+					outer[index] = func(ctx context.Context) error { return runItemLookups(ctx, branch) }
+				}
+
+				lookups = outer
 			}
-		}
+
+			go func() { done <- runItemLookups(ctx, lookups) }()
+
+			for range itemExtractorParallelism {
+				select {
+				case <-started:
+				case <-ctx.Done():
+					t.Fatal("item lookups did not reach the concurrency limit")
+				}
+			}
+
+			close(release)
+			require.NoError(t, <-done)
+			require.EqualValues(t, itemExtractorParallelism, peak.Load())
+			require.Zero(t, inFlight.Load())
+			require.Len(t, started, count-itemExtractorParallelism)
+		})
 	}
-
-	done := make(chan error, 1)
-
-	go func() { done <- runItemLookups(ctx, lookups) }()
-
-	for range itemExtractorParallelism {
-		select {
-		case <-started:
-		case <-ctx.Done():
-			t.Fatal("item lookups did not reach the concurrency limit")
-		}
-	}
-
-	close(release)
-	require.NoError(t, <-done)
-	require.EqualValues(t, itemExtractorParallelism, peak.Load())
-	require.Zero(t, inFlight.Load())
-	require.Len(t, started, count-itemExtractorParallelism)
 }
