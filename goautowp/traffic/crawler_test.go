@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -15,17 +16,23 @@ type fakeCrawlerResolver struct {
 	hosts        []string
 	addresses    []net.IPAddr
 	err          error
+	forwardErr   error
+	cancel       context.CancelFunc
 	forwardCalls int
 }
 
 func (r *fakeCrawlerResolver) LookupAddr(context.Context, string) ([]string, error) {
+	if r.cancel != nil {
+		r.cancel()
+	}
+
 	return r.hosts, r.err
 }
 
 func (r *fakeCrawlerResolver) LookupIPAddr(context.Context, string) ([]net.IPAddr, error) {
 	r.forwardCalls++
 
-	return r.addresses, r.err
+	return r.addresses, r.forwardErr
 }
 
 func TestCrawlerVerification(t *testing.T) {
@@ -69,5 +76,64 @@ func TestCrawlerDNSError(t *testing.T) {
 	resolver := &fakeCrawlerResolver{err: errTestResolverUnavailable}
 	valid, _, err := matchCrawler(t.Context(), resolver, net.ParseIP("66.249.73.139"))
 	require.Error(t, err)
+	require.False(t, valid)
+}
+
+func TestCrawlerDNSFailureSkipsIP(t *testing.T) {
+	t.Parallel()
+
+	for _, forward := range []bool{false, true} {
+		for _, dnsErr := range []*net.DNSError{
+			{Err: "server misbehaving", IsTemporary: true},
+			{Err: "i/o timeout", IsTimeout: true},
+			{Err: "no such host", IsNotFound: true},
+		} {
+			resolver := &fakeCrawlerResolver{hosts: []string{"crawl.googlebot.com."}}
+			if forward {
+				resolver.forwardErr = dnsErr
+			} else {
+				resolver.err = dnsErr
+			}
+
+			valid, desc, err := matchCrawler(t.Context(), resolver, net.ParseIP("216.73.217.127"))
+			require.NoError(t, err)
+			require.False(t, valid)
+			require.Empty(t, desc)
+
+			// The next IP can still be verified after a DNS failure.
+			resolver.err = nil
+			resolver.forwardErr = nil
+			resolver.addresses = []net.IPAddr{{IP: net.ParseIP("66.249.73.139")}}
+			valid, _, err = matchCrawler(t.Context(), resolver, net.ParseIP("66.249.73.139"))
+			require.NoError(t, err)
+			require.True(t, valid)
+		}
+	}
+}
+
+func TestCrawlerDNSFailurePreservesCallerCancellation(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+
+	resolver := &fakeCrawlerResolver{
+		err:    &net.DNSError{Err: "operation was canceled"},
+		cancel: cancel,
+	}
+	valid, _, err := matchCrawler(ctx, resolver, net.ParseIP("216.73.217.127"))
+	require.ErrorIs(t, err, context.Canceled)
+	require.False(t, valid)
+}
+
+func TestCrawlerDNSFailurePreservesCallerDeadline(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithDeadline(t.Context(), time.Now().Add(-time.Second))
+	defer cancel()
+
+	resolver := &fakeCrawlerResolver{err: &net.DNSError{Err: "i/o timeout", IsTimeout: true}}
+	valid, _, err := matchCrawler(ctx, resolver, net.ParseIP("216.73.217.127"))
+	require.ErrorIs(t, err, context.DeadlineExceeded)
 	require.False(t, valid)
 }

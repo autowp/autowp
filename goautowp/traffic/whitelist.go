@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
@@ -69,21 +70,20 @@ const (
 )
 
 func matchCrawler(ctx context.Context, resolver crawlerResolver, ip net.IP) (bool, string, error) {
+	if err := ctx.Err(); err != nil {
+		return false, "", err
+	}
+
 	if ip == nil {
 		return false, "", nil
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, crawlerLookupTimeout)
+	lookupCtx, cancel := context.WithTimeout(ctx, crawlerLookupTimeout)
 	defer cancel()
 
-	hosts, err := resolver.LookupAddr(ctx, ip.String())
+	hosts, err := resolver.LookupAddr(lookupCtx, ip.String())
 	if err != nil {
-		var dnsErr *net.DNSError
-		if errors.As(err, &dnsErr) && dnsErr.IsNotFound {
-			return false, "", nil
-		}
-
-		return false, "", err
+		return false, "", crawlerLookupError(ctx, ip, err)
 	}
 
 	for _, host := range hosts {
@@ -105,9 +105,9 @@ func matchCrawler(ctx context.Context, resolver crawlerResolver, ip net.IP) (boo
 			continue
 		}
 
-		addresses, err := resolver.LookupIPAddr(ctx, host)
+		addresses, err := resolver.LookupIPAddr(lookupCtx, host)
 		if err != nil {
-			return false, "", err
+			return false, "", crawlerLookupError(ctx, ip, err)
 		}
 
 		for _, address := range addresses {
@@ -118,6 +118,25 @@ func matchCrawler(ctx context.Context, resolver crawlerResolver, ip net.IP) (boo
 	}
 
 	return false, "", nil
+}
+
+// A failed DNS check must not grant an exemption or stop checks for other IPs.
+// The lookup's own timeout is recoverable; cancellation of the caller is not.
+func crawlerLookupError(ctx context.Context, ip net.IP, err error) error {
+	if contextErr := ctx.Err(); contextErr != nil {
+		return contextErr
+	}
+
+	var dnsErr *net.DNSError
+	if !errors.As(err, &dnsErr) {
+		return err
+	}
+
+	if !dnsErr.IsNotFound {
+		logging.Warnf("Skipping crawler verification for IP %s: %v", ip, err)
+	}
+
+	return nil
 }
 
 // Add IP to whitelist.
