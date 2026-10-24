@@ -36,36 +36,49 @@ func (s *ItemParentExtractor) ExtractRows(
 	lang string,
 	userCtx UserContext,
 ) ([]*ItemParent, error) {
-	var err error
-
 	itemFields := fields.GetItem()
-	itemsMap := make(map[int64]*items.Item)
+	parentFields := fields.GetParent()
 
+	var (
+		itemsMap   map[int64]*items.Item
+		parentsMap map[int64]*items.Item
+		lookups    []func(context.Context) error
+	)
+
+	// Child and parent selections are independent. Share the existing lookup
+	// runner so nested extraction keeps its concurrency limit and cancellation.
 	if itemFields != nil && len(rows) > 0 {
-		ids := make([]int64, 0, len(rows))
-		for _, row := range rows {
-			ids = append(ids, row.ItemID)
-		}
+		lookups = append(lookups, func(ctx context.Context) error {
+			ids := make([]int64, 0, len(rows))
+			for _, row := range rows {
+				ids = append(ids, row.ItemID)
+			}
 
-		itemsMap, err = s.prefetchItems(ctx, ids, lang, convertItemFields(itemFields))
-		if err != nil {
-			return nil, err
-		}
+			var err error
+
+			itemsMap, err = s.prefetchItems(ctx, ids, lang, convertItemFields(itemFields))
+
+			return err
+		})
 	}
 
-	parentFields := fields.GetParent()
-	parentsMap := make(map[int64]*items.Item, len(rows))
-
 	if parentFields != nil && len(rows) > 0 {
-		ids := make([]int64, 0, len(rows))
-		for _, row := range rows {
-			ids = append(ids, row.ParentID)
-		}
+		lookups = append(lookups, func(ctx context.Context) error {
+			ids := make([]int64, 0, len(rows))
+			for _, row := range rows {
+				ids = append(ids, row.ParentID)
+			}
 
-		parentsMap, err = s.prefetchItems(ctx, ids, lang, convertItemFields(parentFields))
-		if err != nil {
-			return nil, err
-		}
+			var err error
+
+			parentsMap, err = s.prefetchItems(ctx, ids, lang, convertItemFields(parentFields))
+
+			return err
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
 	}
 
 	res := make([]*ItemParent, 0, len(rows))
