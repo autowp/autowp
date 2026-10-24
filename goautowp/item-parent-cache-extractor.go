@@ -101,11 +101,13 @@ func (s *ItemParentCacheExtractor) preloadItems(
 		return nil, err
 	}
 
-	for _, row := range rows {
-		result[row.ID], err = itemExtractor.Extract(ctx, row, itemFields, lang, userCtx)
-		if err != nil {
-			return nil, err
-		}
+	extracted, err := itemExtractor.ExtractRows(ctx, rows, itemFields, lang, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range extracted {
+		result[item.GetId()] = item
 	}
 
 	return result, nil
