@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"io"
 	"math"
 	"net"
@@ -114,6 +113,7 @@ type Repository struct {
 	messageInterval int64
 	imageStorage    *storage.Storage
 	visits          visitCache
+	imports         userImports
 }
 
 // UserPreferences object.
@@ -390,23 +390,7 @@ func (s *Repository) DecVotes(ctx context.Context, userID int64) error {
 }
 
 func (s *Repository) AfterUserCreated(ctx context.Context, userID int64) error {
-	ctx = context.WithoutCancel(ctx)
-
-	err := s.RefreshUserConflicts(ctx, userID)
-	if err != nil {
-		return err
-	}
-
-	err = s.UpdateUserVoteLimit(ctx, userID)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.db.Update(schema.UserTable).Set(goqu.Record{
-		schema.UserTableVotesLeftColName: schema.UserTableVotesPerDayCol,
-	}).Where(schema.UserTableIDCol.Eq(userID)).Executor().ExecContext(ctx)
-
-	return err
+	return s.afterUserCreated(context.WithoutCancel(ctx), userID)
 }
 
 func (s *Repository) UpdateUserVoteLimit(ctx context.Context, userID int64) error {
@@ -505,107 +489,6 @@ func (s *Repository) RefreshUserConflicts(ctx context.Context, userID int64) err
 		Executor().ExecContext(ctx)
 
 	return err
-}
-
-func (s *Repository) EnsureUserImported(
-	ctx context.Context,
-	claims Claims,
-	ip net.IP,
-) (int64, error) {
-	locale := strings.ToLower(claims.Locale)
-
-	language, ok := s.languages[locale]
-	if !ok {
-		locale = schema.EnglishLanguageCode
-		language, ok = s.languages[schema.EnglishLanguageCode]
-	}
-
-	if !ok {
-		return 0, fmt.Errorf("%w: `%s`", ErrLanguageNotFound, locale)
-	}
-
-	guid := claims.Subject
-	emailAddr := claims.Email
-	name := fullName(claims.GivenName, claims.FamilyName, claims.PreferredUsername)
-
-	logging.Debugf("Ensure user `%s` imported", guid)
-
-	ctx = context.WithoutCancel(ctx)
-
-	green := util.Contains(claims.ResourceAccess.Autowp.Roles, RoleGreenUser)
-
-	// Common path: the user was already imported. Update the mutable fields with a
-	// plain UPDATE, which does not touch the `id` identity sequence. An
-	// `INSERT ... ON CONFLICT DO UPDATE` would advance the sequence on every call
-	// (Postgres evaluates the identity default before detecting the conflict).
-	var userID int64
-
-	found, err := s.db.Update(schema.UserTable).
-		Set(goqu.Record{
-			schema.UserTableEmailColName:  emailAddr,
-			schema.UserTableNameColName:   name,
-			schema.UserTableLastIPColName: goqu.Func("INET", ip.String()),
-			schema.UserTableGreenColName:  green,
-		}).
-		Where(schema.UserTableUUIDCol.Eq(guid)).
-		Returning(schema.UserTableIDColName).
-		Executor().ScanValContext(ctx, &userID)
-	if err != nil {
-		return 0, err
-	}
-
-	if found {
-		return userID, nil
-	}
-
-	// First login for this guid: insert the user, tolerating a concurrent first
-	// login via ON CONFLICT.
-	st := struct {
-		UserID     int64 `db:"id"`
-		IsInserted bool  `db:"is_inserted"`
-	}{}
-
-	success, err := s.db.Insert(schema.UserTable).
-		Rows(goqu.Record{
-			schema.UserTableLoginColName:          nil,
-			schema.UserTableEmailColName:          emailAddr,
-			schema.UserTablePasswordColName:       nil,
-			schema.UserTableEmailToCheckColName:   nil,
-			schema.UserTableHideEmailColName:      true,
-			schema.UserTableEmailCheckCodeColName: nil,
-			schema.UserTableNameColName:           name,
-			schema.UserTableRegDateColName:        goqu.Func("NOW"),
-			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
-			schema.UserTableTimezoneColName:       language.Timezone,
-			schema.UserTableLastIPColName:         goqu.Func("INET", ip.String()),
-			schema.UserTableLanguageColName:       locale,
-			schema.UserTableGreenColName:          green,
-			schema.UserTableUUIDColName:           guid,
-		}).
-		OnConflict(goqu.DoUpdate(schema.UserTableUUIDColName, goqu.Record{
-			schema.UserTableEmailColName:  schema.Excluded(schema.UserTableEmailColName),
-			schema.UserTableNameColName:   schema.Excluded(schema.UserTableNameColName),
-			schema.UserTableLastIPColName: schema.Excluded(schema.UserTableLastIPColName),
-			schema.UserTableGreenColName:  schema.Excluded(schema.UserTableGreenColName),
-		})).
-		Returning(schema.UserTableIDColName, goqu.L("xmax = 0").As("is_inserted")).
-		Executor().ScanStructContext(ctx, &st)
-	if err != nil {
-		return 0, err
-	}
-
-	if !success {
-		return 0, ErrUserNotFound
-	}
-
-	if st.IsInserted { // row just inserted
-		err = s.AfterUserCreated(ctx, st.UserID)
-		if err != nil {
-			return 0, err
-		}
-	}
-
-	return st.UserID, nil
 }
 
 func (s *Repository) PasswordMatch(
