@@ -68,8 +68,20 @@ func TestItemParentExtractorParallelPreloads(t *testing.T) {
 	rows = append(rows, rows[0])
 	extractor := NewItemParentExtractor(container)
 	inlineCtx := context.WithValue(ctx, itemLookupContextKey{}, true)
-	expected, err := extractor.ExtractRows(inlineCtx, rows, fields, schema.EnglishLanguageCode, UserContext{})
-	require.NoError(t, err)
+
+	expected := make([]*ItemParent, 0, len(rows))
+	for _, row := range rows {
+		individual, err := extractor.ExtractRows(
+			inlineCtx,
+			[]*items.ItemParent{row},
+			fields,
+			schema.EnglishLanguageCode,
+			UserContext{},
+		)
+		require.NoError(t, err)
+
+		expected = append(expected, individual...)
+	}
 
 	// Both SQL reads must start before either can proceed.
 	logger := &itemBatchQueryLogger{}

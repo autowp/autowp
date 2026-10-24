@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
@@ -41,15 +42,43 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 		Fields: &PictureFields{ThumbMedium: true, NameText: true},
 	}}
 	original := proto.Clone(fields)
-	serialCtx := context.WithValue(t.Context(), pictureExtractionParallelismKey{}, 1)
-	expected, err := extractor.ExtractRows(serialCtx, rows, fields, "en", UserContext{})
+	// Retain the original per-distance reads as the reference.
+	repository, err := itemExtractor.container.PicturesRepository(t.Context())
 	require.NoError(t, err)
+
+	individualQueries := &itemBatchQueryLogger{}
+	database.Logger(individualQueries)
+
+	expected := make([]*DfDistance, len(rows))
+	for index, row := range rows {
+		expected[index] = &DfDistance{
+			SrcPictureId: row.SrcPictureID, DstPictureId: row.DstPictureID,
+			Distance: int32(row.Distance), //nolint:gosec
+		}
+		if row.DstPictureID == 0 {
+			continue
+		}
+
+		picture, err := repository.Picture(
+			t.Context(),
+			&query.PictureListOptions{ID: row.DstPictureID},
+			convertPictureFields(
+				fields.GetDstPicture().GetFields(),
+			),
+			convertPicturesOrder(fields.GetDstPicture().GetOrder()),
+		)
+		require.NoError(t, err)
+		expected[index].DstPicture, err = itemExtractor.container.PictureExtractor().Extract(
+			t.Context(), picture, fields.GetDstPicture().GetFields(), "en", UserContext{})
+		require.NoError(t, err)
+	}
+
+	database.Logger(nil)
 
 	for _, limit := range []int{4, 2} {
 		ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 		ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, limit)
 		logger := &itemBatchQueryLogger{}
-		unblock := blockItemExtractionQueries(t, logger, limit)
 		database.Logger(logger)
 
 		done := make(chan error, 1)
@@ -63,8 +92,8 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 			done <- extractErr
 		}()
 
-		unblock()
 		require.NoError(t, <-done)
+		require.Less(t, logger.queries.Load(), individualQueries.queries.Load())
 		cancel()
 		require.Len(t, actual, len(expected))
 
@@ -108,7 +137,7 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer cancel()
 
-	started := make(chan struct{}, 4)
+	started := make(chan struct{}, 1)
 
 	database.Logger(&itemBatchQueryLogger{beforeQuery: func() { started <- struct{}{} }})
 
@@ -125,11 +154,11 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 		done <- extractErr
 	}()
 
-	for range 4 {
+	for range 1 {
 		select {
 		case <-started:
 		case <-ctx.Done():
-			t.Fatal("distance rows did not issue SQL together")
+			t.Fatal("batched picture read did not start")
 		}
 	}
 

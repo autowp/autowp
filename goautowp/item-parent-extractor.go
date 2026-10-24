@@ -40,8 +40,8 @@ func (s *ItemParentExtractor) ExtractRows(
 	parentFields := fields.GetParent()
 
 	var (
-		itemsMap   map[int64]*items.Item
-		parentsMap map[int64]*items.Item
+		itemsMap   map[int64]*Item
+		parentsMap map[int64]*Item
 		lookups    []func(context.Context) error
 	)
 
@@ -56,7 +56,7 @@ func (s *ItemParentExtractor) ExtractRows(
 
 			var err error
 
-			itemsMap, err = s.prefetchItems(ctx, ids, lang, convertItemFields(itemFields))
+			itemsMap, err = s.prefetchItems(ctx, ids, lang, itemFields, userCtx)
 
 			return err
 		})
@@ -71,7 +71,7 @@ func (s *ItemParentExtractor) ExtractRows(
 
 			var err error
 
-			parentsMap, err = s.prefetchItems(ctx, ids, lang, convertItemFields(parentFields))
+			parentsMap, err = s.prefetchItems(ctx, ids, lang, parentFields, userCtx)
 
 			return err
 		})
@@ -98,31 +98,8 @@ func (s *ItemParentExtractor) ExtractRows(
 			Catname:  row.Catname,
 		}
 
-		if itemFields != nil {
-			itemRow, ok := itemsMap[row.ItemID]
-			if ok && itemRow != nil {
-				resRow.Item, err = itemExtractor.Extract(ctx, itemRow, itemFields, lang, userCtx)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
-
-		if parentFields != nil {
-			itemRow, ok := parentsMap[row.ParentID]
-			if ok && itemRow != nil {
-				resRow.Parent, err = itemExtractor.Extract(
-					ctx,
-					itemRow,
-					parentFields,
-					lang,
-					userCtx,
-				)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
+		resRow.Item = itemsMap[row.ItemID]
+		resRow.Parent = parentsMap[row.ParentID]
 
 		duplicateParentFields := fields.GetDuplicateParent()
 		if duplicateParentFields != nil {
@@ -195,8 +172,8 @@ func (s *ItemParentExtractor) ExtractRows(
 }
 
 func (s *ItemParentExtractor) prefetchItems(
-	ctx context.Context, ids []int64, lang string, fields *items.ItemFields,
-) (map[int64]*items.Item, error) {
+	ctx context.Context, ids []int64, lang string, fields *ItemFields, userCtx UserContext,
+) (map[int64]*Item, error) {
 	itemsRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
 		return nil, err
@@ -205,15 +182,23 @@ func (s *ItemParentExtractor) prefetchItems(
 	itemRows, _, err := itemsRepository.List(ctx, &query.ItemListOptions{
 		ItemIDs:  ids,
 		Language: lang,
-	}, fields, items.OrderByNone, false)
+	}, convertItemFields(fields), items.OrderByNone, false)
 	if err != nil {
 		return nil, err
 	}
 
-	itemsMap := make(map[int64]*items.Item, len(itemRows))
+	// The two relation branches share the outer lookup budget. Nested pictures
+	// stay inline rather than multiplying that budget for each branch.
+	ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, 1)
 
-	for _, itemRow := range itemRows {
-		itemsMap[itemRow.ID] = itemRow
+	extracted, err := s.container.ItemExtractor().ExtractRows(ctx, itemRows, fields, lang, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	itemsMap := make(map[int64]*Item, len(extracted))
+	for _, item := range extracted {
+		itemsMap[item.GetId()] = item
 	}
 
 	return itemsMap, nil

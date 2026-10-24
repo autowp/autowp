@@ -2,10 +2,12 @@ package goautowp
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
+	"maps"
+	"slices"
 
-	"github.com/autowp/goautowp/query"
 	"github.com/autowp/goautowp/schema"
-	"golang.org/x/sync/errgroup"
 )
 
 type DfDistanceExtractor struct {
@@ -22,74 +24,67 @@ func (s *DfDistanceExtractor) ExtractRows(
 ) ([]*DfDistance, error) {
 	result := make([]*DfDistance, len(rows))
 
-	picturesRepository, err := s.container.PicturesRepository(ctx)
+	repository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	pictureExtractor := s.container.PictureExtractor()
-
-	group, lookupCtx := errgroup.WithContext(ctx)
-	group.SetLimit(pictureExtractionParallelism(ctx))
-
-	// Spend the inherited picture budget on distance rows. Nested picture and
-	// item extraction must not start another parallel group for every row.
-	lookupCtx = context.WithValue(lookupCtx, pictureExtractionParallelismKey{}, 1)
-	lookupCtx = context.WithValue(lookupCtx, itemLookupContextKey{}, true)
+	ids := make(map[int64]struct{})
+	request := fields.GetDstPicture()
 
 	for index, row := range rows {
 		result[index] = &DfDistance{
-			SrcPictureId: row.SrcPictureID,
-			DstPictureId: row.DstPictureID,
-			Distance:     int32(row.Distance), //nolint: gosec
+			SrcPictureId: row.SrcPictureID, DstPictureId: row.DstPictureID,
+			Distance: int32(row.Distance), //nolint:gosec
 		}
-
-		dstPictureRequest := fields.GetDstPicture()
-		if row.DstPictureID == 0 || dstPictureRequest == nil {
-			continue
+		if request != nil && row.DstPictureID != 0 {
+			ids[row.DstPictureID] = struct{}{}
 		}
-
-		group.Go(func() error {
-			if err := lookupCtx.Err(); err != nil {
-				return err
-			}
-
-			dstPictureFields := dstPictureRequest.GetFields()
-
-			dstPictureOptions, err := convertPictureListOptions(dstPictureRequest.GetOptions())
-			if err != nil {
-				return err
-			}
-
-			if dstPictureOptions == nil {
-				dstPictureOptions = &query.PictureListOptions{}
-			}
-
-			dstPictureOptions.ID = row.DstPictureID
-
-			picRow, err := picturesRepository.Picture(
-				lookupCtx,
-				dstPictureOptions,
-				convertPictureFields(dstPictureFields),
-				convertPicturesOrder(dstPictureRequest.GetOrder()),
-			)
-			if err != nil {
-				return err
-			}
-
-			dstPicture, err := pictureExtractor.Extract(lookupCtx, picRow, dstPictureFields, lang, userCtx)
-			if err != nil {
-				return err
-			}
-
-			result[index].DstPicture = dstPicture
-
-			return nil
-		})
 	}
 
-	if err := group.Wait(); err != nil {
+	if len(ids) == 0 {
+		return result, nil
+	}
+
+	options, err := convertPictureListOptions(request.GetOptions())
+	if err != nil {
 		return nil, err
+	}
+
+	pictures, err := repository.PicturesByIDs(ctx, slices.Collect(maps.Keys(ids)), options,
+		convertPictureFields(request.GetFields()), convertPicturesOrder(request.GetOrder()))
+	if err != nil {
+		return nil, fmt.Errorf("Pictures(): %w", err)
+	}
+
+	found := make(map[int64]struct{}, len(pictures))
+	for _, picture := range pictures {
+		found[picture.ID] = struct{}{}
+	}
+
+	for id := range ids {
+		if _, ok := found[id]; !ok {
+			return nil, sql.ErrNoRows
+		}
+	}
+
+	// Keep nested item reads within the inherited picture budget.
+	ctx = context.WithValue(ctx, itemLookupContextKey{}, true)
+
+	extracted, err := s.container.PictureExtractor().ExtractRows(ctx, pictures, request.GetFields(), lang, userCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	byID := make(map[int64]*Picture, len(extracted))
+	for _, picture := range extracted {
+		byID[picture.GetId()] = picture
+	}
+
+	for index, row := range rows {
+		if row.DstPictureID != 0 {
+			result[index].DstPicture = byID[row.DstPictureID]
+		}
 	}
 
 	return result, nil
