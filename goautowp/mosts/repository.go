@@ -236,25 +236,22 @@ func (s *Repository) VehicleTypes(ctx context.Context, brandID int64) ([]CarType
 		return nil, err
 	}
 
+	parentIDs := make([]int64, 0, len(rows))
+	for _, row := range rows {
+		parentIDs = append(parentIDs, row.ID)
+	}
+
+	children, err := s.itemsRepository.VehicleTypesByParentIDs(ctx, parentIDs, query.VehicleTypeListOptions{
+		Childs: listOptions.Childs,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	carTypes := make([]CarTypesItem, 0, len(rows))
 
 	for _, row := range rows {
-		listOptions = query.VehicleTypeListOptions{ParentID: row.ID}
-
-		if brandID > 0 {
-			listOptions.Childs = &query.VehicleTypeParentsListOptions{
-				ItemVehicleTypeByID: &query.ItemVehicleTypeListOptions{
-					ItemParentCacheAncestor: &query.ItemParentCacheListOptions{
-						ParentID: brandID,
-					},
-				},
-			}
-		}
-
-		srows, err := s.itemsRepository.VehicleTypes(ctx, &listOptions)
-		if err != nil {
-			return nil, err
-		}
+		srows := children[row.ID]
 
 		childs := make([]CarTypesItem, 0, len(srows))
 

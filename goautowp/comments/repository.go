@@ -187,6 +187,32 @@ func (s *Repository) IsSubscribed(
 	return success && result, err
 }
 
+// SubscribedTopics returns subscriptions for a set of topics without one query per topic.
+func (s *Repository) SubscribedTopics(
+	ctx context.Context, userID int64, typeID schema.CommentMessageType, itemIDs []int64,
+) (map[int64]bool, error) {
+	result := make(map[int64]bool, len(itemIDs))
+	if len(itemIDs) == 0 {
+		return result, nil
+	}
+
+	var ids []int64
+
+	err := s.db.Select(schema.CommentTopicSubscribeTableItemIDCol).From(schema.CommentTopicSubscribeTable).
+		Where(schema.CommentTopicSubscribeTableUserIDCol.Eq(userID),
+			schema.CommentTopicSubscribeTableTypeIDCol.Eq(typeID),
+			schema.CommentTopicSubscribeTableItemIDCol.In(itemIDs)).ScanValsContext(ctx, &ids)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, id := range ids {
+		result[id] = true
+	}
+
+	return result, nil
+}
+
 func (s *Repository) Subscribe(
 	ctx context.Context, userID int64, commentsType schema.CommentMessageType, itemID int64,
 ) error {
@@ -1394,26 +1420,54 @@ func (s *Repository) TopicsStatForUser(
 		return nil, err
 	}
 
-	res := make(map[int64]TopicStat, len(messages))
+	var (
+		viewedRows []string
+		viewedArgs []any
+	)
 
+	for _, message := range messages {
+		if userID > 0 && message.Timestamp.Valid {
+			viewedRows = append(viewedRows, "(?::bigint, ?::timestamptz)")
+			viewedArgs = append(viewedArgs, message.ItemID, message.Timestamp.Time)
+		}
+	}
+
+	unread := make(map[int64]int32, len(viewedRows))
+	if len(viewedRows) > 0 {
+		var rows []struct {
+			ItemID int64 `db:"item_id"`
+			Count  int64 `db:"new_messages"`
+		}
+
+		// Use the captured timestamps, as the per-topic implementation did. Reading
+		// the view table again could observe a concurrent mark-as-read operation.
+		viewed := goqu.L(
+			"(VALUES "+strings.Join(viewedRows, ", ")+") AS viewed(item_id, timestamp)", viewedArgs...,
+		)
+
+		err := s.db.From(schema.CommentMessageTable).
+			Join(viewed, goqu.On(schema.CommentMessageTableItemIDCol.Eq(goqu.I("viewed.item_id")))).
+			Select(schema.CommentMessageTableItemIDCol, goqu.COUNT(goqu.Star()).As("new_messages")).
+			Where(schema.CommentMessageTableTypeIDCol.Eq(typeID),
+				schema.CommentMessageTableDatetimeCol.Gt(goqu.I("viewed.timestamp"))).
+			GroupBy(schema.CommentMessageTableItemIDCol).ScanStructsContext(ctx, &rows)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, row := range rows {
+			unread[row.ItemID] = int32(row.Count) //nolint: gosec
+		}
+	}
+
+	res := make(map[int64]TopicStat, len(messages))
 	for _, message := range messages {
 		newMessages := message.Messages
 		if userID > 0 && message.Timestamp.Valid {
-			newMessages, err = s.MessagesCountFromTimestamp(
-				ctx,
-				typeID,
-				message.ItemID,
-				message.Timestamp.Time,
-			)
-			if err != nil {
-				return nil, err
-			}
+			newMessages = unread[message.ItemID]
 		}
 
-		res[message.ItemID] = TopicStat{
-			Messages:    message.Messages,
-			NewMessages: newMessages,
-		}
+		res[message.ItemID] = TopicStat{Messages: message.Messages, NewMessages: newMessages}
 	}
 
 	return res, nil

@@ -468,12 +468,7 @@ func (s *Forums) Topics(
 		return nil, nil, err
 	}
 
-	lookups := make([]func(context.Context) error, 0, 2*len(rows))
-	for _, row := range rows {
-		lookups = append(lookups, s.topicLookups(row, userID)...)
-	}
-
-	if err := runItemLookups(ctx, lookups); err != nil {
+	if err := s.prepareTopics(ctx, rows, userID); err != nil {
 		return nil, nil, err
 	}
 
@@ -567,12 +562,63 @@ func (s *Forums) setStatus(ctx context.Context, id int64, status string) error {
 	return err
 }
 
+func (s *Forums) prepareTopics(ctx context.Context, topics []*ForumsTopic, userID int64) error {
+	if len(topics) == 0 {
+		return nil
+	}
+
+	ids := make([]int64, 0, len(topics))
+	for _, topic := range topics {
+		ids = append(ids, topic.ID)
+	}
+
+	var (
+		stats         map[int64]comments.TopicStat
+		subscriptions map[int64]bool
+	)
+
+	lookups := []func(context.Context) error{
+		func(ctx context.Context) error {
+			var err error
+
+			stats, err = s.commentsRepository.TopicsStatForUser(ctx, schema.CommentMessageTypeIDForums, ids, userID)
+
+			return err
+		},
+	}
+	if userID > 0 {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			subscriptions, err = s.commentsRepository.SubscribedTopics(
+				ctx, userID, schema.CommentMessageTypeIDForums, ids,
+			)
+
+			return err
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return err
+	}
+
+	for _, topic := range topics {
+		topic.Messages = stats[topic.ID].Messages
+		if userID > 0 {
+			topic.NewMessages = stats[topic.ID].NewMessages
+			topic.Subscription = subscriptions[topic.ID]
+		}
+	}
+
+	return nil
+}
+
 func (s *Forums) prepareTopic(ctx context.Context, topic *ForumsTopic, userID int64) error {
 	return runItemLookups(ctx, s.topicLookups(topic, userID))
 }
 
-// Return leaf reads so Topics and single-topic requests share the same bounded
-// runner. Each lookup owns distinct fields, read only after all lookups finish.
+// Single-topic reads use the same bounded runner as list batches. Each lookup
+// owns distinct fields, read only after all lookups finish.
 func (s *Forums) topicLookups(topic *ForumsTopic, userID int64) []func(context.Context) error {
 	if userID > 0 {
 		return []func(context.Context) error{

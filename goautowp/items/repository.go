@@ -2075,6 +2075,48 @@ func (s *Repository) VehicleTypes(
 	return sts, nil
 }
 
+// VehicleTypesByParentIDs loads immediate children in the same order as VehicleTypes.
+func (s *Repository) VehicleTypesByParentIDs(
+	ctx context.Context, parentIDs []int64, options query.VehicleTypeListOptions,
+) (map[int64][]*schema.VehicleTypeRow, error) {
+	result := make(map[int64][]*schema.VehicleTypeRow)
+	if len(parentIDs) == 0 {
+		return result, nil
+	}
+
+	options.ParentIDs = parentIDs
+
+	sqSelect, err := options.Select(s.db, query.VehicleTypeTableAlias)
+	if err != nil {
+		return nil, err
+	}
+
+	aliasTable := goqu.T(query.VehicleTypeTableAlias)
+
+	var rows []struct {
+		schema.VehicleTypeRow
+
+		ParentID int64 `db:"parent_id"`
+	}
+
+	err = sqSelect.Select(
+		aliasTable.Col(schema.VehicleTypeTableIDColName),
+		aliasTable.Col(schema.VehicleTypeTableCatnameColName),
+		aliasTable.Col(schema.VehicleTypeTableNameRpColName),
+		aliasTable.Col(schema.VehicleTypeTableParentIDColName),
+	).Order(aliasTable.Col(schema.VehicleTypeTablePositionColName).Asc()).ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range rows {
+		child := row.VehicleTypeRow
+		result[row.ParentID] = append(result[row.ParentID], &child)
+	}
+
+	return result, nil
+}
+
 func (s *Repository) VehicleTypeIDs(
 	ctx context.Context,
 	vehicleID int64,

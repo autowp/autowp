@@ -8,10 +8,11 @@ import (
 const VehicleTypeTableAlias = "vt"
 
 type VehicleTypeListOptions struct {
-	Catname  string
-	NoParent bool
-	ParentID int64
-	Childs   *VehicleTypeParentsListOptions
+	Catname   string
+	NoParent  bool
+	ParentID  int64
+	ParentIDs []int64
+	Childs    *VehicleTypeParentsListOptions
 }
 
 func (s *VehicleTypeListOptions) Select(
@@ -43,6 +44,10 @@ func (s *VehicleTypeListOptions) apply(
 		sqSelect = sqSelect.Where(
 			aliasTable.Col(schema.VehicleTypeTableParentIDColName).Eq(s.ParentID),
 		)
+	}
+
+	if len(s.ParentIDs) > 0 {
+		sqSelect = sqSelect.Where(aliasTable.Col(schema.VehicleTypeTableParentIDColName).In(s.ParentIDs))
 	}
 
 	if s.Childs != nil {

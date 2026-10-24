@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/autowp/goautowp/comments"
+	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
@@ -54,7 +55,7 @@ func TestForumsTopicsConcurrentReads(t *testing.T) {
 	defer cancel()
 
 	gate := &itemBatchQueryLogger{}
-	unblock := blockItemExtractionQueries(t, gate, 4)
+	unblock := blockItemExtractionQueries(t, gate, 2)
 
 	var seen, active, maximum atomic.Int64
 
@@ -93,7 +94,8 @@ func TestForumsTopicsConcurrentReads(t *testing.T) {
 	require.NoError(t, <-done)
 
 	db.Logger(nil)
-	require.EqualValues(t, 4, maximum.Load())
+	require.EqualValues(t, 2, maximum.Load())
+	require.EqualValues(t, 5, seen.Load(), "count, page, statistics, unread counts and subscriptions")
 
 	expected, expectedPages, err := server.Topics(context.WithValue(ctx, itemLookupContextKey{}, true),
 		1, 7, false, false, 1)
@@ -182,7 +184,7 @@ func TestForumsTopicsCancellation(t *testing.T) {
 
 	var queries atomic.Int64
 
-	started := make(chan struct{}, 4)
+	started := make(chan struct{}, 2)
 
 	db.Logger(&itemBatchQueryLogger{beforeQuery: func() {
 		if queries.Add(1) > 2 {
@@ -199,7 +201,7 @@ func TestForumsTopicsCancellation(t *testing.T) {
 		done <- extractErr
 	}()
 
-	for range 4 {
+	for range 2 {
 		select {
 		case <-started:
 		case <-ctx.Done():
@@ -230,4 +232,96 @@ func TestForumsTopicsReadFailure(t *testing.T) {
 	require.Nil(t, pages)
 	require.NoError(t, ctx.Err())
 	require.Zero(t, pool.Stats().InUse)
+}
+
+func TestForumsTopicStatisticsBatch(t *testing.T) {
+	t.Parallel()
+
+	server, db, pool := newForumsParallelTestServer(t)
+	_, err := pool.ExecContext(t.Context(), `
+  INSERT INTO comment_topic_view VALUES
+   (5, 11, 7, NULL), (5, 10, 7, '2019-01-01'), (5, 9, 7, '2021-01-01'),
+   (1, 12, 7, '2021-01-01'), (5, 12, 8, '2021-01-01');
+  INSERT INTO comment_message VALUES (5, 12, '2020-01-02'), (1, 12, '2022-01-01');
+ `)
+	require.NoError(t, err)
+
+	logger := &itemBatchQueryLogger{}
+
+	db.Logger(logger)
+
+	result, err := server.commentsRepository.TopicsStatForUser(t.Context(), schema.CommentMessageTypeIDForums,
+		[]int64{12, 11, 10, 9, 8, 999, 12}, 7)
+	require.NoError(t, err)
+	require.EqualValues(t, 2, logger.queries.Load())
+	require.Equal(t, map[int64]comments.TopicStat{
+		12: {Messages: 3, NewMessages: 2}, 11: {Messages: 3, NewMessages: 3},
+		10: {Messages: 3, NewMessages: 3}, 9: {Messages: 3, NewMessages: 0}, 8: {Messages: 3, NewMessages: 3},
+	}, result)
+
+	logger.queries.Store(0)
+
+	anonymous, err := server.commentsRepository.TopicsStatForUser(t.Context(), schema.CommentMessageTypeIDForums,
+		[]int64{12, 11}, 0)
+	require.NoError(t, err)
+	require.EqualValues(t, 1, logger.queries.Load())
+	require.Equal(t, comments.TopicStat{Messages: 3, NewMessages: 3}, anonymous[12])
+
+	other, err := server.commentsRepository.TopicsStatForUser(t.Context(), schema.CommentMessageTypeIDForums,
+		[]int64{12}, 8)
+	require.NoError(t, err)
+	require.Zero(t, other[12].NewMessages)
+
+	subscriptions, err := server.commentsRepository.SubscribedTopics(t.Context(), 7,
+		schema.CommentMessageTypeIDForums, []int64{12, 11, 10, 999})
+	require.NoError(t, err)
+	require.Equal(t, map[int64]bool{12: true, 10: true}, subscriptions)
+
+	logger.queries.Store(0)
+
+	empty, err := server.commentsRepository.TopicsStatForUser(t.Context(), schema.CommentMessageTypeIDForums, nil, 7)
+	require.NoError(t, err)
+	require.Nil(t, empty)
+	subscriptions, err = server.commentsRepository.SubscribedTopics(
+		t.Context(), 7, schema.CommentMessageTypeIDForums, nil,
+	)
+	require.NoError(t, err)
+	require.Empty(t, subscriptions)
+	require.Zero(t, logger.queries.Load())
+
+	// Cancel between the statistics query and the batched unread-count query.
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+
+	logger.beforeQuery = func() {
+		if logger.queries.Load() == 2 {
+			cancel()
+		}
+	}
+	result, err = server.commentsRepository.TopicsStatForUser(ctx, schema.CommentMessageTypeIDForums, []int64{12}, 7)
+	require.ErrorIs(t, err, context.Canceled)
+	require.Nil(t, result)
+	require.Zero(t, pool.Stats().InUse)
+}
+
+func TestForumsTopicStatisticsCapturedTimestamp(t *testing.T) {
+	t.Parallel()
+
+	server, db, pool := newForumsParallelTestServer(t)
+	logger := &itemBatchQueryLogger{}
+
+	logger.beforeQuery = func() {
+		if logger.queries.Load() == 2 {
+			_, err := pool.ExecContext(t.Context(),
+				"UPDATE pg_temp.comment_topic_view SET timestamp = '2021-01-01' WHERE user_id = 7")
+			require.NoError(t, err)
+		}
+	}
+
+	db.Logger(logger)
+
+	result, err := server.commentsRepository.TopicsStatForUser(t.Context(), schema.CommentMessageTypeIDForums,
+		[]int64{12}, 7)
+	require.NoError(t, err)
+	require.EqualValues(t, 2, result[12].NewMessages, "use the timestamp read before the concurrent update")
 }
