@@ -1,3 +1,9 @@
 User-agent: ClaudeBot
 User-agent: Claude-SearchBot
+User-agent: Meta-ExternalAgent
+User-agent: Meta-WebIndexer
+User-agent: facebookexternalhit
+User-agent: GPTBot
+User-agent: PerplexityBot
+User-agent: ShapBot
 Crawl-delay: 1
