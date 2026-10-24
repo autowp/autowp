@@ -554,14 +554,17 @@ func (s *ItemExtractor) extractPlain(
 		})
 	}
 
+	var dayPictures *itemOfDayPictures
+
 	if fields.GetItemOfDayPictures() {
-		lookups = append(lookups, func(ctx context.Context) error {
-			var err error
-
-			resultRow.ItemOfDayPictures, err = s.extractItemOfDayPictures(ctx, fields, row, lang)
-
+		data, dayLookups, err := s.prepareItemOfDayPictures(ctx, row, lang)
+		if err != nil {
 			return err
-		})
+		}
+
+		dayPictures = data
+
+		lookups = append(lookups, dayLookups...)
 	}
 
 	if fields.GetSpecsContributors() {
@@ -579,6 +582,13 @@ func (s *ItemExtractor) extractPlain(
 	}
 
 	resultRow.Logo, resultRow.Logo120, resultRow.Brandicon = logos.logo, logos.logo120, logos.brandicon
+
+	if dayPictures != nil {
+		resultRow.ItemOfDayPictures, err = dayPictures.extract(row, lang)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -612,6 +622,16 @@ func (s *ItemExtractor) extractSpecsContributors(
 	return res, nil
 }
 
+type itemOfDayPictures struct {
+	pictures       []*schema.PictureRow
+	formatRequests map[string]map[int]int
+	imagesInfo     map[string]map[int]storage.Image
+	names          map[int64]pictures.PictureNameFormatterOptions
+	paths          []items.CataloguePathResult
+	formatter      *pictures.PictureNameFormatter
+	picturesReady  chan struct{}
+}
+
 func (s *ItemExtractor) extractItemOfDayPictures(
 	ctx context.Context, fields *ItemFields, carOfDay *items.Item, lang string,
 ) ([]*ItemOfDayPicture, error) {
@@ -619,93 +639,152 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 		return nil, nil
 	}
 
+	data, lookups, err := s.prepareItemOfDayPictures(ctx, carOfDay, lang)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, err
+	}
+
+	return data.extract(carOfDay, lang)
+}
+
+func (s *ItemExtractor) prepareItemOfDayPictures(
+	ctx context.Context, carOfDay *items.Item, lang string,
+) (*itemOfDayPictures, []func(context.Context) error, error) {
 	itemRepository, err := s.container.ItemsRepository(ctx)
 	if err != nil {
-		return nil, err
-	}
-
-	carOfDayPictures, err := s.orientedPictureList(ctx, carOfDay.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	// images
-	formatRequests := make(map[string]map[int]int)
-
-	for idx, picture := range carOfDayPictures {
-		if picture != nil && picture.ImageID.Valid {
-			format := "picture-thumb-medium"
-			if idx == 0 {
-				format = "picture-thumb-large"
-			}
-
-			if _, ok := formatRequests[format]; !ok {
-				formatRequests[format] = make(map[int]int)
-			}
-
-			formatRequests[format][idx] = int(picture.ImageID.Int64)
-		}
+		return nil, nil, err
 	}
 
 	imageStorage, err := s.container.ImageStorage(ctx)
 	if err != nil {
-		return nil, err
-	}
-
-	imagesInfo := make(map[string]map[int]storage.Image)
-	for format, requests := range formatRequests {
-		imagesInfo[format], err = imageStorage.FormattedImages(
-			ctx,
-			slices.Collect(maps.Values(requests)),
-			format,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// names
-	notEmptyPics := make([]*schema.PictureRow, 0)
-
-	for _, picture := range carOfDayPictures {
-		if picture != nil {
-			notEmptyPics = append(notEmptyPics, picture)
-		}
+		return nil, nil, err
 	}
 
 	pictureRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
-		return nil, err
-	}
-
-	names, err := pictureRepository.NameData(ctx, notEmptyPics, pictures.NameDataOptions{
-		Language: lang,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	paths, err := itemRepository.CataloguePaths(ctx, carOfDay.ID, items.CataloguePathOptions{
-		BreakOnFirst: true,
-		ToBrand:      false,
-	})
-	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	i18nBundle, err := s.container.I18n()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	pictureNameFormatter := pictures.NewPictureNameFormatter(
-		items.NewItemNameFormatter(i18nBundle),
-		i18nBundle,
-	)
+	data := &itemOfDayPictures{
+		imagesInfo: map[string]map[int]storage.Image{
+			pictureThumbLargeFormat: {}, pictureThumbMediumFormat: {},
+		},
+		formatter:     pictures.NewPictureNameFormatter(items.NewItemNameFormatter(i18nBundle), i18nBundle),
+		picturesReady: make(chan struct{}),
+	}
+	waitForPictures := func(ctx context.Context) error {
+		select {
+		case <-data.picturesReady:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+
+	// Queue the producer before all consumers. Even a full bounded group can
+	// always make progress; consumers honor cancellation if selection fails.
+	lookups := []func(context.Context) error{
+		func(ctx context.Context) error {
+			var err error
+
+			data.paths, err = itemRepository.CataloguePaths(ctx, carOfDay.ID, items.CataloguePathOptions{
+				BreakOnFirst: true, ToBrand: false,
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			data.pictures, err = s.orientedPictureList(ctx, carOfDay.ID)
+			if err != nil {
+				return err
+			}
+
+			data.formatRequests = make(map[string]map[int]int)
+			for index, picture := range data.pictures {
+				if picture == nil || !picture.ImageID.Valid {
+					continue
+				}
+
+				format := pictureThumbMediumFormat
+				if index == 0 {
+					format = pictureThumbLargeFormat
+				}
+
+				if data.formatRequests[format] == nil {
+					data.formatRequests[format] = make(map[int]int)
+				}
+
+				data.formatRequests[format][index] = int(picture.ImageID.Int64)
+			}
+
+			close(data.picturesReady)
+
+			return nil
+		},
+	}
+
+	for _, format := range []string{pictureThumbLargeFormat, pictureThumbMediumFormat} {
+		lookups = append(lookups, func(ctx context.Context) error {
+			if err := waitForPictures(ctx); err != nil {
+				return err
+			}
+
+			requests := data.formatRequests[format]
+			if len(requests) == 0 {
+				return nil
+			}
+
+			images, err := imageStorage.FormattedImages(ctx, slices.Collect(maps.Values(requests)), format)
+			if err != nil {
+				return err
+			}
+
+			// The outer map is immutable; each task owns one distinct inner map.
+			maps.Copy(data.imagesInfo[format], images)
+
+			return nil
+		})
+	}
+
+	lookups = append(lookups, func(ctx context.Context) error {
+		if err := waitForPictures(ctx); err != nil {
+			return err
+		}
+
+		rows := make([]*schema.PictureRow, 0, len(data.pictures))
+		for _, picture := range data.pictures {
+			if picture != nil {
+				rows = append(rows, picture)
+			}
+		}
+
+		var err error
+
+		data.names, err = pictureRepository.NameData(ctx, rows, pictures.NameDataOptions{Language: lang})
+
+		return err
+	})
+
+	return data, lookups, nil
+}
+
+func (data *itemOfDayPictures) extract(carOfDay *items.Item, lang string) ([]*ItemOfDayPicture, error) {
+	var err error
 
 	result := make([]*ItemOfDayPicture, 0)
 
-	for idx, row := range carOfDayPictures {
+	for idx, row := range data.pictures {
 		if row != nil {
 			var route []string
 
@@ -720,7 +799,7 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 				schema.ItemTableItemTypeIDMuseum,
 				schema.ItemTableItemTypeIDPerson,
 				schema.ItemTableItemTypeIDCopyright:
-				for _, path := range paths {
+				for _, path := range data.paths {
 					switch path.Type {
 					case items.CataloguePathResultTypeBrand:
 						route = frontend.PictureRoute(row.Identity)
@@ -745,11 +824,11 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 			}
 
 			var imageID int
-			if idx < len(carOfDayPictures) && carOfDayPictures[idx].ImageID.Valid {
-				imageID = int(carOfDayPictures[idx].ImageID.Int64)
+			if idx < len(data.pictures) && data.pictures[idx].ImageID.Valid {
+				imageID = int(data.pictures[idx].ImageID.Int64)
 			}
 
-			imageInfo, ok := imagesInfo[format][imageID]
+			imageInfo, ok := data.imagesInfo[format][imageID]
 
 			var thumb *Image
 			if ok {
@@ -757,8 +836,8 @@ func (s *ItemExtractor) extractItemOfDayPictures(
 			}
 
 			name := ""
-			if n, ok := names[row.ID]; ok {
-				name, err = pictureNameFormatter.FormatText(n, lang)
+			if n, ok := data.names[row.ID]; ok {
+				name, err = data.formatter.FormatText(n, lang)
 				if err != nil {
 					return nil, err
 				}
