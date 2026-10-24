@@ -1209,77 +1209,120 @@ func (s *ItemsGRPCServer) GetStats(ctx context.Context, _ *emptypb.Empty) (*Stat
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	totalBrands, err := s.repository.Count(ctx, query.ItemListOptions{
-		TypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	var (
+		totalBrands                        int
+		totalCars                          int
+		totalCarAttrs                      int32
+		carAttrsValues                     int32
+		carsWith4OrMorePictures            int32
+		itemsWithBeginYear                 int
+		itemsWithBeginAndEndYears          int
+		itemsWithBeginAndEndYearsAndMonths int
+		brandsWithLogo                     int
+		totalPictures                      int
+		picturesWithCopyrights             int
+	)
+
+	lookups := []func(context.Context) error{
+		func(ctx context.Context) error {
+			var err error
+
+			totalBrands, err = s.repository.Count(ctx, query.ItemListOptions{
+				TypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			totalCars, err = s.repository.Count(ctx, query.ItemListOptions{
+				TypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDVehicle},
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			totalCarAttrs, err = s.attrsRepository.TotalZoneAttrs(ctx, 1)
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			carAttrsValues, err = s.attrsRepository.TotalValues(ctx)
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			carsWith4OrMorePictures, err = s.repository.ItemsWithPicturesCount(ctx, typicalPicturesInList)
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			itemsWithBeginYear, err = s.repository.Count(ctx, query.ItemListOptions{
+				HasBeginYear: true,
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			itemsWithBeginAndEndYears, err = s.repository.Count(ctx, query.ItemListOptions{
+				HasBeginYear: true,
+				HasEndYear:   true,
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			itemsWithBeginAndEndYearsAndMonths, err = s.repository.Count(ctx, query.ItemListOptions{
+				HasBeginYear:  true,
+				HasEndYear:    true,
+				HasBeginMonth: true,
+				HasEndMonth:   true,
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			brandsWithLogo, err = s.repository.Count(ctx, query.ItemListOptions{
+				HasLogo: true,
+				TypeID:  []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+			})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			totalPictures, err = s.picturesRepository.Count(ctx, &query.PictureListOptions{})
+
+			return err
+		},
+		func(ctx context.Context) error {
+			var err error
+
+			picturesWithCopyrights, err = s.picturesRepository.Count(ctx, &query.PictureListOptions{
+				HasCopyrights: true,
+			})
+
+			return err
+		},
 	}
 
-	totalCars, err := s.repository.Count(ctx, query.ItemListOptions{
-		TypeID: []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDVehicle},
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	totalCarAttrs, err := s.attrsRepository.TotalZoneAttrs(ctx, 1)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	carAttrsValues, err := s.attrsRepository.TotalValues(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	carsWith4OrMorePictures, err := s.repository.ItemsWithPicturesCount(ctx, typicalPicturesInList)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	itemsWithBeginYear, err := s.repository.Count(ctx, query.ItemListOptions{
-		HasBeginYear: true,
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	itemsWithBeginAndEndYears, err := s.repository.Count(ctx, query.ItemListOptions{
-		HasBeginYear: true,
-		HasEndYear:   true,
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	itemsWithBeginAndEndYearsAndMonths, err := s.repository.Count(ctx, query.ItemListOptions{
-		HasBeginYear:  true,
-		HasEndYear:    true,
-		HasBeginMonth: true,
-		HasEndMonth:   true,
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	brandsWithLogo, err := s.repository.Count(ctx, query.ItemListOptions{
-		HasLogo: true,
-		TypeID:  []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
-	})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	totalPictures, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	picturesWithCopyrights, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{
-		HasCopyrights: true,
-	})
-	if err != nil {
+	if err := runItemLookups(ctx, lookups); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
