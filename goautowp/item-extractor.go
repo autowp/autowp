@@ -427,17 +427,11 @@ func (s *ItemExtractor) extractPlain(
 		resultRow.CanEditSpecs = util.Contains(itemTypeCanHaveSpecs, row.ItemTypeID) && userCtx.UserID != 0
 	}
 
-	// Each branch owns separate result fields; results are consumed only after joining.
-	var lookups []func(context.Context) error
-
-	if row.LogoID.Valid {
-		lookups = append(lookups, func(ctx context.Context) error {
-			var err error
-
-			resultRow.Logo, resultRow.Logo120, resultRow.Brandicon, err = s.extractLogos(ctx, fields, row)
-
-			return err
-		})
+	// Flatten logo reads into this group so their concurrency shares the same
+	// limit as the other fields, including when extraction recurses.
+	logos, lookups, err := s.prepareLogoLookups(ctx, fields, row)
+	if err != nil {
+		return err
 	}
 
 	if fields.GetIsCompilesItemOfDay() {
@@ -580,7 +574,13 @@ func (s *ItemExtractor) extractPlain(
 		})
 	}
 
-	return runItemLookups(ctx, lookups)
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return err
+	}
+
+	resultRow.Logo, resultRow.Logo120, resultRow.Brandicon = logos.logo, logos.logo120, logos.brandicon
+
+	return nil
 }
 
 func (s *ItemExtractor) extractSpecsContributors(
@@ -1259,52 +1259,78 @@ func (s *ItemExtractor) extractIsCompilesItemOfDay(
 	return itemOfDayRepository.IsComplies(ctx, row.ID)
 }
 
+type itemLogos struct {
+	logo      *Image
+	logo120   *Image
+	brandicon *Image
+}
+
 func (s *ItemExtractor) extractLogos(
 	ctx context.Context, fields *ItemFields, row *items.Item,
 ) (*Image, *Image, *Image, error) {
-	if !row.LogoID.Valid {
-		return nil, nil, nil, nil
-	}
-
-	var (
-		logo      *Image
-		logo120   *Image
-		brandicon *Image
-	)
-
-	imageStorage, err := s.container.ImageStorage(ctx)
+	result, lookups, err := s.prepareLogoLookups(ctx, fields, row)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	if fields.GetLogo() {
-		img, err := imageStorage.Image(ctx, int(row.LogoID.Int64))
-		if err != nil {
-			return nil, nil, nil, err
-		}
-
-		logo = APIImageToGRPC(img)
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, nil, nil, err
 	}
 
-	if fields.GetLogo120() {
-		img, err := imageStorage.FormattedImage(ctx, int(row.LogoID.Int64), "logo")
-		if err != nil {
-			return nil, nil, nil, err
-		}
+	return result.logo, result.logo120, result.brandicon, nil
+}
 
-		logo120 = APIImageToGRPC(img)
+func (s *ItemExtractor) prepareLogoLookups(
+	ctx context.Context, fields *ItemFields, row *items.Item,
+) (*itemLogos, []func(context.Context) error, error) {
+	result := &itemLogos{}
+	if !row.LogoID.Valid {
+		return result, nil, nil
 	}
 
-	if fields.GetBrandicon() {
-		img, err := imageStorage.FormattedImage(ctx, int(row.LogoID.Int64), "brandicon2")
-		if err != nil {
-			return nil, nil, nil, err
-		}
-
-		brandicon = APIImageToGRPC(img)
+	imageStorage, err := s.container.ImageStorage(ctx)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return logo, logo120, brandicon, nil
+	var lookups []func(context.Context) error
+
+	for _, request := range []struct {
+		enabled bool
+		format  string
+		target  **Image
+	}{
+		{enabled: fields.GetLogo(), target: &result.logo},
+		{enabled: fields.GetLogo120(), format: "logo", target: &result.logo120},
+		{enabled: fields.GetBrandicon(), format: "brandicon2", target: &result.brandicon},
+	} {
+		if !request.enabled {
+			continue
+		}
+
+		lookups = append(lookups, func(ctx context.Context) error {
+			var (
+				image *storage.Image
+				err   error
+			)
+
+			if request.format == "" {
+				image, err = imageStorage.Image(ctx, int(row.LogoID.Int64))
+			} else {
+				image, err = imageStorage.FormattedImage(ctx, int(row.LogoID.Int64), request.format)
+			}
+
+			if err != nil {
+				return err
+			}
+
+			*request.target = APIImageToGRPC(image)
+
+			return nil
+		})
+	}
+
+	return result, lookups, nil
 }
 
 func (s *ItemExtractor) extractConnectedItems(
