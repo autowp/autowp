@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/schema"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/protobuf/proto"
 )
@@ -61,7 +62,8 @@ func (s *ItemExtractor) prepareLocationContributorLookups(
 
 func itemPlainFields(fields *ItemFields) *ItemFields {
 	if !fields.GetAltNames() && !fields.GetOtherNames() && !fields.GetLocation() && !fields.GetSpecsContributors() &&
-		!fields.GetDesign() && !fields.GetIsCompilesItemOfDay() && !fields.GetPublicRoutes() {
+		!fields.GetDesign() && !fields.GetIsCompilesItemOfDay() && !fields.GetPublicRoutes() &&
+		fields.GetTwins() == nil && fields.GetCategories() == nil && fields.GetEngineVehicles() == nil {
 		return fields
 	}
 
@@ -73,11 +75,26 @@ func itemPlainFields(fields *ItemFields) *ItemFields {
 	selected.Design = false
 	selected.IsCompilesItemOfDay = false
 	selected.PublicRoutes = false
+	selected.Twins = nil
+	selected.Categories = nil
+	selected.EngineVehicles = nil
 
 	return selected
 }
 
 func (data *itemBatchFields) applyExtraFields(row *items.Item, resultRow *Item, fields *ItemFields, lang string) {
+	if fields.GetTwins() != nil {
+		resultRow.Twins = data.twins[row.ID]
+	}
+
+	if fields.GetCategories() != nil {
+		resultRow.Categories = data.categories[row.ID]
+	}
+
+	if fields.GetEngineVehicles() != nil && row.ItemTypeID == schema.ItemTableItemTypeIDEngine {
+		resultRow.EngineVehicles = data.engineVehicles[row.ID]
+	}
+
 	if fields.GetDesign() {
 		resultRow.Design = data.designs[row.ID]
 	}

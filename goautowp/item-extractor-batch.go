@@ -13,6 +13,9 @@ import (
 // itemBatchFields belongs to one extraction, including its field selection and user.
 // Nothing is cached across requests, so private subscriptions and moderator fields stay isolated.
 type itemBatchFields struct {
+	twins                map[int64][]*Item
+	categories           map[int64][]*Item
+	engineVehicles       map[int64][]*Item
 	names                map[int64]string
 	allNames             map[int64]map[string]string
 	designs              map[int64]*Design
@@ -73,6 +76,8 @@ func (s *ItemExtractor) prepareFieldLookups(
 
 	// Tasks own separate maps; consumers only read them after every task has joined.
 	var lookups []func(context.Context) error
+
+	lookups = append(lookups, s.prepareConnectedLookups(repository, rows, fields, lang, userCtx, result)...)
 
 	lookups = append(lookups, s.prepareDesignRouteLookups(repository, rows, ids, fields, lang, result)...)
 
