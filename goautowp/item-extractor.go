@@ -779,125 +779,121 @@ func (s *ItemExtractor) extractRelatedGroupsPictures(
 		return nil, err
 	}
 
-	carPictures := make([]*RelatedGroupPicture, 0)
-
 	groups, err := itemRepository.RelatedCarGroups(ctx, row.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(groups) > 0 {
-		cars, _, err := itemRepository.List(ctx, &query.ItemListOptions{
-			ItemIDs:  slices.Collect(maps.Keys(groups)),
-			Language: lang,
-		}, &items.ItemFields{
-			NameText: true,
-		}, items.OrderByAge, false)
+	carPictures := make([]*RelatedGroupPicture, 0, len(groups))
+	if len(groups) == 0 {
+		return carPictures, nil
+	}
+
+	ids := slices.Collect(maps.Keys(groups))
+
+	cars, _, err := itemRepository.List(ctx, &query.ItemListOptions{ItemIDs: ids, Language: lang},
+		&items.ItemFields{NameText: true}, items.OrderByAge, false)
+	if err != nil {
+		return nil, err
+	}
+
+	pictureRepository, err := s.container.PicturesRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// A single-child group looks under the representative; merged groups look
+	// under all their children, preserving the old ancestor selection.
+	ancestors := make(map[int64][]int64, len(cars))
+	for _, car := range cars {
+		ancestors[car.ID] = []int64{car.ID}
+		if len(groups[car.ID]) > 1 {
+			ancestors[car.ID] = groups[car.ID]
+		}
+	}
+
+	previews, err := pictureRepository.RelatedGroupPreviews(ctx, ancestors)
+	if err != nil {
+		return nil, err
+	}
+
+	imageIDs := make([]int, 0, len(previews))
+	seen := make(map[int]bool)
+
+	for _, preview := range previews {
+		if preview.ImageID.Valid {
+			id := int(preview.ImageID.Int64)
+			if !seen[id] {
+				seen[id] = true
+				imageIDs = append(imageIDs, id)
+			}
+		}
+	}
+
+	imageStorage, err := s.container.ImageStorage(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	images := make(map[int]storage.Image)
+	if len(imageIDs) > 0 {
+		images, err = imageStorage.FormattedImages(ctx, imageIDs, pictureThumbLargeFormat)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	paths, err := itemRepository.FirstCataloguePaths(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	i18nBundle, err := s.container.I18n()
+	if err != nil {
+		return nil, err
+	}
+
+	itemNameFormatter := items.NewItemNameFormatter(i18nBundle)
+
+	for _, car := range cars {
+		src := ""
+
+		if preview := previews[car.ID]; preview != nil && preview.ImageID.Valid {
+			image := images[int(preview.ImageID.Int64)]
+			src = image.Src()
+		}
+
+		var route []string
+		if path := paths[car.ID]; path != nil {
+			route = append([]string{"/", path.BrandCatname, path.CarCatname}, path.Path...)
+		}
+
+		formatterOptions := items.ItemNameFormatterOptions{
+			BeginModelYear:         util.NullInt32ToScalar(car.BeginModelYear),
+			EndModelYear:           util.NullInt32ToScalar(car.EndModelYear),
+			BeginModelYearFraction: util.NullStringToString(car.BeginModelYearFraction),
+			EndModelYearFraction:   util.NullStringToString(car.EndModelYearFraction),
+			Spec:                   car.SpecShortName,
+			SpecFull:               car.SpecName,
+			Body:                   car.Body,
+			Name:                   car.NameOnly,
+			BeginYear:              util.NullInt32ToScalar(car.BeginYear),
+			EndYear:                util.NullInt32ToScalar(car.EndYear),
+			Today:                  util.NullBoolToBoolPtr(car.Today),
+			BeginMonth:             util.NullInt16ToScalar(car.BeginMonth),
+			EndMonth:               util.NullInt16ToScalar(car.EndMonth),
+		}
+
+		formattedName, err := itemNameFormatter.FormatHTML(formatterOptions, lang)
 		if err != nil {
 			return nil, err
 		}
 
-		pictureRepository, err := s.container.PicturesRepository(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		imageStorage, err := s.container.ImageStorage(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		i18nBundle, err := s.container.I18n()
-		if err != nil {
-			return nil, err
-		}
-
-		itemNameFormatter := items.NewItemNameFormatter(i18nBundle)
-
-		for _, car := range cars {
-			ancestor := []int64{car.ID}
-
-			if len(groups[car.ID]) > 1 {
-				ancestor = groups[car.ID]
-			}
-
-			pictureRow, err := pictureRepository.Picture(ctx, &query.PictureListOptions{
-				Status: schema.PictureStatusAccepted,
-				PictureItem: &query.PictureItemListOptions{
-					ItemParentCacheAncestor: &query.ItemParentCacheListOptions{
-						ParentIDs:       ancestor,
-						ItemsByParentID: &query.ItemListOptions{}, // for ordering by is_concept
-					},
-				},
-			}, nil, pictures.OrderByAncestorStockFrontFirst)
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return nil, err
-			}
-
-			src := ""
-
-			if pictureRow != nil && pictureRow.ImageID.Valid {
-				imagesInfo, err := imageStorage.FormattedImage(
-					ctx,
-					int(pictureRow.ImageID.Int64),
-					"picture-thumb-large",
-				)
-				if err != nil {
-					return nil, err
-				}
-
-				src = imagesInfo.Src()
-			}
-
-			cataloguePaths, err := itemRepository.CataloguePaths(
-				ctx,
-				car.ID,
-				items.CataloguePathOptions{
-					BreakOnFirst: true,
-				},
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			var route []string
-			for _, cataloguePath := range cataloguePaths {
-				route = append([]string{
-					"/",
-					cataloguePath.BrandCatname,
-					cataloguePath.CarCatname,
-				}, cataloguePath.Path...)
-
-				break
-			}
-
-			formatterOptions := items.ItemNameFormatterOptions{
-				BeginModelYear:         util.NullInt32ToScalar(car.BeginModelYear),
-				EndModelYear:           util.NullInt32ToScalar(car.EndModelYear),
-				BeginModelYearFraction: util.NullStringToString(car.BeginModelYearFraction),
-				EndModelYearFraction:   util.NullStringToString(car.EndModelYearFraction),
-				Spec:                   car.SpecShortName,
-				SpecFull:               car.SpecName,
-				Body:                   car.Body,
-				Name:                   car.NameOnly,
-				BeginYear:              util.NullInt32ToScalar(car.BeginYear),
-				EndYear:                util.NullInt32ToScalar(car.EndYear),
-				Today:                  util.NullBoolToBoolPtr(car.Today),
-				BeginMonth:             util.NullInt16ToScalar(car.BeginMonth),
-				EndMonth:               util.NullInt16ToScalar(car.EndMonth),
-			}
-
-			formattedName, err := itemNameFormatter.FormatHTML(formatterOptions, lang)
-			if err != nil {
-				return nil, err
-			}
-
-			carPictures = append(carPictures, &RelatedGroupPicture{
-				NameHtml: formattedName,
-				Src:      src,
-				Route:    route,
-			})
-		}
+		carPictures = append(carPictures, &RelatedGroupPicture{
+			NameHtml: formattedName,
+			Src:      src,
+			Route:    route,
+		})
 	}
 
 	return carPictures, nil

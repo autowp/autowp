@@ -2807,16 +2807,15 @@ func (s *Repository) RelatedCarGroups(
 		return nil, err
 	}
 
+	ancestors, err := s.relatedCarAncestors(ctx, carIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	vectors := make([]Vector, 0, len(carIDs))
 
 	for _, carID := range carIDs {
-		parentIDs, err := s.AncestorsID(ctx, carID, []schema.ItemTableItemTypeID{
-			schema.ItemTableItemTypeIDVehicle,
-			schema.ItemTableItemTypeIDEngine,
-		})
-		if err != nil {
-			return nil, err
-		}
+		parentIDs := ancestors[carID]
 
 		// remove parents
 		for _, parentID := range parentIDs {
