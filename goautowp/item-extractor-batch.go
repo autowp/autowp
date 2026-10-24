@@ -7,6 +7,7 @@ import (
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
+	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
 // itemBatchFields belongs to one extraction, including its field selection and user.
@@ -14,6 +15,8 @@ import (
 type itemBatchFields struct {
 	names                map[int64]string
 	allNames             map[int64]map[string]string
+	locations            map[int64]*latlng.LatLng
+	contributors         map[int64][]*SpecsContributor
 	comments             map[int64]int32
 	specifications       map[int64]int32
 	languages            map[int64]int32
@@ -67,6 +70,8 @@ func (s *ItemExtractor) prepareFieldLookups(
 
 	// Tasks own separate maps; consumers only read them after every task has joined.
 	var lookups []func(context.Context) error
+
+	lookups = append(lookups, s.prepareLocationContributorLookups(repository, ids, fields, result)...)
 
 	if fields.GetAltNames() || fields.GetOtherNames() {
 		lookups = append(lookups, func(ctx context.Context) error {

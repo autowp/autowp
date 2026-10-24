@@ -172,12 +172,7 @@ func (s *ItemExtractor) extractRows(
 		return nil, err
 	}
 
-	plainFields := fields
-	if fields.GetAltNames() || fields.GetOtherNames() {
-		plainFields, _ = proto.Clone(fields).(*ItemFields)
-		plainFields.AltNames = false
-		plainFields.OtherNames = false
-	}
+	plainFields := itemPlainFields(fields)
 
 	extractRow := func(ctx context.Context, index int) error {
 		row := rows[index]
@@ -257,13 +252,7 @@ func (s *ItemExtractor) extractRows(
 			}
 		}
 
-		if fields.GetAltNames() {
-			resultRow.AltNames = formatAltNames(batch.allNames[row.ID], lang)
-		}
-
-		if fields.GetOtherNames() {
-			resultRow.OtherNames = formatOtherNames(batch.allNames[row.ID], row.NameOnly)
-		}
+		batch.applyExtraFields(row, resultRow, fields, lang)
 
 		if err := s.extractPlain(ctx, plainFields, row, resultRow, lang, userCtx); err != nil {
 			return err

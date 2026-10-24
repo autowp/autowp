@@ -397,39 +397,54 @@ func (s *AttrsGRPCServer) GetConflicts(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	userRows, err := s.repository.UserValueRowsForValues(ctx, data)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	values, err := s.repository.UserValues(ctx, userRows, in.GetLanguage(), true)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	grouped := make(map[[2]int64][]*AttrConflictValue)
+
+	for index, row := range userRows {
+		key := [2]int64{row.AttributeID, row.ItemID}
+		grouped[key] = append(
+			grouped[key],
+			&AttrConflictValue{
+				Value:        values[index].Text,
+				ValueIsEmpty: values[index].Value.IsEmpty,
+				UserId:       row.UserID,
+			},
+		)
+	}
+
 	res := make([]*AttrConflict, 0, len(data))
-
 	for _, row := range data {
-		uvRows, err := s.repository.UserValueRows(ctx, query.AttrsUserValueListOptions{
-			AttributeID: row.AttributeID,
-			ItemID:      row.ItemID,
-		})
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
+		selected := grouped[[2]int64{row.AttributeID, row.ItemID}]
 
-		conflictValues := make([]*AttrConflictValue, 0, len(uvRows))
-
-		for _, uvRow := range uvRows {
-			value, uvText, err := s.repository.UserValueText(
-				ctx, uvRow.AttributeID, uvRow.ItemID, uvRow.UserID, in.GetLanguage(),
-			)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
+		conflictValues := make([]*AttrConflictValue, 0, len(selected))
+		if row.AttributeID != 0 && row.ItemID != 0 {
+			conflictValues = append(conflictValues, selected...)
+		} else {
+			for index, userRow := range userRows {
+				if (row.AttributeID == 0 || row.AttributeID == userRow.AttributeID) &&
+					(row.ItemID == 0 || row.ItemID == userRow.ItemID) {
+					conflictValues = append(
+						conflictValues,
+						&AttrConflictValue{
+							Value:        values[index].Text,
+							ValueIsEmpty: values[index].Value.IsEmpty,
+							UserId:       userRow.UserID,
+						},
+					)
+				}
 			}
-
-			conflictValues = append(conflictValues, &AttrConflictValue{
-				Value:        uvText,
-				ValueIsEmpty: value.IsEmpty,
-				UserId:       uvRow.UserID,
-			})
 		}
 
-		res = append(res, &AttrConflict{
-			ItemId:      row.ItemID,
-			AttributeId: row.AttributeID,
-			Values:      conflictValues,
-		})
+		res = append(res, &AttrConflict{ItemId: row.ItemID, AttributeId: row.AttributeID, Values: conflictValues})
 	}
 
 	return &AttrConflictsResponse{

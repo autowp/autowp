@@ -3411,13 +3411,26 @@ func (s *Repository) refreshConflictFlag(ctx context.Context, attributeID, itemI
 }
 
 func (s *Repository) zoneByItemsList(ctx context.Context, list []*items.Item) (int64, error) {
-	ids := make(map[int64]bool)
-
+	itemIDs := make([]int64, 0, len(list))
 	for _, car := range list {
-		vehicleTypeIDs, err := s.itemsRepository.VehicleTypeIDs(ctx, car.ID, false)
+		itemIDs = append(itemIDs, car.ID)
+	}
+
+	var vehicleTypes map[int64][]int64
+
+	if len(itemIDs) > 0 {
+		var err error
+
+		vehicleTypes, err = s.itemsRepository.VehicleTypeIDsBatch(ctx, itemIDs, false)
 		if err != nil {
 			return 0, fmt.Errorf("VehicleTypes(): %w", err)
 		}
+	}
+
+	ids := make(map[int64]bool)
+
+	for _, car := range list {
+		vehicleTypeIDs := vehicleTypes[car.ID]
 
 		zoneID := s.ZoneIDByVehicleTypeIDs(car.ItemTypeID, vehicleTypeIDs)
 		ids[zoneID] = true

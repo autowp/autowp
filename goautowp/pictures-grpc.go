@@ -38,7 +38,6 @@ import (
 const (
 	newboxPicturesPerPage   = 60
 	newboxPicturesPerLine   = 6
-	newboxGroupParallelism  = 4
 	newboxGroupTypeItem     = "item"
 	newboxGroupTypePicture  = "picture"
 	newboxGroupTypePictures = "pictures"
@@ -3141,7 +3140,6 @@ func (s *PicturesGRPCServer) newboxGroups(
 		NameText:    true,
 		NameHtml:    true,
 	}
-	repoItemPictureFields := convertPictureFields(&itemPictureFields)
 
 	itemFields := ItemFields{
 		NameHtml:    true,
@@ -3216,80 +3214,32 @@ func (s *PicturesGRPCServer) newboxGroups(
 		}
 	}
 
-	// Each group's picture extraction is independent; run them concurrently the way
-	// PictureExtractor.ExtractRows already does internally. Every goroutine writes only its own
-	// groups[i] slot.
-	groups := make([]*NewboxGroup, len(groupsData))
-
-	groupsGroup, groupsCtx := errgroup.WithContext(ctx)
-	groupsGroup.SetLimit(newboxGroupParallelism)
-
-	for i, groupData := range groupsData {
-		groupsGroup.Go(func() error {
-			group := &NewboxGroup{
-				Type: groupData.Type,
-			}
-
-			if groupData.Type != newboxGroupTypeItem {
-				var err error
-
-				group.Pictures, err = s.pictureExtractor.ExtractRows(
-					groupsCtx, groupData.Pictures, &pictureFields, lang, userCtx,
-				)
-				if err != nil {
-					return err
-				}
-
-				groups[i] = group
-
-				return nil
-			}
-
-			extractedItem, ok := itemsByID[groupData.ItemID]
-			if !ok {
-				return fmt.Errorf("%w: newbox group item %d", items.ErrItemNotFound, groupData.ItemID)
-			}
-
-			group.Item = extractedItem
-
-			ids := make([]int64, 0, len(groupData.Pictures))
-			for _, picture := range groupData.Pictures {
-				ids = append(ids, picture.ID)
-			}
-
-			pictureRows, _, err := s.repository.Pictures(groupsCtx, &query.PictureListOptions{
-				IDs:    ids,
-				Status: schema.PictureStatusAccepted,
-				PictureItem: &query.PictureItemListOptions{
-					ItemID: groupData.ItemID,
-				},
-				Limit: newboxPicturesPerLine,
-			}, repoItemPictureFields, pictures.OrderByAcceptDatetimeDesc, false)
-			if err != nil {
-				return err
-			}
-
-			group.Pictures, err = s.pictureExtractor.ExtractRows(
-				groupsCtx,
-				pictureRows,
-				&itemPictureFields,
-				lang,
-				userCtx,
-			)
-			if err != nil {
-				return err
-			}
-
-			group.TotalPictures = totalPicturesByItemID[groupData.ItemID]
-
-			groups[i] = group
-
-			return nil
-		})
+	extractedPictures, err := s.extractNewboxPictures(
+		ctx,
+		groupsData,
+		&pictureFields,
+		&itemPictureFields,
+		lang,
+		userCtx,
+	)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	if err := groupsGroup.Wait(); err != nil {
-		return nil, nil, err
+	groups := make([]*NewboxGroup, len(groupsData))
+	for index, groupData := range groupsData {
+		group := &NewboxGroup{Type: groupData.Type, Pictures: extractedPictures[int64(index)]}
+		if groupData.Type == newboxGroupTypeItem {
+			item, found := itemsByID[groupData.ItemID]
+			if !found {
+				return nil, nil, fmt.Errorf("%w: newbox group item %d", items.ErrItemNotFound, groupData.ItemID)
+			}
+
+			group.Item = item
+			group.TotalPictures = totalPicturesByItemID[groupData.ItemID]
+		}
+
+		groups[index] = group
 	}
 
 	return groups, pages, nil
