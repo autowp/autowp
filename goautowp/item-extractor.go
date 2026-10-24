@@ -85,13 +85,16 @@ func (s *ItemExtractor) ExtractRows(
 		return nil, err
 	}
 
-	batch, err := s.preloadFields(ctx, ids, fields, userCtx)
+	batch, err := s.preloadFields(ctx, rows, fields, userCtx)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, row := range rows {
 		resultRow := &Item{
+			AttrZoneId:                 batch.attrZones[row.ID],
+			ChildsCounts:               batch.childsCounts[row.ID],
+			EngineVehiclesCount:        batch.engineVehiclesCounts[row.ID],
 			LinksCount:                 batch.links[row.ID],
 			ItemLanguageCount:          batch.languages[row.ID],
 			CommentsCount:              batch.comments[row.ID],
@@ -351,19 +354,7 @@ func (s *ItemExtractor) extractPlain(
 	lang string,
 	userCtx UserContext,
 ) error {
-	isModer := util.Contains(userCtx.Roles, users.RoleModer)
-
 	var err error
-
-	itemRepository, err := s.container.ItemsRepository(ctx)
-	if err != nil {
-		return err
-	}
-
-	attrsRepository, err := s.container.AttrsRepository(ctx)
-	if err != nil {
-		return err
-	}
 
 	resultRow.NameText, resultRow.NameHtml, err = s.extractNames(fields, row, lang)
 	if err != nil {
@@ -378,15 +369,6 @@ func (s *ItemExtractor) extractPlain(
 	resultRow.IsCompilesItemOfDay, err = s.extractIsCompilesItemOfDay(ctx, fields, row)
 	if err != nil {
 		return err
-	}
-
-	if fields.GetAttrZoneId() {
-		vehicleTypes, err := itemRepository.VehicleTypeIDs(ctx, row.ID, false)
-		if err != nil {
-			return err
-		}
-
-		resultRow.AttrZoneId = attrsRepository.ZoneIDByVehicleTypeIDs(row.ItemTypeID, vehicleTypes)
 	}
 
 	resultRow.Location, err = s.extractLocation(ctx, fields, row)
@@ -405,11 +387,6 @@ func (s *ItemExtractor) extractPlain(
 	}
 
 	resultRow.Design, err = s.extractDesignInfo(ctx, fields, row, lang)
-	if err != nil {
-		return err
-	}
-
-	resultRow.ChildsCounts, err = s.extractChildsCount(ctx, fields, row)
 	if err != nil {
 		return err
 	}
@@ -447,11 +424,6 @@ func (s *ItemExtractor) extractPlain(
 	}
 
 	resultRow.EngineVehicles, err = s.extractEngineVehicles(ctx, fields, row, lang, userCtx)
-	if err != nil {
-		return err
-	}
-
-	resultRow.EngineVehiclesCount, err = s.extractEngineVehiclesCount(ctx, fields, row, isModer)
 	if err != nil {
 		return err
 	}
@@ -899,26 +871,6 @@ func (s *ItemExtractor) extractRelatedGroupsPictures(
 	return carPictures, nil
 }
 
-func (s *ItemExtractor) extractChildsCount(
-	ctx context.Context, fields *ItemFields, row *items.Item,
-) ([]*ChildsCount, error) {
-	if !fields.GetChildsCounts() {
-		return nil, nil
-	}
-
-	itemRepository, err := s.container.ItemsRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	childCounts, err := itemRepository.ChildsCounts(ctx, row.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return convertChildsCounts(childCounts), nil
-}
-
 func (s *ItemExtractor) extractEngineVehicles(
 	ctx context.Context, fields *ItemFields, row *items.Item, lang string, userCtx UserContext,
 ) ([]*Item, error) {
@@ -976,31 +928,6 @@ func (s *ItemExtractor) extractEngineVehicles(
 	}
 
 	return itemExtractor.ExtractRows(ctx, rows, itemFields, lang, userCtx)
-}
-
-func (s *ItemExtractor) extractEngineVehiclesCount(
-	ctx context.Context, fields *ItemFields, row *items.Item, isModer bool,
-) (int32, error) {
-	if !fields.GetEngineVehiclesCount() || !isModer {
-		return 0, nil
-	}
-
-	if row.ItemTypeID != schema.ItemTableItemTypeIDEngine {
-		return 0, nil
-	}
-
-	itemRepository, err := s.container.ItemsRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	listOptions := query.ItemListOptions{
-		EngineItemID: row.ID,
-	}
-
-	res, err := itemRepository.Count(ctx, listOptions)
-
-	return int32(res), err //nolint: gosec
 }
 
 // previewPictureFields is the field set a preview picture is extracted with: what the caller asked
