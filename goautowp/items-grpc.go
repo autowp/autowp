@@ -3544,41 +3544,23 @@ func (s *ItemsGRPCServer) otherGroups(
 		})
 	}
 
+	counts, err := s.picturesRepository.BrandCounts(ctx, brandID)
+	if err != nil {
+		return nil, err
+	}
+
 	groupTypes := []struct {
-		PerspectiveID        int32
-		ExcludePerspectiveID []int32
-		Catname              string
-		Name                 string
+		Count   int
+		Catname string
+		Name    string
 	}{
-		{
-			PerspectiveID: items.PerspectiveIDLogo,
-			Catname:       frontend.BrandLogotypes,
-			Name:          "logotypes",
-		},
-		{
-			PerspectiveID: items.PerspectiveIDMixed,
-			Catname:       frontend.BrandMixed,
-			Name:          "mixed",
-		},
-		{
-			ExcludePerspectiveID: []int32{items.PerspectiveIDLogo, items.PerspectiveIDMixed},
-			Catname:              frontend.BrandOther,
-			Name:                 "unsorted",
-		},
+		{Count: counts.Logotypes, Catname: frontend.BrandLogotypes, Name: "logotypes"},
+		{Count: counts.Mixed, Catname: frontend.BrandMixed, Name: "mixed"},
+		{Count: counts.Other, Catname: frontend.BrandOther, Name: "unsorted"},
 	}
 
 	for _, groupType := range groupTypes {
-		picturesCount, err := s.picturesRepository.Count(ctx, &query.PictureListOptions{
-			Status: schema.PictureStatusAccepted,
-			PictureItem: &query.PictureItemListOptions{
-				ItemID:               brandID,
-				PerspectiveID:        groupType.PerspectiveID,
-				ExcludePerspectiveID: groupType.ExcludePerspectiveID,
-			},
-		})
-		if err != nil {
-			return nil, err
-		}
+		picturesCount := groupType.Count
 
 		if picturesCount > 0 {
 			translated, err := localizer.Localize(&i18n.LocalizeConfig{
