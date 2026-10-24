@@ -71,6 +71,8 @@ func runItemLookups(ctx context.Context, lookups []func(context.Context) error) 
 	}
 
 	ctx = context.WithValue(ctx, itemLookupContextKey{}, true)
+	// Each branch owns one slot, including any nested picture extraction.
+	ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, 1)
 	group, lookupCtx := errgroup.WithContext(ctx)
 	group.SetLimit(itemExtractorParallelism)
 

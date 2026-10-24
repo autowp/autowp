@@ -4,14 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"maps"
-	"slices"
 	"time"
 
 	"github.com/autowp/goautowp/logging"
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/lib/pq"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -269,30 +268,66 @@ func (s *Repository) loadActualValueGroup(
 func scanActualValueRows[T any](
 	ctx context.Context, db *goqu.Database, table string, requests []actualValueRequest, ordered bool,
 ) ([]T, error) {
-	itemIDs := make(map[int64]struct{})
-
-	attributeIDs := make(map[int64]struct{})
-	userIDs := make(map[int64]struct{})
-
-	for _, request := range requests {
-		itemIDs[request.itemID] = struct{}{}
-		attributeIDs[request.attributeID] = struct{}{}
-		userIDs[request.userID] = struct{}{}
+	if len(requests) == 0 {
+		return []T{}, nil
 	}
 
-	source := goqu.T(table)
-
-	query := db.From(source).Select(source.Col(schema.AttrsValuesTableItemIDColName),
-		source.Col(schema.AttrsValuesTableAttributeIDColName), source.Col(schema.AttrsValuesStringTableValueColName)).
-		Where(source.Col(schema.AttrsValuesTableItemIDColName).In(slices.Collect(maps.Keys(itemIDs))),
-			source.Col(schema.AttrsValuesTableAttributeIDColName).In(slices.Collect(maps.Keys(attributeIDs))))
+	userValues := false
 
 	switch table {
 	case schema.AttrsUserValuesStringTableName, schema.AttrsUserValuesIntTableName,
 		schema.AttrsUserValuesFloatTableName, schema.AttrsUserValuesListTableName:
-		query = query.SelectAppend(source.Col(schema.AttrsUserValuesTypeTableUserIDColName)).
-			Where(source.Col(schema.AttrsUserValuesTypeTableUserIDColName).In(slices.Collect(maps.Keys(userIDs))))
-	default:
+		userValues = true
+	}
+
+	itemIDs := make([]int64, 0, len(requests))
+	attributeIDs := make([]int64, 0, len(requests))
+	userIDs := make([]int64, 0, len(requests))
+
+	seen := make(map[[3]int64]bool, len(requests))
+	for _, request := range requests {
+		key := [3]int64{request.itemID, request.attributeID, 0}
+		if userValues {
+			key[2] = request.userID
+		}
+
+		if seen[key] {
+			continue
+		}
+
+		seen[key] = true
+		itemIDs = append(itemIDs, key[0])
+		attributeIDs = append(attributeIDs, key[1])
+		userIDs = append(userIDs, key[2])
+	}
+
+	// Parallel arrays describe exact keys, not every combination of their parts.
+	// Deduplication prevents repeated requests from duplicating list values.
+	source := goqu.T(table)
+	requested := goqu.T("requested")
+	keys := goqu.L("unnest(?::bigint[], ?::bigint[], ?::bigint[]) AS requested(item_id, attribute_id, user_id)",
+		pq.Array(itemIDs), pq.Array(attributeIDs), pq.Array(userIDs))
+
+	condition := goqu.And(
+		source.Col(schema.AttrsValuesTableItemIDColName).Eq(requested.Col(schema.AttrsValuesTableItemIDColName)),
+		source.Col(schema.AttrsValuesTableAttributeIDColName).
+			Eq(requested.Col(schema.AttrsValuesTableAttributeIDColName)),
+	)
+	if userValues {
+		condition = goqu.And(
+			condition,
+			source.Col(schema.AttrsUserValuesTypeTableUserIDColName).
+				Eq(requested.Col(schema.AttrsUserValuesTypeTableUserIDColName)),
+		)
+	}
+
+	query := db.From(source).Join(keys, goqu.On(condition)).Select(
+		source.Col(schema.AttrsValuesTableItemIDColName),
+		source.Col(schema.AttrsValuesTableAttributeIDColName),
+		source.Col(schema.AttrsValuesStringTableValueColName))
+	if userValues {
+		query = query.SelectAppend(source.Col(schema.AttrsUserValuesTypeTableUserIDColName))
+	} else {
 		query = query.SelectAppend(goqu.L("0").As(schema.AttrsUserValuesTypeTableUserIDColName))
 	}
 

@@ -28,6 +28,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+const httpShutdownTimeout = 30 * time.Second
+
 type ServeOptions struct {
 	DuplicateFinderAMQP   bool
 	MonitoringAMQP        bool
@@ -180,21 +182,10 @@ func (s *Application) ServeMetrics(ctx context.Context, quit chan bool) error {
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
 
-	go func(ctx context.Context) {
-		<-quit
-
-		if err := httpServer.Shutdown(ctx); err != nil {
-			logging.Error(err.Error())
-		}
-	}(ctx)
-
 	logging.Infoln("metrics HTTP listener started")
 
-	err := httpServer.ListenAndServe()
-	if err != nil {
-		if !errors.Is(err, http.ErrServerClosed) {
-			return err
-		}
+	if err := serveHTTPServer(ctx, httpServer, quit, httpServer.ListenAndServe); err != nil {
+		return err
 	}
 
 	logging.Infoln("metrics HTTP listener stopped")
@@ -208,26 +199,48 @@ func (s *Application) ServePublic(ctx context.Context, quit chan bool) error {
 		return fmt.Errorf("PublicHTTPServer(): %w", err)
 	}
 
-	go func(ctx context.Context) {
-		<-quit
-
-		if err := httpServer.Shutdown(ctx); err != nil {
-			logging.Error(err.Error())
-		}
-	}(ctx)
-
 	logging.Infoln("public HTTP listener started")
 
-	err = httpServer.ListenAndServe()
-	if err != nil {
-		if !errors.Is(err, http.ErrServerClosed) {
-			return err
-		}
+	if err := serveHTTPServer(ctx, httpServer, quit, httpServer.ListenAndServe); err != nil {
+		return err
 	}
 
 	logging.Infoln("public HTTP listener stopped")
 
 	return nil
+}
+
+// serveHTTPServer joins shutdown before returning, so service workers cannot finish
+// while HTTP handlers are still recording views. A listener failure also releases
+// the shutdown goroutine without waiting for a future quit signal.
+func serveHTTPServer(ctx context.Context, server *http.Server, quit <-chan bool, serve func() error) error {
+	servingDone := make(chan struct{})
+	shutdownDone := make(chan error, 1)
+
+	go func() {
+		select {
+		case <-quit:
+			// Shutdown must drain even if the service context was canceled by a signal.
+			shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), httpShutdownTimeout)
+			defer cancel()
+
+			shutdownDone <- server.Shutdown(shutdownCtx)
+		case <-servingDone:
+			shutdownDone <- nil
+		}
+	}()
+
+	err := serve()
+
+	close(servingDone)
+
+	shutdownErr := <-shutdownDone
+
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+
+	return shutdownErr
 }
 
 // ListenMessagingWSEvents fans out Redis-published "messages changed" events to this

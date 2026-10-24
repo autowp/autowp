@@ -91,6 +91,10 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	lang string,
 	userCtx UserContext,
 ) ([]*Picture, error) {
+	if len(rows) == 0 {
+		return []*Picture{}, nil
+	}
+
 	isModer := util.Contains(userCtx.Roles, users.RoleModer)
 
 	if fields == nil {
@@ -182,6 +186,9 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 
 	preloadGroup, preloadCtx := errgroup.WithContext(ctx)
 	preloadGroup.SetLimit(pictureExtractionParallelism(ctx))
+	// Nested item and picture reads execute within this task's single slot.
+	preloadCtx = context.WithValue(preloadCtx, itemLookupContextKey{}, true)
+	preloadCtx = context.WithValue(preloadCtx, pictureExtractionParallelismKey{}, 1)
 
 	if fields.GetSubscribed() && userCtx.UserID > 0 {
 		preloadGroup.Go(func() error {
@@ -409,6 +416,9 @@ func (s *PictureExtractor) ExtractRows( //nolint: maintidx
 	// are complete before this loop and can be read without synchronization.
 	group, groupCtx := errgroup.WithContext(ctx)
 	group.SetLimit(pictureExtractionParallelism(ctx))
+
+	groupCtx = context.WithValue(groupCtx, itemLookupContextKey{}, true)
+	groupCtx = context.WithValue(groupCtx, pictureExtractionParallelismKey{}, 1)
 
 	for _, row := range rows {
 		resultRow := &Picture{
@@ -1089,6 +1099,10 @@ func pictureImageFormatRequests(
 func (s *PictureExtractor) preloadPaths(
 	ctx context.Context, rows []*schema.PictureRow, targetItemID int64,
 ) (map[int64][]*PathTreePictureItem, error) {
+	if len(rows) == 0 {
+		return map[int64][]*PathTreePictureItem{}, nil
+	}
+
 	picturesRepository, err := s.container.PicturesRepository(ctx)
 	if err != nil {
 		return nil, err
