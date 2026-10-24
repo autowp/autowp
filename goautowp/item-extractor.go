@@ -15,12 +15,16 @@ import (
 	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/users"
 	"github.com/autowp/goautowp/util"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const engineVehiclesGroupsLimit = 3
+
+// Bound independent lookups; recursive extraction and image generation stay sequential.
+const itemExtractorParallelism = 4
 
 var (
 	itemTypeCanHaveSpecs = []schema.ItemTableItemTypeID{
@@ -43,6 +47,18 @@ func NewItemExtractor(
 	container *Container,
 ) *ItemExtractor {
 	return &ItemExtractor{container: container}
+}
+
+// runItemLookups cancels sibling reads on the first failure and joins all tasks.
+func runItemLookups(ctx context.Context, lookups []func(context.Context) error) error {
+	group, lookupCtx := errgroup.WithContext(ctx)
+	group.SetLimit(itemExtractorParallelism)
+
+	for _, lookup := range lookups {
+		group.Go(func() error { return lookup(lookupCtx) })
+	}
+
+	return group.Wait()
 }
 
 func (s *ItemExtractor) ExtractRows(
@@ -366,40 +382,81 @@ func (s *ItemExtractor) extractPlain(
 		return err
 	}
 
-	resultRow.IsCompilesItemOfDay, err = s.extractIsCompilesItemOfDay(ctx, fields, row)
-	if err != nil {
-		return err
+	// Each lookup owns separate result fields. Wait before recursive extraction so
+	// nested item/picture extractors cannot multiply this group's concurrency.
+	var lookups []func(context.Context) error
+
+	if fields.GetIsCompilesItemOfDay() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.IsCompilesItemOfDay, err = s.extractIsCompilesItemOfDay(ctx, fields, row)
+
+			return err
+		})
 	}
 
-	resultRow.Location, err = s.extractLocation(ctx, fields, row)
-	if err != nil {
-		return err
+	if fields.GetLocation() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.Location, err = s.extractLocation(ctx, fields, row)
+
+			return err
+		})
 	}
 
-	resultRow.OtherNames, err = s.extractOtherNames(ctx, fields, row)
-	if err != nil {
-		return err
+	if fields.GetOtherNames() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.OtherNames, err = s.extractOtherNames(ctx, fields, row)
+
+			return err
+		})
 	}
 
-	resultRow.AltNames, err = s.extractAltNames(ctx, fields, row, lang)
-	if err != nil {
-		return err
+	if fields.GetAltNames() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.AltNames, err = s.extractAltNames(ctx, fields, row, lang)
+
+			return err
+		})
 	}
 
-	resultRow.Design, err = s.extractDesignInfo(ctx, fields, row, lang)
-	if err != nil {
-		return err
+	if fields.GetDesign() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.Design, err = s.extractDesignInfo(ctx, fields, row, lang)
+
+			return err
+		})
 	}
 
 	if fields.GetPublicRoutes() {
-		resultRow.PublicRoutes, err = s.itemPublicRoutes(ctx, row)
-		if err != nil {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.PublicRoutes, err = s.itemPublicRoutes(ctx, row)
+
 			return err
-		}
+		})
 	}
 
-	resultRow.Route, resultRow.SpecsRoute, err = s.extractRoutes(ctx, fields, row)
-	if err != nil {
+	if fields.GetRoute() || fields.GetSpecsRoute() {
+		lookups = append(lookups, func(ctx context.Context) error {
+			var err error
+
+			resultRow.Route, resultRow.SpecsRoute, err = s.extractRoutes(ctx, fields, row)
+
+			return err
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
 		return err
 	}
 

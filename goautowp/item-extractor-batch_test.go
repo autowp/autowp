@@ -3,8 +3,10 @@ package goautowp
 import (
 	"context"
 	"database/sql"
+	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/autowp/goautowp/attrs"
 	"github.com/autowp/goautowp/comments"
@@ -18,11 +20,16 @@ import (
 )
 
 type itemBatchQueryLogger struct {
-	queries atomic.Int64
+	queries     atomic.Int64
+	beforeQuery func()
 }
 
 func (s *itemBatchQueryLogger) Printf(_ string, _ ...interface{}) {
 	s.queries.Add(1)
+
+	if s.beforeQuery != nil {
+		s.beforeQuery()
+	}
 }
 
 func newItemBatchTestExtractor(t *testing.T) (*ItemExtractor, *itemBatchQueryLogger) {
@@ -200,5 +207,116 @@ func TestItemExtractorAdditionalFieldsEmptyAndCanceled(t *testing.T) {
 	cancel()
 
 	_, err = extractor.ExtractRows(ctx, []*items.Item{{ID: 1}}, &ItemFields{CommentsCount: true}, "en", UserContext{})
+	require.ErrorIs(t, err, context.Canceled)
+}
+
+// Block before SQL acquisition, so even the single-connection temporary-table fixture
+// can prove independent lookups start together without timing query execution.
+func blockItemExtractionQueries(t *testing.T, logger *itemBatchQueryLogger, count int) func() {
+	t.Helper()
+
+	started := make(chan struct{}, count)
+	release := make(chan struct{})
+
+	var once sync.Once
+
+	unblock := func() { once.Do(func() { close(release) }) }
+	t.Cleanup(unblock)
+
+	logger.beforeQuery = func() {
+		started <- struct{}{}
+
+		<-release
+	}
+
+	return func() {
+		t.Helper()
+
+		defer unblock()
+
+		timer := time.NewTimer(5 * time.Second)
+		defer timer.Stop()
+
+		for range count {
+			select {
+			case <-started:
+			case <-timer.C:
+				t.Fatal("independent item lookups did not start together")
+			}
+		}
+	}
+}
+
+func TestItemExtractorPreloadsFieldsConcurrently(t *testing.T) {
+	t.Parallel()
+
+	extractor, logger := newItemBatchTestExtractor(t)
+	unblock := blockItemExtractionQueries(t, logger, itemExtractorParallelism)
+
+	type extractionResult struct {
+		batch *itemBatchFields
+		err   error
+	}
+
+	done := make(chan extractionResult, 1)
+
+	go func() {
+		batch, err := extractor.preloadFields(t.Context(), []*items.Item{{ID: 1}}, &ItemFields{
+			Meta: true, LinksCount: true, ItemLanguageCount: true, HasText: true,
+		}, UserContext{Roles: []string{users.RoleModer}})
+		done <- extractionResult{batch: batch, err: err}
+	}()
+
+	unblock()
+
+	result := <-done
+	require.NoError(t, result.err)
+	require.Equal(t, "First", result.batch.names[1])
+	require.EqualValues(t, 2, result.batch.links[1])
+	require.EqualValues(t, 2, result.batch.languages[1])
+	require.True(t, result.batch.fullText[1])
+	require.EqualValues(t, itemExtractorParallelism, logger.queries.Load())
+}
+
+func TestItemExtractorPlainLookupsPreserveResults(t *testing.T) {
+	t.Parallel()
+
+	extractor, logger := newItemBatchTestExtractor(t)
+	fields := &ItemFields{OtherNames: true, AltNames: true, CanEditSpecs: true}
+	row := &items.Item{ID: 1, NameOnly: "First RU", ItemTypeID: schema.ItemTableItemTypeIDVehicle}
+	expectedNames, err := extractor.extractOtherNames(t.Context(), fields, row)
+	require.NoError(t, err)
+	expectedAltNames, err := extractor.extractAltNames(t.Context(), fields, row, "ru")
+	require.NoError(t, err)
+
+	logger.queries.Store(0)
+	unblock := blockItemExtractionQueries(t, logger, 2)
+	result := &Item{Id: row.ID, Description: "Preserved"}
+
+	done := make(chan error, 1)
+
+	go func() {
+		done <- extractor.extractPlain(t.Context(), fields, row, result, "ru", UserContext{UserID: 7})
+	}()
+
+	unblock()
+	require.NoError(t, <-done)
+	require.ElementsMatch(t, expectedNames, result.GetOtherNames())
+	require.ElementsMatch(t, expectedAltNames, result.GetAltNames())
+	require.True(t, result.GetCanEditSpecs())
+	require.EqualValues(t, 1, result.GetId())
+	require.Equal(t, "Preserved", result.GetDescription())
+	require.EqualValues(t, 2, logger.queries.Load())
+}
+
+func TestItemExtractorPlainLookupsCanceled(t *testing.T) {
+	t.Parallel()
+
+	extractor, _ := newItemBatchTestExtractor(t)
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+
+	err := extractor.extractPlain(ctx, &ItemFields{OtherNames: true, AltNames: true},
+		&items.Item{ID: 1}, &Item{}, "ru", UserContext{})
 	require.ErrorIs(t, err, context.Canceled)
 }
