@@ -1459,6 +1459,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 			// caller waits on.
 			SlowCallUnaryServerInterceptor(s.config.GRPC.SlowCallThreshold),
 			grpclogging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
+			RequestContextUnaryServerInterceptor(),
 			realip.UnaryServerInterceptorOpts(opts...),
 			BanUnaryServerInterceptor(banChecker),
 			monitoringUnaryInterceptor(s.trafficRecorder, monitoringAuth),
@@ -1468,6 +1469,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 		),
 		grpc.ChainStreamInterceptor(
 			grpclogging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
+			RequestContextStreamServerInterceptor(),
 			realip.StreamServerInterceptorOpts(opts...),
 			BanStreamServerInterceptor(banChecker), //nolint: contextcheck
 			//nolint:contextcheck // Context comes from grpc.ServerStream.

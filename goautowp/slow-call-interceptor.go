@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 // SlowCallUnaryServerInterceptor logs calls that took longer than threshold, at warn level.
@@ -19,6 +20,10 @@ import (
 //
 // A threshold of 0 disables it.
 func SlowCallUnaryServerInterceptor(threshold time.Duration) grpc.UnaryServerInterceptor {
+	return slowCallUnaryServerInterceptor(threshold, slog.Default())
+}
+
+func slowCallUnaryServerInterceptor(threshold time.Duration, logger *slog.Logger) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		req interface{},
@@ -35,12 +40,13 @@ func SlowCallUnaryServerInterceptor(threshold time.Duration) grpc.UnaryServerInt
 
 		elapsed := time.Since(start)
 		if elapsed >= threshold {
-			slog.WarnContext(ctx, "slow call",
+			logger.WarnContext(ctx, "slow call",
 				"grpc.duration_ms", elapsed.Milliseconds(),
 				"grpc.method", info.FullMethod,
 				// Distinguishes "slow, and the caller was still there" from "slow, and it was
 				// abandoned" without needing the error itself.
 				"grpc.failed", err != nil,
+				"grpc.code", status.Code(err).String(),
 			)
 		}
 
