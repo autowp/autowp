@@ -3301,7 +3301,7 @@ func (s *ItemsGRPCServer) GetTree(ctx context.Context, in *GetTreeRequest) (*Tre
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	res, err := s.carTreeWalk(ctx, item, in.GetLanguage(), schema.ItemParentTypeDefault)
+	res, err := s.carTreeWalk(ctx, item, in.GetLanguage())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -4269,42 +4269,89 @@ func (s *ItemsGRPCServer) buildChangesMessage( //nolint: maintidx
 }
 
 func (s *ItemsGRPCServer) carTreeWalk(
-	ctx context.Context, car *items.Item, lang string, parentType schema.ItemParentType,
+	ctx context.Context, car *items.Item, lang string,
+) (*TreeItem, error) {
+	root, err := s.carTreeNode(car, lang, schema.ItemParentTypeDefault)
+	if err != nil {
+		return nil, err
+	}
+
+	level := []*TreeItem{root}
+	for len(level) > 0 {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+
+		parentIDs := make(map[int64]struct{}, len(level))
+		for _, node := range level {
+			parentIDs[node.GetId()] = struct{}{}
+		}
+
+		relations, _, err := s.repository.ItemParents(ctx, &query.ItemParentListOptions{
+			ParentIDs: slices.Collect(maps.Keys(parentIDs)),
+		}, items.ItemParentFields{}, items.ItemParentOrderByAuto)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(relations) == 0 {
+			break
+		}
+
+		children := make(map[int64][]*items.ItemParent)
+		childIDs := make(map[int64]struct{})
+		// Bucketing retains the automatic sibling order returned by ItemParents.
+		for _, relation := range relations {
+			children[relation.ParentID] = append(children[relation.ParentID], relation)
+			childIDs[relation.ItemID] = struct{}{}
+		}
+
+		rows, _, err := s.repository.List(ctx, &query.ItemListOptions{
+			ItemIDs: slices.Collect(maps.Keys(childIDs)),
+		}, &items.ItemFields{NameHTML: true}, items.OrderByNone, false)
+		if err != nil {
+			return nil, err
+		}
+
+		byID := make(map[int64]*items.Item, len(rows))
+		for _, row := range rows {
+			byID[row.ID] = row
+		}
+
+		next := make([]*TreeItem, 0, len(relations))
+
+		for _, node := range level {
+			for _, relation := range children[node.GetId()] {
+				row, found := byID[relation.ItemID]
+				if !found {
+					return nil, items.ErrItemNotFound
+				}
+
+				child, err := s.carTreeNode(row, lang, relation.Type)
+				if err != nil {
+					return nil, err
+				}
+				// Each occurrence has its own subtree, even when a child has several parents.
+				node.Childs = append(node.Childs, child)
+				next = append(next, child)
+			}
+		}
+
+		level = next
+	}
+
+	return root, nil
+}
+
+func (s *ItemsGRPCServer) carTreeNode(
+	car *items.Item, lang string, parentType schema.ItemParentType,
 ) (*TreeItem, error) {
 	nameHTML, err := s.formatItemNameHTML(car, lang)
 	if err != nil {
 		return nil, err
 	}
 
-	data := TreeItem{
-		Id:       car.ID,
-		NameHtml: nameHTML,
-		Childs:   []*TreeItem{},
-		Type:     extractItemParentType(parentType),
-	}
-
-	itemParentRows, _, err := s.repository.ItemParents(ctx, &query.ItemParentListOptions{
-		ParentID: car.ID,
-	}, items.ItemParentFields{}, items.ItemParentOrderByAuto)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, itemParentRow := range itemParentRows {
-		carRow, err := s.repository.Item(ctx, &query.ItemListOptions{
-			ItemID: itemParentRow.ItemID,
-		}, &items.ItemFields{NameHTML: true})
-		if err != nil {
-			return nil, err
-		}
-
-		child, err := s.carTreeWalk(ctx, carRow, lang, itemParentRow.Type)
-		if err != nil {
-			return nil, err
-		}
-
-		data.Childs = append(data.Childs, child)
-	}
-
-	return &data, nil
+	return &TreeItem{
+		Id: car.ID, NameHtml: nameHTML, Childs: []*TreeItem{}, Type: extractItemParentType(parentType),
+	}, nil
 }

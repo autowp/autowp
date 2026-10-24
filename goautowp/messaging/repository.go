@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"maps"
+	"slices"
 	"strings"
 	"time"
 
@@ -520,10 +522,6 @@ func (s *Repository) prepareList(
 	rows []schema.PersonalMessageRow,
 	options Options,
 ) ([]Message, error) {
-	var err error
-
-	cache := make(map[int64]int32)
-
 	messages := make([]Message, len(rows))
 
 	for idx, msg := range rows {
@@ -543,24 +541,6 @@ func (s *Repository) prepareList(
 			dialogWithUserID = msg.ToUserID
 		}
 
-		var dialogCount int32
-
-		if options.AllMessagesLink && dialogWithUserID != 0 {
-			var (
-				ok bool
-				id = dialogWithUserID
-			)
-
-			if dialogCount, ok = cache[id]; !ok {
-				dialogCount, err = s.GetDialogCount(ctx, userID, id)
-				if err != nil {
-					return messages, err
-				}
-
-				cache[id] = dialogCount
-			}
-		}
-
 		messages[idx] = Message{
 			ID:               msg.ID,
 			AuthorID:         util.SQLNullInt64ToPtr(msg.FromUserID),
@@ -569,10 +549,29 @@ func (s *Repository) prepareList(
 			CanDelete:        canDelete,
 			Date:             msg.CreatedAt,
 			CanReply:         canReply,
-			DialogCount:      dialogCount,
+			DialogCount:      0,
 			AllMessagesLink:  options.AllMessagesLink,
 			ToUserID:         msg.ToUserID,
 			DialogWithUserID: dialogWithUserID,
+		}
+	}
+
+	if options.AllMessagesLink {
+		peers := make(map[int64]struct{})
+
+		for _, message := range messages {
+			if message.DialogWithUserID != 0 {
+				peers[message.DialogWithUserID] = struct{}{}
+			}
+		}
+
+		counts, err := s.dialogCounts(ctx, userID, slices.Collect(maps.Keys(peers)))
+		if err != nil {
+			return messages, err
+		}
+
+		for index := range messages {
+			messages[index].DialogCount = counts[messages[index].DialogWithUserID]
 		}
 	}
 
