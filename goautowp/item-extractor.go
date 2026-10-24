@@ -85,13 +85,19 @@ func (s *ItemExtractor) ExtractRows(
 		return nil, err
 	}
 
-	itemRepository, err := s.container.ItemsRepository(ctx)
+	batch, err := s.preloadFields(ctx, ids, fields, userCtx)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, row := range rows {
 		resultRow := &Item{
+			LinksCount:                 batch.links[row.ID],
+			ItemLanguageCount:          batch.languages[row.ID],
+			CommentsCount:              batch.comments[row.ID],
+			HasText:                    batch.fullText[row.ID],
+			Subscription:               batch.subscriptions[row.ID],
+			SpecificationsCount:        batch.specifications[row.ID],
 			Id:                         row.ID,
 			Catname:                    util.NullStringToString(row.Catname),
 			EngineItemId:               util.NullInt64ToScalar(row.EngineItemID),
@@ -127,14 +133,7 @@ func (s *ItemExtractor) ExtractRows(
 		}
 
 		if fields.GetMeta() && isModer {
-			resultRow.Name, err = itemRepository.LanguageName(
-				ctx,
-				row.ID,
-				schema.DefaultLanguageCode,
-			)
-			if err != nil {
-				return nil, err
-			}
+			resultRow.Name = batch.names[row.ID]
 
 			resultRow.Body = row.Body
 			resultRow.BeginYear = util.NullInt32ToScalar(row.BeginYear)
@@ -344,7 +343,7 @@ func (s *ItemExtractor) preloadPictureItems(
 	return result, nil
 }
 
-func (s *ItemExtractor) extractPlain( //nolint: maintidx
+func (s *ItemExtractor) extractPlain(
 	ctx context.Context,
 	fields *ItemFields,
 	row *items.Item,
@@ -390,25 +389,6 @@ func (s *ItemExtractor) extractPlain( //nolint: maintidx
 		resultRow.AttrZoneId = attrsRepository.ZoneIDByVehicleTypeIDs(row.ItemTypeID, vehicleTypes)
 	}
 
-	if fields.GetSpecificationsCount() && isModer {
-		resultRow.SpecificationsCount, err = attrsRepository.ValuesCount(
-			ctx,
-			query.AttrsValueListOptions{
-				ItemID: row.ID,
-			},
-		)
-		if err != nil {
-			return err
-		}
-	}
-
-	if fields.GetSubscription() && userCtx.UserID != 0 {
-		resultRow.Subscription, err = itemRepository.UserItemSubscribed(ctx, row.ID, userCtx.UserID)
-		if err != nil {
-			return err
-		}
-	}
-
 	resultRow.Location, err = s.extractLocation(ctx, fields, row)
 	if err != nil {
 		return err
@@ -446,13 +426,6 @@ func (s *ItemExtractor) extractPlain( //nolint: maintidx
 		return err
 	}
 
-	if fields.GetHasText() {
-		resultRow.HasText, err = itemRepository.HasFullText(ctx, row.ID)
-		if err != nil {
-			return err
-		}
-	}
-
 	resultRow.Categories, err = s.extractCategories(ctx, fields, row, lang, userCtx)
 	if err != nil {
 		return err
@@ -468,11 +441,6 @@ func (s *ItemExtractor) extractPlain( //nolint: maintidx
 			userCtx.UserID != 0
 	}
 
-	resultRow.CommentsCount, err = s.extractCommentsCount(ctx, fields, row)
-	if err != nil {
-		return err
-	}
-
 	resultRow.PreviewPictures, err = s.extractPreviewPictures(ctx, fields, row, lang, userCtx)
 	if err != nil {
 		return err
@@ -486,28 +454,6 @@ func (s *ItemExtractor) extractPlain( //nolint: maintidx
 	resultRow.EngineVehiclesCount, err = s.extractEngineVehiclesCount(ctx, fields, row, isModer)
 	if err != nil {
 		return err
-	}
-
-	if fields.GetItemLanguageCount() && isModer {
-		resultRow.ItemLanguageCount, err = itemRepository.ItemLanguageCount(
-			ctx,
-			&query.ItemLanguageListOptions{
-				ItemID:          row.ID,
-				ExcludeLanguage: schema.DefaultLanguageCode,
-			},
-		)
-		if err != nil {
-			return err
-		}
-	}
-
-	if fields.GetLinksCount() && isModer {
-		resultRow.LinksCount, err = itemRepository.LinksCount(ctx, &query.LinkListOptions{
-			ItemID: row.ID,
-		})
-		if err != nil {
-			return err
-		}
 	}
 
 	resultRow.RelatedGroupPictures, err = s.extractRelatedGroupsPictures(ctx, fields, row, lang)
@@ -1202,23 +1148,6 @@ func (s *ItemExtractor) extractIsCompilesItemOfDay(
 	}
 
 	return itemOfDayRepository.IsComplies(ctx, row.ID)
-}
-
-func (s *ItemExtractor) extractCommentsCount(
-	ctx context.Context,
-	fields *ItemFields,
-	row *items.Item,
-) (int32, error) {
-	if !fields.GetCommentsCount() {
-		return 0, nil
-	}
-
-	commentsRepo, err := s.container.CommentsRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	return commentsRepo.TopicStat(ctx, schema.CommentMessageTypeIDItems, row.ID)
 }
 
 func (s *ItemExtractor) extractLogos(
