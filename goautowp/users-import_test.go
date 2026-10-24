@@ -69,13 +69,13 @@ func TestEnsureUserImportedCreatesAndSynchronizesUser(t *testing.T) {
 	require.NoError(t, err)
 	logger.queries.Store(0)
 
-	for range 2 {
+	for range 100 {
 		existingID, err := repository.EnsureUserImported(t.Context(), claims, net.ParseIP("192.0.2.1"))
 		require.NoError(t, err)
 		require.Equal(t, id, existingID)
 	}
 
-	require.EqualValues(t, 2, logger.queries.Load(), "sequential imports still synchronize with the database")
+	require.Zero(t, logger.queries.Load(), "repeated imports with the same profile avoid the database")
 
 	claims.GivenName = "Changed"
 	claims.Email = uuid.NewString() + "@test.io"
@@ -83,7 +83,7 @@ func TestEnsureUserImportedCreatesAndSynchronizesUser(t *testing.T) {
 	existingID, err := repository.EnsureUserImported(t.Context(), claims, net.ParseIP("2001:db8::1"))
 	require.NoError(t, err)
 	require.Equal(t, id, existingID)
-	require.EqualValues(t, 3, logger.queries.Load())
+	require.EqualValues(t, 1, logger.queries.Load())
 	err = database.QueryRowContext(t.Context(), `SELECT name, e_mail, HOST(last_ip), green, votes_left
  FROM users WHERE id = $1`, id).
 		Scan(&name, &email, &ip, &green, &votesLeft)

@@ -532,6 +532,8 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 		return false, err
 	}
 
+	var importedUUID string
+
 	if user.UUID.Status == pgtype.Present {
 		token, err := s.keycloak.LoginClient(
 			ctx,
@@ -549,6 +551,8 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 		if err != nil {
 			return false, err
 		}
+
+		importedUUID = userGUID.String()
 
 		logging.Infof("attempt to disable user `%s` in keycloak", userGUID.String())
 
@@ -589,6 +593,9 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 	if err != nil {
 		return false, err
 	}
+
+	// Invalidate immediately after anonymization, before any fallible cleanup.
+	s.imports.invalidate(userID, importedUUID)
 
 	// external-profile links the user added
 	_, err = s.db.Delete(schema.UserContactTable).
@@ -1340,7 +1347,7 @@ func (s *Repository) ensureUserExportedToKeycloak(
 		schema.UserTableEmailToCheckCol,
 		schema.UserTableLoginCol,
 		schema.UserTableNameCol,
-		goqu.Func("COALESCE", schema.UserTableUUIDCol, "").As("guid"),
+		goqu.Func("COALESCE", schema.UserTableUUIDCol.Cast("text"), "").As("guid"),
 	).
 		From(schema.UserTable).
 		Where(schema.UserTableIDCol.Eq(userID)).
@@ -1412,6 +1419,8 @@ func (s *Repository) ensureUserExportedToKeycloak(
 	if err != nil {
 		return "", err
 	}
+
+	s.imports.invalidate(userID, st.GUID)
 
 	return st.GUID, err
 }

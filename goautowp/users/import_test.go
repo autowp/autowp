@@ -20,7 +20,7 @@ type importTestResult struct {
 	err error
 }
 
-func TestUserImportsSharesConcurrentResultsOnly(t *testing.T) {
+func TestUserImportsSharesResultsAndCachesSuccess(t *testing.T) {
 	t.Parallel()
 
 	for _, importErr := range []error{nil, errImportTest} {
@@ -76,12 +76,13 @@ func TestUserImportsSharesConcurrentResultsOnly(t *testing.T) {
 				id, err := imports.ensure(t.Context(), input, importUser)
 				require.NoError(t, err)
 				require.EqualValues(t, 42, id)
-				require.EqualValues(
-					t,
-					2,
-					calls.Load(),
-					"a sequential call must execute again, including after an error",
-				)
+
+				expectedCalls := int32(1)
+				if importErr != nil {
+					expectedCalls = 2
+				}
+
+				require.Equal(t, expectedCalls, calls.Load(), "only successful imports may be reused")
 			})
 		})
 	}

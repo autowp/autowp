@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/autowp/goautowp/logging"
@@ -15,7 +16,11 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-const userImportTimeout = 10 * time.Second
+const (
+	userImportTimeout         = 10 * time.Second
+	userImportCacheTTL        = 5 * time.Second
+	userImportCacheMaxEntries = 10000
+)
 
 var errUnexpectedImportResult = errors.New("unexpected user import result")
 
@@ -32,14 +37,25 @@ type userImportInput struct {
 }
 
 type userImportResult struct {
-	input userImportInput
-	id    int64
+	input    userImportInput
+	id       int64
+	revision uint64
 }
 
-// userImports keeps only in-flight operations. Later sequential calls still
-// synchronize with the database; there is no TTL cache of identities or claims.
+type userImportCacheEntry struct {
+	input userImportInput
+	id    int64
+	until time.Time
+}
+
+// User IDs are cached only after successful profile synchronization. Token
+// verification and authorization roles stay outside this process-local cache.
+// A revision change prevents an in-flight import from repopulating invalidated data.
 type userImports struct {
-	group singleflight.Group
+	group    singleflight.Group
+	mutex    sync.Mutex
+	entries  map[string]userImportCacheEntry
+	revision uint64
 }
 
 func (s *userImports) ensure(
@@ -52,14 +68,7 @@ func (s *userImports) ensure(
 		}
 
 		pending := s.group.DoChan(input.uuid, func() (interface{}, error) {
-			// The mutation and required post-insert initialization share one bounded
-			// context, independent of any individual waiting client's cancellation.
-			importCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), userImportTimeout)
-			defer cancel()
-
-			id, err := importUser(importCtx, input)
-
-			return userImportResult{input: input, id: id}, err
+			return s.synchronize(ctx, input, importUser)
 		})
 
 		select {
@@ -74,6 +83,14 @@ func (s *userImports) ensure(
 			if result.input != input {
 				// A request with different claims/IP must apply its own update after
 				// the current synchronization, rather than reusing its result or error.
+				continue
+			}
+
+			s.mutex.Lock()
+			current := result.revision == s.revision
+			s.mutex.Unlock()
+
+			if !current {
 				continue
 			}
 
