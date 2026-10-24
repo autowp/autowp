@@ -48,8 +48,6 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 	ctx context.Context,
 	_ *emptypb.Empty,
 ) (*TrafficTopResponse, error) {
-	var err error
-
 	userCtx, err := s.auth.ValidateGRPC(ctx)
 	if err != nil {
 		return nil, s.auth.GRPCError(err)
@@ -65,63 +63,77 @@ func (s *TrafficGRPCServer) GetTrafficTop(
 	}
 
 	result := make([]*TrafficTopItem, len(items))
+	lookups := make([]func(context.Context) error, 0, 2*len(items))
 
 	for idx, item := range items {
-		banItem, banErr := s.traffic.Ban.Get(ctx, item.IP)
-		if banErr != nil && !errors.Is(banErr, ban.ErrBanItemNotFound) {
-			return nil, status.Error(codes.Internal, banErr.Error())
+		resultRow := &TrafficTopItem{
+			IpAddress: item.IP.String(),
+			Count:     int32(item.Count), //nolint: gosec
+			WhoisUrl:  "https://nic.ru/whois/?query=" + url.QueryEscape(item.IP.String()),
 		}
+		result[idx] = resultRow
 
-		var (
-			user       *schema.UsersRow
-			topItemBan *BanItem
-		)
+		// Flatten both independent reads for every IP into the same bounded queue.
+		// The user lookup/extraction stays in the ban branch and inherits its slot.
+		lookups = append(lookups, func(ctx context.Context) error {
+			banItem, banErr := s.traffic.Ban.Get(ctx, item.IP)
+			if banErr != nil && !errors.Is(banErr, ban.ErrBanItemNotFound) {
+				return banErr
+			}
 
-		if banItem != nil {
-			var extractedUser *User
+			var (
+				user *schema.UsersRow
+				err  error
+			)
 
-			if banItem.ByUserID > 0 {
-				user, err = s.usersRepository.User(ctx, &query.UserListOptions{
-					ID: banItem.ByUserID,
-				}, users.UserFields{}, users.OrderByNone)
-				if err != nil && !errors.Is(err, users.ErrUserNotFound) {
-					return nil, status.Error(codes.Internal, err.Error())
-				}
+			if banItem != nil {
+				var extractedUser *User
 
-				if user != nil {
-					extractedUser, err = s.userExtractor.Extract(
-						ctx,
-						user,
-						nil,
-						userCtx.UserID,
-						userCtx.Roles,
-					)
-					if err != nil {
-						return nil, status.Error(codes.Internal, err.Error())
+				if banItem.ByUserID > 0 {
+					user, err = s.usersRepository.User(ctx, &query.UserListOptions{
+						ID: banItem.ByUserID,
+					}, users.UserFields{}, users.OrderByNone)
+					if err != nil && !errors.Is(err, users.ErrUserNotFound) {
+						return err
+					}
+
+					if user != nil {
+						extractedUser, err = s.userExtractor.Extract(
+							ctx,
+							user,
+							nil,
+							userCtx.UserID,
+							userCtx.Roles,
+						)
+						if err != nil {
+							return err
+						}
 					}
 				}
+
+				resultRow.Ban = &BanItem{
+					Until:    timestamppb.New(banItem.Until),
+					ByUserId: banItem.ByUserID,
+					ByUser:   extractedUser,
+					Reason:   banItem.Reason,
+				}
 			}
 
-			topItemBan = &BanItem{
-				Until:    timestamppb.New(banItem.Until),
-				ByUserId: banItem.ByUserID,
-				ByUser:   extractedUser,
-				Reason:   banItem.Reason,
+			return nil
+		}, func(ctx context.Context) error {
+			inWhitelist, err := s.traffic.Whitelist.Exists(ctx, item.IP)
+			if err != nil {
+				return err
 			}
-		}
 
-		inWhitelist, err := s.traffic.Whitelist.Exists(ctx, item.IP)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
+			resultRow.InWhitelist = inWhitelist
 
-		result[idx] = &TrafficTopItem{
-			IpAddress:   item.IP.String(),
-			Count:       int32(item.Count), //nolint: gosec
-			Ban:         topItemBan,
-			InWhitelist: inWhitelist,
-			WhoisUrl:    "https://nic.ru/whois/?query=" + url.QueryEscape(item.IP.String()),
-		}
+			return nil
+		})
+	}
+
+	if err := runItemLookups(ctx, lookups); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &TrafficTopResponse{
