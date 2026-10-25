@@ -189,6 +189,7 @@ export class CategoriesCategoryItemComponent {
               pictureItem: new PictureItemListOptions({
                 itemId: current.id,
               }),
+              status: PictureStatus.PICTURE_STATUS_ACCEPTED,
             }),
           }),
         )
