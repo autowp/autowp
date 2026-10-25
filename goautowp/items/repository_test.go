@@ -28,6 +28,8 @@ func TestTopBrandsListRuZh(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -80,6 +82,8 @@ func TestListFilters(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -136,6 +140,8 @@ func TestGetItemsNameAndCatnameShouldNotBeOmittedWhenDescendantsCountRequested(t
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -204,6 +210,8 @@ func TestGetUserPicturesBrands(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -352,6 +360,8 @@ func TestPaginator(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -399,6 +409,8 @@ func TestOrderByDescendantsCount(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -520,6 +532,8 @@ func TestOrderByDescendantsCountBrands(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -612,6 +626,8 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -775,6 +791,8 @@ func TestOrderByCreatedAt(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -886,6 +904,8 @@ func TestOrderByName(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -1007,6 +1027,8 @@ func TestOrderByDescendantsParentsCount(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -1162,6 +1184,8 @@ func TestOrderByStarCount(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()
@@ -1256,6 +1280,8 @@ func TestOrderByItemParentParentTimestamp(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)

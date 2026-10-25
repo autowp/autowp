@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/schema"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -124,8 +125,17 @@ func TestCommentReplyNotificationShouldBeDelivered(t *testing.T) { //nolint:para
 	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
-	_, user1Token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
+	user1ID, user1Token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 	_, user2Token := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
+
+	_, err = NewUsersClient(conn).UpdateUser(
+		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+user1Token),
+		&UpdateUserRequest{
+			User:       &User{Id: user1ID, Language: schema.EnglishLanguageCode},
+			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"language"}},
+		},
+	)
+	require.NoError(t, err)
 
 	response, err := client.Add(
 		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+user1Token),

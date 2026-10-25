@@ -19,6 +19,8 @@ func createTrafficService(t *testing.T) *Repository {
 
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquPostgresDB := goqu.New("postgres", db)
 

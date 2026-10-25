@@ -33,6 +33,8 @@ func TestGetTransactions(t *testing.T) {
 
 	postgresDB, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	postgresDB.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, postgresDB.Close()) })
 
 	db := goqu.New("postgres", postgresDB)
 

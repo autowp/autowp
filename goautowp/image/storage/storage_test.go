@@ -28,6 +28,8 @@ func TestS3AddImageFromFilepathChangeNameAndDelete(t *testing.T) {
 	cfg := config.LoadConfig("../../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 
@@ -100,6 +102,8 @@ func TestAddImageFromBlobAndFormat(t *testing.T) {
 	cfg := config.LoadConfig("../../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 
@@ -131,6 +135,8 @@ func TestS3AddImageWithPreferredName(t *testing.T) {
 	cfg := config.LoadConfig("../../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 
@@ -161,6 +167,8 @@ func TestAddImageAndCrop(t *testing.T) {
 	cfg := config.LoadConfig("../../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 
@@ -238,6 +246,8 @@ func TestFlopNormalizeAndMultipleRequest(t *testing.T) {
 	cfg := config.LoadConfig("../../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 
@@ -281,6 +291,8 @@ func TestRequestFormattedImageAgain(t *testing.T) {
 	cfg := config.LoadConfig("../../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 
@@ -369,6 +381,7 @@ func TestFormatImageRetrySelectsRequestedFormat(t *testing.T) {
 	cfg := config.LoadConfig("../../")
 	database, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	database.SetMaxOpenConns(2)
 	t.Cleanup(func() { require.NoError(t, database.Close()) })
 
 	imageStorage, err := NewStorage(goqu.New("postgres", database), cfg.ImageStorage)

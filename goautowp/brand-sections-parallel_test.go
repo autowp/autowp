@@ -28,6 +28,7 @@ func newBrandSectionsTestServer(t *testing.T) (*ItemsGRPCServer, *goqu.Database,
 	cfg := config.LoadConfig(".")
 	pool, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	pool.SetMaxOpenConns(2)
 	t.Cleanup(func() { require.NoError(t, pool.Close()) })
 
 	database := goqu.New("postgres", pool)

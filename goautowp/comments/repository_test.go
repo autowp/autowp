@@ -98,6 +98,8 @@ func createRepositoryWithCallback(
 
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 

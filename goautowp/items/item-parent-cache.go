@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/util"
 	"github.com/doug-martin/goqu/v9"
 )
 
@@ -112,28 +111,22 @@ func (s *ItemParentCacheRepository) collectParentInfo(
 	id int64,
 	diff int64,
 ) (map[int64]parentInfo, error) {
-	//nolint: sqlclosecheck
-	rows, err := s.db.Select(schema.ItemParentTableParentIDCol, schema.ItemParentTableTypeCol).
+	parents := make([]schema.ItemParentRow, 0)
+
+	err := s.db.Select(schema.ItemParentTableParentIDCol, schema.ItemParentTableTypeCol).
 		From(schema.ItemParentTable).
 		Where(schema.ItemParentTableItemIDCol.Eq(id)).
-		Executor().QueryContext(ctx)
+		ScanStructsContext(ctx, &parents)
 	if err != nil {
 		return nil, err
 	}
-	defer util.Close(rows)
 
 	result := make(map[int64]parentInfo, 0)
 
-	for rows.Next() {
-		var (
-			parentID int64
-			typeID   schema.ItemParentType
-		)
-
-		err = rows.Scan(&parentID, &typeID)
-		if err != nil {
-			return nil, err
-		}
+	// Finish reading before descending so each ancestor does not hold a pool connection.
+	for _, parent := range parents {
+		parentID := parent.ParentID
+		typeID := parent.Type
 
 		isTuning := typeID == schema.ItemParentTypeTuning
 		isSport := typeID == schema.ItemParentTypeSport
@@ -161,10 +154,6 @@ func (s *ItemParentCacheRepository) collectParentInfo(
 				result[pid] = val
 			}
 		}
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
 	}
 
 	return result, nil

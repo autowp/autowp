@@ -16,6 +16,8 @@ func TestGetText(t *testing.T) {
 	cfg := config.LoadConfig("../")
 	db, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	goquDB := goqu.New("postgres", db)
 	ctx := t.Context()

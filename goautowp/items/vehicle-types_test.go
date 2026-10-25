@@ -32,6 +32,8 @@ func vehicleTypesFixture(t *testing.T) (*Repository, *sql.DB) {
 	dsn.RawQuery = params.Encode()
 	db, err := sql.Open("postgres", dsn.String())
 	require.NoError(t, err)
+	// The concurrent test holds a lock, starts two writers, and observes their locks.
+	db.SetMaxOpenConns(4)
 	t.Cleanup(func() {
 		cleanupCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()

@@ -47,6 +47,7 @@ func newItemOfDayTestExtractor(t *testing.T) (*ItemExtractor, *items.Item, *goqu
 
 	database, err := sql.Open("postgres", cfg.PostgresDSN)
 	require.NoError(t, err)
+	database.SetMaxOpenConns(2)
 	t.Cleanup(func() { require.NoError(t, database.Close()) })
 
 	goquDB := goqu.New("postgres", database)
