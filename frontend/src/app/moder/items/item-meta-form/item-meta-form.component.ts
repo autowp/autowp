@@ -396,7 +396,7 @@ export class ItemMetaFormComponent {
         );
       }
       if ([ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)) {
-        elements.vehicle_type_id = new FormControl(vehicleTypeIDs, {nonNullable: true});
+        elements.vehicle_type_id = new FormControl([...vehicleTypeIDs], {nonNullable: true});
       }
       if (item.itemTypeId !== ItemType.ITEM_TYPE_COPYRIGHT) {
         elements.begin = new FormGroup({

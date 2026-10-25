@@ -13,7 +13,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth.service';
 import {ItemService} from '@services/item';
-import {catchError, EMPTY, forkJoin, map, of, tap} from 'rxjs';
+import {catchError, EMPTY, map, of, switchMap, tap} from 'rxjs';
 
 import type {ItemMetaFormResult} from '../../item-meta-form/item-meta-form.component';
 
@@ -33,6 +33,7 @@ export class ModerItemsItemMetaComponent implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
   readonly #injector = inject(Injector);
+  #savedVehicleTypes: undefined | {ids: string[]; itemId: string};
 
   readonly item = input.required<Item>();
 
@@ -65,7 +66,12 @@ export class ModerItemsItemMetaComponent implements OnInit {
                 itemId: item.id,
               }),
             )
-            .pipe(map((response) => (response.items ?? []).map((row) => row.vehicleTypeId)));
+            .pipe(
+              map((response) => (response.items ?? []).map((row) => row.vehicleTypeId)),
+              tap(() => {
+                this.#savedVehicleTypes = undefined;
+              }),
+            );
         }
 
         return of([]);
@@ -82,8 +88,15 @@ export class ModerItemsItemMetaComponent implements OnInit {
   );
 
   protected saveMeta(item: Item, event: ItemMetaFormResult) {
+    if (this.loadingNumber()) {
+      return;
+    }
     this.loadingNumber.set(true);
 
+    const hasVehicleTypes = [ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId);
+    const selectedIds = hasVehicleTypes ? [...event.vehicle_type_id] : [];
+    const originalIds =
+      this.#savedVehicleTypes?.itemId === item.id ? this.#savedVehicleTypes.ids : (this.vehicleTypeIDsData() ?? []);
     const newItem = itemMetaFormResultsToAPIItem(event);
     newItem.id = item.id;
 
@@ -132,42 +145,46 @@ export class ModerItemsItemMetaComponent implements OnInit {
         break;
     }
 
-    const pipes: Observable<void>[] = [
-      this.#itemsClient
-        .updateItem(
-          new UpdateItemRequest({
-            item: newItem,
-            updateMask: new FieldMask({paths: mask}),
-          }),
-        )
-        .pipe(
-          catchError((response: unknown) => {
-            if (response instanceof GrpcStatusEvent) {
-              const fieldViolations = extractFieldViolations(response);
-              this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
-            } else {
-              this.#toastService.handleError(response);
-            }
-            return EMPTY;
-          }),
-          tap(() => {
-            this.invalidParams.set({});
-          }),
-          map(() => void 0),
-        ),
-    ];
-    if ([ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)) {
-      pipes.push(this.#itemService.setItemVehicleTypes$(item.id, event.vehicle_type_id));
-    }
+    this.#itemsClient
+      .updateItem(
+        new UpdateItemRequest({
+          item: newItem,
+          updateMask: new FieldMask({paths: mask}),
+        }),
+      )
+      .pipe(
+        catchError((response: unknown) => {
+          if (response instanceof GrpcStatusEvent) {
+            const fieldViolations = extractFieldViolations(response);
+            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+          } else {
+            this.#toastService.handleError(response);
+          }
+          return EMPTY;
+        }),
+        tap(() => {
+          this.invalidParams.set({});
+        }),
+        switchMap(() => {
+          if (!hasVehicleTypes) {
+            return of(void 0);
+          }
 
-    forkJoin(pipes).subscribe({
-      complete: () => {
-        this.loadingNumber.set(false);
-      },
-      error: (error: unknown) => {
-        this.loadingNumber.set(false);
-        this.#toastService.handleError(error);
-      },
-    });
+          return this.#itemService.updateItemVehicleTypes$(item.id, selectedIds, originalIds).pipe(
+            tap((ids) => {
+              this.#savedVehicleTypes = {ids, itemId: item.id};
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        complete: () => {
+          this.loadingNumber.set(false);
+        },
+        error: (error: unknown) => {
+          this.loadingNumber.set(false);
+          this.#toastService.handleError(error);
+        },
+      });
   }
 }

@@ -3,7 +3,7 @@ import type {Observable} from 'rxjs';
 import {inject, Service} from '@angular/core';
 import {GetItemVehicleTypesRequest, ItemType, ItemVehicleType, ItemVehicleTypeRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {forkJoin, map, of, switchMap} from 'rxjs';
+import {concatMap, from, last, map, scan, startWith, switchMap} from 'rxjs';
 
 export interface APIItemChildsCounts {
   sport: number;
@@ -40,54 +40,42 @@ export class ItemService {
   readonly #itemsClient = inject(ItemsClient);
 
   public setItemVehicleTypes$(itemId: string, ids: string[]): Observable<void> {
-    return this.#itemsClient
-      .getItemVehicleTypes(
-        new GetItemVehicleTypesRequest({
-          itemId: itemId,
-        }),
-      )
-      .pipe(
-        switchMap((response) => {
-          const promises: Observable<null>[] = [];
+    const selectedIds = [...ids];
+    return this.#itemsClient.getItemVehicleTypes(new GetItemVehicleTypesRequest({itemId})).pipe(
+      switchMap((response) =>
+        this.updateItemVehicleTypes$(
+          itemId,
+          selectedIds,
+          (response.items ?? []).map((row) => row.vehicleTypeId),
+        ),
+      ),
+      last(),
+      map(() => void 0),
+    );
+  }
 
-          const currentIds: string[] = [];
-          for (const itemVehicleType of response.items ?? []) {
-            currentIds.push(itemVehicleType.vehicleTypeId);
-            if (!ids.includes(itemVehicleType.vehicleTypeId)) {
-              promises.push(
-                this.#itemsClient
-                  .deleteItemVehicleType(
-                    new ItemVehicleTypeRequest({
-                      itemId: itemId,
-                      vehicleTypeId: itemVehicleType.vehicleTypeId,
-                    }),
-                  )
-                  .pipe(map(() => null)),
-              );
-            }
-          }
+  // Emit the acknowledged snapshot after each edit, so a later failure does not lose
+  // the baseline for a retry. Concurrent changes absent from the original snapshot are preserved.
+  public updateItemVehicleTypes$(itemId: string, ids: string[], originalIds: string[]): Observable<string[]> {
+    const initialIds = [...originalIds];
+    const changes = [
+      ...ids.filter((id) => !initialIds.includes(id)).map((id) => ({id, selected: true})),
+      ...initialIds.filter((id) => !ids.includes(id)).map((id) => ({id, selected: false})),
+    ];
 
-          for (const vehicleTypeId of ids) {
-            if (!currentIds.includes(vehicleTypeId)) {
-              promises.push(
-                this.#itemsClient
-                  .createItemVehicleType(
-                    new ItemVehicleType({
-                      itemId: itemId,
-                      vehicleTypeId,
-                    }),
-                  )
-                  .pipe(map(() => null)),
-              );
-            }
-          }
-
-          if (promises.length <= 0) {
-            promises.push(of(null));
-          }
-
-          return forkJoin(promises).pipe(map(() => void 0));
-        }),
-      );
+    return from(changes).pipe(
+      concatMap((change) => {
+        const request$ = change.selected
+          ? this.#itemsClient.createItemVehicleType(new ItemVehicleType({itemId, vehicleTypeId: change.id}))
+          : this.#itemsClient.deleteItemVehicleType(new ItemVehicleTypeRequest({itemId, vehicleTypeId: change.id}));
+        return request$.pipe(map(() => change));
+      }),
+      scan(
+        (currentIds, change) =>
+          change.selected ? [...currentIds, change.id] : currentIds.filter((id) => id !== change.id),
+        initialIds,
+      ),
+      startWith(initialIds),
+    );
   }
 }

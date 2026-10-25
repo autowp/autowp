@@ -8,6 +8,7 @@
         <app-item-meta-form
           [item]="item"
           [invalidParams]="invalidParams()"
+          [sending]="loadingNumber()"
           [vehicleTypeIDs]="vehicleTypeIDs"
           (submitted)="saveMeta(item, $event)"
         />
