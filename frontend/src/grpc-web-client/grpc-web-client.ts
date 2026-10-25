@@ -2,8 +2,9 @@ import type {Provider} from '@angular/core';
 import type {GrpcClient, GrpcClientFactory, GrpcEvent, GrpcMessage, GrpcMessageClass} from '@ngx-grpc/common';
 import type {Observable} from 'rxjs';
 
+import {isPlatformServer} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
-import {inject, Service} from '@angular/core';
+import {inject, PLATFORM_ID, Service} from '@angular/core';
 import {GrpcDataEvent, GrpcMetadata, GrpcStatusEvent} from '@ngx-grpc/common';
 import {GRPC_CLIENT_FACTORY} from '@ngx-grpc/core';
 import {numericEnumValue} from '@utils/numeric-enum-value';
@@ -43,6 +44,10 @@ export interface NgGrpcWebClientSettings {
 @Service()
 export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClientSettings> {
   readonly #httpClient = inject(HttpClient);
+  // Keep Node's Buffer out of the browser path and avoid the per-byte atob conversion during SSR.
+  readonly #decodeBase64 = isPlatformServer(inject(PLATFORM_ID))
+    ? (input: string): Uint8Array<ArrayBuffer> => Buffer.from(input, 'base64')
+    : base64ToUint8Array;
   readonly #defaultSettings: NgGrpcWebClientSettings | null = inject(NG_GRPC_WEB_CLIENT_DEFAULT_SETTINGS, {
     optional: true,
   });
@@ -60,7 +65,7 @@ export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClient
       throw new Error(`grpc-web client factory: no settings provided for ${serviceId}`);
     }
 
-    return new NgGrpcWebClient(settings, this.#httpClient);
+    return new NgGrpcWebClient(settings, this.#httpClient, this.#decodeBase64);
   }
 }
 
@@ -73,6 +78,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
   constructor(
     private readonly settings: NgGrpcWebClientSettings,
     private readonly httpClient: HttpClient,
+    private readonly decodeBase64: (input: string) => Uint8Array<ArrayBuffer> = base64ToUint8Array,
   ) {
     this.#withCredentials = settings.withCredentials ?? false;
   }
@@ -188,7 +194,7 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
             return of(this.handleError_(new RpcError(StatusCode.UNKNOWN, 'No data received.')));
           }
 
-          const byteSource = decodeGrpcWebTextResponse(newData);
+          const byteSource = decodeGrpcWebTextResponse(newData, this.decodeBase64);
 
           let messages;
           try {
@@ -348,13 +354,16 @@ export function provideGrpcWebClient(options?: NgGrpcWebClientRootOptions): Prov
   return providers;
 }
 
-function decodeGrpcWebTextResponse(input: string): Uint8Array<ArrayBuffer> {
+function decodeGrpcWebTextResponse(
+  input: string,
+  decodeBase64: (input: string) => Uint8Array<ArrayBuffer>,
+): Uint8Array<ArrayBuffer> {
   const eqIndex = input.lastIndexOf('=');
   if (eqIndex > 0) {
     const data = input.substring(0, eqIndex + 1);
     const trailer = input.substring(eqIndex + 1);
-    return concatUint8Arrays([base64ToUint8Array(data), base64ToUint8Array(trailer)]);
+    return concatUint8Arrays([decodeBase64(data), decodeBase64(trailer)]);
   }
 
-  return base64ToUint8Array(input);
+  return decodeBase64(input);
 }
