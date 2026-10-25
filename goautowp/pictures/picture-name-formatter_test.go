@@ -339,6 +339,62 @@ func TestPictureNamePersonsFirst(t *testing.T) {
 	}
 }
 
+func TestPictureNamePersonsKeepFullNames(t *testing.T) {
+	t.Parallel()
+
+	formatter := newPictureNameTestFormatter(t)
+	tests := []struct {
+		name    string
+		persons []string
+		want    string
+	}{
+		{
+			name:    "common first name",
+			persons: []string{"Henry Ford", "Henry Leland"},
+			want:    "Henry Ford, Henry Leland, Ford Mustang Coupe and Convertible",
+		},
+		{
+			name:    "common last name",
+			persons: []string{"Henry Ford", "Edsel Ford"},
+			want:    "Henry Ford, Edsel Ford, Ford Mustang Coupe and Convertible",
+		},
+		{
+			name:    "common prefix with vehicle",
+			persons: []string{"Ford Person"},
+			want:    "Ford Person, Ford Mustang Coupe and Convertible",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			picture := PictureNameFormatterOptions{Items: []PictureNameFormatterItem{}}
+			for _, name := range test.persons {
+				picture.Items = append(picture.Items, PictureNameFormatterItem{
+					Item:       items.ItemNameFormatterOptions{Name: name},
+					ItemTypeID: schema.ItemTableItemTypeIDPerson,
+				})
+			}
+
+			for _, name := range []string{"Ford Mustang Coupe", "Ford Mustang Convertible"} {
+				picture.Items = append(picture.Items, PictureNameFormatterItem{
+					Item:       items.ItemNameFormatterOptions{Name: name},
+					ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+				})
+			}
+
+			text, err := formatter.FormatText(picture, schema.EnglishLanguageCode)
+			require.NoError(t, err)
+			require.Equal(t, test.want, text)
+
+			rendered, err := formatter.FormatHTML(picture, schema.EnglishLanguageCode)
+			require.NoError(t, err)
+			require.Equal(t, test.want, rendered)
+		})
+	}
+}
+
 func TestPictureNameDetailsMustMatchEveryItem(t *testing.T) {
 	t.Parallel()
 

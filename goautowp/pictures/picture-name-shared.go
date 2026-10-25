@@ -99,6 +99,13 @@ func pictureItemNames(pictureItems []PictureNameFormatterItem) []string {
 
 	for _, pictureItem := range pictureItems {
 		name := pictureItem.Item.Name
+		if pictureItem.ItemTypeID == schema.ItemTableItemTypeIDPerson {
+			names = append(names, name)
+			previousWords = []string{}
+
+			continue
+		}
+
 		words := strings.Fields(name)
 		common := 0
 
