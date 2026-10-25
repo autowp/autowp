@@ -1,9 +1,11 @@
 package pictures
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/schema"
 )
 
 // Shared details are formatted as a single item, preserving the ordinary text and HTML
@@ -76,6 +78,22 @@ func pictureItemToday(item items.ItemNameFormatterOptions) bool {
 }
 
 func pictureItemNames(pictureItems []PictureNameFormatterItem) []string {
+	pictureItems = slices.Clone(pictureItems)
+	slices.SortStableFunc(pictureItems, func(left, right PictureNameFormatterItem) int {
+		leftPerson := left.ItemTypeID == schema.ItemTableItemTypeIDPerson
+		rightPerson := right.ItemTypeID == schema.ItemTableItemTypeIDPerson
+
+		if leftPerson == rightPerson {
+			return 0
+		}
+
+		if leftPerson {
+			return -1
+		}
+
+		return 1
+	})
+
 	names := make([]string, 0, len(pictureItems))
 	previousWords := []string{}
 

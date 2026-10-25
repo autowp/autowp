@@ -5,6 +5,7 @@ import (
 
 	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/items"
+	"github.com/autowp/goautowp/schema"
 	"github.com/autowp/goautowp/util"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
@@ -30,6 +31,7 @@ type PictureNameFormatterOptions struct {
 
 type PictureNameFormatterItem struct {
 	Item        items.ItemNameFormatterOptions
+	ItemTypeID  schema.ItemTableItemTypeID
 	Perspective string
 }
 

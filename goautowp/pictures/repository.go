@@ -1927,6 +1927,7 @@ func (s *Repository) NameData(
 	}
 
 	itemsCache := make(map[int64]items.ItemNameFormatterOptions)
+	itemTypes := make(map[int64]schema.ItemTableItemTypeID)
 
 	if len(itemIDs) > 0 {
 		itemRows, _, err := s.itemsRepository.List(ctx, &query.ItemListOptions{
@@ -1942,6 +1943,7 @@ func (s *Repository) NameData(
 		}
 
 		for _, row := range itemRows {
+			itemTypes[row.ID] = row.ItemTypeID
 			itemsCache[row.ID] = items.ItemNameFormatterOptions{
 				BeginModelYear:         util.NullInt32ToScalar(row.BeginModelYear),
 				EndModelYear:           util.NullInt32ToScalar(row.EndModelYear),
@@ -2025,6 +2027,7 @@ func (s *Repository) NameData(
 
 			resultItems = append(resultItems, PictureNameFormatterItem{
 				Item:        item,
+				ItemTypeID:  itemTypes[itemID],
 				Perspective: perspective,
 			})
 		}

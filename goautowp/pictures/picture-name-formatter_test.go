@@ -296,6 +296,49 @@ func TestPictureNameCommonWords(t *testing.T) {
 	}
 }
 
+func TestPictureNamePersonsFirst(t *testing.T) {
+	t.Parallel()
+
+	formatter := newPictureNameTestFormatter(t)
+	picture := PictureNameFormatterOptions{Items: []PictureNameFormatterItem{
+		{
+			Item:       items.ItemNameFormatterOptions{Name: "Ford Mustang Coupe"},
+			ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+		},
+		{
+			Item:       items.ItemNameFormatterOptions{Name: "Henry Ford"},
+			ItemTypeID: schema.ItemTableItemTypeIDPerson,
+		},
+		{
+			Item:       items.ItemNameFormatterOptions{Name: "Ford Mustang Convertible"},
+			ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+		},
+		{
+			Item:       items.ItemNameFormatterOptions{Name: "Lee Iacocca"},
+			ItemTypeID: schema.ItemTableItemTypeIDPerson,
+		},
+	}}
+	originalItems := slices.Clone(picture.Items)
+
+	const want = "Henry Ford, Lee Iacocca, Ford Mustang Coupe and Convertible"
+
+	for _, lang := range []string{schema.EnglishLanguageCode, schema.RussianLanguageCode} {
+		expected := want
+		if lang == schema.RussianLanguageCode {
+			expected = "Henry Ford, Lee Iacocca, Ford Mustang Coupe и Convertible"
+		}
+
+		text, err := formatter.FormatText(picture, lang)
+		require.NoError(t, err)
+		require.Equal(t, expected, text)
+
+		rendered, err := formatter.FormatHTML(picture, lang)
+		require.NoError(t, err)
+		require.Equal(t, expected, rendered)
+		require.Equal(t, originalItems, picture.Items)
+	}
+}
+
 func TestPictureNameDetailsMustMatchEveryItem(t *testing.T) {
 	t.Parallel()
 
