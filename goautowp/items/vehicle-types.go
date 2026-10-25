@@ -80,35 +80,38 @@ func (s *Repository) updateItemVehicleTypesLocked(
 		return err
 	}
 
+	// Rollback also covers panics; after a successful commit it is a harmless no-op.
+	defer func() { _ = tx.Rollback() }()
+
+	var lockedID int64
+
+	found, err := tx.Select(schema.ItemTableIDCol).From(schema.ItemTable).
+		Where(schema.ItemTableIDCol.Eq(itemID)).ForUpdate(goqu.Wait).
+		ScanValContext(ctx, &lockedID)
+	if err != nil {
+		return err
+	}
+
+	if !found {
+		return ErrItemNotFound
+	}
+
 	changed := false
-
-	err = tx.Wrap(func() error {
-		var lockedID int64
-
-		found, err := tx.Select(schema.ItemTableIDCol).From(schema.ItemTable).
-			Where(schema.ItemTableIDCol.Eq(itemID)).ForUpdate(goqu.Wait).
-			ScanValContext(ctx, &lockedID)
+	if mutate != nil {
+		changed, err = mutate(ctx, tx)
 		if err != nil {
 			return err
 		}
+	}
 
-		if !found {
-			return ErrItemNotFound
-		}
-
-		if mutate != nil {
-			changed, err = mutate(ctx, tx)
-			if err != nil {
-				return err
-			}
-		}
-
-		inheritedChanged, err := refreshItemVehicleTypes(ctx, tx, itemID)
-		changed = changed || inheritedChanged
-
-		return err
-	})
+	inheritedChanged, err := refreshItemVehicleTypes(ctx, tx, itemID)
 	if err != nil {
+		return err
+	}
+
+	changed = changed || inheritedChanged
+
+	if err := tx.Commit(); err != nil {
 		return err
 	}
 
