@@ -2,6 +2,7 @@ package i18nbundle
 
 import (
 	"encoding/json"
+	"regexp"
 	"testing"
 	"text/template"
 
@@ -33,6 +34,56 @@ func TestMessagesParseAsTemplates(t *testing.T) {
 			for id, value := range messages {
 				_, err := template.New(id).Parse(value)
 				require.NoErrorf(t, err, "message %q: %q", id, value)
+			}
+		})
+	}
+}
+
+func TestGermanAndJapaneseMessagesComplete(t *testing.T) {
+	t.Parallel()
+
+	english, err := LocaleFS.ReadFile("en.json")
+	require.NoError(t, err)
+
+	var source map[string]string
+
+	require.NoError(t, json.Unmarshal(english, &source))
+
+	fields := regexp.MustCompile(`{{\s*\.(\w+)\s*}}`)
+
+	for _, locale := range []string{"de", "ja"} {
+		t.Run(locale, func(t *testing.T) {
+			t.Parallel()
+
+			data, err := LocaleFS.ReadFile(locale + ".json")
+			require.NoError(t, err)
+
+			var translated map[string]string
+
+			require.NoError(t, json.Unmarshal(data, &translated))
+			require.Len(t, translated, len(source))
+
+			for key, original := range source {
+				require.Contains(t, translated, key)
+
+				if original != "" {
+					require.NotEmpty(t, translated[key], "message %s", key)
+				}
+
+				originalMatches := fields.FindAllStringSubmatch(original, -1)
+				translatedMatches := fields.FindAllStringSubmatch(translated[key], -1)
+				originalFields := make([]string, 0, len(originalMatches))
+				translatedFields := make([]string, 0, len(translatedMatches))
+
+				for _, match := range originalMatches {
+					originalFields = append(originalFields, match[1])
+				}
+
+				for _, match := range translatedMatches {
+					translatedFields = append(translatedFields, match[1])
+				}
+
+				require.ElementsMatch(t, originalFields, translatedFields, "message %s", key)
 			}
 		})
 	}

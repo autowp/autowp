@@ -2,7 +2,6 @@ package pictures
 
 import (
 	"html"
-	"strings"
 
 	"github.com/autowp/goautowp/i18nbundle"
 	"github.com/autowp/goautowp/items"
@@ -42,13 +41,15 @@ func (s *PictureNameFormatter) FormatText(
 	}
 
 	if len(picture.Items) > 1 {
-		result := make([]string, 0)
-		for _, item := range picture.Items {
-			result = append(result, item.Item.Name)
+		item, err := s.sharedPictureItem(picture.Items, lang)
+		if err != nil {
+			return "", err
 		}
 
-		return strings.Join(result, ", "), nil
-	} else if len(picture.Items) == 1 {
+		return s.ItemNameFormatter.FormatText(item, lang)
+	}
+
+	if len(picture.Items) == 1 {
 		item := picture.Items[0]
 		prefix := ""
 
@@ -82,13 +83,15 @@ func (s *PictureNameFormatter) FormatHTML(
 	}
 
 	if len(picture.Items) > 1 {
-		result := make([]string, 0)
-		for _, item := range picture.Items {
-			result = append(result, html.EscapeString(item.Item.Name))
+		item, err := s.sharedPictureItem(picture.Items, lang)
+		if err != nil {
+			return "", err
 		}
 
-		return strings.Join(result, ", "), nil
-	} else if len(picture.Items) == 1 {
+		return s.ItemNameFormatter.FormatHTML(item, lang)
+	}
+
+	if len(picture.Items) == 1 {
 		item := picture.Items[0]
 		prefix := ""
 

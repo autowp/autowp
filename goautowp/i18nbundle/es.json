@@ -1,4 +1,7 @@
 {
+  "list/last-separator": " y ",
+  "list/separator": ", ",
+  "list/last-separator-before-i": " e ",
   "pm/user-%s-post-new-message-%s": "{{.Name}} colocó un mensaje nuevo\n{{.Message}}",
   "pm/user-%s-replies-to-you-%s": "{{.Name}} te responde\n{{.Message}}",
   "pm/achievement-granted": "¡Felicidades! Has conseguido el logro «{{.Achievement}}».\n{{.ProfileURL}}",

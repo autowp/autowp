@@ -1,4 +1,6 @@
 {
+  "list/last-separator": " і ",
+  "list/separator": ", ",
   "pm/user-%s-post-new-message-%s": "{{.Name}} написав повідомлення\n{{.Message}}",
   "pm/user-%s-replies-to-you-%s": "{{.Name}} відповів на ваше повідомлення\n{{.Message}}",
   "pm/achievement-granted": "Вітаємо! Ви отримали досягнення «{{.Achievement}}».\n{{.ProfileURL}}",
