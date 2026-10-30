@@ -171,6 +171,72 @@ func TestPictureNameSharedDetails(t *testing.T) {
 	}
 }
 
+func TestPictureNameSameNameDifferentBodies(t *testing.T) {
+	t.Parallel()
+
+	formatter := newPictureNameTestFormatter(t)
+
+	tests := []struct {
+		name   string
+		lang   string
+		bodies []string
+		want   string
+	}{
+		{
+			name: "Russian", lang: "ru", bodies: []string{"E46", "E47"},
+			want: "BMW 3 Series (E46 и E47)",
+		},
+		{
+			name: "English", lang: "en", bodies: []string{"E46", "E47"},
+			want: "BMW 3 Series (E46 and E47)",
+		},
+		{
+			name: "three codes", lang: "ru", bodies: []string{"E46", "E47", "E48"},
+			want: "BMW 3 Series (E46, E47 и E48)",
+		},
+		{
+			name: "repeated code", lang: "ru", bodies: []string{"E46", "E47", "E46"},
+			want: "BMW 3 Series (E46 и E47)",
+		},
+		{
+			name: "missing code", lang: "ru", bodies: []string{"E46", ""},
+			want: "BMW 3 Series и BMW 3 Series",
+		},
+		{
+			name: "identical codes", lang: "ru", bodies: []string{"E46", "E46"},
+			want: "BMW 3 Series и BMW 3 Series (E46)",
+		},
+		{
+			name: "escaping", lang: "ru", bodies: []string{"E46 & E47", "<E48>"},
+			want: "BMW 3 Series (E46 & E47 и <E48>)",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			picture := PictureNameFormatterOptions{Items: []PictureNameFormatterItem{}}
+			for _, body := range test.bodies {
+				picture.Items = append(picture.Items, PictureNameFormatterItem{
+					Item:       items.ItemNameFormatterOptions{Name: "BMW 3 Series", Body: body},
+					ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+				})
+			}
+
+			originalItems := slices.Clone(picture.Items)
+
+			text, err := formatter.FormatText(picture, test.lang)
+			require.NoError(t, err)
+			require.Equal(t, test.want, text)
+
+			rendered, err := formatter.FormatHTML(picture, test.lang)
+			require.NoError(t, err)
+			require.Equal(t, html.EscapeString(test.want), rendered)
+			require.Equal(t, originalItems, picture.Items)
+		})
+	}
+}
+
 func TestPictureNameSamuraiHTML(t *testing.T) {
 	t.Parallel()
 

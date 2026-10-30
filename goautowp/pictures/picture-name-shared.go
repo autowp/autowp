@@ -53,7 +53,38 @@ func (s *PictureNameFormatter) sharedPictureItem(
 		}
 	}
 
+	if bodies := pictureItemBodies(pictureItems); len(bodies) > 1 {
+		body, err := s.i18nBundle.FormatList(bodies, lang)
+		if err != nil {
+			return items.ItemNameFormatterOptions{}, err
+		}
+
+		shared.Name = pictureItems[0].Item.Name
+		shared.Body = body
+	}
+
 	return shared, nil
+}
+
+func pictureItemBodies(pictureItems []PictureNameFormatterItem) []string {
+	bodies := make([]string, 0, len(pictureItems))
+
+	for _, pictureItem := range pictureItems {
+		item := pictureItem.Item
+		if pictureItem.ItemTypeID == schema.ItemTableItemTypeIDPerson {
+			return []string{}
+		}
+
+		if item.Name != pictureItems[0].Item.Name || item.Body == "" {
+			return []string{}
+		}
+
+		if !slices.Contains(bodies, item.Body) {
+			bodies = append(bodies, item.Body)
+		}
+	}
+
+	return bodies
 }
 
 func samePictureModelYears(left, right items.ItemNameFormatterOptions) bool {
