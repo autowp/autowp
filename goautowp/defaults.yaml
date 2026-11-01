@@ -53,6 +53,7 @@ smtp:
   password: password
   hostname: localhost
   port: 465
+  ssl: true
 feedback:
   from: Robot autowp.ru <no-reply@autowp.ru>
   to:

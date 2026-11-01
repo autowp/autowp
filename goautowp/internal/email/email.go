@@ -1,11 +1,12 @@
 package email
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/autowp/goautowp/internal/config"
 	"github.com/autowp/goautowp/internal/logging"
-	"gopkg.in/gomail.v2"
+	"github.com/wneessen/go-mail"
 )
 
 // Sender Sender.
@@ -22,16 +23,47 @@ type MockSender struct {
 }
 
 func (s *SMTPSender) Send(from string, to []string, subject, body, replyTo string) error {
-	msg := gomail.NewMessage()
-	msg.SetHeader("From", from)
-	msg.SetHeader("To", to...)
-	msg.SetHeader("Subject", subject)
-	msg.SetBody("text/plain", body)
-	msg.SetHeader("Reply-To", replyTo)
+	msg := mail.NewMsg()
+	if err := msg.From(from); err != nil {
+		return fmt.Errorf("set email sender: %w", err)
+	}
 
-	d := gomail.NewDialer(s.Config.Hostname, s.Config.Port, s.Config.Username, s.Config.Password)
+	if err := msg.To(to...); err != nil {
+		return fmt.Errorf("set email recipients: %w", err)
+	}
 
-	return d.DialAndSend(msg)
+	if replyTo != "" {
+		if err := msg.ReplyTo(replyTo); err != nil {
+			return fmt.Errorf("set email reply-to: %w", err)
+		}
+	}
+
+	msg.Subject(subject)
+	msg.SetBodyString(mail.TypeTextPlain, body)
+
+	options := []mail.Option{mail.WithPort(s.Config.Port)}
+	if s.Config.SSL {
+		options = append(options, mail.WithSSL())
+	}
+
+	if s.Config.Username != "" {
+		options = append(options,
+			mail.WithSMTPAuth(mail.SMTPAuthAutoDiscover),
+			mail.WithUsername(s.Config.Username),
+			mail.WithPassword(s.Config.Password),
+		)
+	}
+
+	client, err := mail.NewClient(s.Config.Hostname, options...)
+	if err != nil {
+		return fmt.Errorf("create SMTP client: %w", err)
+	}
+
+	if err = client.DialAndSend(msg); err != nil {
+		return fmt.Errorf("send email: %w", err)
+	}
+
+	return nil
 }
 
 func (s *MockSender) Send(from string, to []string, subject, body, _ string) error {

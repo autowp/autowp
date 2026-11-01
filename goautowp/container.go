@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Nerzal/gocloak/v13"
+	"github.com/Nerzal/gocloak/v14"
 	"github.com/autowp/goautowp/api/pb"
 	"github.com/autowp/goautowp/internal/achievements"
 	"github.com/autowp/goautowp/internal/articles"

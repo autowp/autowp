@@ -42,6 +42,7 @@ smtp:
   password: {{ .Values.smtp.password | quote }}
   hostname: {{ .Values.smtp.hostname | quote }}
   port: {{ .Values.smtp.port }}
+  ssl: {{ .Values.smtp.ssl }}
 feedback:
   captcha: true
   from: Robot autowp.ru <no-reply@autowp.ru>

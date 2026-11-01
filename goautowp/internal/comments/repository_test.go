@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Nerzal/gocloak/v13"
+	"github.com/Nerzal/gocloak/v14"
 	"github.com/autowp/goautowp/internal/config"
 	"github.com/autowp/goautowp/internal/hosts"
 	"github.com/autowp/goautowp/internal/i18nbundle"

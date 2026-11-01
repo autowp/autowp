@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Nerzal/gocloak/v13"
+	"github.com/Nerzal/gocloak/v14"
 	"github.com/autowp/goautowp/api/pb"
 	authn "github.com/autowp/goautowp/internal/auth"
 	"github.com/autowp/goautowp/internal/image/storage"
@@ -52,7 +52,7 @@ func registerRandomUser(t *testing.T) (string, int64) {
 		FirstName:     &name,
 		LastName:      &name,
 		Email:         &email,
-		Credentials: &[]gocloak.CredentialRepresentation{{
+		Credentials: []gocloak.CredentialRepresentation{{
 			Type:  gocloak.StringP("password"),
 			Value: &password,
 		}},
@@ -200,7 +200,7 @@ func TestCreateUpdateDeleteUser(t *testing.T) {
 		FirstName:     &name,
 		LastName:      &lastName,
 		Email:         &userEmail,
-		Credentials: &[]gocloak.CredentialRepresentation{{
+		Credentials: []gocloak.CredentialRepresentation{{
 			Type:  gocloak.StringP("password"),
 			Value: &password,
 		}},

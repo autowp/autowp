@@ -51,6 +51,7 @@ vk:
 smtp:
   hostname: "example.com"
   port: 465
+  ssl: true
   username: "no-reply@autowp.ru"
   password: "password"
 telegram:

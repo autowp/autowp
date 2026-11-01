@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Nerzal/gocloak/v13"
+	"github.com/Nerzal/gocloak/v14"
 	"github.com/autowp/goautowp/internal/config"
 	"github.com/autowp/goautowp/internal/users"
 	"github.com/gin-gonic/gin"

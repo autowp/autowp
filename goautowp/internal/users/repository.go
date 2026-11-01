@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Nerzal/gocloak/v13"
-	"github.com/Nerzal/gocloak/v13/pkg/jwx"
+	"github.com/Nerzal/gocloak/v14"
+	"github.com/Nerzal/gocloak/v14/pkg/jwx"
 	"github.com/autowp/goautowp/internal/config"
 	"github.com/autowp/goautowp/internal/image/sampler"
 	"github.com/autowp/goautowp/internal/image/storage"

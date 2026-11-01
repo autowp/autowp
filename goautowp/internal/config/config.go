@@ -46,6 +46,7 @@ type KeycloakConfig struct {
 type SMTPConfig struct {
 	Hostname string `mapstructure:"hostname" yaml:"hostname"`
 	Port     int    `mapstructure:"port"     yaml:"port"`
+	SSL      bool   `mapstructure:"ssl"      yaml:"ssl"`
 	Username string `mapstructure:"username" yaml:"username"`
 	Password string `mapstructure:"password" yaml:"password"`
 }

@@ -3,7 +3,7 @@ package testutil
 import (
 	"testing"
 
-	"github.com/Nerzal/gocloak/v13"
+	"github.com/Nerzal/gocloak/v14"
 	"github.com/autowp/goautowp/api/pb"
 	authn "github.com/autowp/goautowp/internal/auth"
 	"github.com/autowp/goautowp/internal/config"

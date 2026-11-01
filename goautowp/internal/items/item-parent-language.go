@@ -10,7 +10,7 @@ import (
 
 	"github.com/autowp/goautowp/internal/logging"
 	"github.com/autowp/goautowp/internal/schema"
-	"github.com/dlclark/regexp2"
+	"github.com/dlclark/regexp2/v2"
 	"github.com/doug-martin/goqu/v9"
 )
 
