@@ -283,7 +283,7 @@ func TestImageExif(t *testing.T) {
 
 	userID := createRandomUser(t, goquDB)
 
-	handle, err := os.OpenFile("../../test/test_exif.jpeg", os.O_RDONLY, 0)
+	handle, err := os.OpenFile("../../tests/testdata/images/test_exif.jpeg", os.O_RDONLY, 0)
 	require.NoError(t, err)
 
 	defer util.Close(handle)
@@ -319,7 +319,7 @@ func TestImageExifGPS(t *testing.T) {
 
 	userID := createRandomUser(t, goquDB)
 
-	handle, err := os.OpenFile("../../test/test_exif_gps.jpeg", os.O_RDONLY, 0)
+	handle, err := os.OpenFile("../../tests/testdata/images/test_exif_gps.jpeg", os.O_RDONLY, 0)
 	require.NoError(t, err)
 
 	defer util.Close(handle)
@@ -351,7 +351,7 @@ func TestImageBlackEdgeCrop(t *testing.T) {
 
 	userID := createRandomUser(t, goquDB)
 
-	handle, err := os.OpenFile("../../test/black-edge.jpeg", os.O_RDONLY, 0)
+	handle, err := os.OpenFile("../../tests/testdata/images/black-edge.jpeg", os.O_RDONLY, 0)
 	require.NoError(t, err)
 
 	defer util.Close(handle)

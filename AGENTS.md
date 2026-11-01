@@ -50,9 +50,10 @@ All commands below run from `goautowp/`.
 go build ./...
 go vet ./...
 golangci-lint run ./... --timeout 5m   # full lint config in .golangci.yml
-go test ./...                          # unit tests
+go test ./...                          # all tests, including integration tests
 go test ./... -run TestName            # single test
-go test ./internal/items/...                    # single package
+go test ./internal/items/...           # single package
+go test -race ./tests/integration      # extracted integration suite
 ```
 
 Integration-style tests need real Postgres/Redis/RabbitMQ/Keycloak/S3 backing services (S3 is
@@ -83,6 +84,62 @@ block, so add `--jsonfile x.json` and grep it, or run the failing tests directly
 Config is loaded via `config.LoadConfig(".")` (viper), layering `goautowp/defaults.yaml` with
 `goautowp/config.yaml` (local overrides, gitignored-style test config). See `goautowp/internal/config/` for
 the typed config structs.
+
+Shared test assets live in `goautowp/tests/testdata/` (images, PostgreSQL dump and Keycloak realm).
+Test environment initialization scripts live in `goautowp/tests/environment/`; both Compose files
+reference these paths. See `goautowp/tests/README.md` for environment preparation.
+
+Cross-service integration tests live in `goautowp/tests/integration/`. Its
+`TestMain` loads config from the backend root and assembles services through the public
+`Container` API; individual tests use `cnt.Config()`. Both suites share the in-memory gRPC
+server/client lifecycle helper in `internal/testutil/`. Database migrations and baseline fixture
+imports remain separate preparation steps. Package-specific tests stay with their code. The root
+keeps application, migration and HTTP shutdown tests, plus their shared bootstrap.
+Catalogue creation is shared through `internal/testutil.CreateItem`, taking a gRPC Items client
+and authenticated context. Suite-local adapters own account login; application tests prepare
+catalogue data through repositories directly. Map, mosts and attrs integration tests live in `tests/integration/`.
+Forums and comments integration tests use `internal/testutil.UserWithCleanHistory` to log in existing fixture
+accounts and reset posting/voting limits. Neither shared fixture helper depends on the root
+application package; the user fixture is called directly from the integration suite.
+Users gRPC integration tests also live in `tests/integration/`. Tests mutating language or
+notification preferences use fresh accounts to avoid interfering with comment notification tests.
+Rating and REST items/pictures integration tests use upload helpers in `internal/testutil/`.
+`CreatePicture` accepts an `http.Handler`; suite-local adapters assemble routers. Application-test
+credentials stay in the single application test that uses them. Upload and query-barrier
+fixtures are kept with the suites that use them.
+Items gRPC integration tests live in `tests/integration/items-grpc_test.go` and use the shared
+catalogue/user/upload fixtures with suite-local adapters.
+Pictures gRPC integration tests also live in `tests/integration/` and reuse those adapters.
+YooMoney webhook and duplicate-finder integration scenarios live there as well, including the
+HTTP-fetch deadline regression test.
+Repository-level user import, persistent cache invalidation and visit tests live alongside
+`internal/users/` as external-package database tests. Their local fixture uses one connection
+for temporary tables and an atomic SQL query counter, without constructing the application.
+Batch event-log and mosts vehicle-type repository tests live alongside `internal/log/` and
+`internal/mosts/`. Shared `internal/testutil.NewPostgres`, `QueryLogger` and `BlockQueries`
+provide single-connection temporary-table fixtures, SQL counts and a parallel-query barrier.
+Related-group repository tests are split between `internal/items/`, `internal/pictures/` and
+`internal/image/storage/`; the corresponding API scenario lives in `tests/integration/`.
+Duplicate-parent extraction tests live with `internal/transport/grpc/itemparentextractor/`.
+They use local temporary-table fixtures and direct item/parent extractor dependencies through
+`NewPostgres`, without a root database or container adapter.
+Mosts field-batching tests live with `internal/transport/grpc/mosts/` and construct their item
+extractor from repository callbacks. Empty-preload tests live with `itemextractor/`; nested
+picture fields exercised through the API are covered in `tests/integration/`. Shared query-logging
+and barrier helpers live in `internal/testutil/`.
+Picture field, remaining-field, descendant-picture, df-distance filter and nested-budget tests
+are grouped under `internal/transport/grpc/pictureextractor/`. Their local fixture constructs
+repositories and the picture/item/parent/distance extractor graph directly; all fixture rows,
+including suggested authors and localized names, are temporary and need no application container.
+Parent-cache field batching and related parent-item extraction tests are grouped under
+`internal/transport/grpc/parentcacheextractor/`, with temporary items/localized names and
+direct repository/extractor dependencies instead of gRPC-created catalogue fixtures.
+Concurrent mosts card and df-distance extraction tests share the local item-of-day/image fixture
+under `internal/transport/grpc/itemextractor/`. That fixture creates catalogue rows directly and
+cleans up its database rows and stored images; the root item-of-day/container adapters are removed.
+The remaining item, parent and picture-item preload tests and heavy-field extraction test share
+the same directly wired graph in `internal/transport/grpc/itemextractor/`, including parent-cache,
+picture-item and distance dependencies. All extractor tests have left the application root.
 
 ### Backend architecture
 
@@ -346,7 +403,7 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   context of the request that happened to initialize them. Test cancellation between persistent
   mutation steps when partial completion could leave inconsistent state.
 - Auth for both gRPC and REST is backed by Keycloak (`goautowp/internal/auth/`, `KeycloakConfig`); local
-  dev/test Keycloak is provisioned via `goautowp/docker-compose.yml` with `test/realm.json`.
+  dev/test Keycloak is provisioned via `goautowp/docker-compose.yml` with `tests/testdata/keycloak/realm.json`.
 - The `chart/` directory holds the Helm chart used to deploy both services together
   (`goautowp.image` / `frontend.image`).
 - CI (`.gitlab-ci.yml`) is the authoritative source for exact lint/build/test invocations if this

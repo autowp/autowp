@@ -32,7 +32,7 @@ func newItemLogoTestExtractor(t *testing.T) (*testExtractor, *items.Item, *itemB
 	imageStorage, err := extractor.dependencies.ImageStorage(t.Context())
 	require.NoError(t, err)
 	imageID, err := imageStorage.AddImageFromFilepath(
-		t.Context(), "../../../../test/test.jpg", "brand", storage.GenerateOptions{},
+		t.Context(), "../../../../tests/testdata/images/test.jpg", "brand", storage.GenerateOptions{},
 	)
 	require.NoError(t, err)
 	t.Cleanup(func() {

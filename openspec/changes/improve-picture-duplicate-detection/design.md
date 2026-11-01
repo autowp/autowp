@@ -80,9 +80,9 @@ have silently no-op'd in that case instead.
 
 Meta's own PDQ documentation recommends ≤ 31 as the default "likely match" cutoff.
 Verified this is sound for this catalogue's actual images rather than trusting the
-number blindly: hashing `test/large.jpg` and `test/small.jpg` (same source photo,
+number blindly: hashing `tests/testdata/images/large.jpg` and `tests/testdata/images/small.jpg` (same source photo,
 600×429 vs 200×143 — a real resize pair already used as a fixture in this repo) gives a
-distance of 2; hashing either against `test/test.jpg` (an unrelated photo) gives 118.
+distance of 2; hashing either against `tests/testdata/images/test.jpg` (an unrelated photo) gives 118.
 The margin between "real duplicate" and "unrelated" is large enough that 31 has
 substantial headroom on both sides for this data.
 

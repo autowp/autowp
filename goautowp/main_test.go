@@ -2,76 +2,55 @@ package goautowp
 
 import (
 	"context"
-	"net"
 	"os"
 	"testing"
 
 	"github.com/autowp/goautowp/internal/config"
 	"github.com/autowp/goautowp/internal/logging"
-	"github.com/autowp/goautowp/internal/util"
+	"github.com/autowp/goautowp/internal/testutil"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/test/bufconn"
 )
 
 var (
-	cnt       *Container
-	bufDialer func(context.Context, string) (net.Conn, error)
-	conn      *grpc.ClientConn
+	cnt  *Container
+	conn *grpc.ClientConn
 )
 
 func TestMain(m *testing.M) {
-	const bufSize = 1024 * 1024
+	os.Exit(runTests(m))
+}
 
-	var lis *bufconn.Listener
-
-	cfg := config.LoadConfig(".")
-
-	cnt = NewContainer(cfg)
+func runTests(m *testing.M) int {
+	cnt = NewContainer(config.LoadConfig("."))
 
 	if err := logging.SetLevel("debug"); err != nil {
-		panic(err)
+		logging.Error(err.Error())
+
+		return 1
 	}
 
-	grpcServer, err := cnt.GRPCServerWithServices(context.TODO())
+	server, err := cnt.GRPCServerWithServices(context.Background())
 	if err != nil {
-		panic(err)
+		logging.Error(err.Error())
+
+		return 1
 	}
 
-	lis = bufconn.Listen(bufSize)
-
-	bufDialer = func(context.Context, string) (net.Conn, error) {
-		return lis.Dial()
-	}
-
-	go func() {
-		if err := grpcServer.Serve(lis); err != nil {
-			logging.Errorf("Server exited with error: %v", err)
-		}
-	}()
-
-	/*return cnt, func(context.Context, string) (net.Conn, error) {
-		return lis.Dial()
-	}*/
-
-	go func() {
-		if err := grpcServer.Serve(lis); err != nil {
-			logging.Errorf("Server exited with error: %v", err)
-		}
-	}()
-
-	conn, err = grpc.NewClient(
-		"localhost",
-		grpc.WithContextDialer(bufDialer),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	client, cleanup, err := testutil.NewGRPCClient(server)
 	if err != nil {
-		panic(err)
+		logging.Error(err.Error())
+
+		return 1
 	}
 
-	res := m.Run()
+	conn = client
+	result := m.Run()
 
-	util.Close(conn)
+	if err := cleanup(); err != nil {
+		logging.Error(err.Error())
 
-	os.Exit(res)
+		return 1
+	}
+
+	return result
 }

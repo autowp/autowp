@@ -17,7 +17,11 @@ import (
 	"github.com/autowp/goautowp/internal/query"
 	"github.com/autowp/goautowp/internal/schema"
 	"github.com/autowp/goautowp/internal/textstorage"
+	"github.com/autowp/goautowp/internal/transport/grpc/dfdistanceextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemparentextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/parentcacheextractor"
 	"github.com/autowp/goautowp/internal/transport/grpc/pictureextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/pictureitemextractor"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
@@ -27,10 +31,13 @@ import (
 type testExtractor struct {
 	*Extractor
 
-	db                 *goqu.Database
-	itemsRepository    *items.Repository
-	attrsRepository    *attrs.Repository
-	commentsRepository *comments.Repository
+	db                   *goqu.Database
+	itemsRepository      *items.Repository
+	attrsRepository      *attrs.Repository
+	commentsRepository   *comments.Repository
+	pictureExtractor     *pictureextractor.Extractor
+	pictureItemExtractor *pictureitemextractor.Extractor
+	parentExtractor      *itemparentextractor.Extractor
 }
 
 func newRelatedGroupTestDB(t *testing.T) (*goqu.Database, *sql.DB, *itemBatchQueryLogger) {
@@ -74,6 +81,12 @@ func newTestExtractor(t *testing.T, db *goqu.Database) *testExtractor {
 		ImageStorage:        func(_ context.Context) (*storage.Storage, error) { return images, nil },
 		I18n:                func() (*i18nbundle.I18n, error) { return bundle, nil },
 	}
+
+	var (
+		pictureItems *pictureitemextractor.Extractor
+		distances    *dfdistanceextractor.Extractor
+	)
+
 	extractor := New(dependencies)
 	pictureExtractor := pictureextractor.New(pictureextractor.Dependencies{
 		PicturesRepository:    dependencies.PicturesRepository,
@@ -83,12 +96,24 @@ func newTestExtractor(t *testing.T, db *goqu.Database) *testExtractor {
 		I18n:                  dependencies.I18n,
 		TextStorageRepository: func(_ context.Context) (*textstorage.Repository, error) { return texts, nil },
 		ItemExtractor:         func() pictureextractor.ItemExtractor { return extractor },
+		PictureItemExtractor:  func() *pictureitemextractor.Extractor { return pictureItems },
+		DfDistanceExtractor:   func(_ context.Context) (*dfdistanceextractor.Extractor, error) { return distances, nil },
 	})
+	parents := itemparentextractor.New(dependencies.ItemsRepository, dependencies.PicturesRepository,
+		extractor, pictureExtractor)
+	cache := parentcacheextractor.New(itemRepository, extractor)
+	pictureItems = pictureitemextractor.New(dependencies.ItemsRepository, dependencies.PicturesRepository,
+		extractor, pictureExtractor,
+		func(_ context.Context) (*parentcacheextractor.Extractor, error) { return cache, nil })
+	distances = dfdistanceextractor.New(pictureRepository, pictureExtractor)
 	extractor.dependencies.PictureExtractor = func() PictureExtractor { return pictureExtractor }
+	extractor.dependencies.PictureItemExtractor = func() *pictureitemextractor.Extractor { return pictureItems }
+	extractor.dependencies.ItemParentExtractor = func() *itemparentextractor.Extractor { return parents }
 
 	return &testExtractor{
 		Extractor: extractor, db: db, itemsRepository: itemRepository,
-		attrsRepository: attributes, commentsRepository: commentRepository,
+		attrsRepository: attributes, commentsRepository: commentRepository, pictureExtractor: pictureExtractor,
+		pictureItemExtractor: pictureItems, parentExtractor: parents,
 	}
 }
 
@@ -96,11 +121,18 @@ func createTestItem(t *testing.T, extractor *testExtractor,
 	itemType schema.ItemTableItemTypeID, group bool, name string,
 ) int64 {
 	t.Helper()
-	id, err := extractor.itemsRepository.CreateItem(t.Context(), schema.ItemRow{
-		ItemTypeID: itemType,
-		IsGroup:    group,
-		Catname:    sql.NullString{String: "extractor-" + uuid.NewString(), Valid: true},
-	}, name, 0)
+
+	return createTestItemWithRow(t, extractor, schema.ItemRow{ItemTypeID: itemType, IsGroup: group}, name)
+}
+
+func createTestItemWithRow(t *testing.T, extractor *testExtractor, row schema.ItemRow, name string) int64 {
+	t.Helper()
+
+	if !row.Catname.Valid {
+		row.Catname = sql.NullString{String: "extractor-" + uuid.NewString(), Valid: true}
+	}
+
+	id, err := extractor.itemsRepository.CreateItem(t.Context(), row, name, 0)
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		extractor.db.Logger(nil)
@@ -154,13 +186,13 @@ func newItemOfDayTestExtractor(t *testing.T) (*testExtractor, *items.Item, *goqu
 	return extractor, row, db, pool
 }
 
-func createTestPicture(t *testing.T, extractor *testExtractor, itemID int64, perspective int32) {
+func createTestPicture(t *testing.T, extractor *testExtractor, itemID int64, perspective int32) int64 {
 	t.Helper()
 	images, err := extractor.dependencies.ImageStorage(t.Context())
 	require.NoError(t, err)
 	imageID, err := images.AddImageFromFilepath(
 		t.Context(),
-		"../../../../test/test.jpg",
+		"../../../../tests/testdata/images/test.jpg",
 		"picture",
 		storage.GenerateOptions{},
 	)
@@ -200,4 +232,16 @@ func createTestPicture(t *testing.T, extractor *testExtractor, itemID int64, per
 	require.NoError(t, err)
 	_, err = repository.CreatePictureItem(t.Context(), pictureID, itemID, schema.PictureItemTypeContent, perspective, 0)
 	require.NoError(t, err)
+
+	return pictureID
+}
+
+func newPreloadTestExtractor(t *testing.T) (*testExtractor, *goqu.Database) {
+	t.Helper()
+
+	db, pool, _ := newRelatedGroupTestDB(t)
+	pool.SetMaxOpenConns(2)
+	db.Logger(nil)
+
+	return newTestExtractor(t, db), db
 }

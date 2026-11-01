@@ -6,7 +6,7 @@ services:
     depends_on:
       - minio
     volumes:
-      - ./test/createbuckets.sh:/createbuckets.sh:ro
+      - ./tests/environment/createbuckets.sh:/createbuckets.sh:ro
     environment:
       AWS_ENDPOINT_URL: "http://minio:9000"
       AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
@@ -20,7 +20,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./test/realm.json:/opt/keycloak/data/import/realm.json
+      - ./tests/testdata/keycloak/realm.json:/opt/keycloak/data/import/realm.json
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: password
@@ -67,7 +67,7 @@ services:
     image: nginx:1-alpine
     container_name: goautowp_nginx_test
     volumes:
-      - ./test:/usr/share/nginx/html:ro
+      - ./tests/testdata/images:/usr/share/nginx/html:ro
     ports:
       - '0.0.0.0:80:80'
     restart: always
@@ -76,9 +76,9 @@ services:
     image: postgis/postgis:18-3.6-alpine
     container_name: goautowp_postgres_test
     volumes:
-      - ./test/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
-      - ./test/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
-      - ./test/dump.sql:/dump.sql:ro
+      - ./tests/environment/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
+      - ./tests/environment/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
+      - ./tests/testdata/postgres/dump.sql:/dump.sql:ro
     environment:
       - POSTGRES_DB=traffic
       - POSTGRES_USER=traffic

@@ -42,9 +42,9 @@ func hashFile(t *testing.T, path string) []byte {
 func TestGetFileHashSimilarity(t *testing.T) {
 	t.Parallel()
 
-	large := hashFile(t, "../../test/large.jpg")
-	small := hashFile(t, "../../test/small.jpg")
-	unrelated := hashFile(t, "../../test/test.jpg")
+	large := hashFile(t, "../../tests/testdata/images/large.jpg")
+	small := hashFile(t, "../../tests/testdata/images/small.jpg")
+	unrelated := hashFile(t, "../../tests/testdata/images/test.jpg")
 
 	require.LessOrEqual(t, hammingDistance(large, small), 10)
 	require.Greater(t, hammingDistance(large, unrelated), threshold)

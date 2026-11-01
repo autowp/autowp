@@ -6,7 +6,7 @@ services:
     depends_on:
       - minio
     volumes:
-      - ./goautowp/test/createbuckets.sh:/createbuckets.sh:ro
+      - ./goautowp/tests/environment/createbuckets.sh:/createbuckets.sh:ro
     environment:
       AWS_ENDPOINT_URL: "http://minio:9000"
       AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
@@ -100,8 +100,8 @@ services:
     image: postgis/postgis:18-3.6-alpine
     container_name: autowp_test_traffic_postgres
     volumes:
-      - ./goautowp/test/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
-      - ./goautowp/test/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
+      - ./goautowp/tests/environment/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
+      - ./goautowp/tests/environment/postgres-initdb.d/create-keycloak-database.sh:/docker-entrypoint-initdb.d/create-keycloak-database.sh:ro
     environment:
       - POSTGRES_DB=traffic
       - POSTGRES_USER=traffic

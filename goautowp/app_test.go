@@ -1,6 +1,7 @@
 package goautowp
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -117,11 +118,11 @@ func TestSpecsRefreshUserConflicts(t *testing.T) {
 	// tester
 	testerToken, err := kc.Login(
 		ctx,
-		keycloakClientID,
+		"frontend",
 		"",
 		cfg.Keycloak.Realm,
-		testUsername,
-		testPassword,
+		"tester",
+		"123123",
 	)
 	require.NoError(t, err)
 	require.NotNil(t, testerToken)
@@ -131,7 +132,7 @@ func TestSpecsRefreshUserConflicts(t *testing.T) {
 		metadata.AppendToOutgoingContext(
 			ctx,
 			authn.AuthorizationHeader,
-			bearerPrefix+testerToken.AccessToken,
+			"Bearer "+testerToken.AccessToken,
 		),
 		&pb.MeRequest{},
 	)
@@ -222,18 +223,22 @@ func TestBuildBrandsSprite(t *testing.T) {
 	imageStorage, err := cnt.ImageStorage(t.Context())
 	require.NoError(t, err)
 
+	itemsRepository, err := cnt.ItemsRepository(t.Context())
+	require.NoError(t, err)
+
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	for i := range 1 {
-		itemID := createItem(t, conn, cnt, &pb.Item{
-			Name:       fmt.Sprintf("brand-%d-%d", random.Int(), i),
-			ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
-			Catname:    fmt.Sprintf("brand-%d-%d", random.Int(), i),
-		})
+		itemID, err := itemsRepository.CreateItem(t.Context(), schema.ItemRow{
+			ItemTypeID: schema.ItemTableItemTypeIDBrand,
+			IsGroup:    true,
+			Catname:    sql.NullString{String: fmt.Sprintf("brand-%d-%d", random.Int(), i), Valid: true},
+		}, fmt.Sprintf("brand-%d-%d", random.Int(), i), 0)
+		require.NoError(t, err)
 
 		imageID, err := imageStorage.AddImageFromFilepath(
 			t.Context(),
-			"./test/png.png",
+			"./tests/testdata/images/png.png",
 			"brand",
 			storage.GenerateOptions{},
 		)

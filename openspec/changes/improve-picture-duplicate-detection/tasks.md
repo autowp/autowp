@@ -24,7 +24,7 @@
       distance in Go, which doesn't scale to `df_hash`'s ~2M rows and was corrected
       before landing
 - [x] 2.5 Raise `threshold` from 3 to 31 (Meta's published PDQ recommendation);
-      empirically verified against `test/large.jpg` vs `test/small.jpg` (distance 2) and
+      empirically verified against `tests/testdata/images/large.jpg` vs `tests/testdata/images/small.jpg` (distance 2) and
       an unrelated fixture (distance 118)
 - [x] 2.6 Add `hammingDistance()` as a pure, DB-free Go helper mirroring the SQL
       computation, for unit testing
