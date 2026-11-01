@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgtype"
 )
 
 type (
@@ -53,7 +52,7 @@ type CommentMessageRow struct {
 	Deleted            bool                             `db:"deleted"`
 	ModeratorAttention CommentMessageModeratorAttention `db:"moderator_attention"`
 	AuthorID           sql.NullInt64                    `db:"author_id"`
-	IP                 pgtype.Inet                      `db:"ip"`
+	IP                 NullInet                         `db:"ip"`
 	Message            string                           `db:"message"`
 	Vote               int32                            `db:"vote"`
 }

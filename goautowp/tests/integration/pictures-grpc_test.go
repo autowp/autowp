@@ -18,7 +18,6 @@ import (
 	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
 	"github.com/autowp/goautowp/internal/util"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/latlng"
@@ -2140,9 +2139,9 @@ func TestGetPictureIP(t *testing.T) {
 
 			var pictureID int64
 
-			var pgIP pgtype.Inet
+			var pgIP schema.NullInet
 
-			err := pgIP.Set(ip)
+			err := pgIP.Scan(ip.String())
 			require.NoError(t, err)
 
 			success, err := goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
@@ -2187,9 +2186,9 @@ func TestInbox(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
 
-	var pgIP pgtype.Inet
+	var pgIP schema.NullInet
 
-	err = pgIP.Set(net.IPv4allrouter)
+	err = pgIP.Scan(net.IPv4allrouter.String())
 	require.NoError(t, err)
 
 	token, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)

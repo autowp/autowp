@@ -138,8 +138,8 @@ func (s *Repository) Get(ctx context.Context, ip net.IP) (*Item, error) {
 		item.ByUserID = st.ByUserID.Int64
 	}
 
-	if st.PgInet.IPNet != nil {
-		item.IP = st.PgInet.IPNet.IP
+	if st.PgInet.IsValid() {
+		item.IP = net.IP(st.PgInet.Addr().AsSlice())
 	}
 
 	return &item, nil

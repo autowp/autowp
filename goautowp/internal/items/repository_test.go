@@ -17,7 +17,6 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
 	_ "github.com/lib/pq" // enable postgres driver
 	"github.com/stretchr/testify/require"
 )
@@ -691,9 +690,9 @@ func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
 
 		var pictureID int64
 
-		var ip pgtype.Inet
+		var ip schema.NullInet
 
-		err = ip.Set(net.IPv4zero)
+		err = ip.Scan(net.IPv4zero.String())
 		require.NoError(t, err)
 
 		success, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{

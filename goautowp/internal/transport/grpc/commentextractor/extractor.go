@@ -12,7 +12,6 @@ import (
 	"github.com/autowp/goautowp/internal/transport/grpc/picturemapper"
 	"github.com/autowp/goautowp/internal/users"
 	"github.com/autowp/goautowp/internal/util"
-	"github.com/jackc/pgtype"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -251,8 +250,8 @@ func (s *Extractor) extractWithState(
 	}
 
 	ip := ""
-	if canViewIP && row.IP.Status == pgtype.Present {
-		ip = row.IP.IPNet.IP.String()
+	if canViewIP && row.IP.IsValid() {
+		ip = row.IP.Addr().Unmap().String()
 	}
 
 	var updateTime *timestamppb.Timestamp

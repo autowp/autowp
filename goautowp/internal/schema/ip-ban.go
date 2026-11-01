@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgtype"
 )
 
 const (
@@ -25,7 +24,7 @@ var (
 )
 
 type IPBanRow struct {
-	PgInet   pgtype.Inet   `db:"ip"`
+	PgInet   NullInet      `db:"ip"`
 	Until    time.Time     `db:"until"`
 	Reason   string        `db:"reason"`
 	ByUserID sql.NullInt64 `db:"by_user_id"`

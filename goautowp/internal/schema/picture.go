@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgtype"
 )
 
 type PictureStatus string
@@ -93,7 +92,7 @@ type PictureRow struct {
 	CopyrightsTextID      sql.NullInt32  `db:"copyrights_text_id"`
 	AcceptDatetime        sql.NullTime   `db:"accept_datetime"`
 	ReplacePictureID      sql.NullInt64  `db:"replace_picture_id"`
-	IP                    pgtype.Inet    `db:"ip"`
+	IP                    NullInet       `db:"ip"`
 	Name                  sql.NullString `db:"name"`
 	CreatedAt             time.Time      `db:"created_at"`
 	DPIX                  sql.NullInt32  `db:"dpi_x"`

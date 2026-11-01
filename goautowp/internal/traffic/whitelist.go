@@ -11,7 +11,6 @@ import (
 	"github.com/autowp/goautowp/internal/schema"
 	"github.com/autowp/goautowp/internal/util"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgtype"
 )
 
 var ErrWhitelistItemNotFound = errors.New("whitelist item not found")
@@ -30,14 +29,14 @@ type WhitelistItem struct {
 }
 
 type whitelistItemRow struct {
-	IP          pgtype.Inet `db:"ip"`
-	Description string      `db:"description"`
+	IP          schema.NullInet `db:"ip"`
+	Description string          `db:"description"`
 }
 
 func (row whitelistItemRow) item() *WhitelistItem {
 	item := &WhitelistItem{Description: row.Description}
-	if row.IP.IPNet != nil {
-		item.IP = row.IP.IPNet.IP
+	if row.IP.IsValid() {
+		item.IP = net.IP(row.IP.Addr().AsSlice())
 	}
 
 	return item

@@ -12,7 +12,6 @@ import (
 	"github.com/autowp/goautowp/internal/schema"
 	"github.com/autowp/goautowp/internal/util"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgtype"
 )
 
 // Monitoring Main Object.
@@ -224,8 +223,8 @@ func (s *Monitoring) ClearIP(ctx context.Context, ip net.IP) error {
 // ListOfTop ListOfTop.
 func (s *Monitoring) ListOfTop(ctx context.Context, limit uint) ([]ListOfTopItem, error) {
 	var rows []struct {
-		IP    pgtype.Inet `db:"ip"`
-		Count int         `db:"c"`
+		IP    schema.NullInet `db:"ip"`
+		Count int             `db:"c"`
 	}
 
 	err := s.db.Select(schema.IPMonitoringTableIPCol, goqu.SUM(schema.IPMonitoringTableCountCol).As("c")).
@@ -246,8 +245,8 @@ func (s *Monitoring) ListOfTop(ctx context.Context, limit uint) ([]ListOfTopItem
 			Count: row.Count,
 		}
 
-		if row.IP.IPNet != nil {
-			item.IP = row.IP.IPNet.IP
+		if row.IP.IsValid() {
+			item.IP = net.IP(row.IP.Addr().AsSlice())
 		}
 
 		result = append(result, item)
@@ -265,7 +264,7 @@ func (s *Monitoring) ListByBanProfile(
 
 	const numberOfRecordsToScanForAutoban = 1000
 
-	var rows []pgtype.Inet
+	var rows []schema.NullInet
 
 	err := s.db.Select(schema.IPMonitoringTableIPCol).
 		From(schema.IPMonitoringTable).
@@ -285,8 +284,8 @@ func (s *Monitoring) ListByBanProfile(
 	result := make([]net.IP, 0, len(rows))
 
 	for _, row := range rows {
-		if row.IPNet != nil {
-			result = append(result, row.IPNet.IP)
+		if row.IsValid() {
+			result = append(result, net.IP(row.Addr().AsSlice()))
 		}
 	}
 

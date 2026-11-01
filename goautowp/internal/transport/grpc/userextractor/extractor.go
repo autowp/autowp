@@ -18,7 +18,6 @@ import (
 	"github.com/autowp/goautowp/internal/users"
 	"github.com/autowp/goautowp/internal/util"
 	"github.com/drexedam/gravatar"
-	"github.com/jackc/pgtype"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -262,8 +261,8 @@ func (s *Extractor) extract(
 		}
 
 		if fields.GetLastIp() && util.Contains(currentUserRoles, users.RoleModer) &&
-			row.LastIP.Status == pgtype.Present {
-			user.LastIp = row.LastIP.IPNet.IP.String()
+			row.LastIP.IsValid() {
+			user.LastIp = row.LastIP.Addr().Unmap().String()
 		}
 
 		if fields.GetLogin() && row.Login != nil && util.Contains(currentUserRoles, users.RoleModer) {

@@ -13,7 +13,6 @@ import (
 	"github.com/autowp/goautowp/api/pb"
 	"github.com/autowp/goautowp/internal/maps"
 	"github.com/autowp/goautowp/internal/schema"
-	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/twpayne/go-geom"
@@ -240,9 +239,9 @@ func createPictureWithPointAt(t *testing.T, latitude, longitude float64) string 
 
 	point.SetSRID(schema.SRID)
 
-	var pgIP pgtype.Inet
+	var pgIP schema.NullInet
 
-	err = pgIP.Set(net.IPv4(127, 0, 0, 1))
+	err = pgIP.Scan(net.IPv4(127, 0, 0, 1).String())
 	require.NoError(t, err)
 
 	var id int64

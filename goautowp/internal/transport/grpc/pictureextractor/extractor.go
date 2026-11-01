@@ -29,7 +29,6 @@ import (
 	"github.com/autowp/goautowp/internal/transport/grpc/querymapper"
 	"github.com/autowp/goautowp/internal/users"
 	"github.com/autowp/goautowp/internal/util"
-	"github.com/jackc/pgtype"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/latlng"
@@ -748,8 +747,8 @@ func (s *Extractor) ExtractRows( //nolint: maintidx
 			resultRow.Siblings = siblingsByID[row.ID]
 		}
 
-		if row.IP.Status == pgtype.Present && row.IP.IPNet != nil && util.Contains(userCtx.Roles, users.RoleModer) {
-			resultRow.IpAddress = row.IP.IPNet.IP.String()
+		if row.IP.IsValid() && util.Contains(userCtx.Roles, users.RoleModer) {
+			resultRow.IpAddress = row.IP.Addr().Unmap().String()
 		}
 
 		if fields.GetSubscribed() && userCtx.UserID > 0 {

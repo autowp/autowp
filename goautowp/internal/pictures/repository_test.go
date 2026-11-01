@@ -22,7 +22,6 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
 	_ "github.com/lib/pq" // enable postgres driver
 	"github.com/stretchr/testify/require"
 	"gopkg.in/gographics/imagick.v3/imagick"
@@ -120,9 +119,9 @@ func createTestPicture(t *testing.T, db *goqu.Database, ownerID sql.NullInt64) i
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
 
-	var pgIP pgtype.Inet
+	var pgIP schema.NullInet
 
-	err := pgIP.Set(net.IPv4(127, 0, 0, 1))
+	err := pgIP.Scan(net.IPv4(127, 0, 0, 1).String())
 	require.NoError(t, err)
 
 	var id int64

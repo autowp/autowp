@@ -22,9 +22,7 @@ import (
 	"github.com/autowp/goautowp/internal/util"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
-	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
-	_ "github.com/lib/pq" // enable postgres driver
+	_ "github.com/lib/pq"                               // enable postgres driver
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
 
@@ -534,7 +532,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 
 	var importedUUID string
 
-	if user.UUID.Status == pgtype.Present {
+	if user.UUID.Valid {
 		token, err := s.keycloak.LoginClient(
 			ctx,
 			s.keycloakConfig.ClientID,
@@ -547,11 +545,7 @@ func (s *Repository) DeleteUser(ctx context.Context, userID int64) (bool, error)
 
 		ctx = context.WithoutCancel(ctx)
 
-		userGUID, err := uuid.FromBytes(user.UUID.Bytes[:])
-		if err != nil {
-			return false, err
-		}
-
+		userGUID := user.UUID.UUID
 		importedUUID = userGUID.String()
 
 		logging.Infof("attempt to disable user `%s` in keycloak", userGUID.String())
