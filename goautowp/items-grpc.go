@@ -984,22 +984,29 @@ func (s *ItemsGRPCServer) GetItemLanguages(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	textIDs := make(map[int32]struct{}, len(rows)*2)
+	for _, row := range rows {
+		if row.TextID > 0 {
+			textIDs[row.TextID] = struct{}{}
+		}
+
+		if row.FullTextID > 0 {
+			textIDs[row.FullTextID] = struct{}{}
+		}
+	}
+
+	texts, err := s.textstorageRepository.Texts(ctx, slices.Collect(maps.Keys(textIDs)))
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	result := make([]*ItemLanguage, len(rows))
 
 	for idx, row := range rows {
-		text := ""
-		if row.TextID > 0 {
-			text, err = s.textstorageRepository.Text(ctx, row.TextID)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-		}
-
-		fullText := ""
-		if row.FullTextID > 0 {
-			fullText, err = s.textstorageRepository.Text(ctx, row.FullTextID)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
+		// Texts omits missing IDs; preserve Text's error for dangling references.
+		for _, id := range []int32{row.TextID, row.FullTextID} {
+			if _, found := texts[id]; id > 0 && !found {
+				return nil, status.Errorf(codes.Internal, "%s: `%v`", textstorage.ErrTextNotFound, id)
 			}
 		}
 
@@ -1008,9 +1015,9 @@ func (s *ItemsGRPCServer) GetItemLanguages(
 			Name:       row.Name,
 			Language:   row.Language,
 			TextId:     row.TextID,
-			Text:       text,
+			Text:       texts[row.TextID],
 			FullTextId: row.FullTextID,
-			FullText:   fullText,
+			FullText:   texts[row.FullTextID],
 		}
 	}
 
