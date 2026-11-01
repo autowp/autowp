@@ -6,8 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -16,7 +18,7 @@ import (
 
 var errGridIsEmpty = errors.New("grid is empty")
 
-func assertGridNotEmpty(grid []*PulseGrid) error {
+func assertGridNotEmpty(grid []*pb.PulseGrid) error {
 	for _, lines := range grid {
 		for _, y := range lines.GetLine() {
 			if y > 0 {
@@ -36,7 +38,7 @@ func TestStatisticsPulse(t *testing.T) {
 	ctxTimeout, cancel := context.WithTimeout(ctx, 5000*time.Second)
 	defer cancel()
 
-	statisticsClient := NewStatisticsClient(conn)
+	statisticsClient := pb.NewStatisticsClient(conn)
 
 	cfg := config.LoadConfig(".")
 
@@ -55,14 +57,14 @@ func TestStatisticsPulse(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	usersClient := NewUsersClient(conn)
+	usersClient := pb.NewUsersClient(conn)
 	user, err := usersClient.Me(
 		metadata.AppendToOutgoingContext(
 			ctxTimeout,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&MeRequest{},
+		&pb.MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -74,25 +76,25 @@ func TestStatisticsPulse(t *testing.T) {
 		).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	r1, err := statisticsClient.GetPulse(ctxTimeout, &PulseRequest{})
+	r1, err := statisticsClient.GetPulse(ctxTimeout, &pb.PulseRequest{})
 	require.NoError(t, err)
 
-	_, err = statisticsClient.GetPulse(ctxTimeout, &PulseRequest{
-		Period: PulseRequest_DEFAULT,
+	_, err = statisticsClient.GetPulse(ctxTimeout, &pb.PulseRequest{
+		Period: pb.PulseRequest_DEFAULT,
 	})
 	require.NoError(t, err)
 
 	require.NoError(t, assertGridNotEmpty(r1.GetGrid()))
 
-	r1, err = statisticsClient.GetPulse(ctxTimeout, &PulseRequest{
-		Period: PulseRequest_MONTH,
+	r1, err = statisticsClient.GetPulse(ctxTimeout, &pb.PulseRequest{
+		Period: pb.PulseRequest_MONTH,
 	})
 	require.NoError(t, err)
 
 	require.NoError(t, assertGridNotEmpty(r1.GetGrid()))
 
-	r1, err = statisticsClient.GetPulse(ctxTimeout, &PulseRequest{
-		Period: PulseRequest_YEAR,
+	r1, err = statisticsClient.GetPulse(ctxTimeout, &pb.PulseRequest{
+		Period: pb.PulseRequest_YEAR,
 	})
 	require.NoError(t, err)
 
@@ -104,7 +106,7 @@ func TestAboutData(t *testing.T) {
 
 	ctx := t.Context()
 
-	statisticsClient := NewStatisticsClient(conn)
+	statisticsClient := pb.NewStatisticsClient(conn)
 
 	_, err := statisticsClient.GetAboutData(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -113,7 +115,7 @@ func TestAboutData(t *testing.T) {
 func BenchmarkAboutData(b *testing.B) {
 	ctx := b.Context()
 
-	statisticsClient := NewStatisticsClient(conn)
+	statisticsClient := pb.NewStatisticsClient(conn)
 
 	for range b.N {
 		_, err := statisticsClient.GetAboutData(ctx, &emptypb.Empty{})

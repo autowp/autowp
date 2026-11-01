@@ -13,13 +13,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/autowp/goautowp/attrsamqp"
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/image/storage"
-	"github.com/autowp/goautowp/logging"
-	"github.com/autowp/goautowp/messaging"
-	"github.com/autowp/goautowp/pictures"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/attrsamqp"
+	"github.com/autowp/goautowp/internal/brandssprite"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/image/storage"
+	"github.com/autowp/goautowp/internal/logging"
+	"github.com/autowp/goautowp/internal/messaging"
+	"github.com/autowp/goautowp/internal/pictures"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/grpc/imagemapper"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // enable postgres migrations
@@ -89,6 +92,8 @@ func (s *Application) ServeGRPC(ctx context.Context, quit chan bool) error {
 // recovered and logged with its stack. One failing worker must not take the whole process down
 // with it - the others keep running and graceful shutdown still works.
 func runWorker(wg *sync.WaitGroup, name string, fn func() error) {
+	const panicStackBufSize = 64 << 10
+
 	wg.Add(1)
 
 	go func() {
@@ -752,7 +757,7 @@ func (s *Application) BuildBrandsSprite(ctx context.Context) error {
 
 	cfg := s.container.Config()
 
-	return createIconsSprite(ctx, repository, imageStorage, cfg.FileStorage)
+	return brandssprite.Build(ctx, repository, imageStorage, cfg.FileStorage)
 }
 
 func (s *Application) TelegramWebhookInfo(ctx context.Context) error {
@@ -851,7 +856,7 @@ func (s *Application) AttrsUpdateValuesAMQP(ctx context.Context, quit chan bool)
 	return nil
 }
 
-func (s *Application) ImageStorageGetImage(ctx context.Context, imageID int) (*Image, error) {
+func (s *Application) ImageStorageGetImage(ctx context.Context, imageID int) (*pb.Image, error) {
 	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
@@ -862,14 +867,14 @@ func (s *Application) ImageStorageGetImage(ctx context.Context, imageID int) (*I
 		return nil, err
 	}
 
-	return APIImageToGRPC(img), nil
+	return imagemapper.FromStorage(img), nil
 }
 
 func (s *Application) ImageStorageGetFormattedImage(
 	ctx context.Context,
 	imageID int,
 	format string,
-) (*Image, error) {
+) (*pb.Image, error) {
 	is, err := s.container.ImageStorage(ctx)
 	if err != nil {
 		return nil, err
@@ -880,7 +885,7 @@ func (s *Application) ImageStorageGetFormattedImage(
 		return nil, err
 	}
 
-	return APIImageToGRPC(img), nil
+	return imagemapper.FromStorage(img), nil
 }
 
 func (s *Application) ImageStorageFlushFormattedImages(

@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/logging"
-	"github.com/autowp/goautowp/util"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/logging"
+	"github.com/autowp/goautowp/internal/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/test/bufconn"

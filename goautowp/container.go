@@ -10,33 +10,82 @@ import (
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/autowp/goautowp/achievements"
-	"github.com/autowp/goautowp/attrs"
-	"github.com/autowp/goautowp/ban"
-	"github.com/autowp/goautowp/comments"
-	"github.com/autowp/goautowp/compliance"
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/contentreport"
-	"github.com/autowp/goautowp/email"
-	"github.com/autowp/goautowp/feedback"
-	"github.com/autowp/goautowp/hosts"
-	"github.com/autowp/goautowp/i18nbundle"
-	"github.com/autowp/goautowp/image/storage"
-	"github.com/autowp/goautowp/index"
-	"github.com/autowp/goautowp/itemofday"
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/log"
-	"github.com/autowp/goautowp/logging"
-	"github.com/autowp/goautowp/messaging"
-	"github.com/autowp/goautowp/mosts"
-	"github.com/autowp/goautowp/pictures"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/telegram"
-	"github.com/autowp/goautowp/textstorage"
-	"github.com/autowp/goautowp/traffic"
-	"github.com/autowp/goautowp/users"
-	"github.com/autowp/goautowp/util"
-	"github.com/autowp/goautowp/votings"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/achievements"
+	"github.com/autowp/goautowp/internal/articles"
+	"github.com/autowp/goautowp/internal/attrs"
+	"github.com/autowp/goautowp/internal/audit"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/ban"
+	"github.com/autowp/goautowp/internal/catalogue"
+	"github.com/autowp/goautowp/internal/comments"
+	"github.com/autowp/goautowp/internal/compliance"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/contacts"
+	"github.com/autowp/goautowp/internal/contentreport"
+	"github.com/autowp/goautowp/internal/donations"
+	"github.com/autowp/goautowp/internal/duplicatefinder"
+	"github.com/autowp/goautowp/internal/email"
+	"github.com/autowp/goautowp/internal/feedback"
+	"github.com/autowp/goautowp/internal/forums"
+	"github.com/autowp/goautowp/internal/hosts"
+	"github.com/autowp/goautowp/internal/i18nbundle"
+	"github.com/autowp/goautowp/internal/image/storage"
+	"github.com/autowp/goautowp/internal/inboxbrands"
+	"github.com/autowp/goautowp/internal/index"
+	"github.com/autowp/goautowp/internal/itemofday"
+	"github.com/autowp/goautowp/internal/itemofdaycache"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/log"
+	"github.com/autowp/goautowp/internal/logging"
+	"github.com/autowp/goautowp/internal/maps"
+	"github.com/autowp/goautowp/internal/messaging"
+	"github.com/autowp/goautowp/internal/mosts"
+	"github.com/autowp/goautowp/internal/pictures"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/statistics"
+	"github.com/autowp/goautowp/internal/telegram"
+	"github.com/autowp/goautowp/internal/textstorage"
+	"github.com/autowp/goautowp/internal/traffic"
+	achievementsgrpc "github.com/autowp/goautowp/internal/transport/grpc/achievements"
+	articlesgrpc "github.com/autowp/goautowp/internal/transport/grpc/articles"
+	attrsgrpc "github.com/autowp/goautowp/internal/transport/grpc/attrs"
+	autowpgrpc "github.com/autowp/goautowp/internal/transport/grpc/autowp"
+	"github.com/autowp/goautowp/internal/transport/grpc/commentextractor"
+	commentsgrpc "github.com/autowp/goautowp/internal/transport/grpc/comments"
+	contactsgrpc "github.com/autowp/goautowp/internal/transport/grpc/contacts"
+	"github.com/autowp/goautowp/internal/transport/grpc/dfdistanceextractor"
+	donationsgrpc "github.com/autowp/goautowp/internal/transport/grpc/donations"
+	forumsgrpc "github.com/autowp/goautowp/internal/transport/grpc/forums"
+	"github.com/autowp/goautowp/internal/transport/grpc/ipextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemparentextractor"
+	itemsgrpc "github.com/autowp/goautowp/internal/transport/grpc/items"
+	loggrpc "github.com/autowp/goautowp/internal/transport/grpc/log"
+	mapgrpc "github.com/autowp/goautowp/internal/transport/grpc/maps"
+	messaginggrpc "github.com/autowp/goautowp/internal/transport/grpc/messaging"
+	mostsgrpc "github.com/autowp/goautowp/internal/transport/grpc/mosts"
+	"github.com/autowp/goautowp/internal/transport/grpc/parentcacheextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/pictureextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/pictureitemextractor"
+	picturesgrpc "github.com/autowp/goautowp/internal/transport/grpc/pictures"
+	ratinggrpc "github.com/autowp/goautowp/internal/transport/grpc/rating"
+	statisticsgrpc "github.com/autowp/goautowp/internal/transport/grpc/statistics"
+	textgrpc "github.com/autowp/goautowp/internal/transport/grpc/text"
+	trafficgrpc "github.com/autowp/goautowp/internal/transport/grpc/traffic"
+	"github.com/autowp/goautowp/internal/transport/grpc/userextractor"
+	usersgrpc "github.com/autowp/goautowp/internal/transport/grpc/users"
+	votingsgrpc "github.com/autowp/goautowp/internal/transport/grpc/votings"
+	itemshttp "github.com/autowp/goautowp/internal/transport/http/items"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
+	usershttp "github.com/autowp/goautowp/internal/transport/http/users"
+	yoomoneyhttp "github.com/autowp/goautowp/internal/transport/http/yoomoney"
+	"github.com/autowp/goautowp/internal/transport/middleware"
+	messagingws "github.com/autowp/goautowp/internal/transport/websocket/messaging"
+	picturesws "github.com/autowp/goautowp/internal/transport/websocket/pictures"
+	"github.com/autowp/goautowp/internal/users"
+	"github.com/autowp/goautowp/internal/util"
+	"github.com/autowp/goautowp/internal/votings"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -56,71 +105,75 @@ type Container struct {
 	mu sync.Mutex
 
 	achievementsRepository       *achievements.Repository
-	achievementsGrpcServer       *AchievementsGRPCServer
-	articlesGRPCServer           *ArticlesGRPCServer
+	achievementsGrpcServer       *achievementsgrpc.Server
+	articlesGRPCServer           *articlesgrpc.Server
+	articlesRepository           *articles.Repository
 	attrsRepository              *attrs.Repository
 	autowpDB                     *sql.DB
 	banRepository                *ban.Repository
-	banChecker                   *BanChecker
-	catalogue                    *Catalogue
+	banChecker                   *middleware.BanChecker
+	catalogue                    *catalogue.Service
 	commentsRepository           *comments.Repository
 	mostsRepository              *mosts.Repository
 	config                       config.Config
-	commentsGrpcServer           *CommentsGRPCServer
-	mostsGrpcServer              *MostsGRPCServer
-	contactsGrpcServer           *ContactsGRPCServer
-	contactsRepository           *ContactsRepository
-	duplicateFinder              *DuplicateFinder
-	donationsGrpcServer          *DonationsGRPCServer
+	commentsGrpcServer           *commentsgrpc.Server
+	mostsGrpcServer              *mostsgrpc.Server
+	contactsGrpcServer           *contactsgrpc.Server
+	contactsRepository           *contacts.Repository
+	duplicateFinder              *duplicatefinder.Finder
+	donationsGrpcServer          *donationsgrpc.Server
+	donationsRepository          *donations.Repository
 	contentReports               *contentreport.Repository
 	complianceRepository         *compliance.Repository
 	emailSender                  email.Sender
-	events                       *Events
+	events                       *audit.Recorder
 	feedback                     *feedback.Repository
-	forums                       *Forums
+	forums                       *forums.Repository
 	goquDB                       *goqu.Database
-	grpcServer                   *GRPCServer
+	grpcServer                   *autowpgrpc.Server
 	hostsManager                 *hosts.Manager
 	imageStorage                 *storage.Storage
 	i18n                         *i18nbundle.I18n
 	itemOfDayRepository          *itemofday.Repository
-	itemsGrpcServer              *ItemsGRPCServer
-	itemOfDayCached              *ItemOfDayCached
-	inboxBrandsCached            *InboxBrandsCached
+	itemsGrpcServer              *itemsgrpc.Server
+	itemOfDayCached              *itemofdaycache.Cache
+	inboxBrandsCached            *inboxbrands.Cache
 	itemParentLanguageRepository *items.ItemParentLanguageRepository
-	ratingGrpcServer             *RatingGRPCServer
-	votingsGrpcServer            *VotingsGRPCServer
+	ratingGrpcServer             *ratinggrpc.Server
+	votingsGrpcServer            *votingsgrpc.Server
 	itemsRepository              *items.Repository
 	keyCloak                     *gocloak.GoCloak
-	messagingGrpcServer          *MessagingGRPCServer
+	messagingGrpcServer          *messaginggrpc.Server
 	messagingRepository          *messaging.Repository
 	messagingHub                 *messaging.Hub
-	messagingWS                  *MessagingWS
+	messagingWS                  *messagingws.Server
 	publicHTTPServer             *http.Server
 	publicRouter                 http.HandlerFunc
 	grpcServerWithServices       *grpc.Server
 	telegramService              *telegram.Service
-	textGrpcServer               *TextGRPCServer
+	textGrpcServer               *textgrpc.Server
 	traffic                      *traffic.Repository
 	trafficRecorder              *traffic.Recorder
-	trafficGrpcServer            *TrafficGRPCServer
+	trafficGrpcServer            *trafficgrpc.Server
 	votingsRepository            *votings.Repository
 	usersRepository              *users.Repository
-	usersGrpcServer              *UsersGRPCServer
+	usersGrpcServer              *usersgrpc.Server
 	redis                        *redis.Client
-	auth                         *Auth
-	mapGrpcServer                *MapGRPCServer
+	auth                         *authn.Service
+	mapRepository                *maps.Repository
+	mapGrpcServer                *mapgrpc.Server
 	picturesRepository           *pictures.Repository
-	picturesGrpcServer           *PicturesGRPCServer
+	picturesGrpcServer           *picturesgrpc.Server
 	picturesHub                  *pictures.Hub
-	picturesWS                   *PicturesWS
-	statisticsGrpcServer         *StatisticsGRPCServer
-	forumsGrpcServer             *ForumsGRPCServer
-	attrsGRPCServer              *AttrsGRPCServer
+	picturesWS                   *picturesws.Server
+	statisticsGrpcServer         *statisticsgrpc.Server
+	statisticsRepository         *statistics.Repository
+	forumsGrpcServer             *forumsgrpc.Server
+	attrsGRPCServer              *attrsgrpc.Server
 	textStorageRepository        *textstorage.Repository
-	yoomoneyHandler              *YoomoneyHandler
+	yoomoneyHandler              *yoomoneyhttp.Server
 	logRepository                *log.Repository
-	LogGrpcServer                *LogGRPCServer
+	LogGrpcServer                *loggrpc.Server
 }
 
 // NewContainer constructor.
@@ -153,14 +206,14 @@ func (s *Container) BanRepository(ctx context.Context) (*ban.Repository, error) 
 
 // BanChecker returns the shared ban lookup used by the gRPC interceptors and the REST middleware -
 // one instance, so they share its cache.
-func (s *Container) BanChecker(ctx context.Context) (*BanChecker, error) {
+func (s *Container) BanChecker(ctx context.Context) (*middleware.BanChecker, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.banCheckerLocked(ctx)
 }
 
-func (s *Container) Catalogue(ctx context.Context) (*Catalogue, error) {
+func (s *Container) Catalogue(ctx context.Context) (*catalogue.Service, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -192,14 +245,14 @@ func (s *Container) AttrsRepository(ctx context.Context) (*attrs.Repository, err
 	return s.attrsRepositoryLocked(ctx)
 }
 
-func (s *Container) ContactsRepository(ctx context.Context) (*ContactsRepository, error) {
+func (s *Container) ContactsRepository(ctx context.Context) (*contacts.Repository, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.contactsRepositoryLocked(ctx)
 }
 
-func (s *Container) DuplicateFinder(ctx context.Context) (*DuplicateFinder, error) {
+func (s *Container) DuplicateFinder(ctx context.Context) (*duplicatefinder.Finder, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -213,7 +266,7 @@ func (s *Container) Feedback() (*feedback.Repository, error) {
 	return s.feedbackLocked()
 }
 
-func (s *Container) IPExtractor(ctx context.Context) (*IPExtractor, error) {
+func (s *Container) IPExtractor(ctx context.Context) (*ipextractor.Extractor, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -249,7 +302,7 @@ func (s *Container) PicturesHub() *pictures.Hub {
 	return s.picturesHubLocked()
 }
 
-func (s *Container) PicturesWS() *PicturesWS {
+func (s *Container) PicturesWS() *picturesws.Server {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -263,21 +316,21 @@ func (s *Container) PublicHTTPServer(ctx context.Context) (*http.Server, error) 
 	return s.publicHTTPServerLocked(ctx)
 }
 
-func (s *Container) ItemsREST(ctx context.Context) (*ItemsREST, error) {
+func (s *Container) ItemsREST(ctx context.Context) (*itemshttp.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.itemsRESTLocked(ctx)
 }
 
-func (s *Container) UsersREST(ctx context.Context) (*UsersREST, error) {
+func (s *Container) UsersREST(ctx context.Context) (*usershttp.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.usersRESTLocked(ctx)
 }
 
-func (s *Container) PicturesREST(ctx context.Context) (*PicturesREST, error) {
+func (s *Container) PicturesREST(ctx context.Context) (*pictureshttp.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -312,7 +365,14 @@ func (s *Container) Traffic(ctx context.Context) (*traffic.Repository, error) {
 	return s.trafficLocked(ctx)
 }
 
-func (s *Container) UserExtractor(ctx context.Context) (*UserExtractor, error) {
+func (s *Container) CommentExtractor(ctx context.Context) (*commentextractor.Extractor, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.commentExtractorLocked(ctx)
+}
+
+func (s *Container) UserExtractor(ctx context.Context) (*userextractor.Extractor, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -354,182 +414,254 @@ func (s *Container) ItemParentLanguageRepository(ctx context.Context) (*items.It
 	return s.itemParentLanguageRepositoryLocked(ctx)
 }
 
-func (s *Container) ItemExtractor() *ItemExtractor {
-	return NewItemExtractor(s)
+func (s *Container) ItemExtractor() *itemextractor.Extractor {
+	return itemextractor.New(itemextractor.Dependencies{
+		ItemsRepository:      s.ItemsRepository,
+		PicturesRepository:   s.PicturesRepository,
+		AttrsRepository:      s.AttrsRepository,
+		CommentsRepository:   s.CommentsRepository,
+		ItemOfDayRepository:  s.ItemOfDayRepository,
+		ImageStorage:         s.ImageStorage,
+		I18n:                 s.I18n,
+		PictureExtractor:     func() itemextractor.PictureExtractor { return s.PictureExtractor() },
+		PictureItemExtractor: s.PictureItemExtractor,
+		ItemParentExtractor:  s.ItemParentExtractor,
+	})
 }
 
-func (s *Container) PictureItemExtractor() *PictureItemExtractor {
-	return NewPictureItemExtractor(s)
+func (s *Container) PictureItemExtractor() *pictureitemextractor.Extractor {
+	return pictureitemextractor.New(
+		s.ItemsRepository,
+		s.PicturesRepository,
+		s.ItemExtractor(),
+		s.PictureExtractor(),
+		s.ItemParentCacheExtractor,
+	)
 }
 
-func (s *Container) PictureExtractor() *PictureExtractor {
-	return NewPictureExtractor(s)
+func (s *Container) PictureExtractor() *pictureextractor.Extractor {
+	return pictureextractor.New(pictureextractor.Dependencies{
+		PicturesRepository:    s.PicturesRepository,
+		ItemsRepository:       s.ItemsRepository,
+		CommentsRepository:    s.CommentsRepository,
+		I18n:                  s.I18n,
+		ImageStorage:          s.ImageStorage,
+		TextStorageRepository: s.TextStorageRepository,
+		DfDistanceExtractor:   s.DfDistanceExtractor,
+		PictureItemExtractor:  s.PictureItemExtractor,
+		ItemExtractor:         func() pictureextractor.ItemExtractor { return s.ItemExtractor() },
+	})
 }
 
-func (s *Container) ItemParentCacheExtractor() *ItemParentCacheExtractor {
-	return NewItemParentCacheExtractor(s)
+func (s *Container) ItemParentCacheExtractor(ctx context.Context) (*parentcacheextractor.Extractor, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	repository, err := s.itemsRepositoryLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return parentcacheextractor.New(repository, s.ItemExtractor()), nil
 }
 
-func (s *Container) DfDistanceExtractor() *DfDistanceExtractor {
-	return NewDfDistanceExtractor(s)
+func (s *Container) DfDistanceExtractor(ctx context.Context) (*dfdistanceextractor.Extractor, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	repository, err := s.picturesRepositoryLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return dfdistanceextractor.New(repository, s.PictureExtractor()), nil
 }
 
-func (s *Container) ItemParentExtractor() *ItemParentExtractor {
-	return NewItemParentExtractor(s)
+func (s *Container) ItemParentExtractor() *itemparentextractor.Extractor {
+	return itemparentextractor.New(
+		s.ItemsRepository,
+		s.PicturesRepository,
+		s.ItemExtractor(),
+		s.PictureExtractor(),
+	)
 }
 
-func (s *Container) NewLinkExtractor() *LinkExtractor {
-	return NewLinkExtractor(s)
-}
-
-func (s *Container) Auth(ctx context.Context) (*Auth, error) {
+func (s *Container) Auth(ctx context.Context) (*authn.Service, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.authLocked(ctx)
 }
 
-func (s *Container) GRPCServer(ctx context.Context) (*GRPCServer, error) {
+func (s *Container) GRPCServer(ctx context.Context) (*autowpgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.grpcServerLocked(ctx)
 }
 
-func (s *Container) StatisticsGRPCServer(ctx context.Context) (*StatisticsGRPCServer, error) {
+func (s *Container) StatisticsGRPCServer(ctx context.Context) (*statisticsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.statisticsGRPCServerLocked(ctx)
 }
 
-func (s *Container) TextGRPCServer(ctx context.Context) (*TextGRPCServer, error) {
+func (s *Container) StatisticsRepository(ctx context.Context) (*statistics.Repository, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.statisticsRepositoryLocked(ctx)
+}
+
+func (s *Container) TextGRPCServer(ctx context.Context) (*textgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.textGRPCServerLocked(ctx)
 }
 
-func (s *Container) TrafficGRPCServer(ctx context.Context) (*TrafficGRPCServer, error) {
+func (s *Container) TrafficGRPCServer(ctx context.Context) (*trafficgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.trafficGRPCServerLocked(ctx)
 }
 
-func (s *Container) UsersGRPCServer(ctx context.Context) (*UsersGRPCServer, error) {
+func (s *Container) UsersGRPCServer(ctx context.Context) (*usersgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.usersGRPCServerLocked(ctx)
 }
 
-func (s *Container) VotingsGRPCServer(ctx context.Context) (*VotingsGRPCServer, error) {
+func (s *Container) VotingsGRPCServer(ctx context.Context) (*votingsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.votingsGRPCServerLocked(ctx)
 }
 
-func (s *Container) RatingGRPCServer(ctx context.Context) (*RatingGRPCServer, error) {
+func (s *Container) RatingGRPCServer(ctx context.Context) (*ratinggrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.ratingGRPCServerLocked(ctx)
 }
 
-func (s *Container) ItemOfDayCached(ctx context.Context) (*ItemOfDayCached, error) {
+func (s *Container) ItemOfDayCached(ctx context.Context) (*itemofdaycache.Cache, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.itemOfDayCachedLocked(ctx)
 }
 
-func (s *Container) ItemsGRPCServer(ctx context.Context) (*ItemsGRPCServer, error) {
+func (s *Container) ItemsGRPCServer(ctx context.Context) (*itemsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.itemsGRPCServerLocked(ctx)
 }
 
-func (s *Container) MostsGRPCServer(ctx context.Context) (*MostsGRPCServer, error) {
+func (s *Container) MostsGRPCServer(ctx context.Context) (*mostsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.mostsGRPCServerLocked(ctx)
 }
 
-func (s *Container) CommentsGRPCServer(ctx context.Context) (*CommentsGRPCServer, error) {
+func (s *Container) CommentsGRPCServer(ctx context.Context) (*commentsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.commentsGRPCServerLocked(ctx)
 }
 
-func (s *Container) ArticlesGRPCServer(ctx context.Context) (*ArticlesGRPCServer, error) {
+func (s *Container) ArticlesGRPCServer(ctx context.Context) (*articlesgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.articlesGRPCServerLocked(ctx)
 }
 
-func (s *Container) AttrsGRPCServer(ctx context.Context) (*AttrsGRPCServer, error) {
+func (s *Container) ArticlesRepository(ctx context.Context) (*articles.Repository, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.articlesRepositoryLocked(ctx)
+}
+
+func (s *Container) AttrsGRPCServer(ctx context.Context) (*attrsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.attrsGRPCServerLocked(ctx)
 }
 
-func (s *Container) ContactsGRPCServer(ctx context.Context) (*ContactsGRPCServer, error) {
+func (s *Container) ContactsGRPCServer(ctx context.Context) (*contactsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.contactsGRPCServerLocked(ctx)
 }
 
-func (s *Container) LogGRPCServer(ctx context.Context) (*LogGRPCServer, error) {
+func (s *Container) LogGRPCServer(ctx context.Context) (*loggrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.logGRPCServerLocked(ctx)
 }
 
-func (s *Container) PicturesGRPCServer(ctx context.Context) (*PicturesGRPCServer, error) {
+func (s *Container) PicturesGRPCServer(ctx context.Context) (*picturesgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.picturesGRPCServerLocked(ctx)
 }
 
-func (s *Container) MapGRPCServer(ctx context.Context) (*MapGRPCServer, error) {
+func (s *Container) MapGRPCServer(ctx context.Context) (*mapgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.mapGRPCServerLocked(ctx)
 }
 
-func (s *Container) DonationsGRPCServer(ctx context.Context) (*DonationsGRPCServer, error) {
+func (s *Container) MapRepository(ctx context.Context) (*maps.Repository, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.mapRepositoryLocked(ctx)
+}
+
+func (s *Container) DonationsGRPCServer(ctx context.Context) (*donationsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.donationsGRPCServerLocked(ctx)
 }
 
-func (s *Container) ForumsGRPCServer(ctx context.Context) (*ForumsGRPCServer, error) {
+func (s *Container) DonationsRepository(ctx context.Context) (*donations.Repository, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.donationsRepositoryLocked(ctx)
+}
+
+func (s *Container) ForumsGRPCServer(ctx context.Context) (*forumsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.forumsGRPCServerLocked(ctx)
 }
 
-func (s *Container) MessagingGRPCServer(ctx context.Context) (*MessagingGRPCServer, error) {
+func (s *Container) MessagingGRPCServer(ctx context.Context) (*messaginggrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.messagingGRPCServerLocked(ctx)
 }
 
-func (s *Container) Forums(ctx context.Context) (*Forums, error) {
+func (s *Container) Forums(ctx context.Context) (*forums.Repository, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -557,7 +689,7 @@ func (s *Container) AchievementsRepository(ctx context.Context) (*achievements.R
 	return s.achievementsRepositoryLocked(ctx)
 }
 
-func (s *Container) AchievementsGRPCServer(ctx context.Context) (*AchievementsGRPCServer, error) {
+func (s *Container) AchievementsGRPCServer(ctx context.Context) (*achievementsgrpc.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -572,7 +704,7 @@ func (s *Container) MessagingHub() *messaging.Hub {
 	return s.messagingHubLocked()
 }
 
-func (s *Container) MessagingWS(ctx context.Context) (*MessagingWS, error) {
+func (s *Container) MessagingWS(ctx context.Context) (*messagingws.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -600,7 +732,7 @@ func (s *Container) SetEmailSender(emailSender email.Sender) {
 	s.setEmailSenderLocked(emailSender)
 }
 
-func (s *Container) Events(ctx context.Context) (*Events, error) {
+func (s *Container) Events(ctx context.Context) (*audit.Recorder, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -635,7 +767,7 @@ func (s *Container) TextStorageRepository(ctx context.Context) (*textstorage.Rep
 	return s.textStorageRepositoryLocked(ctx)
 }
 
-func (s *Container) YoomoneyHandler(ctx context.Context) (*YoomoneyHandler, error) {
+func (s *Container) YoomoneyHandler(ctx context.Context) (*yoomoneyhttp.Server, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -742,20 +874,20 @@ func (s *Container) banRepositoryLocked(ctx context.Context) (*ban.Repository, e
 	return s.banRepository, nil
 }
 
-func (s *Container) banCheckerLocked(ctx context.Context) (*BanChecker, error) {
+func (s *Container) banCheckerLocked(ctx context.Context) (*middleware.BanChecker, error) {
 	if s.banChecker == nil {
 		banRepository, err := s.banRepositoryLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.banChecker = NewBanChecker(banRepository)
+		s.banChecker = middleware.NewBanChecker(banRepository)
 	}
 
 	return s.banChecker, nil
 }
 
-func (s *Container) catalogueLocked(ctx context.Context) (*Catalogue, error) {
+func (s *Container) catalogueLocked(ctx context.Context) (*catalogue.Service, error) {
 	if s.catalogue == nil {
 		db, err := s.goquDBLocked(ctx)
 		if err != nil {
@@ -767,7 +899,7 @@ func (s *Container) catalogueLocked(ctx context.Context) (*Catalogue, error) {
 			return nil, err
 		}
 
-		s.catalogue, err = NewCatalogue(db, pgDB)
+		s.catalogue, err = catalogue.New(db, pgDB)
 		if err != nil {
 			return nil, err
 		}
@@ -886,27 +1018,27 @@ func (s *Container) attrsRepositoryLocked(ctx context.Context) (*attrs.Repositor
 	return s.attrsRepository, nil
 }
 
-func (s *Container) contactsRepositoryLocked(ctx context.Context) (*ContactsRepository, error) {
+func (s *Container) contactsRepositoryLocked(ctx context.Context) (*contacts.Repository, error) {
 	if s.contactsRepository == nil {
 		db, err := s.goquDBLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.contactsRepository = NewContactsRepository(db)
+		s.contactsRepository = contacts.NewRepository(db)
 	}
 
 	return s.contactsRepository, nil
 }
 
-func (s *Container) duplicateFinderLocked(ctx context.Context) (*DuplicateFinder, error) {
+func (s *Container) duplicateFinderLocked(ctx context.Context) (*duplicatefinder.Finder, error) {
 	if s.duplicateFinder == nil {
 		db, err := s.goquDBLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.duplicateFinder, err = NewDuplicateFinder(db, s.Config().DuplicateFinder)
+		s.duplicateFinder, err = duplicatefinder.New(db, s.Config().DuplicateFinder)
 		if err != nil {
 			return nil, err
 		}
@@ -936,7 +1068,7 @@ func (s *Container) contentReportsRepositoryLocked(ctx context.Context) (*conten
 	return s.contentReports, nil
 }
 
-func (s *Container) ipExtractorLocked(ctx context.Context) (*IPExtractor, error) {
+func (s *Container) ipExtractorLocked(ctx context.Context) (*ipextractor.Extractor, error) {
 	banRepository, err := s.banRepositoryLocked(ctx)
 	if err != nil {
 		return nil, err
@@ -952,7 +1084,7 @@ func (s *Container) ipExtractorLocked(ctx context.Context) (*IPExtractor, error)
 		return nil, err
 	}
 
-	return NewIPExtractor(banRepository, userRepository, userExtractor), nil
+	return ipextractor.New(banRepository, userRepository, userExtractor), nil
 }
 
 func (s *Container) hostsManagerLocked() *hosts.Manager {
@@ -1076,9 +1208,9 @@ func (s *Container) picturesHubLocked() *pictures.Hub {
 	return s.picturesHub
 }
 
-func (s *Container) picturesWSLocked() *PicturesWS {
+func (s *Container) picturesWSLocked() *picturesws.Server {
 	if s.picturesWS == nil {
-		s.picturesWS = NewPicturesWS(s.picturesHubLocked(), s.config.PublicRest.Cors.Origin)
+		s.picturesWS = picturesws.NewServer(s.picturesHubLocked(), s.config.PublicRest.Cors.Origin)
 	}
 
 	return s.picturesWS
@@ -1103,7 +1235,7 @@ func (s *Container) publicHTTPServerLocked(ctx context.Context) (*http.Server, e
 	return s.publicHTTPServer, nil
 }
 
-func (s *Container) itemsRESTLocked(ctx context.Context) (*ItemsREST, error) {
+func (s *Container) itemsRESTLocked(ctx context.Context) (*itemshttp.Server, error) {
 	itemsRepo, err := s.itemsRepositoryLocked(ctx)
 	if err != nil {
 		return nil, err
@@ -1119,10 +1251,10 @@ func (s *Container) itemsRESTLocked(ctx context.Context) (*ItemsREST, error) {
 		return nil, err
 	}
 
-	return NewItemsREST(auth, itemsRepo, events), nil
+	return itemshttp.NewServer(auth, itemsRepo, events), nil
 }
 
-func (s *Container) usersRESTLocked(ctx context.Context) (*UsersREST, error) {
+func (s *Container) usersRESTLocked(ctx context.Context) (*usershttp.Server, error) {
 	usersRepo, err := s.usersRepositoryLocked(ctx)
 	if err != nil {
 		return nil, err
@@ -1133,10 +1265,10 @@ func (s *Container) usersRESTLocked(ctx context.Context) (*UsersREST, error) {
 		return nil, err
 	}
 
-	return NewUsersREST(auth, usersRepo), nil
+	return usershttp.NewServer(auth, usersRepo), nil
 }
 
-func (s *Container) picturesRESTLocked(ctx context.Context) (*PicturesREST, error) {
+func (s *Container) picturesRESTLocked(ctx context.Context) (*pictureshttp.Server, error) {
 	auth, err := s.authLocked(ctx)
 	if err != nil {
 		return nil, err
@@ -1177,11 +1309,6 @@ func (s *Container) picturesRESTLocked(ctx context.Context) (*PicturesREST, erro
 		return nil, err
 	}
 
-	df, err := s.duplicateFinderLocked(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	ts, err := s.telegramServiceLocked(ctx)
 	if err != nil {
 		return nil, err
@@ -1202,7 +1329,7 @@ func (s *Container) picturesRESTLocked(ctx context.Context) (*PicturesREST, erro
 		return nil, err
 	}
 
-	return NewPicturesREST(
+	return pictureshttp.NewServer(
 		auth,
 		picturesRepo,
 		pictureNameFormatter,
@@ -1212,7 +1339,6 @@ func (s *Container) picturesRESTLocked(ctx context.Context) (*PicturesREST, erro
 		itemsRepo,
 		usersRepo,
 		commentsRepo,
-		df,
 		ts,
 		itemOfDayCached,
 		inboxBrandsCached,
@@ -1264,7 +1390,7 @@ func (s *Container) publicRouterLocked(ctx context.Context) (http.HandlerFunc, e
 		return nil, fmt.Errorf("BanChecker(): %w", err)
 	}
 
-	ginEngine.Use(BanGinMiddleware(banChecker)) //nolint: contextcheck
+	ginEngine.Use(middleware.BanGinMiddleware(banChecker)) //nolint: contextcheck
 
 	monitoringAuth, err := s.authLocked(ctx)
 	if err != nil {
@@ -1272,7 +1398,7 @@ func (s *Container) publicRouterLocked(ctx context.Context) (http.HandlerFunc, e
 	}
 
 	//nolint:contextcheck // Gin owns the context.
-	ginEngine.Use(monitoringGinMiddleware(s.trafficRecorder, monitoringAuth))
+	ginEngine.Use(middleware.MonitoringGinMiddleware(s.trafficRecorder, monitoringAuth))
 
 	yoomoney.SetupRouter(ctx, ginEngine)
 
@@ -1304,7 +1430,7 @@ func (s *Container) publicRouterLocked(ctx context.Context) (http.HandlerFunc, e
 		return nil, fmt.Errorf("MessagingWS(): %w", err)
 	}
 
-	messagingWS.SetupRouter(ginEngine) //nolint: contextcheck
+	messagingWS.SetupRouter(ginEngine)
 
 	s.picturesWSLocked().SetupRouter(ginEngine)
 
@@ -1429,7 +1555,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 		return nil, err
 	}
 
-	opts := clientIPOptions(s.Config().TrustedNetwork)
+	opts := middleware.ClientIPOptions(s.Config().TrustedNetwork)
 
 	logger := slog.Default()
 	loggerOpts := []grpclogging.Option{
@@ -1457,49 +1583,49 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 		grpc.ChainUnaryInterceptor(
 			// Outermost, so what it times is the whole call - ban check and all - the same span the
 			// caller waits on.
-			SlowCallUnaryServerInterceptor(s.config.GRPC.SlowCallThreshold),
-			grpclogging.UnaryServerInterceptor(InterceptorLogger(logger), loggerOpts...),
-			RequestContextUnaryServerInterceptor(),
+			middleware.SlowCallUnaryServerInterceptor(s.config.GRPC.SlowCallThreshold),
+			grpclogging.UnaryServerInterceptor(middleware.InterceptorLogger(logger), loggerOpts...),
+			middleware.RequestContextUnaryServerInterceptor(),
 			realip.UnaryServerInterceptorOpts(opts...),
-			BanUnaryServerInterceptor(banChecker),
-			monitoringUnaryInterceptor(s.trafficRecorder, monitoringAuth),
+			middleware.BanUnaryServerInterceptor(banChecker),
+			middleware.MonitoringUnaryInterceptor(s.trafficRecorder, monitoringAuth),
 			// Innermost, so it wraps the handler itself: a panic that escapes becomes a logged
 			// codes.Internal for that one call instead of unwinding the serving goroutine.
-			recovery.UnaryServerInterceptor(recoveryOpts()...),
+			recovery.UnaryServerInterceptor(middleware.RecoveryOptions()...),
 		),
 		grpc.ChainStreamInterceptor(
-			grpclogging.StreamServerInterceptor(InterceptorLogger(logger), loggerOpts...),
-			RequestContextStreamServerInterceptor(),
+			grpclogging.StreamServerInterceptor(middleware.InterceptorLogger(logger), loggerOpts...),
+			middleware.RequestContextStreamServerInterceptor(),
 			realip.StreamServerInterceptorOpts(opts...),
-			BanStreamServerInterceptor(banChecker), //nolint: contextcheck
+			middleware.BanStreamServerInterceptor(banChecker), //nolint: contextcheck
 			//nolint:contextcheck // Context comes from grpc.ServerStream.
-			monitoringStreamInterceptor(
+			middleware.MonitoringStreamInterceptor(
 				s.trafficRecorder,
 				monitoringAuth,
 			),
-			recovery.StreamServerInterceptor(recoveryOpts()...),
+			recovery.StreamServerInterceptor(middleware.RecoveryOptions()...),
 		),
 	)
-	RegisterArticlesServer(grpcServer, articlesSrv)
-	RegisterAttrsServer(grpcServer, attrsSrv)
-	RegisterAutowpServer(grpcServer, srv)
-	RegisterCommentsServer(grpcServer, commentsSrv)
-	RegisterContactsServer(grpcServer, contactsSrv)
-	RegisterDonationsServer(grpcServer, donationsSrv)
-	RegisterForumsServer(grpcServer, forumsSrv)
-	RegisterItemsServer(grpcServer, itemsSrv)
-	RegisterLogServer(grpcServer, logSrv)
-	RegisterMapServer(grpcServer, mapSrv)
-	RegisterMostsServer(grpcServer, mostsSrv)
-	RegisterMessagingServer(grpcServer, messagingSrv)
-	RegisterPicturesServer(grpcServer, picturesSrv)
-	RegisterStatisticsServer(grpcServer, statSrv)
-	RegisterTextServer(grpcServer, textSrv)
-	RegisterTrafficServer(grpcServer, trafficSrv)
-	RegisterUsersServer(grpcServer, usersSrv)
-	RegisterRatingServer(grpcServer, ratingSrv)
-	RegisterVotingsServer(grpcServer, votingSrv)
-	RegisterAchievementsServer(grpcServer, achievementsSrv)
+	pb.RegisterArticlesServer(grpcServer, articlesSrv)
+	pb.RegisterAttrsServer(grpcServer, attrsSrv)
+	pb.RegisterAutowpServer(grpcServer, srv)
+	pb.RegisterCommentsServer(grpcServer, commentsSrv)
+	pb.RegisterContactsServer(grpcServer, contactsSrv)
+	pb.RegisterDonationsServer(grpcServer, donationsSrv)
+	pb.RegisterForumsServer(grpcServer, forumsSrv)
+	pb.RegisterItemsServer(grpcServer, itemsSrv)
+	pb.RegisterLogServer(grpcServer, logSrv)
+	pb.RegisterMapServer(grpcServer, mapSrv)
+	pb.RegisterMostsServer(grpcServer, mostsSrv)
+	pb.RegisterMessagingServer(grpcServer, messagingSrv)
+	pb.RegisterPicturesServer(grpcServer, picturesSrv)
+	pb.RegisterStatisticsServer(grpcServer, statSrv)
+	pb.RegisterTextServer(grpcServer, textSrv)
+	pb.RegisterTrafficServer(grpcServer, trafficSrv)
+	pb.RegisterUsersServer(grpcServer, usersSrv)
+	pb.RegisterRatingServer(grpcServer, ratingSrv)
+	pb.RegisterVotingsServer(grpcServer, votingSrv)
+	pb.RegisterAchievementsServer(grpcServer, achievementsSrv)
 
 	reflection.Register(grpcServer)
 
@@ -1574,7 +1700,7 @@ func (s *Container) trafficLocked(ctx context.Context) (*traffic.Repository, err
 	return s.traffic, nil
 }
 
-func (s *Container) userExtractorLocked(ctx context.Context) (*UserExtractor, error) {
+func (s *Container) userExtractorLocked(ctx context.Context) (*userextractor.Extractor, error) {
 	is, err := s.imageStorageLocked(ctx)
 	if err != nil {
 		return nil, err
@@ -1585,7 +1711,7 @@ func (s *Container) userExtractorLocked(ctx context.Context) (*UserExtractor, er
 		return nil, err
 	}
 
-	return NewUserExtractor(is, picRepository), nil
+	return userextractor.New(is, picRepository), nil
 }
 
 func (s *Container) votingsRepositoryLocked(ctx context.Context) (*votings.Repository, error) {
@@ -1696,27 +1822,22 @@ func (s *Container) itemParentLanguageRepositoryLocked(
 	return s.itemParentLanguageRepository, nil
 }
 
-func (s *Container) authLocked(ctx context.Context) (*Auth, error) {
+func (s *Container) authLocked(ctx context.Context) (*authn.Service, error) {
 	if s.auth == nil {
 		cfg := s.Config()
-
-		db, err := s.goquDBLocked(ctx)
-		if err != nil {
-			return nil, err
-		}
 
 		rep, err := s.usersRepositoryLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.auth = NewAuth(db, s.keycloakLocked(), cfg.Keycloak, rep)
+		s.auth = authn.New(s.keycloakLocked(), cfg.Keycloak, rep)
 	}
 
 	return s.auth, nil
 }
 
-func (s *Container) grpcServerLocked(ctx context.Context) (*GRPCServer, error) {
+func (s *Container) grpcServerLocked(ctx context.Context) (*autowpgrpc.Server, error) {
 	if s.grpcServer == nil {
 		cfg := s.Config()
 
@@ -1760,7 +1881,7 @@ func (s *Container) grpcServerLocked(ctx context.Context) (*GRPCServer, error) {
 			return nil, err
 		}
 
-		s.grpcServer = NewGRPCServer(
+		s.grpcServer = autowpgrpc.NewServer(
 			auth,
 			cfg.Recaptcha,
 			commentsRepository,
@@ -1777,22 +1898,35 @@ func (s *Container) grpcServerLocked(ctx context.Context) (*GRPCServer, error) {
 	return s.grpcServer, nil
 }
 
-func (s *Container) statisticsGRPCServerLocked(ctx context.Context) (*StatisticsGRPCServer, error) {
+func (s *Container) statisticsGRPCServerLocked(ctx context.Context) (*statisticsgrpc.Server, error) {
 	if s.statisticsGrpcServer == nil {
-		db, err := s.goquDBLocked(ctx)
+		repository, err := s.statisticsRepositoryLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.statisticsGrpcServer = NewStatisticsGRPCServer(db, s.Config().About)
+		s.statisticsGrpcServer = statisticsgrpc.NewServer(repository, s.Config().About)
 	}
 
 	return s.statisticsGrpcServer, nil
 }
 
-func (s *Container) textGRPCServerLocked(ctx context.Context) (*TextGRPCServer, error) {
-	if s.textGrpcServer == nil {
+func (s *Container) statisticsRepositoryLocked(ctx context.Context) (*statistics.Repository, error) {
+	if s.statisticsRepository == nil {
 		db, err := s.goquDBLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.statisticsRepository = statistics.NewRepository(db)
+	}
+
+	return s.statisticsRepository, nil
+}
+
+func (s *Container) textGRPCServerLocked(ctx context.Context) (*textgrpc.Server, error) {
+	if s.textGrpcServer == nil {
+		repository, err := s.textStorageRepositoryLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1802,13 +1936,13 @@ func (s *Container) textGRPCServerLocked(ctx context.Context) (*TextGRPCServer, 
 			return nil, err
 		}
 
-		s.textGrpcServer = NewTextGRPCServer(auth, db)
+		s.textGrpcServer = textgrpc.NewServer(auth, repository)
 	}
 
 	return s.textGrpcServer, nil
 }
 
-func (s *Container) trafficGRPCServerLocked(ctx context.Context) (*TrafficGRPCServer, error) {
+func (s *Container) trafficGRPCServerLocked(ctx context.Context) (*trafficgrpc.Server, error) {
 	if s.trafficGrpcServer == nil {
 		traf, err := s.trafficLocked(ctx)
 		if err != nil {
@@ -1830,13 +1964,13 @@ func (s *Container) trafficGRPCServerLocked(ctx context.Context) (*TrafficGRPCSe
 			return nil, err
 		}
 
-		s.trafficGrpcServer = NewTrafficGRPCServer(auth, usersRepo, userExtractor, traf)
+		s.trafficGrpcServer = trafficgrpc.NewServer(auth, usersRepo, userExtractor, traf)
 	}
 
 	return s.trafficGrpcServer, nil
 }
 
-func (s *Container) usersGRPCServerLocked(ctx context.Context) (*UsersGRPCServer, error) {
+func (s *Container) usersGRPCServerLocked(ctx context.Context) (*usersgrpc.Server, error) {
 	if s.usersGrpcServer == nil {
 		cfg := s.Config()
 
@@ -1865,7 +1999,7 @@ func (s *Container) usersGRPCServerLocked(ctx context.Context) (*UsersGRPCServer
 			return nil, err
 		}
 
-		s.usersGrpcServer = NewUsersGRPCServer(
+		s.usersGrpcServer = usersgrpc.NewServer(
 			auth,
 			contactsRepository,
 			userRepository,
@@ -1879,7 +2013,7 @@ func (s *Container) usersGRPCServerLocked(ctx context.Context) (*UsersGRPCServer
 	return s.usersGrpcServer, nil
 }
 
-func (s *Container) votingsGRPCServerLocked(ctx context.Context) (*VotingsGRPCServer, error) {
+func (s *Container) votingsGRPCServerLocked(ctx context.Context) (*votingsgrpc.Server, error) {
 	if s.votingsGrpcServer == nil {
 		auth, err := s.authLocked(ctx)
 		if err != nil {
@@ -1891,13 +2025,13 @@ func (s *Container) votingsGRPCServerLocked(ctx context.Context) (*VotingsGRPCSe
 			return nil, err
 		}
 
-		s.votingsGrpcServer = NewVotingsGRPCServer(votingsRepo, auth)
+		s.votingsGrpcServer = votingsgrpc.NewServer(votingsRepo, auth)
 	}
 
 	return s.votingsGrpcServer, nil
 }
 
-func (s *Container) ratingGRPCServerLocked(ctx context.Context) (*RatingGRPCServer, error) {
+func (s *Container) ratingGRPCServerLocked(ctx context.Context) (*ratinggrpc.Server, error) {
 	if s.ratingGrpcServer == nil {
 		commentsRepository, err := s.commentsRepositoryLocked(ctx)
 		if err != nil {
@@ -1924,7 +2058,7 @@ func (s *Container) ratingGRPCServerLocked(ctx context.Context) (*RatingGRPCServ
 			return nil, err
 		}
 
-		s.ratingGrpcServer = NewRatingGRPCServer(
+		s.ratingGrpcServer = ratinggrpc.NewServer(
 			picturesRepository,
 			userRepository,
 			itemsRepository,
@@ -1936,7 +2070,7 @@ func (s *Container) ratingGRPCServerLocked(ctx context.Context) (*RatingGRPCServ
 	return s.ratingGrpcServer, nil
 }
 
-func (s *Container) itemOfDayCachedLocked(ctx context.Context) (*ItemOfDayCached, error) {
+func (s *Container) itemOfDayCachedLocked(ctx context.Context) (*itemofdaycache.Cache, error) {
 	if s.itemOfDayCached == nil {
 		itemOfDayRepo, err := s.itemOfDayRepositoryLocked(ctx)
 		if err != nil {
@@ -1958,15 +2092,20 @@ func (s *Container) itemOfDayCachedLocked(ctx context.Context) (*ItemOfDayCached
 			return nil, err
 		}
 
-		s.itemOfDayCached = NewItemOfDayCached(
-			itemOfDayRepo, itemsRepo, picturesRepo, s.Config().ContentLanguages, redisClient, s.ItemExtractor(),
+		s.itemOfDayCached = itemofdaycache.New(
+			itemOfDayRepo,
+			itemsRepo,
+			picturesRepo,
+			s.Config().ContentLanguages,
+			redisClient,
+			s.ItemExtractor(),
 		)
 	}
 
 	return s.itemOfDayCached, nil
 }
 
-func (s *Container) inboxBrandsCachedLocked(ctx context.Context) (*InboxBrandsCached, error) {
+func (s *Container) inboxBrandsCachedLocked(ctx context.Context) (*inboxbrands.Cache, error) {
 	if s.inboxBrandsCached == nil {
 		itemsRepo, err := s.itemsRepositoryLocked(ctx)
 		if err != nil {
@@ -1978,13 +2117,13 @@ func (s *Container) inboxBrandsCachedLocked(ctx context.Context) (*InboxBrandsCa
 			return nil, err
 		}
 
-		s.inboxBrandsCached = NewInboxBrandsCached(itemsRepo, s.Config().ContentLanguages, redisClient)
+		s.inboxBrandsCached = inboxbrands.New(itemsRepo, s.Config().ContentLanguages, redisClient)
 	}
 
 	return s.inboxBrandsCached, nil
 }
 
-func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer, error) {
+func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*itemsgrpc.Server, error) {
 	if s.itemsGrpcServer == nil {
 		repo, err := s.itemsRepositoryLocked(ctx)
 		if err != nil {
@@ -1992,11 +2131,6 @@ func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer
 		}
 
 		auth, err := s.authLocked(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		db, err := s.goquDBLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -2073,10 +2207,9 @@ func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer
 			return nil, err
 		}
 
-		s.itemsGrpcServer = NewItemsGRPCServer(
+		s.itemsGrpcServer = itemsgrpc.NewServer(
 			repo,
 			itemParentLanguageRepository,
-			db,
 			auth,
 			s.Config().ContentLanguages,
 			textStorageRepository,
@@ -2090,7 +2223,6 @@ func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer
 			messagingRepository,
 			s.hostsManagerLocked(),
 			s.ItemParentExtractor(),
-			s.NewLinkExtractor(),
 			redisClient,
 			catalogue,
 			s.Config().FileStorage,
@@ -2103,7 +2235,7 @@ func (s *Container) itemsGRPCServerLocked(ctx context.Context) (*ItemsGRPCServer
 	return s.itemsGrpcServer, nil
 }
 
-func (s *Container) mostsGRPCServerLocked(ctx context.Context) (*MostsGRPCServer, error) {
+func (s *Container) mostsGRPCServerLocked(ctx context.Context) (*mostsgrpc.Server, error) {
 	if s.mostsGrpcServer == nil {
 		mostsRepository, err := s.mostsRepositoryLocked(ctx)
 		if err != nil {
@@ -2115,7 +2247,7 @@ func (s *Container) mostsGRPCServerLocked(ctx context.Context) (*MostsGRPCServer
 			return nil, err
 		}
 
-		s.mostsGrpcServer = NewMostsGRPCServer(
+		s.mostsGrpcServer = mostsgrpc.NewServer(
 			auth,
 			s.ItemExtractor(),
 			mostsRepository,
@@ -2125,7 +2257,7 @@ func (s *Container) mostsGRPCServerLocked(ctx context.Context) (*MostsGRPCServer
 	return s.mostsGrpcServer, nil
 }
 
-func (s *Container) commentsGRPCServerLocked(ctx context.Context) (*CommentsGRPCServer, error) {
+func (s *Container) commentsGRPCServerLocked(ctx context.Context) (*commentsgrpc.Server, error) {
 	if s.commentsGrpcServer == nil {
 		commentsRepository, err := s.commentsRepositoryLocked(ctx)
 		if err != nil {
@@ -2137,7 +2269,7 @@ func (s *Container) commentsGRPCServerLocked(ctx context.Context) (*CommentsGRPC
 			return nil, err
 		}
 
-		picturesRepository, err := s.picturesRepositoryLocked(ctx)
+		messageExtractor, err := s.commentExtractorLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -2152,11 +2284,11 @@ func (s *Container) commentsGRPCServerLocked(ctx context.Context) (*CommentsGRPC
 			return nil, err
 		}
 
-		s.commentsGrpcServer = NewCommentsGRPCServer(
+		s.commentsGrpcServer = commentsgrpc.NewServer(
 			auth,
 			commentsRepository,
 			usersRepository,
-			picturesRepository,
+			messageExtractor,
 			userExtractor,
 		)
 	}
@@ -2164,20 +2296,33 @@ func (s *Container) commentsGRPCServerLocked(ctx context.Context) (*CommentsGRPC
 	return s.commentsGrpcServer, nil
 }
 
-func (s *Container) articlesGRPCServerLocked(ctx context.Context) (*ArticlesGRPCServer, error) {
+func (s *Container) articlesGRPCServerLocked(ctx context.Context) (*articlesgrpc.Server, error) {
 	if s.articlesGRPCServer == nil {
-		db, err := s.goquDBLocked(ctx)
+		repository, err := s.articlesRepositoryLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.articlesGRPCServer = NewArticlesGRPCServer(db)
+		s.articlesGRPCServer = articlesgrpc.NewServer(repository)
 	}
 
 	return s.articlesGRPCServer, nil
 }
 
-func (s *Container) attrsGRPCServerLocked(ctx context.Context) (*AttrsGRPCServer, error) {
+func (s *Container) articlesRepositoryLocked(ctx context.Context) (*articles.Repository, error) {
+	if s.articlesRepository == nil {
+		db, err := s.goquDBLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.articlesRepository = articles.NewRepository(db)
+	}
+
+	return s.articlesRepository, nil
+}
+
+func (s *Container) attrsGRPCServerLocked(ctx context.Context) (*attrsgrpc.Server, error) {
 	if s.attrsGRPCServer == nil {
 		repository, err := s.attrsRepositoryLocked(ctx)
 		if err != nil {
@@ -2189,13 +2334,13 @@ func (s *Container) attrsGRPCServerLocked(ctx context.Context) (*AttrsGRPCServer
 			return nil, err
 		}
 
-		s.attrsGRPCServer = NewAttrsGRPCServer(repository, auth)
+		s.attrsGRPCServer = attrsgrpc.NewServer(repository, auth)
 	}
 
 	return s.attrsGRPCServer, nil
 }
 
-func (s *Container) contactsGRPCServerLocked(ctx context.Context) (*ContactsGRPCServer, error) {
+func (s *Container) contactsGRPCServerLocked(ctx context.Context) (*contactsgrpc.Server, error) {
 	if s.contactsGrpcServer == nil {
 		contactsRepository, err := s.contactsRepositoryLocked(ctx)
 		if err != nil {
@@ -2217,7 +2362,7 @@ func (s *Container) contactsGRPCServerLocked(ctx context.Context) (*ContactsGRPC
 			return nil, err
 		}
 
-		s.contactsGrpcServer = NewContactsGRPCServer(
+		s.contactsGrpcServer = contactsgrpc.NewServer(
 			auth,
 			contactsRepository,
 			userRepository,
@@ -2228,7 +2373,7 @@ func (s *Container) contactsGRPCServerLocked(ctx context.Context) (*ContactsGRPC
 	return s.contactsGrpcServer, nil
 }
 
-func (s *Container) logGRPCServerLocked(ctx context.Context) (*LogGRPCServer, error) {
+func (s *Container) logGRPCServerLocked(ctx context.Context) (*loggrpc.Server, error) {
 	if s.LogGrpcServer == nil {
 		repository, err := s.logRepositoryLocked(ctx)
 		if err != nil {
@@ -2240,13 +2385,13 @@ func (s *Container) logGRPCServerLocked(ctx context.Context) (*LogGRPCServer, er
 			return nil, err
 		}
 
-		s.LogGrpcServer = NewLogGRPCServer(repository, auth)
+		s.LogGrpcServer = loggrpc.NewServer(repository, auth)
 	}
 
 	return s.LogGrpcServer, nil
 }
 
-func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*PicturesGRPCServer, error) {
+func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*picturesgrpc.Server, error) {
 	if s.picturesGrpcServer == nil {
 		repository, err := s.picturesRepositoryLocked(ctx)
 		if err != nil {
@@ -2318,7 +2463,7 @@ func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*PicturesGRPC
 			return nil, err
 		}
 
-		s.picturesGrpcServer = NewPicturesGRPCServer(
+		s.picturesGrpcServer = picturesgrpc.NewServer(
 			repository,
 			auth,
 			events,
@@ -2343,9 +2488,9 @@ func (s *Container) picturesGRPCServerLocked(ctx context.Context) (*PicturesGRPC
 	return s.picturesGrpcServer, nil
 }
 
-func (s *Container) mapGRPCServerLocked(ctx context.Context) (*MapGRPCServer, error) {
+func (s *Container) mapGRPCServerLocked(ctx context.Context) (*mapgrpc.Server, error) {
 	if s.mapGrpcServer == nil {
-		db, err := s.goquDBLocked(ctx)
+		repository, err := s.mapRepositoryLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -2360,31 +2505,57 @@ func (s *Container) mapGRPCServerLocked(ctx context.Context) (*MapGRPCServer, er
 			return nil, err
 		}
 
-		s.mapGrpcServer = NewMapGRPCServer(db, imageStorage, i18n)
+		s.mapGrpcServer = mapgrpc.NewServer(repository, imageStorage, i18n)
 	}
 
 	return s.mapGrpcServer, nil
 }
 
-func (s *Container) donationsGRPCServerLocked(ctx context.Context) (*DonationsGRPCServer, error) {
-	if s.donationsGrpcServer == nil {
-		repository, err := s.itemOfDayRepositoryLocked(ctx)
-		if err != nil {
-			return nil, err
-		}
-
+func (s *Container) mapRepositoryLocked(ctx context.Context) (*maps.Repository, error) {
+	if s.mapRepository == nil {
 		db, err := s.goquDBLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.donationsGrpcServer = NewDonationsGRPCServer(repository, s.Config().DonationsVodPrice, db)
+		s.mapRepository = maps.NewRepository(db)
+	}
+
+	return s.mapRepository, nil
+}
+
+func (s *Container) donationsGRPCServerLocked(ctx context.Context) (*donationsgrpc.Server, error) {
+	if s.donationsGrpcServer == nil {
+		itemOfDay, err := s.itemOfDayRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		repository, err := s.donationsRepositoryLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.donationsGrpcServer = donationsgrpc.NewServer(itemOfDay, s.Config().DonationsVodPrice, repository)
 	}
 
 	return s.donationsGrpcServer, nil
 }
 
-func (s *Container) forumsGRPCServerLocked(ctx context.Context) (*ForumsGRPCServer, error) {
+func (s *Container) donationsRepositoryLocked(ctx context.Context) (*donations.Repository, error) {
+	if s.donationsRepository == nil {
+		db, err := s.goquDBLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.donationsRepository = donations.NewRepository(db)
+	}
+
+	return s.donationsRepository, nil
+}
+
+func (s *Container) forumsGRPCServerLocked(ctx context.Context) (*forumsgrpc.Server, error) {
 	if s.forumsGrpcServer == nil {
 		auth, err := s.authLocked(ctx)
 		if err != nil {
@@ -2406,13 +2577,18 @@ func (s *Container) forumsGRPCServerLocked(ctx context.Context) (*ForumsGRPCServ
 			return nil, err
 		}
 
-		s.forumsGrpcServer = NewForumsGRPCServer(auth, forums, commentsRepo, usersRepo)
+		messageExtractor, err := s.commentExtractorLocked(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		s.forumsGrpcServer = forumsgrpc.NewServer(auth, forums, commentsRepo, usersRepo, messageExtractor)
 	}
 
 	return s.forumsGrpcServer, nil
 }
 
-func (s *Container) messagingGRPCServerLocked(ctx context.Context) (*MessagingGRPCServer, error) {
+func (s *Container) messagingGRPCServerLocked(ctx context.Context) (*messaginggrpc.Server, error) {
 	if s.messagingGrpcServer == nil {
 		repository, err := s.messagingRepositoryLocked(ctx)
 		if err != nil {
@@ -2424,13 +2600,13 @@ func (s *Container) messagingGRPCServerLocked(ctx context.Context) (*MessagingGR
 			return nil, err
 		}
 
-		s.messagingGrpcServer = NewMessagingGRPCServer(repository, auth)
+		s.messagingGrpcServer = messaginggrpc.NewServer(repository, auth)
 	}
 
 	return s.messagingGrpcServer, nil
 }
 
-func (s *Container) forumsLocked(ctx context.Context) (*Forums, error) {
+func (s *Container) forumsLocked(ctx context.Context) (*forums.Repository, error) {
 	if s.forums == nil {
 		db, err := s.goquDBLocked(ctx)
 		if err != nil {
@@ -2442,7 +2618,7 @@ func (s *Container) forumsLocked(ctx context.Context) (*Forums, error) {
 			return nil, err
 		}
 
-		s.forums = NewForums(db, commentsRepository)
+		s.forums = forums.NewRepository(db, commentsRepository)
 	}
 
 	return s.forums, nil
@@ -2534,14 +2710,14 @@ func (s *Container) achievementsRepositoryLocked(ctx context.Context) (*achievem
 	return s.achievementsRepository, nil
 }
 
-func (s *Container) achievementsGRPCServerLocked(ctx context.Context) (*AchievementsGRPCServer, error) {
+func (s *Container) achievementsGRPCServerLocked(ctx context.Context) (*achievementsgrpc.Server, error) {
 	if s.achievementsGrpcServer == nil {
 		repository, err := s.achievementsRepositoryLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.achievementsGrpcServer = NewAchievementsGRPCServer(repository)
+		s.achievementsGrpcServer = achievementsgrpc.NewServer(repository)
 	}
 
 	return s.achievementsGrpcServer, nil
@@ -2555,14 +2731,14 @@ func (s *Container) messagingHubLocked() *messaging.Hub {
 	return s.messagingHub
 }
 
-func (s *Container) messagingWSLocked(ctx context.Context) (*MessagingWS, error) {
+func (s *Container) messagingWSLocked(ctx context.Context) (*messagingws.Server, error) {
 	if s.messagingWS == nil {
 		auth, err := s.authLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.messagingWS = NewMessagingWS(s.messagingHubLocked(), auth, s.config.PublicRest.Cors.Origin)
+		s.messagingWS = messagingws.NewServer(s.messagingHubLocked(), auth, s.config.PublicRest.Cors.Origin)
 	}
 
 	return s.messagingWS, nil
@@ -2596,14 +2772,14 @@ func (s *Container) setEmailSenderLocked(emailSender email.Sender) {
 	s.emailSender = emailSender
 }
 
-func (s *Container) eventsLocked(ctx context.Context) (*Events, error) {
+func (s *Container) eventsLocked(ctx context.Context) (*audit.Recorder, error) {
 	if s.events == nil {
 		db, err := s.goquDBLocked(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		s.events = NewEvents(db)
+		s.events = audit.New(db)
 	}
 
 	return s.events, nil
@@ -2667,7 +2843,7 @@ func (s *Container) textStorageRepositoryLocked(ctx context.Context) (*textstora
 	return s.textStorageRepository, nil
 }
 
-func (s *Container) yoomoneyHandlerLocked(ctx context.Context) (*YoomoneyHandler, error) {
+func (s *Container) yoomoneyHandlerLocked(ctx context.Context) (*yoomoneyhttp.Server, error) {
 	if s.yoomoneyHandler == nil {
 		repository, err := s.itemOfDayRepositoryLocked(ctx)
 		if err != nil {
@@ -2676,11 +2852,25 @@ func (s *Container) yoomoneyHandlerLocked(ctx context.Context) (*YoomoneyHandler
 
 		cfg := s.Config().YoomoneyConfig
 
-		s.yoomoneyHandler, err = NewYoomoneyHandler(cfg.Price, cfg.Secret, repository)
+		s.yoomoneyHandler, err = yoomoneyhttp.NewServer(cfg.Price, cfg.Secret, repository)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return s.yoomoneyHandler, nil
+}
+
+func (s *Container) commentExtractorLocked(ctx context.Context) (*commentextractor.Extractor, error) {
+	repository, err := s.commentsRepositoryLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	picturesRepository, err := s.picturesRepositoryLocked(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return commentextractor.New(repository, picturesRepository), nil
 }

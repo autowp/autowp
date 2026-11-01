@@ -3,11 +3,15 @@ package goautowp
 import (
 	"testing"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 func TestGetText(t *testing.T) {
@@ -17,9 +21,9 @@ func TestGetText(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewTextClient(conn)
+	client := pb.NewTextClient(conn)
 	kc := cnt.Keycloak()
-	usersClient := NewUsersClient(conn)
+	usersClient := pb.NewUsersClient(conn)
 
 	// tester
 	testerToken, err := kc.Login(
@@ -37,10 +41,10 @@ func TestGetText(t *testing.T) {
 	tester, err := usersClient.Me(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&MeRequest{},
+		&pb.MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -75,7 +79,7 @@ func TestGetText(t *testing.T) {
 	}).Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	text, err := client.GetText(ctx, &GetTextRequest{Id: id})
+	text, err := client.GetText(ctx, &pb.GetTextRequest{Id: id})
 	require.NoError(t, err)
 	require.Equal(t, "Text 2", text.GetCurrent().GetText())
 	require.Equal(t, tester.GetId(), text.GetCurrent().GetUserId())
@@ -84,4 +88,22 @@ func TestGetText(t *testing.T) {
 	require.Equal(t, tester.GetId(), text.GetPrev().GetUserId())
 	require.Equal(t, int64(1), text.GetPrev().GetRevision())
 	require.Equal(t, int64(0), text.GetNext().GetRevision())
+
+	_, err = client.GetText(ctx, &pb.GetTextRequest{Id: id, Revision: 1})
+	require.Equal(t, codes.PermissionDenied, status.Code(err))
+
+	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
+	require.NoError(t, err)
+
+	moderCtx := metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken.AccessToken)
+	text, err = client.GetText(moderCtx, &pb.GetTextRequest{Id: id, Revision: 1})
+	require.NoError(t, err)
+	require.Equal(t, "Text 1", text.GetCurrent().GetText())
+	require.EqualValues(t, 2, text.GetNext().GetRevision())
+	require.Zero(t, text.GetPrev().GetRevision())
+
+	_, err = client.GetText(moderCtx, &pb.GetTextRequest{Id: id, Revision: 99})
+	require.Equal(t, codes.NotFound, status.Code(err))
+	_, err = client.GetText(ctx, &pb.GetTextRequest{Id: -1})
+	require.Equal(t, codes.NotFound, status.Code(err))
 }

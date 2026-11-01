@@ -6,15 +6,18 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemmapper"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
 
-func newDuplicateParentExtractor(t *testing.T) (*ItemParentExtractor, *goqu.Database, *sql.DB) {
+func newDuplicateParentExtractor(t *testing.T) (*itemParentExtractorFixture, *goqu.Database, *sql.DB) {
 	t.Helper()
 	fixture, db, pool := newConnectedItemExtractor(t)
 	_, err := pool.ExecContext(t.Context(), `
@@ -33,7 +36,10 @@ func newDuplicateParentExtractor(t *testing.T) (*ItemParentExtractor, *goqu.Data
  `)
 	require.NoError(t, err)
 
-	return NewItemParentExtractor(fixture.container), db, pool
+	return &itemParentExtractorFixture{
+		Extractor: fixture.container.ItemParentExtractor(),
+		container: fixture.container,
+	}, db, pool
 }
 
 func duplicateParentRows() []*items.ItemParent {
@@ -74,13 +80,13 @@ func duplicateParentRows() []*items.ItemParent {
 // Reproduce the previous per-row Item + Extract calls with their original filters.
 func legacyParentDuplicate(
 	t *testing.T,
-	extractor *ItemParentExtractor,
+	extractor *itemParentExtractorFixture,
 	row *items.ItemParent,
-	fields *ItemFields,
+	fields *pb.ItemFields,
 	parent bool,
 	lang string,
-	user UserContext,
-) *Item {
+	user authn.User,
+) *pb.Item {
 	t.Helper()
 
 	if fields == nil {
@@ -106,7 +112,7 @@ func legacyParentDuplicate(
 	repository, err := extractor.container.ItemsRepository(t.Context())
 	require.NoError(t, err)
 
-	selected, err := repository.Item(t.Context(), options, convertItemFields(fields))
+	selected, err := repository.Item(t.Context(), options, itemmapper.FieldsFromProto(fields))
 	if errors.Is(err, items.ErrItemNotFound) {
 		return nil
 	}
@@ -122,21 +128,21 @@ func TestItemParentDuplicatesBatchMatchesIndividual(t *testing.T) {
 	t.Parallel()
 	extractor, db, _ := newDuplicateParentExtractor(t)
 	rows := duplicateParentRows()
-	user := UserContext{UserID: 7}
+	user := authn.User{UserID: 7}
 
 	for _, lang := range []string{"en", "ru"} {
-		for _, fields := range []*ItemParentFields{
+		for _, fields := range []*pb.ItemParentFields{
 			{},
-			{DuplicateParent: &ItemFields{}},
-			{DuplicateChild: &ItemFields{}},
+			{DuplicateParent: &pb.ItemFields{}},
+			{DuplicateChild: &pb.ItemFields{}},
 			{
-				DuplicateParent: &ItemFields{NameOnly: true, Location: true, Subscription: true},
-				DuplicateChild:  &ItemFields{NameOnly: true, Location: true},
+				DuplicateParent: &pb.ItemFields{NameOnly: true, Location: true, Subscription: true},
+				DuplicateChild:  &pb.ItemFields{NameOnly: true, Location: true},
 			},
 		} {
-			expectedParents := make([]*Item, len(rows))
+			expectedParents := make([]*pb.Item, len(rows))
 
-			expectedChildren := make([]*Item, len(rows))
+			expectedChildren := make([]*pb.Item, len(rows))
 			for index, row := range rows {
 				expectedParents[index] = legacyParentDuplicate(
 					t,
@@ -168,7 +174,7 @@ func TestItemParentDuplicatesBatchMatchesIndividual(t *testing.T) {
 
 			queries := 0
 
-			for _, itemFields := range []*ItemFields{fields.GetDuplicateParent(), fields.GetDuplicateChild()} {
+			for _, itemFields := range []*pb.ItemFields{fields.GetDuplicateParent(), fields.GetDuplicateChild()} {
 				if itemFields == nil {
 					continue
 				}
@@ -229,9 +235,9 @@ func TestItemParentDuplicatesBatchMatchesIndividual(t *testing.T) {
 func TestItemParentDuplicatesBatchParallelAndEmpty(t *testing.T) {
 	t.Parallel()
 	extractor, db, _ := newDuplicateParentExtractor(t)
-	fields := &ItemParentFields{
-		DuplicateParent: &ItemFields{Location: true},
-		DuplicateChild:  &ItemFields{Location: true},
+	fields := &pb.ItemParentFields{
+		DuplicateParent: &pb.ItemFields{Location: true},
+		DuplicateChild:  &pb.ItemFields{Location: true},
 	}
 	logger := &itemBatchQueryLogger{}
 	unblock := blockItemExtractionQueries(t, logger, 2)
@@ -240,7 +246,7 @@ func TestItemParentDuplicatesBatchParallelAndEmpty(t *testing.T) {
 	joined := make(chan error, 1)
 
 	go func() {
-		_, err := extractor.ExtractRows(t.Context(), duplicateParentRows(), fields, "en", UserContext{})
+		_, err := extractor.ExtractRows(t.Context(), duplicateParentRows(), fields, "en", authn.User{})
 		joined <- err
 	}()
 
@@ -248,7 +254,7 @@ func TestItemParentDuplicatesBatchParallelAndEmpty(t *testing.T) {
 	require.NoError(t, <-joined)
 	logger.queries.Store(0)
 
-	empty, err := extractor.ExtractRows(t.Context(), nil, fields, "en", UserContext{})
+	empty, err := extractor.ExtractRows(t.Context(), nil, fields, "en", authn.User{})
 	require.NoError(t, err)
 	require.NotNil(t, empty)
 	require.Empty(t, empty)
@@ -260,19 +266,22 @@ func TestItemParentDuplicatesBatchErrors(t *testing.T) {
 
 	for _, test := range []struct {
 		statement string
-		fields    *ItemParentFields
+		fields    *pb.ItemParentFields
 	}{
 		{
 			"ALTER TABLE pg_temp.item_parent_cache RENAME COLUMN tuning TO broken",
-			&ItemParentFields{DuplicateParent: &ItemFields{}},
+			&pb.ItemParentFields{DuplicateParent: &pb.ItemFields{}},
 		},
 		{
 			"ALTER TABLE pg_temp.item_parent RENAME COLUMN parent_id TO broken",
-			&ItemParentFields{DuplicateChild: &ItemFields{}},
+			&pb.ItemParentFields{DuplicateChild: &pb.ItemFields{}},
 		},
 		{
 			"ALTER TABLE pg_temp.item_point RENAME COLUMN point TO broken",
-			&ItemParentFields{DuplicateParent: &ItemFields{Location: true}, DuplicateChild: &ItemFields{Location: true}},
+			&pb.ItemParentFields{
+				DuplicateParent: &pb.ItemFields{Location: true},
+				DuplicateChild:  &pb.ItemFields{Location: true},
+			},
 		},
 	} {
 		t.Run(test.statement, func(t *testing.T) {
@@ -280,7 +289,7 @@ func TestItemParentDuplicatesBatchErrors(t *testing.T) {
 			extractor, _, pool := newDuplicateParentExtractor(t)
 			_, err := pool.ExecContext(t.Context(), test.statement)
 			require.NoError(t, err)
-			actual, err := extractor.ExtractRows(t.Context(), duplicateParentRows(), test.fields, "en", UserContext{})
+			actual, err := extractor.ExtractRows(t.Context(), duplicateParentRows(), test.fields, "en", authn.User{})
 			require.Error(t, err)
 			require.Nil(t, actual)
 		})
@@ -291,7 +300,7 @@ func TestItemParentDuplicatesBatchErrors(t *testing.T) {
 	cancel()
 
 	actual, err := extractor.ExtractRows(ctx, duplicateParentRows(),
-		&ItemParentFields{DuplicateParent: &ItemFields{}, DuplicateChild: &ItemFields{}}, "en", UserContext{})
+		&pb.ItemParentFields{DuplicateParent: &pb.ItemFields{}, DuplicateChild: &pb.ItemFields{}}, "en", authn.User{})
 	require.ErrorIs(t, err, context.Canceled)
 	require.Nil(t, actual)
 }

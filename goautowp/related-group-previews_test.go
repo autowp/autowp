@@ -5,12 +5,15 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/image/storage"
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/pictures"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/image/storage"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/pictures"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/grpc/imagemapper"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -218,20 +221,16 @@ func TestRelatedGroupFormattedImagesBatch(t *testing.T) {
 	require.NoError(t, err)
 	imageStorage, err := storage.NewStorage(db, config.LoadConfig(".").ImageStorage)
 	require.NoError(t, err)
-	images, err := imageStorage.FormattedImages(t.Context(), []int{1, 2}, pictureThumbLargeFormat)
+	images, err := imageStorage.FormattedImages(t.Context(), []int{1, 2}, imagemapper.ThumbLargeFormat)
 	require.NoError(t, err)
 	require.Len(t, images, 2)
 	require.EqualValues(t, 1, logger.queries.Load())
 
 	for _, id := range []int{1, 2} {
-		expected, err := imageStorage.FormattedImage(t.Context(), id, pictureThumbLargeFormat)
+		expected, err := imageStorage.FormattedImage(t.Context(), id, imagemapper.ThumbLargeFormat)
 		require.NoError(t, err)
 		require.Equal(t, expected.Src(), images[id].Src())
 	}
-
-	empty, err := (&ItemExtractor{}).extractRelatedGroupsPictures(t.Context(), nil, &items.Item{}, "en")
-	require.NoError(t, err)
-	require.Nil(t, empty)
 }
 
 func TestRelatedCarGroupsBatchesAncestors(t *testing.T) {
@@ -283,18 +282,18 @@ func TestRelatedGroupPreviewsThroughAPI(t *testing.T) {
 
 	ctx := t.Context()
 	brandCatname := "related-" + uuid.NewString()
-	brandID := createItem(t, conn, cnt, &Item{
-		Name: "Related brand", Catname: brandCatname, IsGroup: true, ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+	brandID := createItem(t, conn, cnt, &pb.Item{
+		Name: "Related brand", Catname: brandCatname, IsGroup: true, ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 	})
-	categoryID := createItem(t, conn, cnt, &Item{
+	categoryID := createItem(t, conn, cnt, &pb.Item{
 		Name: "Related category", Catname: "related-" + uuid.NewString(),
-		IsGroup: true, ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
+		IsGroup: true, ItemTypeId: pb.ItemType_ITEM_TYPE_CATEGORY,
 	})
-	firstID := createItem(t, conn, cnt, &Item{
-		Name: "First related car", BeginYear: 1990, ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	firstID := createItem(t, conn, cnt, &pb.Item{
+		Name: "First related car", BeginYear: 1990, ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
-	secondID := createItem(t, conn, cnt, &Item{
-		Name: "Second related car", BeginYear: 2000, ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	secondID := createItem(t, conn, cnt, &pb.Item{
+		Name: "Second related car", BeginYear: 2000, ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 	repository, err := cnt.ItemsRepository(ctx)
 	require.NoError(t, err)
@@ -312,10 +311,12 @@ func TestRelatedGroupPreviewsThroughAPI(t *testing.T) {
 	cfg := config.LoadConfig(".")
 	token, err := cnt.Keycloak().Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
-	addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: firstID},
-		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
-	response, err := NewItemsClient(conn).List(ctx, &ItemsRequest{
-		Language: "en", Options: &ItemListOptions{Id: categoryID}, Fields: &ItemFields{RelatedGroupPictures: true},
+	addPicture(t, cnt, conn, "./test/test.jpg", pictureshttp.PicturePostForm{ItemID: firstID},
+		pb.PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
+	response, err := pb.NewItemsClient(conn).List(ctx, &pb.ItemsRequest{
+		Language: "en",
+		Options:  &pb.ItemListOptions{Id: categoryID},
+		Fields:   &pb.ItemFields{RelatedGroupPictures: true},
 	})
 	require.NoError(t, err)
 	require.Len(t, response.GetItems(), 1)

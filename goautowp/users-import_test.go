@@ -6,8 +6,8 @@ import (
 	"net"
 	"testing"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/users"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/users"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )

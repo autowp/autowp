@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/users"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/users"
 	"github.com/stretchr/testify/require"
 )
 

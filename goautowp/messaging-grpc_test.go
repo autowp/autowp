@@ -3,7 +3,9 @@ package goautowp
 import (
 	"testing"
 
-	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -14,12 +16,12 @@ func TestMessaging(t *testing.T) {
 
 	ctx := t.Context()
 
-	messagingClient := NewMessagingClient(conn)
+	messagingClient := pb.NewMessagingClient(conn)
 
 	cfg := config.LoadConfig(".")
 
 	kc := cnt.Keycloak()
-	usersClient := NewUsersClient(conn)
+	usersClient := pb.NewUsersClient(conn)
 
 	// admin
 	adminToken, err := kc.Login(
@@ -49,10 +51,10 @@ func TestMessaging(t *testing.T) {
 	tester, err := usersClient.Me(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&MeRequest{},
+		&pb.MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -60,10 +62,10 @@ func TestMessaging(t *testing.T) {
 	_, err = messagingClient.CreateMessage(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&CreateMessageRequest{Message: &Message{
+		&pb.CreateMessageRequest{Message: &pb.Message{
 			ToUserId: tester.GetId(),
 			Text:     "Test message",
 		}},
@@ -74,10 +76,10 @@ func TestMessaging(t *testing.T) {
 	res, err := messagingClient.GetMessages(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&MessagingGetMessagesRequest{
+		&pb.MessagingGetMessagesRequest{
 			UserId: tester.GetId(),
 			Folder: "sent",
 			Page:   1,
@@ -89,7 +91,7 @@ func TestMessaging(t *testing.T) {
 	_, err = messagingClient.GetMessagesNewCount(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
 		&emptypb.Empty{},
@@ -99,7 +101,7 @@ func TestMessaging(t *testing.T) {
 	_, err = messagingClient.GetMessagesSummary(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
 		&emptypb.Empty{},
@@ -109,30 +111,30 @@ func TestMessaging(t *testing.T) {
 	_, err = messagingClient.DeleteMessage(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&MessagingDeleteMessage{MessageId: res.GetItems()[0].GetId()},
+		&pb.MessagingDeleteMessage{MessageId: res.GetItems()[0].GetId()},
 	)
 	require.NoError(t, err)
 
 	_, err = messagingClient.ClearFolder(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&MessagingClearFolder{Folder: "sent"},
+		&pb.MessagingClearFolder{Folder: "sent"},
 	)
 	require.NoError(t, err)
 
 	_, err = messagingClient.ClearFolder(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&MessagingClearFolder{Folder: "system"},
+		&pb.MessagingClearFolder{Folder: "system"},
 	)
 	require.NoError(t, err)
 }

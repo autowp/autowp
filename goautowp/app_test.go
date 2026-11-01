@@ -7,9 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/image/storage"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/image/storage"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/stretchr/testify/require"
@@ -110,7 +112,7 @@ func TestSpecsRefreshUserConflicts(t *testing.T) {
 	ctx := t.Context()
 
 	kc := cnt.Keycloak()
-	usersClient := NewUsersClient(conn)
+	usersClient := pb.NewUsersClient(conn)
 
 	// tester
 	testerToken, err := kc.Login(
@@ -128,10 +130,10 @@ func TestSpecsRefreshUserConflicts(t *testing.T) {
 	tester, err := usersClient.Me(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&MeRequest{},
+		&pb.MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -223,9 +225,9 @@ func TestBuildBrandsSprite(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	for i := range 1 {
-		itemID := createItem(t, conn, cnt, &Item{
+		itemID := createItem(t, conn, cnt, &pb.Item{
 			Name:       fmt.Sprintf("brand-%d-%d", random.Int(), i),
-			ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+			ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 			Catname:    fmt.Sprintf("brand-%d-%d", random.Int(), i),
 		})
 

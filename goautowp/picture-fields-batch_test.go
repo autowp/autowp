@@ -7,17 +7,29 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/textstorage"
-	"github.com/autowp/goautowp/users"
-	"github.com/autowp/goautowp/util"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/textstorage"
+	"github.com/autowp/goautowp/internal/transport/extraction"
+	"github.com/autowp/goautowp/internal/transport/grpc/pictureextractor"
+	"github.com/autowp/goautowp/internal/users"
+	"github.com/autowp/goautowp/internal/util"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
 
-func newPictureFieldBatchExtractor(t *testing.T) (*PictureExtractor, *goqu.Database, *sql.DB, []*schema.PictureRow) {
+type pictureExtractorFixture struct {
+	*pictureextractor.Extractor
+
+	container *Container
+}
+
+func newPictureFieldBatchExtractor(
+	t *testing.T,
+) (*pictureExtractorFixture, *goqu.Database, *sql.DB, []*schema.PictureRow) {
 	t.Helper()
 	db, pool, _ := newRelatedGroupTestDB(t)
 	_, err := pool.ExecContext(t.Context(), `
@@ -31,7 +43,8 @@ func newPictureFieldBatchExtractor(t *testing.T) (*PictureExtractor, *goqu.Datab
  `)
 	require.NoError(t, err)
 
-	extractor := NewPictureExtractor(&Container{config: config.LoadConfig("."), goquDB: db})
+	container := &Container{config: config.LoadConfig("."), goquDB: db}
+	extractor := &pictureExtractorFixture{Extractor: container.PictureExtractor(), container: container}
 
 	rows := make([]*schema.PictureRow, 0, 10)
 	for index, status := range []schema.PictureStatus{
@@ -54,9 +67,9 @@ func newPictureFieldBatchExtractor(t *testing.T) (*PictureExtractor, *goqu.Datab
 }
 
 // Populate the three fields with their former per-picture repository calls.
-func legacyPictureExtraFields(t *testing.T, extractor *PictureExtractor, rows []*schema.PictureRow,
-	fields *PictureFields, userCtx UserContext,
-) []*Picture {
+func legacyPictureExtraFields(t *testing.T, extractor *pictureExtractorFixture, rows []*schema.PictureRow,
+	fields *pb.PictureFields, userCtx authn.User,
+) []*pb.Picture {
 	t.Helper()
 	ctx := t.Context()
 	result, err := extractor.ExtractRows(ctx, rows, nil, "en", userCtx)
@@ -95,7 +108,7 @@ func legacyPictureExtraFields(t *testing.T, extractor *PictureExtractor, rows []
 			require.NoError(t, err)
 
 			moder := util.Contains(userCtx.Roles, users.RolePicturesModer)
-			result[index].Rights = &PictureRights{
+			result[index].Rights = &pb.PictureRights{
 				Move:     moder,
 				Unaccept: row.Status == schema.PictureStatusAccepted && moder,
 				Accept:   accept && moder,
@@ -116,13 +129,13 @@ func TestPictureExtraFieldsBatchesMatchIndividualReads(t *testing.T) {
 	t.Parallel()
 	extractor, db, _, rows := newPictureFieldBatchExtractor(t)
 
-	for _, user := range []UserContext{
+	for _, user := range []authn.User{
 		{},
 		{UserID: 7},
 		{UserID: 7, Roles: []string{users.RolePicturesModer}},
 		{UserID: 7, Roles: []string{users.RoleModer, users.RolePicturesModer, users.RoleAdmin}},
 	} {
-		for _, fields := range []*PictureFields{
+		for _, fields := range []*pb.PictureFields{
 			{}, {Subscribed: true}, {Rights: true}, {Copyrights: true}, {Subscribed: true, Rights: true, Copyrights: true},
 		} {
 			original := proto.Clone(fields)
@@ -153,16 +166,16 @@ func TestPictureExtraFieldsBatchesMatchIndividualReads(t *testing.T) {
 				logger.queries.Load(),
 				"one query per requested batch, regardless of row count",
 			)
-			require.True(t, proto.Equal(&PicturesList{Items: expected}, &PicturesList{Items: actual}))
+			require.True(t, proto.Equal(&pb.PicturesList{Items: expected}, &pb.PicturesList{Items: actual}))
 			require.True(t, proto.Equal(original, fields))
 		}
 	}
 
-	fields := &PictureFields{Subscribed: true, Rights: true, Copyrights: true}
+	fields := &pb.PictureFields{Subscribed: true, Rights: true, Copyrights: true}
 	logger := &itemBatchQueryLogger{}
 	db.Logger(logger)
 
-	empty, err := extractor.ExtractRows(t.Context(), nil, fields, "en", UserContext{UserID: 7})
+	empty, err := extractor.ExtractRows(t.Context(), nil, fields, "en", authn.User{UserID: 7})
 	require.NoError(t, err)
 	require.NotNil(t, empty)
 	require.Empty(t, empty)
@@ -171,9 +184,9 @@ func TestPictureExtraFieldsBatchesMatchIndividualReads(t *testing.T) {
 	_, err = extractor.ExtractRows(
 		t.Context(),
 		rows[6:10],
-		&PictureFields{Rights: true, Copyrights: true},
+		&pb.PictureFields{Rights: true, Copyrights: true},
 		"en",
-		UserContext{},
+		authn.User{},
 	)
 	require.NoError(t, err)
 	require.Zero(t, logger.queries.Load())
@@ -182,8 +195,8 @@ func TestPictureExtraFieldsBatchesMatchIndividualReads(t *testing.T) {
 func TestPictureExtraFieldsBatchesParallel(t *testing.T) {
 	t.Parallel()
 	extractor, db, _, rows := newPictureFieldBatchExtractor(t)
-	fields := &PictureFields{Subscribed: true, Rights: true, Copyrights: true}
-	user := UserContext{UserID: 7}
+	fields := &pb.PictureFields{Subscribed: true, Rights: true, Copyrights: true}
+	user := authn.User{UserID: 7}
 	expected := legacyPictureExtraFields(t, extractor, rows, fields, user)
 	logger := &itemBatchQueryLogger{}
 	unblock := blockItemExtractionQueries(t, logger, 3)
@@ -194,7 +207,7 @@ func TestPictureExtraFieldsBatchesParallel(t *testing.T) {
 
 	done := make(chan error, 1)
 
-	var actual []*Picture
+	var actual []*pb.Picture
 
 	go func() {
 		var err error
@@ -206,13 +219,13 @@ func TestPictureExtraFieldsBatchesParallel(t *testing.T) {
 	unblock()
 	require.NoError(t, <-done)
 	require.EqualValues(t, 3, logger.queries.Load())
-	require.True(t, proto.Equal(&PicturesList{Items: expected}, &PicturesList{Items: actual}))
+	require.True(t, proto.Equal(&pb.PicturesList{Items: expected}, &pb.PicturesList{Items: actual}))
 	db.Logger(nil)
 	// Nested callers can restrict the existing picture budget to one worker.
-	serial := context.WithValue(ctx, pictureExtractionParallelismKey{}, 1)
+	serial := extraction.WithPictureParallelism(ctx, 1)
 	actual, err := extractor.ExtractRows(serial, rows, fields, "en", user)
 	require.NoError(t, err)
-	require.True(t, proto.Equal(&PicturesList{Items: expected}, &PicturesList{Items: actual}))
+	require.True(t, proto.Equal(&pb.PicturesList{Items: expected}, &pb.PicturesList{Items: actual}))
 }
 
 func TestPictureExtraFieldsBatchErrors(t *testing.T) {
@@ -220,23 +233,23 @@ func TestPictureExtraFieldsBatchErrors(t *testing.T) {
 
 	for _, test := range []struct {
 		name      string
-		fields    *PictureFields
+		fields    *pb.PictureFields
 		statement string
 	}{
 		{
 			name:      "subscriptions",
-			fields:    &PictureFields{Subscribed: true},
+			fields:    &pb.PictureFields{Subscribed: true},
 			statement: "ALTER TABLE pg_temp.comment_topic_subscribe RENAME COLUMN user_id TO broken",
 		},
-		{"rights", &PictureFields{Rights: true}, "ALTER TABLE pg_temp.picture_moder_vote RENAME COLUMN vote TO broken"},
-		{"copyrights", &PictureFields{Copyrights: true}, "UPDATE pg_temp.textstorage_text SET text=NULL WHERE id=1"},
+		{"rights", &pb.PictureFields{Rights: true}, "ALTER TABLE pg_temp.picture_moder_vote RENAME COLUMN vote TO broken"},
+		{"copyrights", &pb.PictureFields{Copyrights: true}, "UPDATE pg_temp.textstorage_text SET text=NULL WHERE id=1"},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			extractor, _, pool, rows := newPictureFieldBatchExtractor(t)
 			_, err := pool.ExecContext(t.Context(), test.statement)
 			require.NoError(t, err)
-			result, err := extractor.ExtractRows(t.Context(), rows, test.fields, "en", UserContext{UserID: 7})
+			result, err := extractor.ExtractRows(t.Context(), rows, test.fields, "en", authn.User{UserID: 7})
 			require.Error(t, err)
 			require.Nil(t, result)
 
@@ -267,9 +280,9 @@ func TestPictureExtraFieldsBatchCancellation(t *testing.T) {
 		_, err := extractor.ExtractRows(
 			ctx,
 			rows,
-			&PictureFields{Subscribed: true, Rights: true, Copyrights: true},
+			&pb.PictureFields{Subscribed: true, Rights: true, Copyrights: true},
 			"en",
-			UserContext{UserID: 7},
+			authn.User{UserID: 7},
 		)
 		done <- err
 	}()

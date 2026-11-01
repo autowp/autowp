@@ -15,7 +15,7 @@ import "google/api/field_behavior.proto";
 import "google/api/field_info.proto";
 // #import "google/api/client.proto";
 
-option go_package = "github.com/autowp/goautowp";
+option go_package = "github.com/autowp/goautowp/api/pb";
 
 service Autowp {
   rpc CreateFeedback(CreateFeedbackRequest) returns (google.protobuf.Empty) {

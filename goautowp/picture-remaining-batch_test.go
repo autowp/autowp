@@ -7,20 +7,26 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/pictures"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/users"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/pictures"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemmapper"
+	"github.com/autowp/goautowp/internal/transport/grpc/picturemapper"
+	"github.com/autowp/goautowp/internal/users"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
 
-func newRemainingPictureExtractor(t *testing.T) (*PictureExtractor, *goqu.Database, *sql.DB, []*schema.PictureRow) {
+func newRemainingPictureExtractor(
+	t *testing.T,
+) (*pictureExtractorFixture, *goqu.Database, *sql.DB, []*schema.PictureRow) {
 	t.Helper()
 	extractor, db, pool, _ := newPictureFieldBatchExtractor(t)
-	author := createItem(t, conn, cnt, &Item{Name: "Suggested <author>", ItemTypeId: ItemType_ITEM_TYPE_PERSON})
+	author := createItem(t, conn, cnt, &pb.Item{Name: "Suggested <author>", ItemTypeId: pb.ItemType_ITEM_TYPE_PERSON})
 	_, err := pool.ExecContext(t.Context(), `
  CREATE TEMP TABLE picture AS SELECT * FROM public.picture WITH NO DATA;
  ALTER TABLE pg_temp.picture ADD PRIMARY KEY (id);
@@ -55,12 +61,12 @@ func newRemainingPictureExtractor(t *testing.T) (*PictureExtractor, *goqu.Databa
 	return extractor, db, pool, rows
 }
 
-func legacyRemainingPictureFields(t *testing.T, extractor *PictureExtractor, rows []*schema.PictureRow,
-	fields *PictureFields, lang string, user UserContext,
-) []*Picture {
+func legacyRemainingPictureFields(t *testing.T, extractor *pictureExtractorFixture, rows []*schema.PictureRow,
+	fields *pb.PictureFields, lang string, user authn.User,
+) []*pb.Picture {
 	t.Helper()
 	ctx := t.Context()
-	other, _ := proto.Clone(fields).(*PictureFields)
+	other, _ := proto.Clone(fields).(*pb.PictureFields)
 	other.AcceptedCount = false
 	other.IsLast = false
 	other.AuthorSuggestions = false
@@ -106,11 +112,11 @@ func legacyRemainingPictureFields(t *testing.T, extractor *PictureExtractor, row
 					ids = append(ids, suggestion.ItemID)
 				}
 
-				itemFields := &ItemFields{NameHtml: true, NameText: true}
+				itemFields := &pb.ItemFields{NameHtml: true, NameText: true}
 				itemRows, _, err := itemRepository.List(
 					ctx,
 					&query.ItemListOptions{ItemIDs: ids},
-					convertItemFields(itemFields),
+					itemmapper.FieldsFromProto(itemFields),
 					items.OrderByNone,
 					false,
 				)
@@ -118,24 +124,27 @@ func legacyRemainingPictureFields(t *testing.T, extractor *PictureExtractor, row
 				values, err := extractor.container.ItemExtractor().ExtractRows(ctx, itemRows, itemFields, lang, user)
 				require.NoError(t, err)
 
-				byID := make(map[int64]*Item)
+				byID := make(map[int64]*pb.Item)
 				for _, item := range values {
 					byID[item.GetId()] = item
 				}
 
 				for _, suggestion := range suggestions {
-					result[index].AuthorSuggestions = append(result[index].AuthorSuggestions, &PictureAuthorSuggestion{
-						ItemId:   suggestion.ItemID,
-						Item:     byID[suggestion.ItemID],
-						Source:   suggestion.Source,
-						RawValue: suggestion.RawValue,
-					})
+					result[index].AuthorSuggestions = append(
+						result[index].AuthorSuggestions,
+						&pb.PictureAuthorSuggestion{
+							ItemId:   suggestion.ItemID,
+							Item:     byID[suggestion.ItemID],
+							Source:   suggestion.Source,
+							RawValue: suggestion.RawValue,
+						},
+					)
 				}
 			}
 		}
 
 		if request := fields.GetSiblings(); request != nil {
-			values := make([]*Picture, 4)
+			values := make([]*pb.Picture, 4)
 
 			for slot, option := range []*query.PictureListOptions{
 				{IDLt: row.ID},
@@ -148,7 +157,12 @@ func legacyRemainingPictureFields(t *testing.T, extractor *PictureExtractor, row
 					order = pictures.OrderByIDAsc
 				}
 
-				neighbor, err := repository.Picture(ctx, option, convertPictureFields(request.GetFields()), order)
+				neighbor, err := repository.Picture(
+					ctx,
+					option,
+					picturemapper.FieldsFromProto(request.GetFields()),
+					order,
+				)
 				if errors.Is(err, sql.ErrNoRows) {
 					continue
 				}
@@ -165,7 +179,7 @@ func legacyRemainingPictureFields(t *testing.T, extractor *PictureExtractor, row
 				values[slot] = nested[0]
 			}
 
-			result[index].Siblings = &PictureSiblings{
+			result[index].Siblings = &pb.PictureSiblings{
 				Prev:    values[0],
 				Next:    values[1],
 				PrevNew: values[2],
@@ -194,12 +208,12 @@ func TestPictureRemainingBatchesMatchIndividualReads(t *testing.T) {
 	rows = append(rows, &schema.PictureRow{ID: 0, Status: schema.PictureStatusAccepted})
 
 	for _, lang := range []string{"en", "ru"} {
-		for _, user := range []UserContext{{}, {UserID: 7}, {UserID: 8}, {UserID: 42, Roles: []string{users.RoleModer}}} {
-			fields := &PictureFields{
+		for _, user := range []authn.User{{}, {UserID: 7}, {UserID: 8}, {UserID: 42, Roles: []string{users.RoleModer}}} {
+			fields := &pb.PictureFields{
 				AcceptedCount:     true,
 				IsLast:            true,
 				AuthorSuggestions: true,
-				Siblings:          &PicturesRequest{Fields: &PictureFields{}},
+				Siblings:          &pb.PicturesRequest{Fields: &pb.PictureFields{}},
 			}
 			original := proto.Clone(fields)
 			expected := legacyRemainingPictureFields(t, extractor, rows, fields, lang, user)
@@ -211,7 +225,7 @@ func TestPictureRemainingBatchesMatchIndividualReads(t *testing.T) {
 			db.Logger(nil)
 			require.True(
 				t,
-				proto.Equal(&PicturesList{Items: expected}, &PicturesList{Items: actual}),
+				proto.Equal(&pb.PicturesList{Items: expected}, &pb.PicturesList{Items: actual}),
 				"language %s user %v",
 				lang,
 				user,
@@ -227,13 +241,13 @@ func TestPictureRemainingBatchesMatchIndividualReads(t *testing.T) {
 		}
 	}
 	// Nested sibling requests keep their independent field sets and terminate at the request depth.
-	fields := &PictureFields{Siblings: &PicturesRequest{Fields: &PictureFields{
-		AcceptedCount: true, IsLast: true, Siblings: &PicturesRequest{Fields: &PictureFields{Rights: true}},
+	fields := &pb.PictureFields{Siblings: &pb.PicturesRequest{Fields: &pb.PictureFields{
+		AcceptedCount: true, IsLast: true, Siblings: &pb.PicturesRequest{Fields: &pb.PictureFields{Rights: true}},
 	}}}
-	expected := legacyRemainingPictureFields(t, extractor, rows[:2], fields, "en", UserContext{})
-	actual, err := extractor.ExtractRows(t.Context(), rows[:2], fields, "en", UserContext{})
+	expected := legacyRemainingPictureFields(t, extractor, rows[:2], fields, "en", authn.User{})
+	actual, err := extractor.ExtractRows(t.Context(), rows[:2], fields, "en", authn.User{})
 	require.NoError(t, err)
-	require.True(t, proto.Equal(&PicturesList{Items: expected}, &PicturesList{Items: actual}))
+	require.True(t, proto.Equal(&pb.PicturesList{Items: expected}, &pb.PicturesList{Items: actual}))
 }
 
 func TestPictureRemainingBatchesEmptyAndUnrequested(t *testing.T) {
@@ -242,26 +256,26 @@ func TestPictureRemainingBatchesEmptyAndUnrequested(t *testing.T) {
 	logger := &itemBatchQueryLogger{}
 	db.Logger(logger)
 
-	fields := &PictureFields{
+	fields := &pb.PictureFields{
 		AcceptedCount:     true,
 		IsLast:            true,
 		AuthorSuggestions: true,
-		Siblings:          &PicturesRequest{Fields: &PictureFields{}},
+		Siblings:          &pb.PicturesRequest{Fields: &pb.PictureFields{}},
 	}
-	result, err := extractor.ExtractRows(t.Context(), nil, fields, "en", UserContext{UserID: 7})
+	result, err := extractor.ExtractRows(t.Context(), nil, fields, "en", authn.User{UserID: 7})
 	require.NoError(t, err)
 	require.NotNil(t, result)
 	require.Empty(t, result)
 	require.Zero(t, logger.queries.Load())
-	_, err = extractor.ExtractRows(t.Context(), rows, &PictureFields{}, "en", UserContext{})
+	_, err = extractor.ExtractRows(t.Context(), rows, &pb.PictureFields{}, "en", authn.User{})
 	require.NoError(t, err)
 	require.Zero(t, logger.queries.Load())
 	_, err = extractor.ExtractRows(
 		t.Context(),
 		rows[:1],
-		&PictureFields{IsLast: true, AuthorSuggestions: true},
+		&pb.PictureFields{IsLast: true, AuthorSuggestions: true},
 		"en",
-		UserContext{},
+		authn.User{},
 	)
 	require.NoError(t, err)
 	require.Zero(t, logger.queries.Load())
@@ -281,10 +295,10 @@ func TestPictureRemainingBatchesCancellation(t *testing.T) {
 	done := make(chan error, 1)
 
 	go func() {
-		_, err := extractor.ExtractRows(ctx, rows, &PictureFields{
+		_, err := extractor.ExtractRows(ctx, rows, &pb.PictureFields{
 			AcceptedCount: true, AuthorSuggestions: true,
-			Siblings: &PicturesRequest{Fields: &PictureFields{}},
-		}, "en", UserContext{UserID: 7})
+			Siblings: &pb.PicturesRequest{Fields: &pb.PictureFields{}},
+		}, "en", authn.User{UserID: 7})
 		done <- err
 	}()
 
@@ -305,24 +319,24 @@ func TestPictureRemainingBatchErrors(t *testing.T) {
 
 	for _, test := range []struct {
 		name      string
-		fields    *PictureFields
+		fields    *pb.PictureFields
 		statement string
 	}{
 		{
-			name: "authors", fields: &PictureFields{AuthorSuggestions: true},
+			name: "authors", fields: &pb.PictureFields{AuthorSuggestions: true},
 			statement: "ALTER TABLE pg_temp.picture_author_suggestion RENAME COLUMN source TO broken",
 		},
 		{
-			name: "counts", fields: &PictureFields{AcceptedCount: true, IsLast: true},
+			name: "counts", fields: &pb.PictureFields{AcceptedCount: true, IsLast: true},
 			statement: "ALTER TABLE pg_temp.picture_item RENAME COLUMN item_id TO broken",
 		},
 		{
-			name: "siblings", fields: &PictureFields{Siblings: &PicturesRequest{Fields: &PictureFields{}}},
+			name: "siblings", fields: &pb.PictureFields{Siblings: &pb.PicturesRequest{Fields: &pb.PictureFields{}}},
 			statement: "ALTER TABLE pg_temp.picture RENAME COLUMN id TO broken",
 		},
 		{
 			name:   "nested sibling extraction",
-			fields: &PictureFields{Siblings: &PicturesRequest{Fields: &PictureFields{Copyrights: true}}},
+			fields: &pb.PictureFields{Siblings: &pb.PicturesRequest{Fields: &pb.PictureFields{Copyrights: true}}},
 			statement: `UPDATE pg_temp.picture SET copyrights_text_id=1;
  UPDATE pg_temp.textstorage_text SET text=NULL WHERE id=1`,
 		},
@@ -334,11 +348,11 @@ func TestPictureRemainingBatchErrors(t *testing.T) {
 			require.NoError(t, err)
 
 			if test.name == "authors" {
-				_, err = extractor.ExtractRows(t.Context(), rows, test.fields, "en", UserContext{})
+				_, err = extractor.ExtractRows(t.Context(), rows, test.fields, "en", authn.User{})
 				require.NoError(t, err, "invisible suggestions must never be queried")
 			}
 
-			result, err := extractor.ExtractRows(t.Context(), rows, test.fields, "en", UserContext{UserID: 7})
+			result, err := extractor.ExtractRows(t.Context(), rows, test.fields, "en", authn.User{UserID: 7})
 			require.Error(t, err)
 			require.Nil(t, result)
 			require.NoError(t, t.Context().Err())

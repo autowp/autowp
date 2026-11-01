@@ -1,0 +1,1407 @@
+package items
+
+import (
+	"context"
+	"database/sql"
+	"math/rand"
+	"net"
+	"strconv"
+	"testing"
+	"time"
+
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/image/storage"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/textstorage"
+	"github.com/doug-martin/goqu/v9"
+	_ "github.com/doug-martin/goqu/v9/dialect/postgres" // enable postgres dialect
+	"github.com/google/uuid"
+	"github.com/jackc/pgtype"
+	_ "github.com/lib/pq" // enable postgres driver
+	"github.com/stretchr/testify/require"
+)
+
+func TestTopBrandsListRuZh(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	langs := []string{schema.RussianLanguageCode, schema.SimplifiedChineseLanguageCode}
+
+	for _, lang := range langs {
+		options := query.ItemListOptions{
+			Language:   lang,
+			TypeID:     []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+			Limit:      150,
+			SortByName: true,
+		}
+		res, _, err := repository.List(ctx, &options, &ItemFields{
+			NameOnly:                   true,
+			DescendantsCount:           true,
+			NewDescendantsCount:        true,
+			Description:                true,
+			FullText:                   true,
+			NameHTML:                   true,
+			NameText:                   true,
+			NameDefault:                true,
+			DescendantTwinsGroupsCount: true,
+		}, OrderByNone, true)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		c, err := repository.Count(ctx, options)
+		require.NoError(t, err)
+		require.Positive(t, c)
+	}
+}
+
+func TestListFilters(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	options := query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+		ItemParentChild: &query.ItemParentListOptions{
+			ChildItems: &query.ItemListOptions{
+				TypeID:       []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDVehicle},
+				IsConcept:    true,
+				EngineItemID: 1,
+			},
+		},
+		ItemParentParent: &query.ItemParentListOptions{
+			ParentItems: &query.ItemListOptions{
+				TypeID:    []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDVehicle},
+				NoParents: true,
+				Catname:   "test",
+			},
+		},
+		Limit: 150,
+	}
+	_, _, err = repository.List(ctx, &options, &ItemFields{
+		NameOnly:                   true,
+		DescendantsCount:           true,
+		NewDescendantsCount:        true,
+		Description:                true,
+		FullText:                   true,
+		NameHTML:                   true,
+		NameText:                   true,
+		NameDefault:                true,
+		DescendantTwinsGroupsCount: true,
+	}, OrderByDescendantsCount, true)
+	require.NoError(t, err)
+}
+
+func TestGetItemsNameAndCatnameShouldNotBeOmittedWhenDescendantsCountRequested(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+	options := query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+		Limit:    10,
+	}
+	_, _, err = repository.List(ctx, &options, &ItemFields{
+		NameOnly:         true,
+		DescendantsCount: true,
+		ChildsCount:      true,
+	}, OrderByNone, true)
+	require.NoError(t, err)
+}
+
+func createRandomUser(ctx context.Context, t *testing.T, db *goqu.Database) int64 {
+	t.Helper()
+
+	var id int64
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
+	emailAddr := "test" + strconv.Itoa(random.Int()) + "@example.com"
+	name := "ivan"
+	success, err := db.Insert(schema.UserTable).
+		Rows(goqu.Record{
+			schema.UserTableLoginColName:          nil,
+			schema.UserTableEmailColName:          emailAddr,
+			schema.UserTablePasswordColName:       nil,
+			schema.UserTableEmailToCheckColName:   nil,
+			schema.UserTableHideEmailColName:      true,
+			schema.UserTableEmailCheckCodeColName: nil,
+			schema.UserTableNameColName:           name,
+			schema.UserTableRegDateColName:        goqu.Func("NOW"),
+			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
+			schema.UserTableTimezoneColName:       "Europe/Moscow",
+			schema.UserTableLastIPColName:         goqu.Func("INET", "127.0.0.1"),
+			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
+			schema.UserTableUUIDColName:           uuid.New().String(),
+		}).
+		Returning(schema.UserTableIDCol).
+		Executor().ScanValContext(ctx, &id)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	return id
+}
+
+func TestGetUserPicturesBrands(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	userID := createRandomUser(ctx, t, goquDB)
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	brandID, err := repository.CreateItem(ctx, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, "", userID)
+	require.NoError(t, err)
+
+	vehicleID, err := repository.CreateItem(ctx, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+	}, "", userID)
+	require.NoError(t, err)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		vehicleID,
+		brandID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
+	identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
+
+	var pictureID int64
+
+	success, err = goquDB.Insert(schema.PictureTable).Rows(goqu.Record{
+		schema.PictureTableIdentityColName: identity,
+		schema.PictureTableStatusColName:   schema.PictureStatusAccepted,
+		schema.PictureTableIPColName:       "127.0.0.1",
+		schema.PictureTableOwnerIDColName:  userID,
+	}).
+		Returning(schema.PictureTableIDCol).
+		Executor().ScanValContext(ctx, &pictureID)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	_, err = goquDB.Insert(schema.PictureItemTable).Rows(goqu.Record{
+		schema.PictureItemTablePictureIDColName: pictureID,
+		schema.PictureItemTableItemIDColName:    vehicleID,
+	}).Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	// The same picture linked both to the vehicle and its brand is still one picture.
+	_, err = goquDB.Insert(schema.PictureItemTable).Rows(goqu.Record{
+		schema.PictureItemTablePictureIDColName: pictureID,
+		schema.PictureItemTableItemIDColName:    brandID,
+	}).Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	otherUserID := createRandomUser(ctx, t, goquDB)
+	for _, picture := range []struct {
+		ownerID int64
+		status  schema.PictureStatus
+		itemID  int64
+	}{
+		{ownerID: otherUserID, status: schema.PictureStatusAccepted, itemID: vehicleID},
+		{ownerID: userID, status: schema.PictureStatusInbox, itemID: vehicleID},
+		{ownerID: userID, status: schema.PictureStatusAccepted, itemID: brandID},
+	} {
+		var additionalPictureID int64
+
+		_, err := goquDB.Insert(schema.PictureTable).Rows(goqu.Record{
+			schema.PictureTableIdentityColName: uuid.NewString()[:10],
+			schema.PictureTableStatusColName:   picture.status,
+			schema.PictureTableIPColName:       "127.0.0.1",
+			schema.PictureTableOwnerIDColName:  picture.ownerID,
+		}).Returning(schema.PictureTableIDCol).Executor().ScanValContext(ctx, &additionalPictureID)
+		require.NoError(t, err)
+
+		_, err = goquDB.Insert(schema.PictureItemTable).Rows(goqu.Record{
+			schema.PictureItemTablePictureIDColName: additionalPictureID,
+			schema.PictureItemTableItemIDColName:    picture.itemID,
+		}).Executor().ExecContext(ctx)
+		require.NoError(t, err)
+	}
+
+	for _, test := range []struct {
+		name        string
+		limit       uint32
+		excludeSelf bool
+		count       int32
+	}{
+		{name: "aggregated", count: 2},
+		{name: "paginated", limit: 10, count: 2},
+		{name: "aggregated exclude self", excludeSelf: true, count: 1},
+		{name: "paginated exclude self", limit: 10, excludeSelf: true, count: 1},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			options := &query.ItemListOptions{
+				Language: schema.EnglishLanguageCode,
+				ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+					ExcludeSelf: test.excludeSelf,
+					PictureItemsByItemID: &query.PictureItemListOptions{
+						Pictures: &query.PictureListOptions{
+							OwnerID: userID,
+							Status:  schema.PictureStatusAccepted,
+						},
+					},
+				},
+				TypeID:     []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+				Limit:      test.limit,
+				SortByName: true,
+			}
+			res, _, err := repository.List(ctx, options, &ItemFields{
+				NameOnly:                true,
+				DescendantPicturesCount: true,
+				ChildsCount:             true,
+			}, OrderByNone, true)
+			require.NoError(t, err)
+			require.Len(t, res, 1)
+			require.Equal(t, brandID, res[0].ID)
+			require.Equal(t, test.count, res[0].DescendantPicturesCount)
+			require.False(t, options.AggregateDescendantPictures, "caller options must not be mutated")
+		})
+	}
+}
+
+func TestPaginator(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestPaginator" + strconv.Itoa(int(random.Uint32()%100000))
+
+	for i := range 10 {
+		CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+			Body:            "",
+			ProducedExactly: false,
+		}, name+"_"+strconv.Itoa(i))
+	}
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+	options := query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    2,
+		Page:     2,
+		Name:     name + "%",
+	}
+	r, pages, err := repository.List(ctx, &options, nil, OrderByNone, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, r)
+	require.Len(t, r, 2)
+	require.Equal(t, int32(10), pages.TotalItemCount)
+	require.Equal(t, int32(5), pages.PageCount)
+	require.Equal(t, int32(2), pages.Current)
+}
+
+func TestOrderByDescendantsCount(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByDescendantsCount" + strconv.Itoa(int(random.Uint32()%100000))
+	itemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, name)
+
+	subName := name + "sub"
+	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, subName)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		subItemID,
+		itemID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	for i := range 10 {
+		subSubName := name + "_" + strconv.Itoa(i)
+		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+			Body:            "",
+			ProducedExactly: false,
+		}, subSubName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// with field DescendantsCount, with pagination
+	list, pages, err := repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     name + "%",
+	}, &ItemFields{DescendantsCount: true}, OrderByDescendantsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(11), list[0].DescendantsCount)
+
+	// without field DescendantsCount, with pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     name + "%",
+	}, nil, OrderByDescendantsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantsCount)
+
+	// with field DescendantsCount, without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%",
+	}, &ItemFields{DescendantsCount: true}, OrderByDescendantsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(11), list[0].DescendantsCount)
+
+	// without field DescendantsCount, without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%",
+	}, nil, OrderByDescendantsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantsCount)
+}
+
+func TestOrderByDescendantsCountBrands(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByDescendantsCountBrands" + strconv.Itoa(int(random.Uint32()%100000))
+
+	// The "misc" brand: position=1, given more descendants than the regular brand below, so a
+	// plain descendants-count sort would incorrectly rank it first.
+	miscName := name + "_misc"
+	miscItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID: schema.ItemTableItemTypeIDBrand,
+		Body:       "",
+		IsGroup:    true,
+	}, miscName)
+
+	_, err = goquDB.Update(schema.ItemTable).
+		Set(goqu.Record{schema.ItemTablePositionColName: 1}).
+		Where(schema.ItemTableIDCol.Eq(miscItemID)).
+		Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	for i := range 3 {
+		childID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+		}, miscName+"_"+strconv.Itoa(i))
+
+		success, err := repository.CreateItemParent(ctx, childID, miscItemID, schema.ItemParentTypeDefault, "")
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// The regular brand: position=0 (default), fewer descendants than the misc brand.
+	regularName := name + "_regular"
+	regularItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID: schema.ItemTableItemTypeIDBrand,
+		Body:       "",
+		IsGroup:    true,
+	}, regularName)
+
+	childID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID: schema.ItemTableItemTypeIDVehicle,
+	}, regularName+"_0")
+
+	success, err := repository.CreateItemParent(ctx, childID, regularItemID, schema.ItemParentTypeDefault, "")
+	require.NoError(t, err)
+	require.True(t, success)
+
+	// Both fit: the regular (position=0) brand still sorts first, ahead of misc's higher count.
+	list, _, err := repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%_%",
+		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+	}, &ItemFields{DescendantsCount: true}, OrderByDescendantsCountBrands, false)
+	require.NoError(t, err)
+	require.Len(t, list, 2)
+	require.Equal(t, regularItemID, list[0].ID)
+	require.Equal(t, miscItemID, list[1].ID)
+	require.Equal(t, int32(1), list[0].DescendantsCount)
+	require.Equal(t, int32(3), list[1].DescendantsCount)
+
+	// Only room for one: misc is left out entirely, despite its higher descendants count -
+	// exactly the home page top-brands widget's Limit-bounded case.
+	list, _, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%_%",
+		TypeID:   []schema.ItemTableItemTypeID{schema.ItemTableItemTypeIDBrand},
+		Limit:    1,
+	}, &ItemFields{DescendantsCount: true}, OrderByDescendantsCountBrands, false)
+	require.NoError(t, err)
+	require.Len(t, list, 1)
+	require.Equal(t, regularItemID, list[0].ID)
+}
+
+func TestOrderByOrderByDescendantPicturesCount(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByOrderByDescendantPicturesCount" + strconv.Itoa(int(random.Uint32()%100000))
+	userID := createRandomUser(ctx, t, goquDB)
+	itemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, name)
+
+	subName := name + "sub"
+	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, subName)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		subItemID,
+		itemID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	for i := range 10 {
+		subSubName := name + "_" + strconv.Itoa(i)
+		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+			Body:            "",
+			ProducedExactly: false,
+		}, subSubName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+
+		// add picture
+		identity := "t" + strconv.Itoa(int(random.Uint32()%100000))
+
+		var pictureID int64
+
+		var ip pgtype.Inet
+
+		err = ip.Set(net.IPv4zero)
+		require.NoError(t, err)
+
+		success, err = goquDB.Insert(schema.PictureTable).Rows(schema.PictureRow{
+			Identity:  identity,
+			Status:    schema.PictureStatusAccepted,
+			OwnerID:   sql.NullInt64{Valid: true, Int64: userID},
+			CreatedAt: time.Now(),
+			IP:        ip,
+			Point:     schema.NullPoint{Valid: false},
+		}).
+			Returning(schema.PictureTableIDCol).
+			Executor().ScanValContext(ctx, &pictureID)
+		require.NoError(t, err)
+		require.True(t, success)
+
+		_, err = goquDB.Insert(schema.PictureItemTable).Rows(schema.PictureItemRow{
+			PictureID: pictureID,
+			ItemID:    subSubItemID,
+		}).Executor().ExecContext(ctx)
+		require.NoError(t, err)
+	}
+
+	// with field DescendantPicturesCount, with pagination
+	list, pages, err := repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			PictureItemsByItemID: &query.PictureItemListOptions{},
+		},
+	}, &ItemFields{DescendantPicturesCount: true}, OrderByDescendantPicturesCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(10), list[0].DescendantPicturesCount)
+
+	// without field DescendantPicturesCount, with pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			PictureItemsByItemID: &query.PictureItemListOptions{},
+		},
+	}, nil, OrderByDescendantPicturesCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+
+	// with field DescendantPicturesCount, without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			PictureItemsByItemID: &query.PictureItemListOptions{},
+		},
+	}, &ItemFields{DescendantPicturesCount: true}, OrderByDescendantPicturesCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(10), list[0].DescendantPicturesCount)
+
+	// without field DescendantPicturesCount, without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			PictureItemsByItemID: &query.PictureItemListOptions{},
+		},
+	}, nil, OrderByDescendantPicturesCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+}
+
+func TestOrderByCreatedAt(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByCreatedAt" + strconv.Itoa(int(random.Uint32()%100000))
+	// Each item gets an explicit, strictly increasing created_at: the column has no default, so
+	// otherwise every row here is NULL and OrderByCreatedAt has nothing to order by - which only
+	// looks deterministic until concurrent inserts from other tests reshuffle the heap scan.
+	createdAt := time.Now().Add(-time.Hour)
+	nextCreatedAt := func() sql.NullTime {
+		createdAt = createdAt.Add(time.Second)
+
+		return sql.NullTime{Time: createdAt, Valid: true}
+	}
+
+	itemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+		CreatedAt:       nextCreatedAt(),
+	}, name)
+
+	subName := name + "sub"
+	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+		CreatedAt:       nextCreatedAt(),
+	}, subName)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		subItemID,
+		itemID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	var lastItemID int64
+
+	for i := range 10 {
+		subSubName := name + "_" + strconv.Itoa(i)
+		lastItemID = CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+			Body:            "",
+			ProducedExactly: false,
+			CreatedAt:       nextCreatedAt(),
+		}, subSubName)
+
+		success, err = repository.CreateItemParent(
+			ctx, lastItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// OrderByCreatedAt is newest-first, so the last item created leads and the brand trails.
+
+	// with pagination
+	list, pages, err := repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     name + "%",
+	}, nil, OrderByCreatedAt, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, lastItemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+
+	// without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%",
+	}, nil, OrderByCreatedAt, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, lastItemID, list[0].ID)
+	require.Equal(t, itemID, list[len(list)-1].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+}
+
+func TestOrderByName(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByName" + strconv.Itoa(int(random.Uint32()%100000))
+	itemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, "a"+name)
+
+	subName := "b" + name + "sub"
+	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, subName)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		subItemID,
+		itemID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	for i := range 10 {
+		subSubName := "c" + name + "_" + strconv.Itoa(i)
+		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+			Body:            "",
+			ProducedExactly: false,
+		}, subSubName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// with pagination
+	list, pages, err := repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     "%" + name + "%",
+	}, nil, OrderByName, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+
+	// with pagination, with fields
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     "%" + name + "%",
+	}, &ItemFields{NameOnly: true, NameHTML: true, NameText: true, NameDefault: true}, OrderByName, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+
+	// without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     "%" + name + "%",
+	}, nil, OrderByName, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+
+	// without pagination, with fields
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     "%" + name + "%",
+	}, &ItemFields{NameOnly: true, NameHTML: true, NameText: true, NameDefault: true}, OrderByName, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantPicturesCount)
+}
+
+func TestOrderByDescendantsParentsCount(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByDescendantsParentsCount" + strconv.Itoa(int(random.Uint32()%100000))
+
+	itemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, name)
+
+	subName := name + "sub"
+	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, subName)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		subItemID,
+		itemID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	for i := range 10 {
+		subSubName := name + "_" + strconv.Itoa(i)
+		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+			Body:            "",
+			ProducedExactly: false,
+		}, subSubName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+
+		// add parent
+		subSubParentName := name + "_" + strconv.Itoa(i) + "_parent"
+		subSubParentItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDTwins,
+			Body:            "",
+			ProducedExactly: false,
+			IsGroup:         true,
+		}, subSubParentName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subSubParentItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// with field DescendantsParentsCount, with pagination
+	list, pages, err := repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			ExcludeSelf: true,
+			ItemParentByItemID: &query.ItemParentListOptions{
+				ParentItems: &query.ItemListOptions{},
+			},
+		},
+	}, &ItemFields{DescendantsParentsCount: true}, OrderByDescendantsParentsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(12), list[0].DescendantsParentsCount)
+
+	// without field DescendantsParentsCount, with pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Limit:    1,
+		Page:     1,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			ExcludeSelf:        true,
+			ItemParentByItemID: &query.ItemParentListOptions{},
+		},
+	}, nil, OrderByDescendantsParentsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantsParentsCount)
+
+	// with field DescendantsParentsCount, without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			ExcludeSelf:        true,
+			ItemParentByItemID: &query.ItemParentListOptions{},
+		},
+	}, &ItemFields{DescendantsParentsCount: true}, OrderByDescendantsParentsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(12), list[0].DescendantsParentsCount)
+
+	// without field DescendantsParentsCount, without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language: schema.EnglishLanguageCode,
+		Name:     name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{
+			ExcludeSelf:        true,
+			ItemParentByItemID: &query.ItemParentListOptions{},
+		},
+	}, nil, OrderByDescendantsParentsCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+	require.Equal(t, int32(0), list[0].DescendantsParentsCount)
+}
+
+func TestOrderByStarCount(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	ctx := t.Context()
+
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByStarCount" + strconv.Itoa(int(random.Uint32()%100000))
+
+	itemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, name)
+
+	subName := name + "sub"
+	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, subName)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		subItemID,
+		itemID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	for i := range 10 {
+		subSubName := name + "_" + strconv.Itoa(i)
+		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+			Body:            "",
+			ProducedExactly: false,
+		}, subSubName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// with pagination
+	list, pages, err := repository.List(ctx, &query.ItemListOptions{
+		Language:                  schema.EnglishLanguageCode,
+		Limit:                     1,
+		Page:                      1,
+		Name:                      name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{},
+	}, nil, OrderByStarCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(12), pages.TotalItemCount)
+	require.Equal(t, int32(12), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+	require.Equal(t, itemID, list[0].ID)
+
+	// without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language:                  schema.EnglishLanguageCode,
+		Name:                      name + "%",
+		ItemParentCacheDescendant: &query.ItemParentCacheListOptions{},
+	}, nil, OrderByStarCount, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 12)
+	require.Nil(t, pages)
+	require.Equal(t, itemID, list[0].ID)
+}
+
+func TestOrderByItemParentParentTimestamp(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.LoadConfig("../..")
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+	ctx := t.Context()
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+	name := "TestOrderByItemParentParentTimestamp" + strconv.Itoa(int(random.Uint32()%100000))
+	itemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDBrand,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, name)
+
+	subName := name + "sub"
+	subItemID := CreateItem(t, goquDB, schema.ItemRow{
+		ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+		Body:            "",
+		ProducedExactly: false,
+		IsGroup:         true,
+	}, subName)
+
+	success, err := repository.CreateItemParent(
+		ctx,
+		subItemID,
+		itemID,
+		schema.ItemParentTypeDefault,
+		"",
+	)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	for i := range 10 {
+		subSubName := name + "_" + strconv.Itoa(i)
+		subSubItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDVehicle,
+			Body:            "",
+			ProducedExactly: false,
+		}, subSubName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+
+		// add parent
+		subSubParentName := name + "_" + strconv.Itoa(i) + "_parent"
+		subSubParentItemID := CreateItem(t, goquDB, schema.ItemRow{
+			ItemTypeID:      schema.ItemTableItemTypeIDTwins,
+			Body:            "",
+			ProducedExactly: false,
+			IsGroup:         true,
+		}, subSubParentName)
+
+		success, err = repository.CreateItemParent(
+			ctx, subSubItemID, subSubParentItemID, schema.ItemParentTypeDefault, strconv.Itoa(i),
+		)
+		require.NoError(t, err)
+		require.True(t, success)
+	}
+
+	// with pagination
+	list, pages, err := repository.List(ctx, &query.ItemListOptions{
+		Language:         schema.EnglishLanguageCode,
+		Limit:            1,
+		Page:             1,
+		Name:             name + "%",
+		ItemParentParent: &query.ItemParentListOptions{},
+	}, nil, OrderByItemParentParentTimestamp, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 1)
+	require.Equal(t, int32(11), pages.TotalItemCount)
+	require.Equal(t, int32(11), pages.PageCount)
+	require.Equal(t, int32(1), pages.Current)
+
+	// without pagination
+	list, pages, err = repository.List(ctx, &query.ItemListOptions{
+		Language:         schema.EnglishLanguageCode,
+		Name:             name + "%",
+		ItemParentParent: &query.ItemParentListOptions{},
+	}, nil, OrderByItemParentParentTimestamp, true)
+	require.NoError(t, err)
+	require.NotEmpty(t, list)
+	require.Len(t, list, 11)
+	require.Nil(t, pages)
+}
+
+func CreateItem(t *testing.T, goquDB *goqu.Database, row schema.ItemRow, name string) int64 {
+	t.Helper()
+
+	ctx := t.Context()
+	cfg := config.LoadConfig("../..")
+	imageStorage, err := storage.NewStorage(goquDB, cfg.ImageStorage)
+	require.NoError(t, err)
+
+	itemParentLanguageRepository := NewItemParentLanguageRepository(goquDB, cfg.ContentLanguages)
+	repository := NewRepository(
+		goquDB,
+		200,
+		itemParentLanguageRepository,
+		textstorage.New(goquDB),
+		imageStorage,
+	)
+
+	itemID, err := repository.CreateItem(ctx, row, name, 0)
+	require.NoError(t, err)
+
+	_, err = repository.UpdateItemLanguage(ctx, itemID, schema.EnglishLanguageCode, name, "", "", 0)
+	require.NoError(t, err)
+
+	return itemID
+}

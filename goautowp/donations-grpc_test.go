@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -16,7 +17,7 @@ func TestGetVODData(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewDonationsClient(conn)
+	client := pb.NewDonationsClient(conn)
 
 	r, err := client.GetVODData(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -49,7 +50,7 @@ func TestGetTransactions(t *testing.T) {
 		Executor().ExecContext(ctx)
 	require.NoError(t, err)
 
-	client := NewDonationsClient(conn)
+	client := pb.NewDonationsClient(conn)
 
 	r, err := client.GetTransactions(ctx, &emptypb.Empty{})
 	require.NoError(t, err)

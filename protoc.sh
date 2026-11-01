@@ -11,11 +11,17 @@ set -e
 #            -I=. \
 #            spec.proto
 
+mkdir -p goautowp/api/pb
+
 protoc --proto_path="/usr/local/include" \
        --proto_path=. \
-       --go_out=goautowp \
+       --go_out=goautowp/api/pb \
        --go_opt=paths=source_relative \
-       --go-grpc_out=goautowp \
+       --go-grpc_out=goautowp/api/pb \
        --go-grpc_opt=paths=source_relative \
+       --plugin=protoc-gen-ng=frontend/node_modules/.bin/protoc-gen-ng \
        --ng_out=frontend/src/grpc \
        spec.proto
+
+# Remove stubs generated at the old location to avoid duplicate descriptor registration.
+rm -f goautowp/spec.pb.go goautowp/spec_grpc.pb.go

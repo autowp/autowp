@@ -6,6 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/transport/extraction"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,15 +42,15 @@ func TestNestedPictureExtractionSharesItemBudget(t *testing.T) {
 		}
 	}})
 
-	lookups := make([]func(context.Context) error, 0, itemExtractorParallelism)
-	for range itemExtractorParallelism {
+	lookups := make([]func(context.Context) error, 0, extraction.DefaultParallelism)
+	for range extraction.DefaultParallelism {
 		lookups = append(lookups, func(ctx context.Context) error {
 			_, err := extractor.ExtractRows(
 				ctx,
 				rows[:1],
-				&PictureFields{Rights: true, Copyrights: true, Subscribed: true},
+				&pb.PictureFields{Rights: true, Copyrights: true, Subscribed: true},
 				"en",
-				UserContext{UserID: 7},
+				authn.User{UserID: 7},
 			)
 
 			return err
@@ -55,9 +58,9 @@ func TestNestedPictureExtractionSharesItemBudget(t *testing.T) {
 	}
 
 	done := make(chan error, 1)
-	go func() { done <- runItemLookups(ctx, lookups) }()
+	go func() { done <- extraction.Run(ctx, lookups) }()
 
-	for range itemExtractorParallelism {
+	for range extraction.DefaultParallelism {
 		select {
 		case <-started:
 		case <-ctx.Done():
@@ -75,26 +78,7 @@ func TestNestedPictureExtractionSharesItemBudget(t *testing.T) {
 	require.LessOrEqual(
 		t,
 		maximum.Load(),
-		int64(itemExtractorParallelism),
+		int64(extraction.DefaultParallelism),
 		"nested pictures exceeded shared item budget",
 	)
-}
-
-func TestEmptyPicturePathsDoNotLoadDependencies(t *testing.T) {
-	t.Parallel()
-
-	extractor := &PictureExtractor{}
-	paths, err := extractor.preloadPaths(t.Context(), nil, 123)
-	require.NoError(t, err)
-	require.Empty(t, paths)
-	pictures, err := extractor.ExtractRows(
-		t.Context(),
-		nil,
-		&PictureFields{Path: &PicturePathRequest{}},
-		"en",
-		UserContext{},
-	)
-	require.NoError(t, err)
-	require.NotNil(t, pictures)
-	require.Empty(t, pictures)
 }

@@ -9,8 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/duplicatefinder"
+	"github.com/autowp/goautowp/internal/schema"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,7 +27,7 @@ func TestDuplicateFinder(t *testing.T) {
 	ctx := t.Context()
 	kc := cnt.Keycloak()
 
-	df, err := NewDuplicateFinder(goquDB, cfg.DuplicateFinder)
+	df, err := duplicatefinder.New(goquDB, cfg.DuplicateFinder)
 	require.NoError(t, err)
 
 	// admin
@@ -40,18 +43,18 @@ func TestDuplicateFinder(t *testing.T) {
 	require.NotNil(t, adminToken)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	id1 := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, adminToken.AccessToken)
+	id1 := addPicture(t, cnt, conn, "./test/test.jpg", pictureshttp.PicturePostForm{ItemID: itemID},
+		pb.PictureStatus_PICTURE_STATUS_INBOX, adminToken.AccessToken)
 	err = df.Index(ctx, id1, "http://localhost:80/large.jpg")
 	require.NoError(t, err)
 
-	id2 := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: itemID},
-		PictureStatus_PICTURE_STATUS_INBOX, adminToken.AccessToken)
+	id2 := addPicture(t, cnt, conn, "./test/test.jpg", pictureshttp.PicturePostForm{ItemID: itemID},
+		pb.PictureStatus_PICTURE_STATUS_INBOX, adminToken.AccessToken)
 	err = df.Index(ctx, id2, "http://localhost:80/small.jpg")
 	require.NoError(t, err)
 
@@ -93,7 +96,7 @@ func TestIndexRespectsContextDeadline(t *testing.T) {
 
 	cfg := config.LoadConfig(".")
 
-	df, err := NewDuplicateFinder(goquDB, cfg.DuplicateFinder)
+	df, err := duplicatefinder.New(goquDB, cfg.DuplicateFinder)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Millisecond)

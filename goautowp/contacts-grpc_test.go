@@ -3,7 +3,9 @@ package goautowp
 import (
 	"testing"
 
-	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -13,10 +15,10 @@ func TestCreateDeleteContact(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewContactsClient(conn)
+	client := pb.NewContactsClient(conn)
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	usersClient := NewUsersClient(conn)
+	usersClient := pb.NewUsersClient(conn)
 
 	// admin
 	adminToken, err := kc.Login(
@@ -46,10 +48,10 @@ func TestCreateDeleteContact(t *testing.T) {
 	tester, err := usersClient.Me(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&MeRequest{},
+		&pb.MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -57,10 +59,10 @@ func TestCreateDeleteContact(t *testing.T) {
 	_, err = client.CreateContact(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&CreateContactRequest{Contact: &Contact{ContactUserId: tester.GetId()}},
+		&pb.CreateContactRequest{Contact: &pb.Contact{ContactUserId: tester.GetId()}},
 	)
 	require.NoError(t, err)
 
@@ -68,10 +70,10 @@ func TestCreateDeleteContact(t *testing.T) {
 	_, err = client.GetContact(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&GetContactRequest{UserId: tester.GetId()},
+		&pb.GetContactRequest{UserId: tester.GetId()},
 	)
 	require.NoError(t, err)
 
@@ -79,7 +81,7 @@ func TestCreateDeleteContact(t *testing.T) {
 	items, err := client.GetContacts(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
 		&emptypb.Empty{},
@@ -87,7 +89,7 @@ func TestCreateDeleteContact(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, items)
 
-	var contactUser *Contact
+	var contactUser *pb.Contact
 
 	for _, i := range items.GetItems() {
 		if i.GetContactUserId() == tester.GetId() {
@@ -104,10 +106,10 @@ func TestCreateDeleteContact(t *testing.T) {
 	_, err = client.DeleteContact(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&DeleteContactRequest{UserId: tester.GetId()},
+		&pb.DeleteContactRequest{UserId: tester.GetId()},
 	)
 	require.NoError(t, err)
 }

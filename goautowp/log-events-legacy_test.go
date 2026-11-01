@@ -3,9 +3,9 @@ package goautowp
 import (
 	"context"
 
-	eventlog "github.com/autowp/goautowp/log"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/util"
+	eventlog "github.com/autowp/goautowp/internal/log"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/util"
 	"github.com/doug-martin/goqu/v9"
 )
 

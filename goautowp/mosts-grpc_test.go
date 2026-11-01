@@ -6,8 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 )
@@ -16,9 +18,9 @@ func TestMostsMenu(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewMostsClient(conn)
+	client := pb.NewMostsClient(conn)
 
-	res, err := client.GetMenu(ctx, &MostsMenuRequest{})
+	res, err := client.GetMenu(ctx, &pb.MostsMenuRequest{})
 	require.NoError(t, err)
 	require.NotEmpty(t, res.GetYears())
 	require.NotEmpty(t, res.GetVehicleTypes())
@@ -31,9 +33,9 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewMostsClient(conn)
-	itemsClient := NewItemsClient(conn)
-	attrsClient := NewAttrsClient(conn)
+	client := pb.NewMostsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
+	attrsClient := pb.NewAttrsClient(conn)
 
 	// admin
 	kc := cnt.Keycloak()
@@ -52,28 +54,28 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 
 	tests := []struct {
 		ratingCatname string
-		values1       []*AttrUserValue
-		values2       []*AttrUserValue
+		values1       []*pb.AttrUserValue
+		values2       []*pb.AttrUserValue
 		value1        string
 		value2        string
 	}{
 		{
 			ratingCatname: "dynamic",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.AccelerationTo100KmhAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 1,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.AccelerationTo60MphAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 10,
 					},
@@ -84,21 +86,21 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "static",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.AccelerationTo100KmhAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 10,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.AccelerationTo60MphAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 1,
 					},
@@ -109,21 +111,21 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "fastest",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.MaxSpeedAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 300,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.MaxSpeedAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 150,
 					},
@@ -134,21 +136,21 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "slowest",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.MaxSpeedAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 150,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.MaxSpeedAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 300,
 					},
@@ -159,21 +161,21 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "big-engine",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_FLOAT,
 						Valid:    true,
 						IntValue: 6000,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_FLOAT,
 						Valid:    true,
 						IntValue: 1500,
 					},
@@ -184,21 +186,21 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "small-engine",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_FLOAT,
 						Valid:    true,
 						IntValue: 1500,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_FLOAT,
 						Valid:    true,
 						IntValue: 6000,
 					},
@@ -209,69 +211,69 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "bigbrakes",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.RearBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 135,
 					},
 				},
 				{
 					AttributeId: schema.RearBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 135,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.RearBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 100,
 					},
 				},
 				{
 					AttributeId: schema.RearBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 100,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
@@ -282,69 +284,69 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "smallbrakes",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.RearBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 100,
 					},
 				},
 				{
 					AttributeId: schema.RearBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 100,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.RearBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 135,
 					},
 				},
 				{
 					AttributeId: schema.RearBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesDiameterAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 135,
 					},
 				},
 				{
 					AttributeId: schema.FrontBrakesThicknessAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 30,
 					},
@@ -355,101 +357,101 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "mighty",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EnginePowerAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 200,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersLayoutAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{10},
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationValvesCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 4,
 					},
 				},
 				{
 					AttributeId: schema.EngineTurboAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{48},
 					},
 				},
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6000,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EnginePowerAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 100,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersLayoutAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{10},
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationValvesCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 4,
 					},
 				},
 				{
 					AttributeId: schema.EngineTurboAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{48},
 					},
 				},
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6000,
 					},
@@ -462,101 +464,101 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{ //nolint: dupl
 			ratingCatname: "weak",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EnginePowerAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 100,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersLayoutAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{10},
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationValvesCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 4,
 					},
 				},
 				{
 					AttributeId: schema.EngineTurboAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{48},
 					},
 				},
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6000,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EnginePowerAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 200,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersLayoutAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{10},
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationCylindersCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
 				},
 				{
 					AttributeId: schema.EngineConfigurationValvesCountAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 4,
 					},
 				},
 				{
 					AttributeId: schema.EngineTurboAttr,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{48},
 					},
 				},
 				{
 					AttributeId: schema.EngineVolumeAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6000,
 					},
@@ -569,101 +571,101 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "bigwheel",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.FrontWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 175,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 225,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.FrontWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 175,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 175,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
@@ -674,101 +676,101 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		},
 		{
 			ratingCatname: "smallwheel",
-			values1: []*AttrUserValue{
+			values1: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.FrontWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 175,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 175,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
 				},
 			},
-			values2: []*AttrUserValue{
+			values2: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.FrontWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 175,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.FrontWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreWidthAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 225,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelTyreSeriesAttr,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 75,
 					},
 				},
 				{
 					AttributeId: schema.RearWheelRadiusAttr,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 15.5,
 					},
@@ -787,26 +789,26 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 		t.Run(tt.ratingCatname, func(t *testing.T) {
 			t.Parallel()
 
-			brandID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			brandID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:       fmt.Sprintf("brand-%d", randomInt),
 				IsGroup:    true,
-				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+				ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 				Catname:    fmt.Sprintf("brand-%d", randomInt),
 			})
 
-			vehicle1ID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			vehicle1ID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:       fmt.Sprintf("vehicle1-%d", randomInt),
 				IsGroup:    true,
-				ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+				ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 				BeginYear:  1930,
 				EndYear:    1944,
 			})
 
 			// second vehicle
-			vehicle2ID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			vehicle2ID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:       fmt.Sprintf("vehicle2-%d", randomInt),
 				IsGroup:    true,
-				ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+				ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 				BeginYear:  1920,
 				EndYear:    1950,
 			})
@@ -814,10 +816,10 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 			_, err := itemsClient.CreateItemParent(
 				metadata.AppendToOutgoingContext(
 					ctx,
-					authorizationHeader,
+					authn.AuthorizationHeader,
 					bearerPrefix+adminToken.AccessToken,
 				),
-				&ItemParent{
+				&pb.ItemParent{
 					ItemId: vehicle1ID, ParentId: brandID, Catname: fmt.Sprintf("vehicle1-%d", randomInt),
 				},
 			)
@@ -826,10 +828,10 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 			_, err = itemsClient.CreateItemParent(
 				metadata.AppendToOutgoingContext(
 					ctx,
-					authorizationHeader,
+					authn.AuthorizationHeader,
 					bearerPrefix+adminToken.AccessToken,
 				),
-				&ItemParent{
+				&pb.ItemParent{
 					ItemId: vehicle2ID, ParentId: brandID, Catname: fmt.Sprintf("vehicle2-%d", randomInt),
 				},
 			)
@@ -842,10 +844,10 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 			_, err = attrsClient.SetUserValues(
 				metadata.AppendToOutgoingContext(
 					ctx,
-					authorizationHeader,
+					authn.AuthorizationHeader,
 					bearerPrefix+adminToken.AccessToken,
 				),
-				&AttrSetUserValuesRequest{Items: tt.values1},
+				&pb.AttrSetUserValuesRequest{Items: tt.values1},
 			)
 			require.NoError(t, err)
 
@@ -856,15 +858,15 @@ func TestMostsRatings(t *testing.T) { //nolint: maintidx
 			_, err = attrsClient.SetUserValues(
 				metadata.AppendToOutgoingContext(
 					ctx,
-					authorizationHeader,
+					authn.AuthorizationHeader,
 					bearerPrefix+adminToken.AccessToken,
 				),
-				&AttrSetUserValuesRequest{Items: tt.values2},
+				&pb.AttrSetUserValuesRequest{Items: tt.values2},
 			)
 			require.NoError(t, err)
 
 			// rating
-			res, err := client.GetItems(ctx, &MostsItemsRequest{
+			res, err := client.GetItems(ctx, &pb.MostsItemsRequest{
 				Language:      schema.EnglishLanguageCode,
 				YearsCatname:  "1930-39",
 				RatingCatname: tt.ratingCatname,

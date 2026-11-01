@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"testing"
 
-	eventlog "github.com/autowp/goautowp/log"
+	eventlog "github.com/autowp/goautowp/internal/log"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 )

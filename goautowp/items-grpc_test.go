@@ -9,10 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/genproto/googleapis/type/latlng"
@@ -42,34 +45,34 @@ func TestSuppressAuthor(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	personName := fmt.Sprintf("Suppress Author %d", random.Int())
-	personID := createItem(t, conn, cnt, &Item{
+	personID := createItem(t, conn, cnt, &pb.Item{
 		Name:       personName,
-		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_PERSON,
 	})
-	vehicleID := createItem(t, conn, cnt, &Item{
+	vehicleID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	pictureID := CreatePicture(
-		t, cnt, "./test/test.jpg", PicturePostForm{ItemID: vehicleID}, adminToken.AccessToken,
+		t, cnt, "./test/test.jpg", pictureshttp.PicturePostForm{ItemID: vehicleID}, adminToken.AccessToken,
 	)
 
-	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken)
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken.AccessToken)
 
-	picturesClient := NewPicturesClient(conn)
-	_, err = picturesClient.CreatePictureItem(apiCtx, &CreatePictureItemRequest{
+	picturesClient := pb.NewPicturesClient(conn)
+	_, err = picturesClient.CreatePictureItem(apiCtx, &pb.CreatePictureItemRequest{
 		PictureId: pictureID,
 		ItemId:    personID,
-		Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+		Type:      pb.PictureItemType_PICTURE_ITEM_AUTHOR,
 	})
 	require.NoError(t, err)
 
-	itemsClient := NewItemsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
 
 	reference := fmt.Sprintf("TEST-%d", random.Int())
 
-	res, err := itemsClient.SuppressAuthor(apiCtx, &SuppressAuthorRequest{
+	res, err := itemsClient.SuppressAuthor(apiCtx, &pb.SuppressAuthorRequest{
 		ItemId:       personID,
 		Reference:    reference,
 		ContactEmail: "requester@example.com",
@@ -138,7 +141,7 @@ func TestSuppressAuthor(t *testing.T) {
 	// The affected-pictures lookup used to answer GDPR Art. 15 access requests returns the
 	// picture's identity, not just its id - the public route is /picture/:identity, and an
 	// id-based link there 404s.
-	pic, err := picturesClient.GetPicture(apiCtx, &PicturesRequest{Options: &PictureListOptions{Id: pictureID}})
+	pic, err := picturesClient.GetPicture(apiCtx, &pb.PicturesRequest{Options: &pb.PictureListOptions{Id: pictureID}})
 	require.NoError(t, err)
 	require.NotEmpty(t, pic.GetIdentity())
 
@@ -146,9 +149,9 @@ func TestSuppressAuthor(t *testing.T) {
 	// all when author_suppression_id is set - Picture.author_withheld must reflect that.
 	require.True(t, pic.GetAuthorWithheld())
 
-	autowpClient := NewAutowpClient(conn)
+	autowpClient := pb.NewAutowpClient(conn)
 	affected, err := autowpClient.GetGdprObjectionAffectedPictures(
-		apiCtx, &GetGdprObjectionAffectedPicturesRequest{Id: res.GetGdprObjectionId()},
+		apiCtx, &pb.GetGdprObjectionAffectedPicturesRequest{Id: res.GetGdprObjectionId()},
 	)
 	require.NoError(t, err)
 	require.Equal(t, []int64{pictureID}, affected.GetPictureIds())
@@ -157,17 +160,17 @@ func TestSuppressAuthor(t *testing.T) {
 	// A moderator can manually attach a picture the SuppressAuthor-time site-wide search missed
 	// (e.g. spotted by hand in the inbox with the name in its copyrights text) to the same case.
 	extraPictureID := CreatePicture(
-		t, cnt, "./test/test.jpg", PicturePostForm{ItemID: vehicleID}, adminToken.AccessToken,
+		t, cnt, "./test/test.jpg", pictureshttp.PicturePostForm{ItemID: vehicleID}, adminToken.AccessToken,
 	)
 
-	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &AddGdprObjectionCleanupCandidateRequest{
+	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &pb.AddGdprObjectionCleanupCandidateRequest{
 		ObjectionId: res.GetGdprObjectionId(),
 		PictureId:   extraPictureID,
 	})
 	require.NoError(t, err)
 
 	candidates, err := autowpClient.GetGdprObjectionCleanupCandidates(
-		apiCtx, &GetGdprObjectionCleanupCandidatesRequest{ObjectionId: res.GetGdprObjectionId()},
+		apiCtx, &pb.GetGdprObjectionCleanupCandidatesRequest{ObjectionId: res.GetGdprObjectionId()},
 	)
 	require.NoError(t, err)
 
@@ -176,7 +179,7 @@ func TestSuppressAuthor(t *testing.T) {
 	for _, candidate := range candidates.GetItems() {
 		if candidate.GetEntityId() == extraPictureID &&
 			candidate.GetEntityType() ==
-				GdprObjectionCleanupCandidateEntityType_GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_COPYRIGHTS_TEXT_PICTURE {
+				pb.GdprObjectionCleanupCandidateEntityType_GDPR_OBJECTION_CLEANUP_CANDIDATE_ENTITY_TYPE_COPYRIGHTS_TEXT_PICTURE {
 			found = true
 
 			break
@@ -186,14 +189,14 @@ func TestSuppressAuthor(t *testing.T) {
 	require.True(t, found, "manually attached picture should appear as a cleanup candidate")
 
 	// Re-adding the same picture is a no-op, not a duplicate row.
-	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &AddGdprObjectionCleanupCandidateRequest{
+	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &pb.AddGdprObjectionCleanupCandidateRequest{
 		ObjectionId: res.GetGdprObjectionId(),
 		PictureId:   extraPictureID,
 	})
 	require.NoError(t, err)
 
 	candidates, err = autowpClient.GetGdprObjectionCleanupCandidates(
-		apiCtx, &GetGdprObjectionCleanupCandidatesRequest{ObjectionId: res.GetGdprObjectionId()},
+		apiCtx, &pb.GetGdprObjectionCleanupCandidatesRequest{ObjectionId: res.GetGdprObjectionId()},
 	)
 	require.NoError(t, err)
 
@@ -208,7 +211,7 @@ func TestSuppressAuthor(t *testing.T) {
 	require.Equal(t, 1, matches)
 
 	// A nonexistent picture is rejected.
-	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &AddGdprObjectionCleanupCandidateRequest{
+	_, err = autowpClient.AddGdprObjectionCleanupCandidate(apiCtx, &pb.AddGdprObjectionCleanupCandidateRequest{
 		ObjectionId: res.GetGdprObjectionId(),
 		PictureId:   0,
 	})
@@ -219,9 +222,9 @@ func TestTopCategoriesList(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	_, err := client.GetTopCategoriesList(ctx, &GetTopCategoriesListRequest{
+	_, err := client.GetTopCategoriesList(ctx, &pb.GetTopCategoriesListRequest{
 		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
@@ -234,39 +237,39 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	ctx := t.Context()
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brand1 := createItem(t, conn, cnt, &Item{
+	brand1 := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand1-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand1-%d", random.Int()),
 	})
 
-	brand2 := createItem(t, conn, cnt, &Item{
+	brand2 := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand2-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand2-%d", random.Int()),
 	})
 
-	vehicle1 := createItem(t, conn, cnt, &Item{
+	vehicle1 := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle1-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	vehicle2 := createItem(t, conn, cnt, &Item{
+	vehicle2 := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle2-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	twins := createItem(t, conn, cnt, &Item{
+	twins := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("twins-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_TWINS,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_TWINS,
 	})
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	kc := cnt.Keycloak()
 
@@ -285,10 +288,10 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	_, err = client.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: vehicle1, ParentId: brand1, Catname: "vehicle1",
 		},
 	)
@@ -297,10 +300,10 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	_, err = client.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: vehicle2, ParentId: brand2, Catname: "vehicle2",
 		},
 	)
@@ -309,10 +312,10 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	_, err = client.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: vehicle1, ParentId: twins, Catname: "vehicle1",
 		},
 	)
@@ -321,22 +324,22 @@ func TestGetTwinsBrandsList(t *testing.T) {
 	_, err = client.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: vehicle2, ParentId: twins, Catname: "vehicle2",
 		},
 	)
 	require.NoError(t, err)
 
-	res, err := client.GetTopTwinsBrandsList(ctx, &GetTopTwinsBrandsListRequest{
+	res, err := client.GetTopTwinsBrandsList(ctx, &pb.GetTopTwinsBrandsListRequest{
 		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 
-	r6, err := client.GetTwinsBrandsList(ctx, &GetTwinsBrandsListRequest{
+	r6, err := client.GetTwinsBrandsList(ctx, &pb.GetTwinsBrandsListRequest{
 		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
@@ -349,9 +352,9 @@ func TestTopBrandsList(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	res, err := client.GetTopBrandsList(ctx, &GetTopBrandsListRequest{
+	res, err := client.GetTopBrandsList(ctx, &pb.GetTopBrandsListRequest{
 		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
@@ -363,11 +366,11 @@ func TestTopPersonsAuthorList(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	r, err := client.GetTopPersonsList(ctx, &GetTopPersonsListRequest{
+	r, err := client.GetTopPersonsList(ctx, &pb.GetTopPersonsListRequest{
 		Language:        schema.RussianLanguageCode,
-		PictureItemType: PictureItemType_PICTURE_ITEM_AUTHOR,
+		PictureItemType: pb.PictureItemType_PICTURE_ITEM_AUTHOR,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, r)
@@ -378,11 +381,11 @@ func TestTopPersonsContentList(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	r, err := client.GetTopPersonsList(ctx, &GetTopPersonsListRequest{
+	r, err := client.GetTopPersonsList(ctx, &pb.GetTopPersonsListRequest{
 		Language:        schema.RussianLanguageCode,
-		PictureItemType: PictureItemType_PICTURE_ITEM_CONTENT,
+		PictureItemType: pb.PictureItemType_PICTURE_ITEM_CONTENT,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, r)
@@ -393,9 +396,9 @@ func TestTopFactoriesList(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	r, err := client.GetTopFactoriesList(ctx, &GetTopFactoriesListRequest{
+	r, err := client.GetTopFactoriesList(ctx, &pb.GetTopFactoriesListRequest{
 		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
@@ -407,7 +410,7 @@ func TestContentLanguages(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	r, err := client.GetContentLanguages(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -436,15 +439,15 @@ func TestItemLinks(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, adminToken)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	r1, err := client.CreateItemLink(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemLink{
+		&pb.ItemLink{
 			Name:   "Link 1 ",
 			Url:    " https://example.org",
 			Type:   " club",
@@ -454,8 +457,8 @@ func TestItemLinks(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, r1.GetId())
 
-	r2, err := client.GetItemLink(ctx, &ItemLinksRequest{
-		Options: &ItemLinkListOptions{
+	r2, err := client.GetItemLink(ctx, &pb.ItemLinksRequest{
+		Options: &pb.ItemLinkListOptions{
 			Id: r1.GetId(),
 		},
 	})
@@ -471,10 +474,10 @@ func TestItemLinks(t *testing.T) {
 	_, err = client.UpdateItemLink(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemLink{
+		&pb.ItemLink{
 			Id:     r1.GetId(),
 			Name:   "Link 2",
 			Url:    "https://example2.org",
@@ -484,8 +487,8 @@ func TestItemLinks(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	r3, err := client.GetItemLink(ctx, &ItemLinksRequest{
-		Options: &ItemLinkListOptions{
+	r3, err := client.GetItemLink(ctx, &pb.ItemLinksRequest{
+		Options: &pb.ItemLinkListOptions{
 			Id: r1.GetId(),
 		},
 	})
@@ -498,8 +501,8 @@ func TestItemLinks(t *testing.T) {
 	require.Equal(t, "default", r3.GetType())
 	require.Equal(t, int64(2), r3.GetItemId())
 
-	r4, err := client.GetItemLinks(ctx, &ItemLinksRequest{
-		Options: &ItemLinkListOptions{
+	r4, err := client.GetItemLinks(ctx, &pb.ItemLinksRequest{
+		Options: &pb.ItemLinkListOptions{
 			ItemId: r3.GetItemId(),
 		},
 	})
@@ -528,15 +531,15 @@ func TestItemVehicleTypes(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, adminToken)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	_, err = client.CreateItemVehicleType(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemVehicleType{
+		&pb.ItemVehicleType{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -546,10 +549,10 @@ func TestItemVehicleTypes(t *testing.T) {
 	r2, err := client.GetItemVehicleType(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemVehicleTypeRequest{
+		&pb.ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -561,10 +564,10 @@ func TestItemVehicleTypes(t *testing.T) {
 	_, err = client.CreateItemVehicleType(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemVehicleType{
+		&pb.ItemVehicleType{
 			ItemId:        1,
 			VehicleTypeId: 2,
 		},
@@ -574,10 +577,10 @@ func TestItemVehicleTypes(t *testing.T) {
 	r4, err := client.GetItemVehicleTypes(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&GetItemVehicleTypesRequest{
+		&pb.GetItemVehicleTypesRequest{
 			ItemId: 1,
 		},
 	)
@@ -587,10 +590,10 @@ func TestItemVehicleTypes(t *testing.T) {
 	_, err = client.DeleteItemVehicleType(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemVehicleTypeRequest{
+		&pb.ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -600,10 +603,10 @@ func TestItemVehicleTypes(t *testing.T) {
 	r6, err := client.GetItemVehicleType(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemVehicleTypeRequest{
+		&pb.ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 2,
 		},
@@ -615,10 +618,10 @@ func TestItemVehicleTypes(t *testing.T) {
 	_, err = client.GetItemVehicleType(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemVehicleTypeRequest{
+		&pb.ItemVehicleTypeRequest{
 			ItemId:        1,
 			VehicleTypeId: 1,
 		},
@@ -628,10 +631,10 @@ func TestItemVehicleTypes(t *testing.T) {
 	r8, err := client.GetItemVehicleTypes(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&GetItemVehicleTypesRequest{
+		&pb.GetItemVehicleTypesRequest{
 			ItemId: 1,
 		},
 	)
@@ -660,15 +663,15 @@ func TestItemParentLanguages(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, adminToken)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	_, err = client.GetItemParentLanguages(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&GetItemParentLanguagesRequest{
+		&pb.GetItemParentLanguagesRequest{
 			ItemId:   1,
 			ParentId: 1,
 		},
@@ -697,15 +700,15 @@ func TestItemLanguages(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, adminToken)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	_, err = client.GetItemLanguages(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&GetItemLanguagesRequest{
+		&pb.GetItemLanguagesRequest{
 			ItemId: 1,
 		},
 	)
@@ -718,27 +721,27 @@ func TestCatalogueMenuList(t *testing.T) {
 	ctx := t.Context()
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	createItem(t, conn, cnt, &Item{
+	createItem(t, conn, cnt, &pb.Item{
 		Name:            fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:         false,
-		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:         fmt.Sprintf("category-%d", random.Int()),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	res, err := client.List(ctx, &ItemsRequest{
+	res, err := client.List(ctx, &pb.ItemsRequest{
 		Language: schema.RussianLanguageCode,
-		Fields: &ItemFields{
+		Fields: &pb.ItemFields{
 			NameText:         true,
 			DescendantsCount: true,
 		},
 		Limit: 20,
-		Options: &ItemListOptions{
+		Options: &pb.ItemListOptions{
 			NoParent: true,
-			TypeId:   ItemType_ITEM_TYPE_CATEGORY,
+			TypeId:   pb.ItemType_ITEM_TYPE_CATEGORY,
 		},
 	})
 	require.NoError(t, err)
@@ -751,7 +754,7 @@ func TestStats(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	cfg := config.LoadConfig(".")
 
@@ -761,7 +764,7 @@ func TestStats(t *testing.T) {
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	r, err := client.GetStats(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
 		&emptypb.Empty{},
 	)
 	require.NoError(t, err)
@@ -772,7 +775,7 @@ func TestSetItemParentLanguage(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(ctx)
@@ -871,9 +874,9 @@ func TestSetItemParentLanguage(t *testing.T) {
 			childName := fmt.Sprintf(testCase.ChildName, randomInt)
 			parentName := fmt.Sprintf(testCase.ParentName, randomInt)
 
-			itemID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			itemID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:           childName,
-				ItemTypeId:     ItemType_ITEM_TYPE_VEHICLE,
+				ItemTypeId:     pb.ItemType_ITEM_TYPE_VEHICLE,
 				BeginYear:      testCase.ChildBeginYear,
 				EndYear:        testCase.ChildEndYear,
 				BeginModelYear: testCase.ChildBeginModelYear,
@@ -881,10 +884,10 @@ func TestSetItemParentLanguage(t *testing.T) {
 				SpecId:         testCase.ChildSpecID,
 			})
 
-			parentID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			parentID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:           parentName,
 				IsGroup:        true,
-				ItemTypeId:     ItemType_ITEM_TYPE_VEHICLE,
+				ItemTypeId:     pb.ItemType_ITEM_TYPE_VEHICLE,
 				BeginYear:      testCase.ParentBeginYear,
 				EndYear:        testCase.ParentEndYear,
 				BeginModelYear: testCase.ParentBeginModelYear,
@@ -893,16 +896,19 @@ func TestSetItemParentLanguage(t *testing.T) {
 			})
 
 			_, err := client.CreateItemParent(
-				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-				&ItemParent{
-					ItemId: itemID, ParentId: parentID, Catname: "child-item", Type: ItemParentType_ITEM_TYPE_DEFAULT,
+				metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+				&pb.ItemParent{
+					ItemId:   itemID,
+					ParentId: parentID,
+					Catname:  "child-item",
+					Type:     pb.ItemParentType_ITEM_TYPE_DEFAULT,
 				},
 			)
 			require.NoError(t, err)
 
 			_, err = client.SetItemParentLanguage(
-				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-				&ItemParentLanguage{
+				metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+				&pb.ItemParentLanguage{
 					ItemId:   itemID,
 					ParentId: parentID,
 					Language: schema.EnglishLanguageCode,
@@ -912,15 +918,15 @@ func TestSetItemParentLanguage(t *testing.T) {
 			require.NoError(t, err)
 
 			r3, err := client.GetItemParentLanguages(
-				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-				&GetItemParentLanguagesRequest{
+				metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+				&pb.GetItemParentLanguagesRequest{
 					ItemId:   itemID,
 					ParentId: parentID,
 				},
 			)
 			require.NoError(t, err)
 
-			var itemParentLanguageRow *ItemParentLanguage
+			var itemParentLanguageRow *pb.ItemParentLanguage
 
 			for _, row := range r3.GetItems() {
 				if row.GetLanguage() == schema.EnglishLanguageCode {
@@ -942,16 +948,16 @@ func TestBrandNewItems(t *testing.T) {
 	ctx := t.Context()
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	_, err := client.GetBrandNewItems(ctx, &NewItemsRequest{
+	_, err := client.GetBrandNewItems(ctx, &pb.NewItemsRequest{
 		ItemId:   itemID,
 		Language: schema.RussianLanguageCode,
 	})
@@ -970,33 +976,33 @@ func TestNewItems(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:    fmt.Sprintf("category-%d", random.Int()),
 	})
 
-	childID := createItem(t, conn, cnt, &Item{
+	childID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
-			ItemId: childID, ParentId: itemID, Catname: "child-item", Type: ItemParentType_ITEM_TYPE_DEFAULT,
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
+			ItemId: childID, ParentId: itemID, Catname: "child-item", Type: pb.ItemParentType_ITEM_TYPE_DEFAULT,
 		},
 	)
 	require.NoError(t, err)
 
-	_, err = client.GetNewItems(ctx, &NewItemsRequest{
+	_, err = client.GetNewItems(ctx, &pb.NewItemsRequest{
 		ItemId:   itemID,
 		Language: schema.EnglishLanguageCode,
 	})
@@ -1013,24 +1019,24 @@ func TestInboxPicturesCount(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	// create brand
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:            fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:         true,
-		ItemTypeId:      ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:         fmt.Sprintf("brand-%d", random.Int()),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
 	// create vehicle
-	childID := createItem(t, conn, cnt, &Item{
+	childID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	client := NewItemsClient(conn)
-	picturesClient := NewPicturesClient(conn)
+	client := pb.NewItemsClient(conn)
+	picturesClient := pb.NewPicturesClient(conn)
 
 	// login with admin
 	adminToken, err := kc.Login(
@@ -1047,18 +1053,18 @@ func TestInboxPicturesCount(t *testing.T) {
 	_, err = client.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
-			ItemId: childID, ParentId: brandID, Catname: "child-item", Type: ItemParentType_ITEM_TYPE_DEFAULT,
+		&pb.ItemParent{
+			ItemId: childID, ParentId: brandID, Catname: "child-item", Type: pb.ItemParentType_ITEM_TYPE_DEFAULT,
 		},
 	)
 	require.NoError(t, err)
 
 	// create inbox pictures
 	for i := range 10 {
-		pictureID := CreatePicture(t, cnt, "./test/test.jpg", PicturePostForm{
+		pictureID := CreatePicture(t, cnt, "./test/test.jpg", pictureshttp.PicturePostForm{
 			ItemID: childID,
 		}, adminToken.AccessToken)
 
@@ -1066,13 +1072,13 @@ func TestInboxPicturesCount(t *testing.T) {
 			_, err = picturesClient.UpdatePicture(
 				metadata.AppendToOutgoingContext(
 					ctx,
-					authorizationHeader,
+					authn.AuthorizationHeader,
 					bearerPrefix+adminToken.AccessToken,
 				),
-				&UpdatePictureRequest{
-					Picture: &Picture{
+				&pb.UpdatePictureRequest{
+					Picture: &pb.Picture{
 						Id:     pictureID,
-						Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+						Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 					},
 					UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 				},
@@ -1081,20 +1087,20 @@ func TestInboxPicturesCount(t *testing.T) {
 		}
 	}
 
-	_, err = client.List(ctx, &ItemsRequest{
-		Fields: &ItemFields{
+	_, err = client.List(ctx, &pb.ItemsRequest{
+		Fields: &pb.ItemFields{
 			InboxPicturesCount: true,
 		},
-		Options: &ItemListOptions{
+		Options: &pb.ItemListOptions{
 			Id: brandID,
 		},
 		Language: schema.EnglishLanguageCode,
 	})
 	require.ErrorContains(t, err, "PermissionDenied")
 
-	_, err = client.Item(ctx, &ItemRequest{
+	_, err = client.Item(ctx, &pb.ItemRequest{
 		Id: brandID,
-		Fields: &ItemFields{
+		Fields: &pb.ItemFields{
 			InboxPicturesCount: true,
 		},
 		Language: schema.EnglishLanguageCode,
@@ -1104,14 +1110,14 @@ func TestInboxPicturesCount(t *testing.T) {
 	list, err := client.List(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemsRequest{
-			Fields: &ItemFields{
+		&pb.ItemsRequest{
+			Fields: &pb.ItemFields{
 				InboxPicturesCount: true,
 			},
-			Options: &ItemListOptions{
+			Options: &pb.ItemListOptions{
 				Id: brandID,
 			},
 			Language: schema.EnglishLanguageCode,
@@ -1124,12 +1130,12 @@ func TestInboxPicturesCount(t *testing.T) {
 	item, err := client.Item(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemRequest{
+		&pb.ItemRequest{
 			Id: brandID,
-			Fields: &ItemFields{
+			Fields: &pb.ItemFields{
 				InboxPicturesCount: true,
 			},
 			Language: schema.EnglishLanguageCode,
@@ -1151,48 +1157,48 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	parentID1 := createItem(t, conn, cnt, &Item{
+	parentID1 := createItem(t, conn, cnt, &pb.Item{
 		Name:            fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:         true,
-		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:         fmt.Sprintf("category-%d", random.Int()),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
-	parentID2 := createItem(t, conn, cnt, &Item{
+	parentID2 := createItem(t, conn, cnt, &pb.Item{
 		Name:            fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:         true,
-		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:         fmt.Sprintf("category-%d", random.Int()),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
-	childID := createItem(t, conn, cnt, &Item{
+	childID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	// attach to first parent
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
-			ItemId: childID, ParentId: parentID1, Catname: "child-item", Type: ItemParentType_ITEM_TYPE_DEFAULT,
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
+			ItemId: childID, ParentId: parentID1, Catname: "child-item", Type: pb.ItemParentType_ITEM_TYPE_DEFAULT,
 		},
 	)
 	require.NoError(t, err)
 
 	// check child in parent 1
-	res, err := client.List(ctx, &ItemsRequest{
-		Options: &ItemListOptions{
-			Parent: &ItemParentListOptions{
+	res, err := client.List(ctx, &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{
+			Parent: &pb.ItemParentListOptions{
 				ParentId: parentID1,
 			},
 		},
@@ -1206,17 +1212,17 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 
 	// move to second parent
 	_, err = client.MoveItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&MoveItemParentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.MoveItemParentRequest{
 			ItemId: childID, ParentId: parentID1, DestParentId: parentID2,
 		},
 	)
 	require.NoError(t, err)
 
 	// check no childs in parent 1
-	res, err = client.List(ctx, &ItemsRequest{
-		Options: &ItemListOptions{
-			Parent: &ItemParentListOptions{
+	res, err = client.List(ctx, &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{
+			Parent: &pb.ItemParentListOptions{
 				ParentId: parentID1,
 			},
 		},
@@ -1226,9 +1232,9 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 	require.Empty(t, res.GetItems())
 
 	// check child in parent 2
-	res, err = client.List(ctx, &ItemsRequest{
-		Options: &ItemListOptions{
-			Parent: &ItemParentListOptions{
+	res, err = client.List(ctx, &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{
+			Parent: &pb.ItemParentListOptions{
 				ParentId: parentID2,
 			},
 		},
@@ -1242,8 +1248,8 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 
 	// delete
 	_, err = client.DeleteItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&DeleteItemParentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.DeleteItemParentRequest{
 			ItemId:   childID,
 			ParentId: parentID2,
 		},
@@ -1251,9 +1257,9 @@ func TestCreateMoveDeleteItemParent(t *testing.T) {
 	require.NoError(t, err)
 
 	// check no childs in parent 2
-	res, err = client.List(ctx, &ItemsRequest{
-		Options: &ItemListOptions{
-			Parent: &ItemParentListOptions{
+	res, err = client.List(ctx, &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{
+			Parent: &pb.ItemParentListOptions{
 				ParentId: parentID2,
 			},
 		},
@@ -1275,52 +1281,52 @@ func TestDeleteItemParentNotDeletesSecondChild(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	parentID := createItem(t, conn, cnt, &Item{
+	parentID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("category-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:    fmt.Sprintf("category-%d", random.Int()),
 	})
 
-	childID1 := createItem(t, conn, cnt, &Item{
+	childID1 := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	childID2 := createItem(t, conn, cnt, &Item{
+	childID2 := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	// attach first to parent
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
-			ItemId: childID1, ParentId: parentID, Catname: "child-item-1", Type: ItemParentType_ITEM_TYPE_DEFAULT,
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
+			ItemId: childID1, ParentId: parentID, Catname: "child-item-1", Type: pb.ItemParentType_ITEM_TYPE_DEFAULT,
 		},
 	)
 	require.NoError(t, err)
 
 	// attach second to parent
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
-			ItemId: childID2, ParentId: parentID, Catname: "child-item-2", Type: ItemParentType_ITEM_TYPE_DEFAULT,
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
+			ItemId: childID2, ParentId: parentID, Catname: "child-item-2", Type: pb.ItemParentType_ITEM_TYPE_DEFAULT,
 		},
 	)
 	require.NoError(t, err)
 
 	// check childs in parent
-	res, err := client.List(ctx, &ItemsRequest{
-		Options: &ItemListOptions{
-			Parent: &ItemParentListOptions{
+	res, err := client.List(ctx, &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{
+			Parent: &pb.ItemParentListOptions{
 				ParentId: parentID,
 			},
 		},
@@ -1331,8 +1337,8 @@ func TestDeleteItemParentNotDeletesSecondChild(t *testing.T) {
 
 	// delete
 	_, err = client.DeleteItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&DeleteItemParentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.DeleteItemParentRequest{
 			ItemId:   childID1,
 			ParentId: parentID,
 		},
@@ -1340,9 +1346,9 @@ func TestDeleteItemParentNotDeletesSecondChild(t *testing.T) {
 	require.NoError(t, err)
 
 	// check child 2 in parent
-	res, err = client.List(ctx, &ItemsRequest{
-		Options: &ItemListOptions{
-			Parent: &ItemParentListOptions{
+	res, err = client.List(ctx, &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{
+			Parent: &pb.ItemParentListOptions{
 				ParentId: parentID,
 			},
 		},
@@ -1365,7 +1371,7 @@ func TestUpdateItemParent(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -1374,26 +1380,26 @@ func TestUpdateItemParent(t *testing.T) {
 	randomInt := random.Int()
 
 	parentName := fmt.Sprintf("Peugeot-%d", randomInt)
-	parentID := createItem(t, conn, cnt, &Item{
+	parentID := createItem(t, conn, cnt, &pb.Item{
 		Name:            parentName,
 		IsGroup:         true,
-		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:         fmt.Sprintf("peugeot-%d", randomInt),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
 	childName := fmt.Sprintf("Peugeot-%d 407", randomInt)
-	childID := createItem(t, conn, cnt, &Item{
+	childID := createItem(t, conn, cnt, &pb.Item{
 		Name:       childName,
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	// attach first to parent
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
 			ItemId: childID, ParentId: parentID,
 		},
 	)
@@ -1413,17 +1419,17 @@ func TestUpdateItemParent(t *testing.T) {
 
 	// update
 	_, err = client.UpdateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
-			ItemId: childID, ParentId: parentID, Type: ItemParentType_ITEM_TYPE_DESIGN, Catname: "custom",
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
+			ItemId: childID, ParentId: parentID, Type: pb.ItemParentType_ITEM_TYPE_DESIGN, Catname: "custom",
 		},
 	)
 	require.NoError(t, err)
 
 	// check child in parent
-	res, err := client.List(ctx, &ItemsRequest{
-		Options: &ItemListOptions{
-			Parent: &ItemParentListOptions{
+	res, err := client.List(ctx, &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{
+			Parent: &pb.ItemParentListOptions{
 				ParentId: parentID,
 			},
 		},
@@ -1447,9 +1453,9 @@ func TestUpdateItemParent(t *testing.T) {
 
 	// update
 	_, err = client.UpdateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
-			ItemId: childID, ParentId: parentID, Type: ItemParentType_ITEM_TYPE_TUNING, Catname: "",
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
+			ItemId: childID, ParentId: parentID, Type: pb.ItemParentType_ITEM_TYPE_TUNING, Catname: "",
 		},
 	)
 	require.NoError(t, err)
@@ -1475,7 +1481,7 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -1484,18 +1490,18 @@ func TestUpdateItemLanguage(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:            itemName,
 		IsGroup:         true,
-		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:         fmt.Sprintf("peugeot-%d", randomInt),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
 	_, err = client.UpdateItemLanguage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemLanguage{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemLanguage{
 			ItemId:   itemID,
 			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
@@ -1504,8 +1510,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err := client.GetItemLanguages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&GetItemLanguagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1523,8 +1529,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	// setup text
 	_, err = client.UpdateItemLanguage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemLanguage{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemLanguage{
 			ItemId:   itemID,
 			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
@@ -1534,8 +1540,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err = client.GetItemLanguages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&GetItemLanguagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1556,8 +1562,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	// update text
 	_, err = client.UpdateItemLanguage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemLanguage{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemLanguage{
 			ItemId:   itemID,
 			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
@@ -1567,8 +1573,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err = client.GetItemLanguages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&GetItemLanguagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1587,8 +1593,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	// setup full text
 	_, err = client.UpdateItemLanguage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemLanguage{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemLanguage{
 			ItemId:   itemID,
 			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
@@ -1599,8 +1605,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err = client.GetItemLanguages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&GetItemLanguagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1622,8 +1628,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 
 	// clear texts
 	_, err = client.UpdateItemLanguage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemLanguage{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemLanguage{
 			ItemId:   itemID,
 			Language: schema.FrenchLanguageCode,
 			Name:     itemName,
@@ -1632,8 +1638,8 @@ func TestUpdateItemLanguage(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err = client.GetItemLanguages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&GetItemLanguagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.GetItemLanguagesRequest{
 			ItemId: itemID,
 		},
 	)
@@ -1662,7 +1668,7 @@ func TestSetUserItemSubscription(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -1671,18 +1677,18 @@ func TestSetUserItemSubscription(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:            itemName,
 		IsGroup:         true,
-		ItemTypeId:      ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:         fmt.Sprintf("peugeot-%d", randomInt),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
 	_, err = client.SetUserItemSubscription(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&SetUserItemSubscriptionRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.SetUserItemSubscriptionRequest{
 			ItemId:     itemID,
 			Subscribed: true,
 		},
@@ -1690,8 +1696,8 @@ func TestSetUserItemSubscription(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = client.SetUserItemSubscription(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&SetUserItemSubscriptionRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.SetUserItemSubscriptionRequest{
 			ItemId:     itemID,
 			Subscribed: true,
 		},
@@ -1699,8 +1705,8 @@ func TestSetUserItemSubscription(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = client.SetUserItemSubscription(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&SetUserItemSubscriptionRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.SetUserItemSubscriptionRequest{
 			ItemId:     itemID,
 			Subscribed: false,
 		},
@@ -1718,7 +1724,7 @@ func TestSetItemEngine(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -1727,23 +1733,23 @@ func TestSetItemEngine(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       itemName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &Item{
+	engineID := createItem(t, conn, cnt, &pb.Item{
 		Name:       engineName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_ENGINE,
 	})
 
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -1753,16 +1759,16 @@ func TestSetItemEngine(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err := client.Item(ctx, &ItemRequest{
+	res, err := client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
 	require.Equal(t, engineID, res.GetEngineItemId())
 
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: true,
@@ -1772,16 +1778,16 @@ func TestSetItemEngine(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err = client.Item(ctx, &ItemRequest{
+	res, err = client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
 	require.Zero(t, res.GetEngineItemId())
 
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -1791,16 +1797,16 @@ func TestSetItemEngine(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err = client.Item(ctx, &ItemRequest{
+	res, err = client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
 	require.Equal(t, engineID, res.GetEngineItemId())
 
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            itemID,
 				EngineItemId:  0,
 				EngineInherit: false,
@@ -1810,7 +1816,7 @@ func TestSetItemEngine(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err = client.Item(ctx, &ItemRequest{
+	res, err = client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
@@ -1827,7 +1833,7 @@ func TestSetItemEngineInheritance(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -1836,29 +1842,29 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	randomInt := random.Int()
 
 	itemName := fmt.Sprintf("Peugeot-%d", randomInt)
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       itemName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &Item{
+	engineID := createItem(t, conn, cnt, &pb.Item{
 		Name:       engineName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_ENGINE,
 	})
 
 	// test inheritance
-	parentItemID := createItem(t, conn, cnt, &Item{
+	parentItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("Peugeot-%d-Parent", randomInt),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
 			ItemId: itemID, ParentId: parentItemID, Catname: "vehicle1",
 		},
 	)
@@ -1866,9 +1872,9 @@ func TestSetItemEngineInheritance(t *testing.T) {
 
 	// set parent engine
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            parentItemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -1878,16 +1884,16 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err := client.Item(ctx, &ItemRequest{
+	res, err := client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
 	require.Zero(t, res.GetEngineItemId())
 
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            itemID,
 				EngineInherit: true,
 			},
@@ -1896,7 +1902,7 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err = client.Item(ctx, &ItemRequest{
+	res, err = client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
@@ -1904,9 +1910,9 @@ func TestSetItemEngineInheritance(t *testing.T) {
 
 	// reset parent engine
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            parentItemID,
 				EngineItemId:  0,
 				EngineInherit: false,
@@ -1916,7 +1922,7 @@ func TestSetItemEngineInheritance(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err = client.Item(ctx, &ItemRequest{
+	res, err = client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
@@ -1933,7 +1939,7 @@ func TestGetBrands(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -1944,35 +1950,35 @@ func TestGetBrands(t *testing.T) {
 		Name      string
 		Catname   string
 		Language  string
-		Category  BrandsListLine_Category
+		Category  pb.BrandsListLine_Category
 		Character string
 	}{
 		{
 			Name:      "123",
 			Catname:   "numeric",
 			Language:  schema.EnglishLanguageCode,
-			Category:  BrandsListLine_NUMBER,
+			Category:  pb.BrandsListLine_NUMBER,
 			Character: "1",
 		},
 		{
 			Name:      "Бренд",
 			Catname:   "cyrillic",
 			Language:  schema.EnglishLanguageCode,
-			Category:  BrandsListLine_CYRILLIC,
+			Category:  pb.BrandsListLine_CYRILLIC,
 			Character: "Б",
 		},
 		{
 			Name:      "Latin Brand",
 			Catname:   "latin",
 			Language:  schema.EnglishLanguageCode,
-			Category:  BrandsListLine_LATIN,
+			Category:  pb.BrandsListLine_LATIN,
 			Character: "L",
 		},
 		{
 			Name:      "所有",
 			Catname:   "han",
 			Language:  schema.EnglishLanguageCode,
-			Category:  BrandsListLine_LATIN,
+			Category:  pb.BrandsListLine_LATIN,
 			Character: "S",
 		},
 	}
@@ -1982,17 +1988,17 @@ func TestGetBrands(t *testing.T) {
 			t.Parallel()
 
 			brandName := fmt.Sprintf("%s-%d", testCase.Name, randomInt)
-			brandID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			brandID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:       brandName,
 				IsGroup:    true,
-				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+				ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 				Catname:    fmt.Sprintf("%s-%d", testCase.Catname, randomInt),
 			})
 
 			// setup text
 			_, err := client.UpdateItemLanguage(
-				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-				&ItemLanguage{
+				metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+				&pb.ItemLanguage{
 					ItemId:   brandID,
 					Language: testCase.Language,
 					Name:     brandName,
@@ -2006,10 +2012,10 @@ func TestGetBrands(t *testing.T) {
 			err = idx.GenerateBrandsCache(ctx, testCase.Language)
 			require.NoError(t, err)
 
-			res, err := client.GetBrands(ctx, &GetBrandsRequest{Language: testCase.Language})
+			res, err := client.GetBrands(ctx, &pb.GetBrandsRequest{Language: testCase.Language})
 			require.NoError(t, err)
 
-			lineIndex := slices.IndexFunc(res.GetLines(), func(line *BrandsListLine) bool {
+			lineIndex := slices.IndexFunc(res.GetLines(), func(line *pb.BrandsListLine) bool {
 				return testCase.Category == line.GetCategory()
 			})
 			require.GreaterOrEqual(t, lineIndex, 0)
@@ -2018,7 +2024,7 @@ func TestGetBrands(t *testing.T) {
 
 			characterIndex := slices.IndexFunc(
 				line.GetCharacters(),
-				func(character *BrandsListCharacter) bool {
+				func(character *pb.BrandsListCharacter) bool {
 					return testCase.Character == character.GetCharacter()
 				},
 			)
@@ -2027,7 +2033,7 @@ func TestGetBrands(t *testing.T) {
 			character := line.GetCharacters()[characterIndex]
 
 			require.True(t,
-				slices.ContainsFunc(character.GetItems(), func(item *BrandsListItem) bool {
+				slices.ContainsFunc(character.GetItems(), func(item *pb.BrandsListItem) bool {
 					return item.GetId() == brandID
 				}),
 			)
@@ -2044,23 +2050,23 @@ func TestGetItemsFirstChars(t *testing.T) {
 	goquDB, err := cnt.GoquDB(t.Context())
 	require.NoError(t, err)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	personName := fmt.Sprintf("Zeta-%d", random.Int())
 
-	personID := createItem(t, conn, cnt, &Item{
+	personID := createItem(t, conn, cnt, &pb.Item{
 		Name:       personName,
-		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_PERSON,
 	})
 
 	// name is only set for English; requests below use Russian, which does not have a
 	// direct item_language row and must fall back to English via NameOnly's priority chain.
 	_, err = client.UpdateItemLanguage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemLanguage{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemLanguage{
 			ItemId:   personID,
 			Language: schema.EnglishLanguageCode,
 			Name:     personName,
@@ -2068,16 +2074,16 @@ func TestGetItemsFirstChars(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	charsRes, err := client.GetItemsFirstChars(ctx, &ItemsFirstCharsRequest{
-		Options:  &ItemListOptions{Id: personID},
+	charsRes, err := client.GetItemsFirstChars(ctx, &pb.ItemsFirstCharsRequest{
+		Options:  &pb.ItemListOptions{Id: personID},
 		Language: schema.RussianLanguageCode,
 	})
 	require.NoError(t, err)
 	require.Contains(t, charsRes.GetLatin(), "Z")
 
-	listRes, err := client.List(ctx, &ItemsRequest{
+	listRes, err := client.List(ctx, &pb.ItemsRequest{
 		Language: schema.RussianLanguageCode,
-		Options: &ItemListOptions{
+		Options: &pb.ItemListOptions{
 			Id:            personID,
 			NameFirstChar: "Z",
 		},
@@ -2086,9 +2092,9 @@ func TestGetItemsFirstChars(t *testing.T) {
 	require.Len(t, listRes.GetItems(), 1)
 	require.Equal(t, personID, listRes.GetItems()[0].GetId())
 
-	emptyRes, err := client.List(ctx, &ItemsRequest{
+	emptyRes, err := client.List(ctx, &pb.ItemsRequest{
 		Language: schema.RussianLanguageCode,
-		Options: &ItemListOptions{
+		Options: &pb.ItemListOptions{
 			Id:            personID,
 			NameFirstChar: "A",
 		},
@@ -2105,7 +2111,7 @@ func TestBrandSections(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	var ids []int64
 
@@ -2118,7 +2124,7 @@ func TestBrandSections(t *testing.T) {
 	for _, id := range ids {
 		_, err = client.GetBrandSections(
 			ctx,
-			&GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: id},
+			&pb.GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: id},
 		)
 		require.NoError(t, err)
 	}
@@ -2134,7 +2140,7 @@ func TestBrandSections2(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -2144,17 +2150,17 @@ func TestBrandSections2(t *testing.T) {
 
 	// create brand
 	brandName := fmt.Sprintf("Opel-%d", randomInt)
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       brandName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("opel-%d", randomInt),
 	})
 
 	// setup text
 	_, err = client.UpdateItemLanguage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemLanguage{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemLanguage{
 			ItemId:   brandID,
 			Language: schema.EnglishLanguageCode,
 			Name:     brandName,
@@ -2163,41 +2169,41 @@ func TestBrandSections2(t *testing.T) {
 	require.NoError(t, err)
 
 	testCases := []struct {
-		ItemTypeID    ItemType
+		ItemTypeID    pb.ItemType
 		Name          string
 		Catname       string
 		SectionNames  []string
 		VehicleTypeID []int64
 	}{
 		{
-			ItemTypeID:   ItemType_ITEM_TYPE_VEHICLE,
+			ItemTypeID:   pb.ItemType_ITEM_TYPE_VEHICLE,
 			Name:         "Calibra",
 			Catname:      "calibra",
 			SectionNames: []string{""},
 		},
 		{
-			ItemTypeID:    ItemType_ITEM_TYPE_VEHICLE,
+			ItemTypeID:    pb.ItemType_ITEM_TYPE_VEHICLE,
 			Name:          "Insignia",
 			Catname:       "Insignia",
 			SectionNames:  []string{""},
 			VehicleTypeID: []int64{items.VehicleTypeIDCar},
 		},
 		{
-			ItemTypeID:    ItemType_ITEM_TYPE_VEHICLE,
+			ItemTypeID:    pb.ItemType_ITEM_TYPE_VEHICLE,
 			Name:          "Motoclub",
 			Catname:       "motoclub",
 			SectionNames:  []string{"catalogue/section/moto"},
 			VehicleTypeID: []int64{items.VehicleTypeIDMoto},
 		},
 		{
-			ItemTypeID:    ItemType_ITEM_TYPE_VEHICLE,
+			ItemTypeID:    pb.ItemType_ITEM_TYPE_VEHICLE,
 			Name:          "Blitz",
 			Catname:       "blitz",
 			SectionNames:  []string{"catalogue/section/trucks", "catalogue/section/buses"},
 			VehicleTypeID: []int64{items.VehicleTypeIDTruck, items.VehicleTypeIDBus},
 		},
 		{
-			ItemTypeID:   ItemType_ITEM_TYPE_ENGINE,
+			ItemTypeID:   pb.ItemType_ITEM_TYPE_ENGINE,
 			Name:         "Engine",
 			Catname:      "engine",
 			SectionNames: []string{"catalogue/section/engines"},
@@ -2210,7 +2216,7 @@ func TestBrandSections2(t *testing.T) {
 
 			// create child vehicle
 			childName := fmt.Sprintf("Opel-%d %s", randomInt, testCase.Name)
-			childID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			childID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:       childName,
 				IsGroup:    true,
 				ItemTypeId: testCase.ItemTypeID,
@@ -2218,8 +2224,8 @@ func TestBrandSections2(t *testing.T) {
 
 			// setup text
 			_, err := client.UpdateItemLanguage(
-				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-				&ItemLanguage{
+				metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+				&pb.ItemLanguage{
 					ItemId:   childID,
 					Language: schema.EnglishLanguageCode,
 					Name:     childName,
@@ -2231,10 +2237,10 @@ func TestBrandSections2(t *testing.T) {
 				_, err = client.CreateItemVehicleType(
 					metadata.AppendToOutgoingContext(
 						ctx,
-						authorizationHeader,
+						authn.AuthorizationHeader,
 						bearerPrefix+adminToken,
 					),
-					&ItemVehicleType{
+					&pb.ItemVehicleType{
 						ItemId:        childID,
 						VehicleTypeId: vehicleTypeID,
 					},
@@ -2243,21 +2249,21 @@ func TestBrandSections2(t *testing.T) {
 			}
 
 			_, err = client.CreateItemParent(
-				metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-				&ItemParent{
-					ItemId: childID, ParentId: brandID, Type: ItemParentType_ITEM_TYPE_DEFAULT,
+				metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+				&pb.ItemParent{
+					ItemId: childID, ParentId: brandID, Type: pb.ItemParentType_ITEM_TYPE_DEFAULT,
 				},
 			)
 			require.NoError(t, err)
 
 			res, err := client.GetBrandSections(
 				ctx,
-				&GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: brandID},
+				&pb.GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: brandID},
 			)
 			require.NoError(t, err)
 
 			for _, sectionName := range testCase.SectionNames {
-				idx := slices.IndexFunc(res.GetSections(), func(section *BrandSection) bool {
+				idx := slices.IndexFunc(res.GetSections(), func(section *pb.BrandSection) bool {
 					return section.GetName() == sectionName
 				})
 				require.GreaterOrEqual(
@@ -2272,7 +2278,7 @@ func TestBrandSections2(t *testing.T) {
 
 				require.True(
 					t,
-					slices.ContainsFunc(section.GetGroups(), func(a *BrandSection) bool {
+					slices.ContainsFunc(section.GetGroups(), func(a *pb.BrandSection) bool {
 						return a.GetName() == testCase.Name
 					}),
 					"item `%s` not found in section `%s`",
@@ -2294,7 +2300,7 @@ func TestTwinsGroupBrands(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -2303,37 +2309,37 @@ func TestTwinsGroupBrands(t *testing.T) {
 	randomInt := random.Int()
 
 	groupName := fmt.Sprintf("Twins-Group-%d", randomInt)
-	groupID := createItem(t, conn, cnt, &Item{
+	groupID := createItem(t, conn, cnt, &pb.Item{
 		Name:       groupName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_TWINS,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_TWINS,
 	})
 
 	brandName := fmt.Sprintf("Brand-%d", randomInt)
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       brandName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", randomInt),
 	})
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &Item{
+	vehicleID := createItem(t, conn, cnt, &pb.Item{
 		Name:       vehicleName,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
 			ItemId: vehicleID, ParentId: groupID,
 		},
 	)
 	require.NoError(t, err)
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
 			ItemId: vehicleID, ParentId: brandID,
 		},
 	)
@@ -2341,11 +2347,11 @@ func TestTwinsGroupBrands(t *testing.T) {
 
 	res, err := client.List(
 		ctx,
-		&ItemsRequest{
-			Options: &ItemListOptions{
-				TypeId: ItemType_ITEM_TYPE_BRAND,
-				Child: &ItemParentListOptions{
-					ItemParentParentByChild: &ItemParentListOptions{
+		&pb.ItemsRequest{
+			Options: &pb.ItemListOptions{
+				TypeId: pb.ItemType_ITEM_TYPE_BRAND,
+				Child: &pb.ItemParentListOptions{
+					ItemParentParentByChild: &pb.ItemParentListOptions{
 						ParentId: groupID,
 					},
 				},
@@ -2385,13 +2391,13 @@ func TestAutocomplete(t *testing.T) {
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	_, err = client.List(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemsRequest{
-			Options: &ItemListOptions{
-				ParentTypesOf:        ItemType_ITEM_TYPE_BRAND,
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemsRequest{
+			Options: &pb.ItemListOptions{
+				ParentTypesOf:        pb.ItemType_ITEM_TYPE_BRAND,
 				IsGroup:              true,
 				ExcludeSelfAndChilds: 3,
 				Autocomplete:         "Test",
@@ -2414,13 +2420,13 @@ func TestTooBig(t *testing.T) {
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	_, err = client.List(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemsRequest{
-			Order: ItemsRequest_CHILDS_COUNT,
-			Fields: &ItemFields{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemsRequest{
+			Order: pb.ItemsRequest_CHILDS_COUNT,
+			Fields: &pb.ItemFields{
 				ChildsCount: true,
 			},
 			Limit: 100,
@@ -2442,12 +2448,12 @@ func TestSuggestionsTo(t *testing.T) {
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	_, err = client.List(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemsRequest{
-			Options: &ItemListOptions{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemsRequest{
+			Options: &pb.ItemListOptions{
 				SuggestionsTo: 1,
 			},
 			Limit: 1,
@@ -2466,7 +2472,7 @@ func TestGetItemParents(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -2475,47 +2481,47 @@ func TestGetItemParents(t *testing.T) {
 	randomInt := random.Int()
 
 	parentName := fmt.Sprintf("Parent-%d", randomInt)
-	parentID := createItem(t, conn, cnt, &Item{
+	parentID := createItem(t, conn, cnt, &pb.Item{
 		Name:       parentName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:    fmt.Sprintf("parent-%d", randomInt),
 	})
 
 	child1Name := fmt.Sprintf("Child1-%d", randomInt)
-	child1ID := createItem(t, conn, cnt, &Item{
+	child1ID := createItem(t, conn, cnt, &pb.Item{
 		Name:       child1Name,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	child2Name := fmt.Sprintf("Child2-%d", randomInt)
-	child2ID := createItem(t, conn, cnt, &Item{
+	child2ID := createItem(t, conn, cnt, &pb.Item{
 		Name:       child2Name,
-		ItemTypeId: ItemType_ITEM_TYPE_CATEGORY,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_CATEGORY,
 		Catname:    fmt.Sprintf("child2-%d", randomInt),
 	})
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
 			ItemId: child1ID, ParentId: parentID,
 		},
 	)
 	require.NoError(t, err)
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
 			ItemId: child2ID, ParentId: parentID,
 		},
 	)
 	require.NoError(t, err)
 
-	res, err := client.GetItemParents(t.Context(), &ItemParentsRequest{
-		Options: &ItemParentListOptions{
+	res, err := client.GetItemParents(t.Context(), &pb.ItemParentsRequest{
+		Options: &pb.ItemParentListOptions{
 			ParentId: parentID,
 		},
-		Order: ItemParentsRequest_AUTO,
+		Order: pb.ItemParentsRequest_AUTO,
 	})
 	require.NoError(t, err)
 	require.Len(t, res.GetItems(), 2)
@@ -2525,11 +2531,11 @@ func TestGetItemParents(t *testing.T) {
 		require.Contains(t, []int64{child1ID, child2ID}, row.GetItemId())
 	}
 
-	res, err = client.GetItemParents(t.Context(), &ItemParentsRequest{
-		Options: &ItemParentListOptions{
+	res, err = client.GetItemParents(t.Context(), &pb.ItemParentsRequest{
+		Options: &pb.ItemParentListOptions{
 			ParentId: parentID,
 		},
-		Order: ItemParentsRequest_CATEGORIES_FIRST,
+		Order: pb.ItemParentsRequest_CATEGORIES_FIRST,
 		Limit: 1,
 	})
 	require.NoError(t, err)
@@ -2565,22 +2571,22 @@ func TestGetItemParentsOrderByName(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	parentID := createItem(t, conn, cnt, &Item{
+	parentID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("OrderByNameParent-%d", randomInt),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("order-by-name-parent-%d", randomInt),
 	})
 
-	alphaID := createItem(t, conn, cnt, &Item{
+	alphaID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("Alpha-%d", randomInt),
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		BeginYear:  2020,
 		EndYear:    2020,
 	})
-	zebraID := createItem(t, conn, cnt, &Item{
+	zebraID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("Zebra-%d", randomInt),
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		BeginYear:  1990,
 		EndYear:    1990,
 	})
@@ -2590,27 +2596,27 @@ func TestGetItemParentsOrderByName(t *testing.T) {
 	adminToken, err := kc.Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 
-	client := NewItemsClient(conn)
-	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken)
+	client := pb.NewItemsClient(conn)
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken.AccessToken)
 
-	_, err = client.CreateItemParent(apiCtx, &ItemParent{ItemId: zebraID, ParentId: parentID})
+	_, err = client.CreateItemParent(apiCtx, &pb.ItemParent{ItemId: zebraID, ParentId: parentID})
 	require.NoError(t, err)
 
-	_, err = client.CreateItemParent(apiCtx, &ItemParent{ItemId: alphaID, ParentId: parentID})
+	_, err = client.CreateItemParent(apiCtx, &pb.ItemParent{ItemId: alphaID, ParentId: parentID})
 	require.NoError(t, err)
 
-	nameRes, err := client.GetItemParents(ctx, &ItemParentsRequest{
-		Options: &ItemParentListOptions{ParentId: parentID},
-		Order:   ItemParentsRequest_NAME,
+	nameRes, err := client.GetItemParents(ctx, &pb.ItemParentsRequest{
+		Options: &pb.ItemParentListOptions{ParentId: parentID},
+		Order:   pb.ItemParentsRequest_NAME,
 	})
 	require.NoError(t, err)
 	require.Len(t, nameRes.GetItems(), 2)
 	require.Equal(t, alphaID, nameRes.GetItems()[0].GetItemId(), "alphabetical: Alpha should sort before Zebra")
 	require.Equal(t, zebraID, nameRes.GetItems()[1].GetItemId(), "alphabetical: Zebra should sort after Alpha")
 
-	autoRes, err := client.GetItemParents(ctx, &ItemParentsRequest{
-		Options: &ItemParentListOptions{ParentId: parentID},
-		Order:   ItemParentsRequest_AUTO,
+	autoRes, err := client.GetItemParents(ctx, &pb.ItemParentsRequest{
+		Options: &pb.ItemParentListOptions{ParentId: parentID},
+		Order:   pb.ItemParentsRequest_AUTO,
 	})
 	require.NoError(t, err)
 	require.Len(t, autoRes.GetItems(), 2)
@@ -2622,7 +2628,7 @@ func TestItemFields(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	kc := cnt.Keycloak()
 	cfg := config.LoadConfig(".")
 
@@ -2641,12 +2647,12 @@ func TestItemFields(t *testing.T) {
 	res, err := client.List(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemsRequest{
+		&pb.ItemsRequest{
 			Language: schema.RussianLanguageCode,
-			Fields: &ItemFields{
+			Fields: &pb.ItemFields{
 				// AltNames:                   true,
 				// AcceptedPicturesCount:      true,
 				// AttrZoneId:                 true,
@@ -2699,7 +2705,7 @@ func TestItemParentFields(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	kc := cnt.Keycloak()
 	cfg := config.LoadConfig(".")
 
@@ -2718,13 +2724,13 @@ func TestItemParentFields(t *testing.T) {
 	res, err := client.GetItemParents(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParentsRequest{
+		&pb.ItemParentsRequest{
 			Language: schema.RussianLanguageCode,
-			Fields: &ItemParentFields{
-				Item: &ItemFields{
+			Fields: &pb.ItemParentFields{
+				Item: &pb.ItemFields{
 					AcceptedPicturesCount:   true,
 					ChildsCounts:            true,
 					CommentsAttentionsCount: true,
@@ -2737,11 +2743,11 @@ func TestItemParentFields(t *testing.T) {
 					NameText:                true,
 					OtherNames:              true,
 					SpecsRoute:              true,
-					EngineVehicles:          &ItemsRequest{},
+					EngineVehicles:          &pb.ItemsRequest{},
 				},
-				Parent:          &ItemFields{},
-				DuplicateParent: &ItemFields{},
-				DuplicateChild:  &ItemFields{},
+				Parent:          &pb.ItemFields{},
+				DuplicateParent: &pb.ItemFields{},
+				DuplicateChild:  &pb.ItemFields{},
 			},
 			Limit: 200,
 		},
@@ -2760,8 +2766,8 @@ func TestTwinsGroupPictures(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
-	picturesClient := NewPicturesClient(conn)
+	client := pb.NewItemsClient(conn)
+	picturesClient := pb.NewPicturesClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -2770,54 +2776,54 @@ func TestTwinsGroupPictures(t *testing.T) {
 	randomInt := random.Int()
 
 	groupName := fmt.Sprintf("Twins-Group-%d", randomInt)
-	groupID := createItem(t, conn, cnt, &Item{
+	groupID := createItem(t, conn, cnt, &pb.Item{
 		Name:       groupName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_TWINS,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_TWINS,
 	})
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &Item{
+	vehicleID := createItem(t, conn, cnt, &pb.Item{
 		Name:       vehicleName,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.ItemParent{
 			ItemId: vehicleID, ParentId: groupID,
 		},
 	)
 	require.NoError(t, err)
 
-	pictureID := CreatePicture(t, cnt, "./test/test.jpg", PicturePostForm{
+	pictureID := CreatePicture(t, cnt, "./test/test.jpg", pictureshttp.PicturePostForm{
 		ItemID: vehicleID,
 	}, adminToken)
 
 	_, err = picturesClient.UpdatePicture(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdatePictureRequest{
-			Picture: &Picture{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdatePictureRequest{
+			Picture: &pb.Picture{
 				Id:     pictureID,
-				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+				Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 			},
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
 
-	res2, err := client.GetItemParents(ctx, &ItemParentsRequest{
-		Options: &ItemParentListOptions{
+	res2, err := client.GetItemParents(ctx, &pb.ItemParentsRequest{
+		Options: &pb.ItemParentListOptions{
 			ParentId: groupID,
 			ItemId:   vehicleID,
 		},
-		Fields: &ItemParentFields{
-			ChildDescendantPictures: &PicturesRequest{
+		Fields: &pb.ItemParentFields{
+			ChildDescendantPictures: &pb.PicturesRequest{
 				Limit: 1,
-				Options: &PictureListOptions{
-					Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+				Options: &pb.PictureListOptions{
+					Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 				},
-				Order: PicturesRequest_ORDER_FRONT_PERSPECTIVES,
+				Order: pb.PicturesRequest_ORDER_FRONT_PERSPECTIVES,
 			},
 		},
 	})
@@ -2842,8 +2848,8 @@ func TestPersonPreviewPictures(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
-	picturesClient := NewPicturesClient(conn)
+	client := pb.NewItemsClient(conn)
+	picturesClient := pb.NewPicturesClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -2852,39 +2858,39 @@ func TestPersonPreviewPictures(t *testing.T) {
 	randomInt := random.Int()
 
 	personName := fmt.Sprintf("Person-%d", randomInt)
-	personID := createItem(t, conn, cnt, &Item{
+	personID := createItem(t, conn, cnt, &pb.Item{
 		Name:       personName,
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_PERSON,
 	})
 
-	pictureID := CreatePicture(t, cnt, "./test/test.jpg", PicturePostForm{
+	pictureID := CreatePicture(t, cnt, "./test/test.jpg", pictureshttp.PicturePostForm{
 		ItemID: personID,
 	}, adminToken)
 
 	_, err = picturesClient.UpdatePicture(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdatePictureRequest{
-			Picture: &Picture{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdatePictureRequest{
+			Picture: &pb.Picture{
 				Id:     pictureID,
-				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+				Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 			},
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
 	require.NoError(t, err)
 
-	res2, err := client.List(ctx, &ItemsRequest{
-		Fields: &ItemFields{
+	res2, err := client.List(ctx, &pb.ItemsRequest{
+		Fields: &pb.ItemFields{
 			Description: true,
 			HasText:     true,
 			NameDefault: true,
 			NameHtml:    true,
-			PreviewPictures: &PreviewPicturesRequest{
-				Pictures: &PicturesRequest{
-					Options: &PictureListOptions{
-						PictureItem: &PictureItemListOptions{
-							TypeId: PictureItemType_PICTURE_ITEM_CONTENT,
+			PreviewPictures: &pb.PreviewPicturesRequest{
+				Pictures: &pb.PicturesRequest{
+					Options: &pb.PictureListOptions{
+						PictureItem: &pb.PictureItemListOptions{
+							TypeId: pb.PictureItemType_PICTURE_ITEM_CONTENT,
 						},
 					},
 				},
@@ -2892,17 +2898,17 @@ func TestPersonPreviewPictures(t *testing.T) {
 		},
 		Language: schema.EnglishLanguageCode,
 		Limit:    10,
-		Options: &ItemListOptions{
+		Options: &pb.ItemListOptions{
 			Id: personID,
-			Descendant: &ItemParentCacheListOptions{
-				PictureItemsByItemId: &PictureItemListOptions{
-					Pictures: &PictureListOptions{Status: PictureStatus_PICTURE_STATUS_ACCEPTED},
-					TypeId:   PictureItemType_PICTURE_ITEM_CONTENT,
+			Descendant: &pb.ItemParentCacheListOptions{
+				PictureItemsByItemId: &pb.PictureItemListOptions{
+					Pictures: &pb.PictureListOptions{Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED},
+					TypeId:   pb.PictureItemType_PICTURE_ITEM_CONTENT,
 				},
 			},
-			TypeId: ItemType_ITEM_TYPE_PERSON,
+			TypeId: pb.ItemType_ITEM_TYPE_PERSON,
 		},
-		Order: ItemsRequest_NAME,
+		Order: pb.ItemsRequest_NAME,
 		Page:  1,
 	})
 	require.NoError(t, err)
@@ -2927,8 +2933,8 @@ func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewItemsClient(conn)
-	picturesClient := NewPicturesClient(conn)
+	client := pb.NewItemsClient(conn)
+	picturesClient := pb.NewPicturesClient(conn)
 
 	// admin
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
@@ -2937,30 +2943,30 @@ func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
 	randomInt := random.Int()
 
 	personName := fmt.Sprintf("Person-%d", randomInt)
-	personID := createItem(t, conn, cnt, &Item{
+	personID := createItem(t, conn, cnt, &pb.Item{
 		Name:       personName,
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_PERSON,
 	})
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &Item{
+	vehicleID := createItem(t, conn, cnt, &pb.Item{
 		Name:       vehicleName,
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	pictureID := CreatePicture(t, cnt, "./test/test.jpg", PicturePostForm{
+	pictureID := CreatePicture(t, cnt, "./test/test.jpg", pictureshttp.PicturePostForm{
 		ItemID:        vehicleID,
 		PerspectiveID: schema.PerspectiveCutaway,
 	}, adminToken)
 
 	_, err = picturesClient.UpdatePicture(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&UpdatePictureRequest{
-			Picture: &Picture{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.UpdatePictureRequest{
+			Picture: &pb.Picture{
 				Id:     pictureID,
-				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+				Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 			},
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
@@ -2968,50 +2974,50 @@ func TestCutawayAuthorsWithPreviewPictures(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = picturesClient.CreatePictureItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CreatePictureItemRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CreatePictureItemRequest{
 			PictureId: pictureID,
 			ItemId:    personID,
-			Type:      PictureItemType_PICTURE_ITEM_AUTHOR,
+			Type:      pb.PictureItemType_PICTURE_ITEM_AUTHOR,
 		},
 	)
 	require.NoError(t, err)
 
-	res2, err := client.List(ctx, &ItemsRequest{
-		Fields: &ItemFields{
+	res2, err := client.List(ctx, &pb.ItemsRequest{
+		Fields: &pb.ItemFields{
 			Description: true,
 			HasText:     true,
 			NameDefault: true,
 			NameHtml:    true,
-			PreviewPictures: &PreviewPicturesRequest{
+			PreviewPictures: &pb.PreviewPicturesRequest{
 				OnlyExactlyPictures: true,
-				Pictures: &PicturesRequest{
-					Options: &PictureListOptions{
-						PictureItem: &PictureItemListOptions{
-							PictureItemByPictureId: &PictureItemListOptions{
+				Pictures: &pb.PicturesRequest{
+					Options: &pb.PictureListOptions{
+						PictureItem: &pb.PictureItemListOptions{
+							PictureItemByPictureId: &pb.PictureItemListOptions{
 								PerspectiveId: schema.PerspectiveCutaway,
 							},
-							TypeId: PictureItemType_PICTURE_ITEM_AUTHOR,
+							TypeId: pb.PictureItemType_PICTURE_ITEM_AUTHOR,
 						},
-						Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+						Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 					},
 				},
 			},
 		},
 		Language: schema.EnglishLanguageCode,
 		Limit:    12,
-		Options: &ItemListOptions{
+		Options: &pb.ItemListOptions{
 			Id: personID,
-			PictureItems: &PictureItemListOptions{
-				Pictures: &PictureListOptions{
-					PictureItem: &PictureItemListOptions{PerspectiveId: schema.PerspectiveCutaway},
-					Status:      PictureStatus_PICTURE_STATUS_ACCEPTED,
+			PictureItems: &pb.PictureItemListOptions{
+				Pictures: &pb.PictureListOptions{
+					PictureItem: &pb.PictureItemListOptions{PerspectiveId: schema.PerspectiveCutaway},
+					Status:      pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 				},
-				TypeId: PictureItemType_PICTURE_ITEM_AUTHOR,
+				TypeId: pb.PictureItemType_PICTURE_ITEM_AUTHOR,
 			},
-			TypeId: ItemType_ITEM_TYPE_PERSON,
+			TypeId: pb.ItemType_ITEM_TYPE_PERSON,
 		},
-		Order: ItemsRequest_AGE,
+		Order: pb.ItemsRequest_AGE,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, res2.GetItems())
@@ -3028,7 +3034,7 @@ func TestItemOfDayPicture(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	kc := cnt.Keycloak()
 	cfg := config.LoadConfig(".")
 
@@ -3048,24 +3054,24 @@ func TestItemOfDayPicture(t *testing.T) {
 	randomInt := random.Int()
 
 	vehicleName := fmt.Sprintf("Vehicle-%d", randomInt)
-	vehicleID := createItem(t, conn, cnt, &Item{
+	vehicleID := createItem(t, conn, cnt, &pb.Item{
 		Name:       vehicleName,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	addPicture(t, cnt, conn, "./test/test.jpg",
-		PicturePostForm{ItemID: vehicleID, PerspectiveID: schema.PerspectiveFrontStrict},
-		PictureStatus_PICTURE_STATUS_ACCEPTED, adminToken.AccessToken)
+		pictureshttp.PicturePostForm{ItemID: vehicleID, PerspectiveID: schema.PerspectiveFrontStrict},
+		pb.PictureStatus_PICTURE_STATUS_ACCEPTED, adminToken.AccessToken)
 
 	res, err := client.Item(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemRequest{
+		&pb.ItemRequest{
 			Language: schema.RussianLanguageCode,
-			Fields:   &ItemFields{ItemOfDayPictures: true},
+			Fields:   &pb.ItemFields{ItemOfDayPictures: true},
 			Id:       vehicleID,
 		},
 	)
@@ -3078,8 +3084,8 @@ func TestItemOfDayPicture(t *testing.T) {
 func TestGetTopSpecsContributions(t *testing.T) {
 	t.Parallel()
 
-	client := NewItemsClient(conn)
-	attsClient := NewAttrsClient(conn)
+	client := pb.NewItemsClient(conn)
+	attsClient := pb.NewAttrsClient(conn)
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 
@@ -3088,22 +3094,22 @@ func TestGetTopSpecsContributions(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	itemID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
 		IsGroup:    true,
 	})
 
 	_, err = attsClient.SetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.FuelSupplySystemAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{25},
 					},
@@ -3111,8 +3117,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.EngineCylinderDiameter,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_FLOAT,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -3120,8 +3126,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.WidthAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_INTEGER,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -3129,8 +3135,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.ABSAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_BOOLEAN,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_BOOLEAN,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -3138,8 +3144,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.EngineTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_TREE,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_TREE,
 						Valid:     true,
 						IsEmpty:   false,
 						ListValue: []int64{105},
@@ -3148,8 +3154,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.EnginePlacementOrientationAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -3158,8 +3164,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.DriveUnitAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -3168,8 +3174,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.TurningDiameterAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 7.091,
 					},
@@ -3177,8 +3183,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.LengthAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
@@ -3186,8 +3192,8 @@ func TestGetTopSpecsContributions(t *testing.T) {
 				{
 					AttributeId: schema.FrontSuspensionTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:        AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:        pb.AttrAttributeType_STRING,
 						Valid:       true,
 						StringValue: "suspension test",
 					},
@@ -3199,7 +3205,7 @@ func TestGetTopSpecsContributions(t *testing.T) {
 
 	res, err := client.GetTopSpecsContributions(
 		ctx,
-		&TopSpecsContributionsRequest{Language: schema.RussianLanguageCode},
+		&pb.TopSpecsContributionsRequest{Language: schema.RussianLanguageCode},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, res.GetItems())
@@ -3208,7 +3214,7 @@ func TestGetTopSpecsContributions(t *testing.T) {
 func TestVehiclesOnEnginesMerge(t *testing.T) {
 	t.Parallel()
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
@@ -3216,23 +3222,23 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	itemID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "5 Series",
 		Body:       "",
 		IsGroup:    true,
 	})
 
-	childID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	childID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "5 Series",
 		Body:       "E31",
 		IsGroup:    true,
 	})
 
 	_, err = client.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.ItemParent{
 			ItemId: childID, ParentId: itemID, Catname: "vehicle1",
 		},
 	)
@@ -3242,16 +3248,16 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	randomInt := random.Int()
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &Item{
+	engineID := createItem(t, conn, cnt, &pb.Item{
 		Name:       engineName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_ENGINE,
 	})
 
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -3261,16 +3267,16 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	res, err := client.Item(ctx, &ItemRequest{
+	res, err := client.Item(ctx, &pb.ItemRequest{
 		Id: itemID,
 	})
 	require.NoError(t, err)
 	require.Equal(t, engineID, res.GetEngineItemId())
 
 	_, err = client.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            childID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -3281,11 +3287,11 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err = client.Item(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ItemRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.ItemRequest{
 			Id: engineID,
-			Fields: &ItemFields{
-				EngineVehicles:      &ItemsRequest{},
+			Fields: &pb.ItemFields{
+				EngineVehicles:      &pb.ItemsRequest{},
 				EngineVehiclesCount: true,
 			},
 			Language: schema.EnglishLanguageCode,
@@ -3296,8 +3302,8 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	require.EqualValues(t, 2, res.GetEngineVehiclesCount())
 
 	for i := range 10 {
-		childChildID := createItem(t, conn, cnt, &Item{
-			ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		childChildID := createItem(t, conn, cnt, &pb.Item{
+			ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 			Name:       "5 Series",
 			Body:       fmt.Sprintf("E31-%d", i),
 			IsGroup:    false,
@@ -3306,10 +3312,10 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 		_, err = client.CreateItemParent(
 			metadata.AppendToOutgoingContext(
 				ctx,
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&ItemParent{
+			&pb.ItemParent{
 				ItemId: childChildID, ParentId: childID, Catname: "vehicle1",
 			},
 		)
@@ -3318,11 +3324,11 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 		_, err = client.UpdateItem(
 			metadata.AppendToOutgoingContext(
 				ctx,
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&UpdateItemRequest{
-				Item: &Item{
+			&pb.UpdateItemRequest{
+				Item: &pb.Item{
 					Id:            childChildID,
 					EngineItemId:  engineID,
 					EngineInherit: false,
@@ -3336,11 +3342,11 @@ func TestVehiclesOnEnginesMerge(t *testing.T) {
 	}
 
 	res, err = client.Item(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ItemRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.ItemRequest{
 			Id: engineID,
-			Fields: &ItemFields{
-				EngineVehicles:      &ItemsRequest{},
+			Fields: &pb.ItemFields{
+				EngineVehicles:      &pb.ItemsRequest{},
 				EngineVehiclesCount: true,
 			},
 			Language: schema.EnglishLanguageCode,
@@ -3356,7 +3362,7 @@ func TestBrandSectionLanguageName(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	kc := cnt.Keycloak()
@@ -3374,25 +3380,25 @@ func TestBrandSectionLanguageName(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", randomInt),
 	})
 
-	vehicleID := createItem(t, conn, cnt, &Item{
+	vehicleID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	_, err = client.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: vehicleID, ParentId: brandID, Catname: "vehicle1",
 		},
 	)
@@ -3401,10 +3407,10 @@ func TestBrandSectionLanguageName(t *testing.T) {
 	_, err = client.SetItemParentLanguage(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParentLanguage{
+		&pb.ItemParentLanguage{
 			ItemId:   vehicleID,
 			ParentId: brandID,
 			Language: schema.RussianLanguageCode,
@@ -3416,10 +3422,10 @@ func TestBrandSectionLanguageName(t *testing.T) {
 	_, err = client.SetItemParentLanguage(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParentLanguage{
+		&pb.ItemParentLanguage{
 			ItemId:   vehicleID,
 			ParentId: brandID,
 			Language: schema.EnglishLanguageCode,
@@ -3431,10 +3437,10 @@ func TestBrandSectionLanguageName(t *testing.T) {
 	_, err = client.CreateItemVehicleType(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemVehicleType{
+		&pb.ItemVehicleType{
 			ItemId:        vehicleID,
 			VehicleTypeId: 19,
 		},
@@ -3443,7 +3449,7 @@ func TestBrandSectionLanguageName(t *testing.T) {
 
 	res, err := client.GetBrandSections(
 		ctx,
-		&GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: brandID},
+		&pb.GetBrandSectionsRequest{Language: schema.EnglishLanguageCode, ItemId: brandID},
 	)
 	require.NoError(t, err)
 	require.NotEmpty(t, res.GetSections()[2].GetGroups())
@@ -3455,7 +3461,7 @@ func TestAlpha(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	kc := cnt.Keycloak()
@@ -3473,7 +3479,7 @@ func TestAlpha(t *testing.T) {
 	_, err = client.GetAlpha(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
 		&emptypb.Empty{},
@@ -3486,7 +3492,7 @@ func TestUpdateItemName(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3505,26 +3511,26 @@ func TestUpdateItemName(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
 	name := fmt.Sprintf("vehicle-%d", randomInt)
 	newName := fmt.Sprintf("vehicle-%d-2", randomInt)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		Body:       "Body",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, "Body", item.GetBody())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:   itemID,
 			Name: newName,
 			Body: "IgnoreMe",
@@ -3533,7 +3539,7 @@ func TestUpdateItemName(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newName, item.GetName())
 	require.Equal(t, "Body", item.GetBody())
@@ -3549,7 +3555,7 @@ func TestUpdateItemLocationAxisOrder(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3558,11 +3564,11 @@ func TestUpdateItemLocationAxisOrder(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, adminToken)
 
-	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken.AccessToken)
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken.AccessToken)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("factory-%d", randomInt),
-		ItemTypeId: ItemType_ITEM_TYPE_FACTORY,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_FACTORY,
 	})
 
 	testCases := []struct {
@@ -3577,8 +3583,8 @@ func TestUpdateItemLocationAxisOrder(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-			Item: &Item{
+		_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id: itemID,
 				Location: &latlng.LatLng{
 					Latitude:  testCase.latitude,
@@ -3589,20 +3595,20 @@ func TestUpdateItemLocationAxisOrder(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Location: true}})
+		item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Location: true}})
 		require.NoError(t, err)
 		require.NotNil(t, item.GetLocation())
 		require.InDelta(t, testCase.latitude, item.GetLocation().GetLatitude(), 0.0001)
 		require.InDelta(t, testCase.longitude, item.GetLocation().GetLongitude(), 0.0001)
 	}
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item:       &Item{Id: itemID},
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item:       &pb.Item{Id: itemID},
 		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"location"}},
 	})
 	require.NoError(t, err)
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Location: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Location: true}})
 	require.NoError(t, err)
 	require.Nil(t, item.GetLocation())
 }
@@ -3612,7 +3618,7 @@ func TestUpdateItemBody(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3631,7 +3637,7 @@ func TestUpdateItemBody(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -3639,20 +3645,20 @@ func TestUpdateItemBody(t *testing.T) {
 	body := "Body"
 	newBody := "New Body"
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		Body:       body,
 		BeginYear:  2000,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, body, item.GetBody())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:        itemID,
 			Body:      newBody,
 			BeginYear: 2001,
@@ -3661,7 +3667,7 @@ func TestUpdateItemBody(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newBody, item.GetBody())
 	require.EqualValues(t, 2000, item.GetBeginYear())
@@ -3672,7 +3678,7 @@ func TestUpdateItemBeginYear(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3691,7 +3697,7 @@ func TestUpdateItemBeginYear(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -3702,20 +3708,20 @@ func TestUpdateItemBeginYear(t *testing.T) { //nolint: dupl
 		newBeginYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		BeginYear:  beginYear,
 		EndYear:    2000,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, beginYear, item.GetBeginYear())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:        itemID,
 			BeginYear: newBeginYear,
 			EndYear:   2001,
@@ -3724,7 +3730,7 @@ func TestUpdateItemBeginYear(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newBeginYear, item.GetBeginYear())
 	require.EqualValues(t, 2000, item.GetEndYear())
@@ -3735,7 +3741,7 @@ func TestUpdateItemEndYear(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3754,7 +3760,7 @@ func TestUpdateItemEndYear(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -3765,20 +3771,20 @@ func TestUpdateItemEndYear(t *testing.T) { //nolint: dupl
 		newEndYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:           name,
 		EndYear:        endYear,
 		BeginModelYear: 2000,
-		ItemTypeId:     ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:     pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, endYear, item.GetEndYear())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:             itemID,
 			EndYear:        newEndYear,
 			BeginModelYear: 2001,
@@ -3787,7 +3793,7 @@ func TestUpdateItemEndYear(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newEndYear, item.GetEndYear())
 	require.EqualValues(t, 2000, item.GetBeginModelYear())
@@ -3798,7 +3804,7 @@ func TestUpdateItemBeginModelYear(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3817,7 +3823,7 @@ func TestUpdateItemBeginModelYear(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -3828,20 +3834,20 @@ func TestUpdateItemBeginModelYear(t *testing.T) { //nolint: dupl
 		newBeginModelYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:           name,
 		BeginModelYear: beginModelYear,
 		EndModelYear:   2000,
-		ItemTypeId:     ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:     pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, beginModelYear, item.GetBeginModelYear())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:             itemID,
 			BeginModelYear: newBeginModelYear,
 			EndModelYear:   2001,
@@ -3850,7 +3856,7 @@ func TestUpdateItemBeginModelYear(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newBeginModelYear, item.GetBeginModelYear())
 	require.EqualValues(t, 2000, item.GetEndModelYear())
@@ -3861,7 +3867,7 @@ func TestUpdateItemEndModelYear(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3880,7 +3886,7 @@ func TestUpdateItemEndModelYear(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -3891,20 +3897,20 @@ func TestUpdateItemEndModelYear(t *testing.T) { //nolint: dupl
 		newEndModelYear = 2001
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:         name,
 		EndModelYear: endModelYear,
 		BeginMonth:   1,
-		ItemTypeId:   ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:   pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, endModelYear, item.GetEndModelYear())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:           itemID,
 			EndModelYear: newEndModelYear,
 			BeginMonth:   3,
@@ -3913,7 +3919,7 @@ func TestUpdateItemEndModelYear(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newEndModelYear, item.GetEndModelYear())
 	require.EqualValues(t, 1, item.GetBeginMonth())
@@ -3924,7 +3930,7 @@ func TestUpdateItemBeginMonth(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -3943,7 +3949,7 @@ func TestUpdateItemBeginMonth(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -3954,20 +3960,20 @@ func TestUpdateItemBeginMonth(t *testing.T) {
 		newBeginMonth = time.May
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		BeginMonth: int32(beginMonth),
 		EndMonth:   int32(time.February),
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, beginMonth, item.GetBeginMonth())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:         itemID,
 			BeginMonth: int32(newBeginMonth),
 			EndMonth:   int32(time.December),
@@ -3976,7 +3982,7 @@ func TestUpdateItemBeginMonth(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newBeginMonth, item.GetBeginMonth())
 	require.EqualValues(t, time.February, item.GetEndMonth())
@@ -3987,7 +3993,7 @@ func TestUpdateItemEndMonth(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4006,7 +4012,7 @@ func TestUpdateItemEndMonth(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4017,20 +4023,20 @@ func TestUpdateItemEndMonth(t *testing.T) {
 		newEndMonth = time.May
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:                   name,
 		EndMonth:               int32(endMonth),
 		BeginModelYearFraction: "¼",
-		ItemTypeId:             ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:             pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, endMonth, item.GetEndMonth())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:                     itemID,
 			EndMonth:               int32(newEndMonth),
 			BeginModelYearFraction: "½",
@@ -4039,7 +4045,7 @@ func TestUpdateItemEndMonth(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newEndMonth, item.GetEndMonth())
 	require.Equal(t, "¼", item.GetBeginModelYearFraction())
@@ -4050,7 +4056,7 @@ func TestUpdateItemBeginModelYearFraction(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4069,7 +4075,7 @@ func TestUpdateItemBeginModelYearFraction(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4080,20 +4086,20 @@ func TestUpdateItemBeginModelYearFraction(t *testing.T) { //nolint: dupl
 		newBeginModelYearFraction = "½"
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:                   name,
 		BeginModelYearFraction: beginModelYearFraction,
 		EndModelYearFraction:   "¼",
-		ItemTypeId:             ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:             pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, beginModelYearFraction, item.GetBeginModelYearFraction())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:                     itemID,
 			BeginModelYearFraction: newBeginModelYearFraction,
 			EndModelYearFraction:   "½",
@@ -4102,7 +4108,7 @@ func TestUpdateItemBeginModelYearFraction(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newBeginModelYearFraction, item.GetBeginModelYearFraction())
 	require.Equal(t, "¼", item.GetEndModelYearFraction())
@@ -4113,7 +4119,7 @@ func TestUpdateItemEndModelYearFraction(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4132,7 +4138,7 @@ func TestUpdateItemEndModelYearFraction(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4143,20 +4149,20 @@ func TestUpdateItemEndModelYearFraction(t *testing.T) {
 		newEndModelYearFraction = "½"
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:                 name,
 		EndModelYearFraction: endModelYearFraction,
 		SpecId:               schema.SpecIDWorldwide,
-		ItemTypeId:           ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:           pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, endModelYearFraction, item.GetEndModelYearFraction())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:                   itemID,
 			EndModelYearFraction: newEndModelYearFraction,
 			SpecId:               schema.SpecIDNorthAmerica,
@@ -4165,7 +4171,7 @@ func TestUpdateItemEndModelYearFraction(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newEndModelYearFraction, item.GetEndModelYearFraction())
 	require.EqualValues(t, schema.SpecIDWorldwide, item.GetSpecId())
@@ -4176,7 +4182,7 @@ func TestUpdateItemSpecID(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4195,7 +4201,7 @@ func TestUpdateItemSpecID(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4206,20 +4212,20 @@ func TestUpdateItemSpecID(t *testing.T) {
 		newSpecID = schema.SpecIDNorthAmerica
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		SpecId:     specID,
 		IsConcept:  true,
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, specID, item.GetSpecId())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:        itemID,
 			SpecId:    newSpecID,
 			IsConcept: false,
@@ -4228,7 +4234,7 @@ func TestUpdateItemSpecID(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newSpecID, item.GetSpecId())
 	require.True(t, item.GetIsConcept())
@@ -4239,7 +4245,7 @@ func TestUpdateItemIsConcept(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4258,7 +4264,7 @@ func TestUpdateItemIsConcept(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4269,20 +4275,20 @@ func TestUpdateItemIsConcept(t *testing.T) { //nolint: dupl
 		newIsConcept = false
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:        name,
 		IsConcept:   isConcept,
 		SpecInherit: true,
-		ItemTypeId:  ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:  pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, isConcept, item.GetIsConcept())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:          itemID,
 			IsConcept:   newIsConcept,
 			SpecInherit: false,
@@ -4291,7 +4297,7 @@ func TestUpdateItemIsConcept(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newIsConcept, item.GetIsConcept())
 	require.True(t, item.GetSpecInherit())
@@ -4302,7 +4308,7 @@ func TestUpdateItemSpecInherit(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4321,7 +4327,7 @@ func TestUpdateItemSpecInherit(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4332,20 +4338,20 @@ func TestUpdateItemSpecInherit(t *testing.T) { //nolint: dupl
 		newSpecInherit = false
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:             name,
 		SpecInherit:      specInherit,
 		IsConceptInherit: true,
-		ItemTypeId:       ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:       pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, specInherit, item.GetSpecInherit())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:               itemID,
 			SpecInherit:      newSpecInherit,
 			IsConceptInherit: false,
@@ -4354,7 +4360,7 @@ func TestUpdateItemSpecInherit(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newSpecInherit, item.GetSpecInherit())
 	require.True(t, item.GetIsConceptInherit())
@@ -4365,7 +4371,7 @@ func TestUpdateItemIsConceptInherit(t *testing.T) { //nolint: dupl
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4384,7 +4390,7 @@ func TestUpdateItemIsConceptInherit(t *testing.T) { //nolint: dupl
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4395,20 +4401,20 @@ func TestUpdateItemIsConceptInherit(t *testing.T) { //nolint: dupl
 		newIsConceptInherit = false
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:             name,
 		IsConceptInherit: isConceptInherit,
 		IsGroup:          true,
-		ItemTypeId:       ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:       pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, isConceptInherit, item.GetIsConceptInherit())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:               itemID,
 			IsConceptInherit: newIsConceptInherit,
 			IsGroup:          false,
@@ -4417,7 +4423,7 @@ func TestUpdateItemIsConceptInherit(t *testing.T) { //nolint: dupl
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newIsConceptInherit, item.GetIsConceptInherit())
 	require.True(t, item.GetIsGroup())
@@ -4428,7 +4434,7 @@ func TestUpdateItemIsGroup(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4447,7 +4453,7 @@ func TestUpdateItemIsGroup(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4458,20 +4464,20 @@ func TestUpdateItemIsGroup(t *testing.T) {
 		newIsGroup = false
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		IsGroup:    isGroup,
 		Produced:   &wrapperspb.Int32Value{Value: 10},
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, isGroup, item.GetIsGroup())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:       itemID,
 			IsGroup:  newIsGroup,
 			Produced: &wrapperspb.Int32Value{Value: 30},
@@ -4480,7 +4486,7 @@ func TestUpdateItemIsGroup(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newIsGroup, item.GetIsGroup())
 	require.EqualValues(t, 10, item.GetProduced().GetValue())
@@ -4491,7 +4497,7 @@ func TestUpdateItemProduced(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4510,7 +4516,7 @@ func TestUpdateItemProduced(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4521,20 +4527,20 @@ func TestUpdateItemProduced(t *testing.T) {
 		newProduced = 30
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:            name,
 		Produced:        &wrapperspb.Int32Value{Value: produced},
 		ProducedExactly: true,
-		ItemTypeId:      ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.EqualValues(t, produced, item.GetProduced().GetValue())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:              itemID,
 			Produced:        &wrapperspb.Int32Value{Value: newProduced},
 			ProducedExactly: false,
@@ -4543,7 +4549,7 @@ func TestUpdateItemProduced(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.EqualValues(t, newProduced, item.GetProduced().GetValue())
 	require.True(t, item.GetProducedExactly())
@@ -4554,7 +4560,7 @@ func TestUpdateItemProducedExactly(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4573,7 +4579,7 @@ func TestUpdateItemProducedExactly(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4584,20 +4590,20 @@ func TestUpdateItemProducedExactly(t *testing.T) {
 		newProducedExactly = false
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:            name,
 		ProducedExactly: producedExactly,
 		Today:           &wrapperspb.BoolValue{Value: true},
-		ItemTypeId:      ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, producedExactly, item.GetProducedExactly())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:              itemID,
 			ProducedExactly: newProducedExactly,
 			Today:           &wrapperspb.BoolValue{Value: false},
@@ -4606,7 +4612,7 @@ func TestUpdateItemProducedExactly(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newProducedExactly, item.GetProducedExactly())
 	require.True(t, item.GetToday().GetValue())
@@ -4617,7 +4623,7 @@ func TestUpdateItemToday(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4636,7 +4642,7 @@ func TestUpdateItemToday(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4648,20 +4654,20 @@ func TestUpdateItemToday(t *testing.T) {
 		newToday = false
 	)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		Today:      &wrapperspb.BoolValue{Value: today},
 		Catname:    catname,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, today, item.GetToday().GetValue())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:      itemID,
 			Today:   &wrapperspb.BoolValue{Value: newToday},
 			Catname: fmt.Sprintf("vehicle-%d-new", randomInt),
@@ -4670,7 +4676,7 @@ func TestUpdateItemToday(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newToday, item.GetToday().GetValue())
 	require.Equal(t, catname, item.GetCatname())
@@ -4681,7 +4687,7 @@ func TestUpdateItemCatname(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4700,7 +4706,7 @@ func TestUpdateItemCatname(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -4708,20 +4714,20 @@ func TestUpdateItemCatname(t *testing.T) {
 	catname := fmt.Sprintf("vehicle-%d", randomInt)
 	newCatname := fmt.Sprintf("vehicle-%d-new", randomInt)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       name,
 		Catname:    catname,
 		FullName:   "FullName",
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, catname, item.GetCatname())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:       itemID,
 			Catname:  newCatname,
 			FullName: "FullName New",
@@ -4730,7 +4736,7 @@ func TestUpdateItemCatname(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, newCatname, item.GetCatname())
 	require.Equal(t, "FullName", item.GetFullName())
@@ -4741,7 +4747,7 @@ func TestUpdateItemFullname(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -4760,26 +4766,26 @@ func TestUpdateItemFullname(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
 	name := fmt.Sprintf("vehicle-%d", randomInt)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		FullName:   "FullName",
 		Catname:    fmt.Sprintf("vehicle-%d", randomInt),
 		Name:       name,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 	})
 
-	item, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, name, item.GetName())
 	require.Equal(t, "FullName", item.GetFullName())
 
-	_, err = client.UpdateItem(apiCtx, &UpdateItemRequest{
-		Item: &Item{
+	_, err = client.UpdateItem(apiCtx, &pb.UpdateItemRequest{
+		Item: &pb.Item{
 			Id:       itemID,
 			FullName: "FullName New",
 			Name:     "New name",
@@ -4788,7 +4794,7 @@ func TestUpdateItemFullname(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	item, err = client.Item(apiCtx, &ItemRequest{Id: itemID, Fields: &ItemFields{Meta: true}})
+	item, err = client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Fields: &pb.ItemFields{Meta: true}})
 	require.NoError(t, err)
 	require.Equal(t, "FullName New", item.GetFullName())
 	require.Equal(t, name, item.GetName())
@@ -4800,9 +4806,9 @@ func TestUpdateBeginOrderCache(t *testing.T) {
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	createItem(t, conn, cnt, &Item{
+	createItem(t, conn, cnt, &pb.Item{
 		Name:                   fmt.Sprintf("engine-%d", randomInt),
-		ItemTypeId:             ItemType_ITEM_TYPE_ENGINE,
+		ItemTypeId:             pb.ItemType_ITEM_TYPE_ENGINE,
 		BeginModelYear:         1999,
 		BeginModelYearFraction: "¼",
 		EndModelYear:           2000,
@@ -4815,7 +4821,7 @@ func TestGetTree(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	kc := cnt.Keycloak()
@@ -4832,21 +4838,21 @@ func TestGetTree(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("person-%d", randomInt),
-		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_PERSON,
 		BeginYear:  1999,
 		EndYear:    2000,
 	})
 
-	res, err := client.GetTree(apiCtx, &GetTreeRequest{Id: itemID, Language: schema.EnglishLanguageCode})
+	res, err := client.GetTree(apiCtx, &pb.GetTreeRequest{Id: itemID, Language: schema.EnglishLanguageCode})
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 }
@@ -4856,7 +4862,7 @@ func TestCreatedBrandIsGroup(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
 	// admin
 	kc := cnt.Keycloak()
@@ -4873,20 +4879,20 @@ func TestCreatedBrandIsGroup(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", randomInt),
 		Catname:    fmt.Sprintf("brand-%d", randomInt),
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 	})
 
-	res, err := client.Item(apiCtx, &ItemRequest{Id: itemID, Language: schema.EnglishLanguageCode})
+	res, err := client.Item(apiCtx, &pb.ItemRequest{Id: itemID, Language: schema.EnglishLanguageCode})
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 	require.True(t, res.GetIsGroup())
@@ -4897,7 +4903,7 @@ func TestGetBrandVehicleTypes(t *testing.T) {
 
 	ctx := t.Context()
 
-	grpcClient := NewItemsClient(conn)
+	grpcClient := pb.NewItemsClient(conn)
 
 	cfg := config.LoadConfig(".")
 
@@ -4918,10 +4924,10 @@ func TestGetBrandVehicleTypes(t *testing.T) {
 	_, err = grpcClient.GetBrandVehicleTypes(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
-		&GetBrandVehicleTypesRequest{
+		&pb.GetBrandVehicleTypesRequest{
 			BrandId: 1,
 		},
 	)
@@ -4933,7 +4939,7 @@ func TestGetSpecs(t *testing.T) {
 
 	ctx := t.Context()
 
-	grpcClient := NewItemsClient(conn)
+	grpcClient := pb.NewItemsClient(conn)
 
 	cfg := config.LoadConfig(".")
 
@@ -4954,7 +4960,7 @@ func TestGetSpecs(t *testing.T) {
 	_, err = grpcClient.GetSpecs(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+testerToken.AccessToken,
 		),
 		&emptypb.Empty{},
@@ -4980,7 +4986,7 @@ func TestGetVehicleTypes(t *testing.T) {
 	result, err := srv.GetVehicleTypes(
 		metadata.NewIncomingContext(
 			ctx,
-			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
+			metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + token.AccessToken}),
 		),
 		&emptypb.Empty{},
 	)
@@ -5006,7 +5012,7 @@ func TestGetVehicleTypesInaccessibleWithEmptyToken(t *testing.T) {
 
 	ctx := metadata.NewIncomingContext(
 		t.Context(),
-		metadata.New(map[string]string{authorizationHeader: bearerPrefix}),
+		metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix}),
 	)
 
 	_, err = srv.GetVehicleTypes(ctx, &emptypb.Empty{})
@@ -5021,7 +5027,7 @@ func TestGetVehicleTypesInaccessibleWithInvalidToken(t *testing.T) {
 
 	ctx := metadata.NewIncomingContext(
 		t.Context(),
-		metadata.New(map[string]string{authorizationHeader: bearerPrefix + "abc"}),
+		metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + "abc"}),
 	)
 
 	_, err = srv.GetVehicleTypes(ctx, &emptypb.Empty{})
@@ -5037,7 +5043,7 @@ func TestGetVehicleTypesInaccessibleWithWronglySignedToken(t *testing.T) {
 	ctx := metadata.NewIncomingContext(
 		t.Context(),
 		metadata.New(map[string]string{
-			authorizationHeader: bearerPrefix + tokenWithInvalidSignature,
+			authn.AuthorizationHeader: bearerPrefix + tokenWithInvalidSignature,
 		}),
 	)
 
@@ -5063,7 +5069,7 @@ func TestGetVehicleTypesInaccessibleWithoutModeratePrivilege(t *testing.T) {
 	_, err = srv.GetVehicleTypes(
 		metadata.NewIncomingContext(
 			ctx,
-			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
+			metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + token.AccessToken}),
 		),
 		&emptypb.Empty{},
 	)
@@ -5075,7 +5081,7 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 	randomInt := random.Int()
 
@@ -5094,7 +5100,7 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 
 	apiCtx := metadata.AppendToOutgoingContext(
 		ctx,
-		authorizationHeader,
+		authn.AuthorizationHeader,
 		bearerPrefix+adminToken.AccessToken,
 	)
 
@@ -5140,37 +5146,37 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 			// one case race the "Kalina" assertions in the other.
 			brandCatname := fmt.Sprintf("lada-%d-%s", randomInt, testCase.Language)
 
-			itemID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			itemID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:       ruName,
-				ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+				ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 			})
 
-			brandID := createItem(t, conn, cnt, &Item{ //nolint: contextcheck
+			brandID := createItem(t, conn, cnt, &pb.Item{ //nolint: contextcheck
 				Name:       ruBrandName,
 				Catname:    brandCatname,
-				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+				ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 				IsGroup:    true,
 			})
 
 			_, err := client.CreateItemParent(
 				apiCtx,
-				&ItemParent{ItemId: itemID, ParentId: brandID},
+				&pb.ItemParent{ItemId: itemID, ParentId: brandID},
 			)
 			require.NoError(t, err)
 
 			_, err = client.UpdateItemLanguage(
 				apiCtx,
-				&ItemLanguage{ItemId: brandID, Language: testCase.Language, Name: testCase.BrandName},
+				&pb.ItemLanguage{ItemId: brandID, Language: testCase.Language, Name: testCase.BrandName},
 			)
 			require.NoError(t, err)
 
 			_, err = client.UpdateItemLanguage(
 				apiCtx,
-				&ItemLanguage{ItemId: itemID, Language: testCase.Language, Name: testCase.FullName},
+				&pb.ItemLanguage{ItemId: itemID, Language: testCase.Language, Name: testCase.FullName},
 			)
 			require.NoError(t, err)
 
-			sections, err := client.GetBrandSections(ctx, &GetBrandSectionsRequest{
+			sections, err := client.GetBrandSections(ctx, &pb.GetBrandSectionsRequest{
 				Language: testCase.Language, ItemId: brandID,
 			})
 			require.NoError(t, err)
@@ -5185,7 +5191,7 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 
 			_, err = client.UpdateItemLanguage(
 				apiCtx,
-				&ItemLanguage{
+				&pb.ItemLanguage{
 					ItemId:   itemID,
 					Language: testCase.Language,
 					Name:     testCase.NewFullName,
@@ -5193,7 +5199,7 @@ func TestItemParentLanguageAutoUpdates(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			sections, err = client.GetBrandSections(ctx, &GetBrandSectionsRequest{
+			sections, err = client.GetBrandSections(ctx, &pb.GetBrandSectionsRequest{
 				Language: testCase.Language, ItemId: brandID,
 			})
 			require.NoError(t, err)

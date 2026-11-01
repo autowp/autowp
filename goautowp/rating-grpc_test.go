@@ -6,8 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -19,7 +22,7 @@ func TestLikesRating(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewRatingClient(conn)
+	client := pb.NewRatingClient(conn)
 
 	r, err := client.GetUserCommentsRating(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -27,7 +30,7 @@ func TestLikesRating(t *testing.T) {
 	for _, item := range r.GetUsers() {
 		_, err = client.GetUserCommentsRatingFans(
 			ctx,
-			&UserRatingDetailsRequest{UserId: item.GetUserId()},
+			&pb.UserRatingDetailsRequest{UserId: item.GetUserId()},
 		)
 		require.NoError(t, err)
 	}
@@ -39,7 +42,7 @@ func TestPictureLikesRating(t *testing.T) {
 	ctx := t.Context()
 	cfg := config.LoadConfig(".")
 	kc := cnt.Keycloak()
-	picturesClient := NewPicturesClient(conn)
+	picturesClient := pb.NewPicturesClient(conn)
 
 	// tester
 	testerToken, err := kc.Login(
@@ -66,29 +69,29 @@ func TestPictureLikesRating(t *testing.T) {
 	require.NotNil(t, adminToken)
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("vehicle-%d", random.Int()),
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	pictureID := CreatePicture(
 		t,
 		cnt,
 		"./test/test.jpg",
-		PicturePostForm{ItemID: itemID},
+		pictureshttp.PicturePostForm{ItemID: itemID},
 		testerToken.AccessToken,
 	)
 
 	_, err = picturesClient.UpdatePicture(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&UpdatePictureRequest{
-			Picture: &Picture{
+		&pb.UpdatePictureRequest{
+			Picture: &pb.Picture{
 				Id:     pictureID,
-				Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+				Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 			},
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
@@ -98,14 +101,14 @@ func TestPictureLikesRating(t *testing.T) {
 	_, err = picturesClient.Vote(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&PicturesVoteRequest{PictureId: pictureID, Value: 1},
+		&pb.PicturesVoteRequest{PictureId: pictureID, Value: 1},
 	)
 	require.NoError(t, err)
 
-	client := NewRatingClient(conn)
+	client := pb.NewRatingClient(conn)
 
 	r, err := client.GetUserPictureLikesRating(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -113,7 +116,7 @@ func TestPictureLikesRating(t *testing.T) {
 	for _, item := range r.GetUsers() {
 		_, err = client.GetUserPictureLikesRatingFans(
 			ctx,
-			&UserRatingDetailsRequest{UserId: item.GetUserId()},
+			&pb.UserRatingDetailsRequest{UserId: item.GetUserId()},
 		)
 		require.NoError(t, err)
 	}
@@ -124,13 +127,13 @@ func TestPicturesRating(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewRatingClient(conn)
+	client := pb.NewRatingClient(conn)
 
 	r, err := client.GetUserPicturesRating(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
 
 	for _, item := range r.GetUsers() {
-		_, err = client.GetUserPicturesRatingBrands(ctx, &UserRatingDetailsRequest{
+		_, err = client.GetUserPicturesRatingBrands(ctx, &pb.UserRatingDetailsRequest{
 			UserId:   item.GetUserId(),
 			Language: schema.EnglishLanguageCode,
 		})
@@ -143,7 +146,7 @@ func TestSpecsRating(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewRatingClient(conn)
+	client := pb.NewRatingClient(conn)
 
 	r, err := client.GetUserSpecsRating(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -151,7 +154,7 @@ func TestSpecsRating(t *testing.T) {
 	for _, item := range r.GetUsers() {
 		_, err = client.GetUserSpecsRatingBrands(
 			ctx,
-			&UserRatingDetailsRequest{UserId: item.GetUserId()},
+			&pb.UserRatingDetailsRequest{UserId: item.GetUserId()},
 		)
 		require.NoError(t, err)
 	}

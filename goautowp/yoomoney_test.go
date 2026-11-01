@@ -6,9 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/itemofday"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/itemofday"
+	"github.com/autowp/goautowp/internal/schema"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
+	yoomoneyhttp "github.com/autowp/goautowp/internal/transport/http/yoomoney"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,10 +25,10 @@ func TestYoomoneyWebhookInvalidLabel(t *testing.T) {
 
 	ctx := t.Context()
 
-	yh, err := NewYoomoneyHandler("0.99", "01234567890ABCDEF01234567890", itemOfDayRepository)
+	yh, err := yoomoneyhttp.NewServer("0.99", "01234567890ABCDEF01234567890", itemOfDayRepository)
 	require.NoError(t, err)
 
-	err = yh.Handle(ctx, YoomoneyWebhook{
+	err = yh.Handle(ctx, yoomoneyhttp.Webhook{
 		NotificationType: "p2p-incoming",
 		OperationID:      "1234567",
 		Amount:           "300.00",
@@ -59,7 +62,7 @@ func TestYoomoneyWebhookHappyPath(t *testing.T) {
 	itemOfDayRepository := itemofday.NewRepository(goquDB)
 	itemOfDayRepository.SetMinPictures(0)
 
-	yh, err := NewYoomoneyHandler("0.99", "01234567890ABCDEF01234567890", itemOfDayRepository)
+	yh, err := yoomoneyhttp.NewServer("0.99", "01234567890ABCDEF01234567890", itemOfDayRepository)
 	require.NoError(t, err)
 
 	dateStr := time.Now().Format(itemofday.YoomoneyLabelDateFormat)
@@ -73,18 +76,18 @@ func TestYoomoneyWebhookHappyPath(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:            fmt.Sprintf("item-of-day-%d", random.Int()),
 		IsGroup:         true,
-		ItemTypeId:      ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId:      pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:         fmt.Sprintf("brand1-%d", random.Int()),
 		Body:            "",
 		ProducedExactly: false,
 	})
 
-	addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{
+	addPicture(t, cnt, conn, "./test/test.jpg", pictureshttp.PicturePostForm{
 		ItemID: itemID,
-	}, PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
+	}, pb.PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
 
 	// check prepared item passes candidate checks
 	r := itemofday.CandidateRecord{}
@@ -96,7 +99,7 @@ func TestYoomoneyWebhookHappyPath(t *testing.T) {
 
 	label := fmt.Sprintf("vod/%s/%d/0", dateStr, itemID)
 
-	fields := YoomoneyWebhook{
+	fields := yoomoneyhttp.Webhook{
 		NotificationType: "p2p-incoming",
 		OperationID:      "1234567",
 		Amount:           "300.00",

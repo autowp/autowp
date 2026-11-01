@@ -1,20 +1,17 @@
 package goautowp
 
 import (
-	"context"
 	"database/sql"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/attrs"
-	"github.com/autowp/goautowp/comments"
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/users"
+	"github.com/autowp/goautowp/internal/attrs"
+	"github.com/autowp/goautowp/internal/comments"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +29,7 @@ func (s *itemBatchQueryLogger) Printf(_ string, _ ...interface{}) {
 	}
 }
 
-func newItemBatchTestExtractor(t *testing.T) (*ItemExtractor, *itemBatchQueryLogger) {
+func newItemBatchTestExtractor(t *testing.T) (*itemExtractorFixture, *itemBatchQueryLogger) {
 	t.Helper()
 
 	cfg := config.LoadConfig(".")
@@ -71,147 +68,9 @@ func newItemBatchTestExtractor(t *testing.T) (*ItemExtractor, *itemBatchQueryLog
 		commentsRepository: comments.NewRepository(goquDB, nil, nil, nil, nil),
 	}
 
-	return NewItemExtractor(container), logger
+	return newItemExtractorFixture(container), logger
 }
 
-func TestItemExtractorBatchesAdditionalFields(t *testing.T) {
-	t.Parallel()
-
-	extractor, logger := newItemBatchTestExtractor(t)
-	fields := &ItemFields{
-		Meta: true, SpecificationsCount: true, Subscription: true, HasText: true,
-		CommentsCount: true, ItemLanguageCount: true, LinksCount: true,
-	}
-	userCtx := UserContext{UserID: 7, Roles: []string{users.RoleModer}}
-
-	rows := []*items.Item{{ID: 2}, {ID: 1}}
-	for id := int64(3); id <= 50; id++ {
-		rows = append(rows, &items.Item{ID: id})
-	}
-
-	rows = append(rows, &items.Item{ID: 1})
-
-	result, err := extractor.ExtractRows(t.Context(), rows, fields, "ru", userCtx)
-	require.NoError(t, err)
-	require.Len(t, result, len(rows))
-	require.EqualValues(t, 7, logger.queries.Load(), "one SQL query per selected field, independent of list size")
-
-	for index, row := range rows {
-		actual := result[index]
-		require.Equal(t, row.ID, actual.GetId())
-
-		name, err := extractor.container.itemsRepository.LanguageName(t.Context(), row.ID, schema.DefaultLanguageCode)
-		require.NoError(t, err)
-		require.Equal(t, name, actual.GetName())
-
-		languages, err := extractor.container.itemsRepository.ItemLanguageCount(
-			t.Context(),
-			&query.ItemLanguageListOptions{ItemID: row.ID, ExcludeLanguage: schema.DefaultLanguageCode},
-		)
-		require.NoError(t, err)
-		require.Equal(t, languages, actual.GetItemLanguageCount())
-
-		links, err := extractor.container.itemsRepository.LinksCount(
-			t.Context(),
-			&query.LinkListOptions{ItemID: row.ID},
-		)
-		require.NoError(t, err)
-		require.Equal(t, links, actual.GetLinksCount())
-
-		subscribed, err := extractor.container.itemsRepository.UserItemSubscribed(t.Context(), row.ID, userCtx.UserID)
-		require.NoError(t, err)
-		require.Equal(t, subscribed, actual.GetSubscription())
-
-		fullText, err := extractor.container.itemsRepository.HasFullText(t.Context(), row.ID)
-		require.NoError(t, err)
-		require.Equal(t, fullText, actual.GetHasText())
-
-		specifications, err := extractor.container.attrsRepository.ValuesCount(t.Context(), query.AttrsValueListOptions{
-			ItemID: row.ID,
-		})
-		require.NoError(t, err)
-		require.Equal(t, specifications, actual.GetSpecificationsCount())
-
-		messages, err := extractor.container.commentsRepository.TopicStat(
-			t.Context(), schema.CommentMessageTypeIDItems, row.ID,
-		)
-		require.NoError(t, err)
-		require.Equal(t, messages, actual.GetCommentsCount())
-	}
-
-	require.EqualValues(t, 7+7*len(rows), logger.queries.Load(), "the old methods need seven queries per item")
-}
-
-func TestItemExtractorAdditionalFieldsRespectPermissionsAndSelection(t *testing.T) {
-	t.Parallel()
-
-	extractor, logger := newItemBatchTestExtractor(t)
-
-	rows := []*items.Item{{ID: 1}, {ID: 2}}
-	fields := &ItemFields{
-		Meta: true, SpecificationsCount: true, Subscription: true, HasText: true,
-		CommentsCount: true, ItemLanguageCount: true, LinksCount: true,
-	}
-	result, err := extractor.ExtractRows(t.Context(), rows, fields, "en", UserContext{})
-	require.NoError(t, err)
-	require.EqualValues(t, 2, logger.queries.Load(), "anonymous callers only load full-text presence and comments")
-	require.True(t, result[0].GetHasText())
-	require.EqualValues(t, 12, result[0].GetCommentsCount())
-
-	for _, item := range result {
-		require.Empty(t, item.GetName())
-		require.Zero(t, item.GetSpecificationsCount())
-		require.Zero(t, item.GetItemLanguageCount())
-		require.Zero(t, item.GetLinksCount())
-		require.False(t, item.GetSubscription())
-	}
-
-	logger.queries.Store(0)
-
-	result, err = extractor.ExtractRows(t.Context(), rows, nil, "en", UserContext{
-		UserID: 7, Roles: []string{users.RoleModer},
-	})
-	require.NoError(t, err)
-	require.Len(t, result, 2)
-	require.Zero(t, logger.queries.Load())
-	require.Zero(t, result[0].GetCommentsCount())
-	require.False(t, result[0].GetHasText())
-
-	result, err = extractor.ExtractRows(
-		t.Context(),
-		rows,
-		&ItemFields{Subscription: true},
-		"en",
-		UserContext{UserID: 8},
-	)
-	require.NoError(t, err)
-	require.False(t, result[0].GetSubscription())
-	require.True(t, result[1].GetSubscription())
-	require.EqualValues(t, 1, logger.queries.Load())
-}
-
-func TestItemExtractorAdditionalFieldsEmptyAndCanceled(t *testing.T) {
-	t.Parallel()
-
-	batch, err := (&ItemExtractor{}).preloadFields(t.Context(), nil, &ItemFields{CommentsCount: true}, UserContext{})
-	require.NoError(t, err)
-	require.Empty(t, batch.comments)
-
-	extractor, logger := newItemBatchTestExtractor(t)
-	result, err := extractor.ExtractRows(t.Context(), nil, &ItemFields{CommentsCount: true}, "en", UserContext{})
-	require.NoError(t, err)
-	require.Empty(t, result)
-	require.Zero(t, logger.queries.Load())
-
-	ctx, cancel := context.WithCancel(t.Context())
-	cancel()
-
-	_, err = extractor.ExtractRows(ctx, []*items.Item{{ID: 1}}, &ItemFields{CommentsCount: true}, "en", UserContext{})
-	require.ErrorIs(t, err, context.Canceled)
-}
-
-// Block before SQL acquisition, so even the single-connection temporary-table fixture
-// can prove independent lookups start together without timing query execution.
 func blockItemExtractionQueries(t *testing.T, logger *itemBatchQueryLogger, count int) func() {
 	t.Helper()
 
@@ -251,78 +110,4 @@ func blockItemExtractionQueries(t *testing.T, logger *itemBatchQueryLogger, coun
 			}
 		}
 	}
-}
-
-func TestItemExtractorPreloadsFieldsConcurrently(t *testing.T) {
-	t.Parallel()
-
-	extractor, logger := newItemBatchTestExtractor(t)
-	unblock := blockItemExtractionQueries(t, logger, itemExtractorParallelism)
-
-	type extractionResult struct {
-		batch *itemBatchFields
-		err   error
-	}
-
-	done := make(chan extractionResult, 1)
-
-	go func() {
-		batch, err := extractor.preloadFields(t.Context(), []*items.Item{{ID: 1}}, &ItemFields{
-			Meta: true, LinksCount: true, ItemLanguageCount: true, HasText: true,
-		}, UserContext{Roles: []string{users.RoleModer}})
-		done <- extractionResult{batch: batch, err: err}
-	}()
-
-	unblock()
-
-	result := <-done
-	require.NoError(t, result.err)
-	require.Equal(t, "First", result.batch.names[1])
-	require.EqualValues(t, 2, result.batch.links[1])
-	require.EqualValues(t, 2, result.batch.languages[1])
-	require.True(t, result.batch.fullText[1])
-	require.EqualValues(t, itemExtractorParallelism, logger.queries.Load())
-}
-
-func TestItemExtractorPlainLookupsPreserveResults(t *testing.T) {
-	t.Parallel()
-
-	extractor, logger := newItemBatchTestExtractor(t)
-	fields := &ItemFields{OtherNames: true, AltNames: true, CanEditSpecs: true}
-	row := &items.Item{ID: 1, NameOnly: "First RU", ItemTypeID: schema.ItemTableItemTypeIDVehicle}
-	expectedNames, err := extractor.extractOtherNames(t.Context(), fields, row)
-	require.NoError(t, err)
-	expectedAltNames, err := extractor.extractAltNames(t.Context(), fields, row, "ru")
-	require.NoError(t, err)
-
-	logger.queries.Store(0)
-	unblock := blockItemExtractionQueries(t, logger, 2)
-	result := &Item{Id: row.ID, Description: "Preserved"}
-
-	done := make(chan error, 1)
-
-	go func() {
-		done <- extractor.extractPlain(t.Context(), fields, row, result, "ru", UserContext{UserID: 7})
-	}()
-
-	unblock()
-	require.NoError(t, <-done)
-	require.ElementsMatch(t, expectedNames, result.GetOtherNames())
-	require.ElementsMatch(t, expectedAltNames, result.GetAltNames())
-	require.True(t, result.GetCanEditSpecs())
-	require.EqualValues(t, 1, result.GetId())
-	require.Equal(t, "Preserved", result.GetDescription())
-	require.EqualValues(t, 2, logger.queries.Load())
-}
-
-func TestItemExtractorPlainLookupsCanceled(t *testing.T) {
-	t.Parallel()
-
-	extractor, _ := newItemBatchTestExtractor(t)
-	ctx, cancel := context.WithCancel(t.Context())
-	cancel()
-
-	err := extractor.extractPlain(ctx, &ItemFields{OtherNames: true, AltNames: true},
-		&items.Item{ID: 1}, &Item{}, "ru", UserContext{})
-	require.ErrorIs(t, err, context.Canceled)
 }

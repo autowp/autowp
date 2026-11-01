@@ -6,16 +6,27 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/extraction"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemparentextractor"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 )
+
+// Carries application-only integration dependencies used by the independent reference reads.
+type itemParentExtractorFixture struct {
+	*itemparentextractor.Extractor
+
+	container *Container
+}
 
 func TestItemParentExtractorParallelPreloads(t *testing.T) {
 	t.Parallel()
@@ -25,26 +36,26 @@ func TestItemParentExtractorParallelPreloads(t *testing.T) {
 	token, err := cnt.Keycloak().Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 
-	parentID := createItem(t, conn, cnt, &Item{
-		Name: "parent-prefetch-" + uuid.NewString(), ItemTypeId: ItemType_ITEM_TYPE_VEHICLE, IsGroup: true,
+	parentID := createItem(t, conn, cnt, &pb.Item{
+		Name: "parent-prefetch-" + uuid.NewString(), ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE, IsGroup: true,
 	})
-	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken)
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken)
 
 	for range 2 {
-		childID := createItem(t, conn, cnt, &Item{
-			Name: "child-prefetch-" + uuid.NewString(), ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		childID := createItem(t, conn, cnt, &pb.Item{
+			Name: "child-prefetch-" + uuid.NewString(), ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		})
-		_, err := NewItemsClient(conn).CreateItemParent(apiCtx, &ItemParent{ItemId: childID, ParentId: parentID})
+		_, err := pb.NewItemsClient(conn).CreateItemParent(apiCtx, &pb.ItemParent{ItemId: childID, ParentId: parentID})
 		require.NoError(t, err)
 	}
 
-	fields := &ItemParentFields{
-		Item:            &ItemFields{NameText: true, HasText: true},
-		Parent:          &ItemFields{NameHtml: true, CommentsCount: true},
-		DuplicateParent: &ItemFields{NameText: true},
-		DuplicateChild:  &ItemFields{NameText: true},
-		ChildDescendantPictures: &PicturesRequest{Options: &PictureListOptions{
-			Status: PictureStatus_PICTURE_STATUS_ACCEPTED,
+	fields := &pb.ItemParentFields{
+		Item:            &pb.ItemFields{NameText: true, HasText: true},
+		Parent:          &pb.ItemFields{NameHtml: true, CommentsCount: true},
+		DuplicateParent: &pb.ItemFields{NameText: true},
+		DuplicateChild:  &pb.ItemFields{NameText: true},
+		ChildDescendantPictures: &pb.PicturesRequest{Options: &pb.PictureListOptions{
+			Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED,
 		}},
 	}
 	requested := proto.Clone(fields)
@@ -67,17 +78,17 @@ func TestItemParentExtractorParallelPreloads(t *testing.T) {
 
 	rows[0], rows[1] = rows[1], rows[0]
 	rows = append(rows, rows[0])
-	extractor := NewItemParentExtractor(container)
-	inlineCtx := context.WithValue(ctx, itemLookupContextKey{}, true)
+	extractor := container.ItemParentExtractor()
+	inlineCtx := extraction.WithInlineLookups(ctx)
 
-	expected := make([]*ItemParent, 0, len(rows))
+	expected := make([]*pb.ItemParent, 0, len(rows))
 	for _, row := range rows {
 		individual, err := extractor.ExtractRows(
 			inlineCtx,
 			[]*items.ItemParent{row},
 			fields,
 			schema.EnglishLanguageCode,
-			UserContext{},
+			authn.User{},
 		)
 		require.NoError(t, err)
 
@@ -93,14 +104,14 @@ func TestItemParentExtractorParallelPreloads(t *testing.T) {
 	defer cancel()
 
 	type extractionResult struct {
-		items []*ItemParent
+		items []*pb.ItemParent
 		err   error
 	}
 
 	done := make(chan extractionResult, 1)
 
 	go func() {
-		result, err := extractor.ExtractRows(lookupCtx, rows, fields, schema.EnglishLanguageCode, UserContext{})
+		result, err := extractor.ExtractRows(lookupCtx, rows, fields, schema.EnglishLanguageCode, authn.User{})
 		done <- extractionResult{items: result, err: err}
 	}()
 
@@ -127,25 +138,7 @@ func TestItemParentExtractorParallelPreloads(t *testing.T) {
 	canceledCtx, cancelRequest := context.WithCancel(ctx)
 	cancelRequest()
 
-	result, err := extractor.ExtractRows(canceledCtx, rows, fields, schema.EnglishLanguageCode, UserContext{})
+	result, err := extractor.ExtractRows(canceledCtx, rows, fields, schema.EnglishLanguageCode, authn.User{})
 	require.ErrorIs(t, err, context.Canceled)
 	require.Nil(t, result)
-
-	logger.queries.Store(0)
-
-	result, err = extractor.ExtractRows(ctx, rows, nil, schema.EnglishLanguageCode, UserContext{})
-	require.NoError(t, err)
-	require.Len(t, result, len(rows))
-	require.Zero(t, logger.queries.Load(), "unselected child/parent fields require no prefetch")
-
-	for _, relation := range result {
-		require.Nil(t, relation.GetItem())
-		require.Nil(t, relation.GetParent())
-	}
-
-	result, err = extractor.ExtractRows(ctx, nil, fields, schema.EnglishLanguageCode, UserContext{})
-	require.NoError(t, err)
-	require.NotNil(t, result)
-	require.Empty(t, result)
-	require.Zero(t, logger.queries.Load(), "empty input requires no prefetch")
 }

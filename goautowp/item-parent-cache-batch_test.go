@@ -7,26 +7,46 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/users"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/extraction"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemmapper"
+	"github.com/autowp/goautowp/internal/transport/grpc/parentcacheextractor"
+	"github.com/autowp/goautowp/internal/users"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
 
+type parentCacheBatchFixture struct {
+	*parentcacheextractor.Extractor
+
+	container *Container
+}
+
+func parentCacheRows(ids []int64) []*schema.ItemParentCacheRow {
+	rows := make([]*schema.ItemParentCacheRow, 0, len(ids))
+	for _, id := range ids {
+		rows = append(rows, &schema.ItemParentCacheRow{ParentID: id})
+	}
+
+	return rows
+}
+
 func newParentCacheBatchTestExtractor(
 	t *testing.T,
-) (*ItemParentCacheExtractor, []int64, *sql.DB, *itemBatchQueryLogger) {
+) (*parentCacheBatchFixture, []int64, *sql.DB, *itemBatchQueryLogger) {
 	t.Helper()
 
 	ids := make([]int64, 0, 3)
 	for range 3 {
-		ids = append(ids, createItem(t, conn, cnt, &Item{
-			Name: "parent-cache-" + uuid.NewString(), ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ids = append(ids, createItem(t, conn, cnt, &pb.Item{
+			Name: "parent-cache-" + uuid.NewString(), ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		}))
 	}
 
@@ -59,13 +79,16 @@ func newParentCacheBatchTestExtractor(
 	db.Logger(logger)
 	container := &Container{config: cfg, goquDB: db}
 
-	return NewItemParentCacheExtractor(container), ids, pool, logger
+	extractor, err := container.ItemParentCacheExtractor(t.Context())
+	require.NoError(t, err)
+
+	return &parentCacheBatchFixture{Extractor: extractor, container: container}, ids, pool, logger
 }
 
-func parentCacheBatchTestFields() *ItemParentCacheFields {
-	return &ItemParentCacheFields{ParentItem: &ItemsRequest{
-		Options: &ItemListOptions{TypeId: ItemType_ITEM_TYPE_VEHICLE},
-		Fields: &ItemFields{
+func parentCacheBatchTestFields() *pb.ItemParentCacheFields {
+	return &pb.ItemParentCacheFields{ParentItem: &pb.ItemsRequest{
+		Options: &pb.ItemListOptions{TypeId: pb.ItemType_ITEM_TYPE_VEHICLE},
+		Fields: &pb.ItemFields{
 			Meta: true, NameHtml: true, NameText: true, LinksCount: true, ItemLanguageCount: true,
 			SpecificationsCount: true, Subscription: true, HasText: true, CommentsCount: true,
 		},
@@ -86,16 +109,16 @@ func TestItemParentCacheBatchesExtraction(t *testing.T) {
 		{ItemID: 105},
 		{ItemID: 106, ParentID: -1},
 	}
-	userCtx := UserContext{UserID: 7, Roles: []string{users.RoleModer}}
+	userCtx := authn.User{UserID: 7, Roles: []string{users.RoleModer}}
 	repository, err := extractor.container.ItemsRepository(t.Context())
 	require.NoError(t, err)
 
 	for _, lang := range []string{"en", "ru"} {
 		source, _, err := repository.List(t.Context(), &query.ItemListOptions{ItemIDs: ids, Language: lang},
-			convertItemFields(fields.GetParentItem().GetFields()), items.OrderByNone, false)
+			itemmapper.FieldsFromProto(fields.GetParentItem().GetFields()), items.OrderByNone, false)
 		require.NoError(t, err)
 
-		expected := make(map[int64]*Item, len(source))
+		expected := make(map[int64]*pb.Item, len(source))
 
 		logger.queries.Store(0)
 
@@ -113,7 +136,7 @@ func TestItemParentCacheBatchesExtraction(t *testing.T) {
 		for _, nested := range []bool{false, true} {
 			ctx := t.Context()
 			if nested {
-				ctx = context.WithValue(ctx, itemLookupContextKey{}, true)
+				ctx = extraction.WithInlineLookups(ctx)
 			}
 
 			logger.queries.Store(0)
@@ -139,17 +162,17 @@ func TestItemParentCacheBatchesExtraction(t *testing.T) {
 
 	require.True(t, proto.Equal(requested, fields))
 
-	public, err := extractor.ExtractRows(t.Context(), rows, fields, "en", UserContext{UserID: 7})
+	public, err := extractor.ExtractRows(t.Context(), rows, fields, "en", authn.User{UserID: 7})
 	require.NoError(t, err)
 	require.Zero(t, public[1].GetParentItem().GetLinksCount())
 	require.Zero(t, public[1].GetParentItem().GetSpecificationsCount())
 	require.Empty(t, public[1].GetParentItem().GetName())
 	require.NotEmpty(t, public[1].GetParentItem().GetNameHtml())
 
-	filtered, ok := proto.Clone(fields).(*ItemParentCacheFields)
+	filtered, ok := proto.Clone(fields).(*pb.ItemParentCacheFields)
 	require.True(t, ok)
 
-	filtered.GetParentItem().GetOptions().TypeId = ItemType_ITEM_TYPE_ENGINE
+	filtered.GetParentItem().GetOptions().TypeId = pb.ItemType_ITEM_TYPE_ENGINE
 	actual, err := extractor.ExtractRows(t.Context(), rows, filtered, "en", userCtx)
 	require.NoError(t, err)
 
@@ -180,8 +203,8 @@ func TestItemParentCacheBatchCancellation(t *testing.T) {
 	done := make(chan error, 1)
 
 	go func() {
-		_, extractErr := extractor.preloadItems(ctx, parentCacheBatchTestFields().GetParentItem(), ids,
-			"en", UserContext{UserID: 7, Roles: []string{users.RoleModer}})
+		_, extractErr := extractor.ExtractRows(ctx, parentCacheRows(ids), parentCacheBatchTestFields(),
+			"en", authn.User{UserID: 7, Roles: []string{users.RoleModer}})
 		done <- extractErr
 	}()
 
@@ -208,27 +231,10 @@ func TestItemParentCacheBatchReadFailure(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer cancel()
 
-	actual, err := extractor.preloadItems(ctx, parentCacheBatchTestFields().GetParentItem(), ids,
-		"en", UserContext{UserID: 7, Roles: []string{users.RoleModer}})
+	actual, err := extractor.ExtractRows(ctx, parentCacheRows(ids), parentCacheBatchTestFields(),
+		"en", authn.User{UserID: 7, Roles: []string{users.RoleModer}})
 	require.ErrorContains(t, err, "item_id")
 	require.Nil(t, actual)
 	require.NoError(t, ctx.Err())
 	require.Zero(t, pool.Stats().InUse)
-}
-
-func TestItemParentCacheBatchUnselectedAndEmpty(t *testing.T) {
-	t.Parallel()
-
-	extractor := &ItemParentCacheExtractor{}
-	unselected, err := extractor.preloadItems(t.Context(), nil, []int64{7}, "en", UserContext{})
-	require.NoError(t, err)
-	require.Nil(t, unselected)
-	empty, err := extractor.preloadItems(t.Context(), &ItemsRequest{}, nil, "en", UserContext{})
-	require.NoError(t, err)
-	require.NotNil(t, empty)
-	require.Empty(t, empty)
-	result, err := extractor.ExtractRows(t.Context(), []*schema.ItemParentCacheRow{{ItemID: 1, ParentID: 7}},
-		nil, "en", UserContext{})
-	require.NoError(t, err)
-	require.Nil(t, result[0].GetParentItem())
 }

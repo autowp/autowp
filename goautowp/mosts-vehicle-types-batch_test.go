@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/mosts"
-	"github.com/autowp/goautowp/query"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/mosts"
+	"github.com/autowp/goautowp/internal/query"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/stretchr/testify/require"
 )

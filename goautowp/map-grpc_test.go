@@ -10,82 +10,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/maps"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/twpayne/go-geom"
 	"google.golang.org/genproto/googleapis/type/latlng"
 )
-
-func TestNormalizedLongitudeRanges(t *testing.T) {
-	t.Parallel()
-
-	testCases := []struct {
-		name       string
-		lngLo      float64
-		lngHi      float64
-		wantRanges [][2]float64
-	}{
-		{
-			name:       "already canonical, no split needed",
-			lngLo:      10,
-			lngHi:      20,
-			wantRanges: [][2]float64{{10, 20}},
-		},
-		{
-			name:       "wide low-zoom view, still within canonical bounds",
-			lngLo:      -170,
-			lngHi:      170,
-			wantRanges: [][2]float64{{-170, 170}},
-		},
-		{
-			name:       "straddles the antimeridian",
-			lngLo:      170,
-			lngHi:      190,
-			wantRanges: [][2]float64{{170, 180}, {-180, -170}},
-		},
-		{
-			name:       "panned one world copy to the right",
-			lngLo:      300,
-			lngHi:      340,
-			wantRanges: [][2]float64{{-60, -20}},
-		},
-		{
-			name:       "panned one world copy to the left",
-			lngLo:      -340,
-			lngHi:      -300,
-			wantRanges: [][2]float64{{20, 60}},
-		},
-		{
-			name:       "exactly a full world",
-			lngLo:      -60,
-			lngHi:      300,
-			wantRanges: [][2]float64{{-180, 180}},
-		},
-		{
-			name:       "much more than a full world",
-			lngLo:      -600,
-			lngHi:      600,
-			wantRanges: [][2]float64{{-180, 180}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			t.Parallel()
-
-			got := normalizedLongitudeRanges(testCase.lngLo, testCase.lngHi)
-
-			require.Len(t, got, len(testCase.wantRanges))
-
-			for i, wantRange := range testCase.wantRanges {
-				require.InDelta(t, wantRange[0], got[i][0], 0.0001)
-				require.InDelta(t, wantRange[1], got[i][1], 0.0001)
-			}
-		})
-	}
-}
 
 func createItemWithPoint(t *testing.T) {
 	t.Helper()
@@ -98,10 +31,10 @@ func createItemWithPointAt(t *testing.T, latitude, longitude float64) int64 {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	return createItem(t, conn, cnt, &Item{
+	return createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("factory-%d", random.Int()),
 		IsGroup:    false,
-		ItemTypeId: ItemType_ITEM_TYPE_FACTORY,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_FACTORY,
 		Location:   &latlng.LatLng{Latitude: latitude, Longitude: longitude},
 	})
 }
@@ -113,11 +46,11 @@ func TestGetPoints(t *testing.T) {
 
 	createItemWithPoint(t)
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
 	_, err := client.GetPoints(
 		ctx,
-		&MapGetPointsRequest{
+		&pb.MapGetPointsRequest{
 			Bounds:   "0,0,60,60",
 			Language: schema.EnglishLanguageCode,
 		},
@@ -132,11 +65,11 @@ func TestGetPointsOnly(t *testing.T) {
 
 	createItemWithPoint(t)
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
 	_, err := client.GetPoints(
 		ctx,
-		&MapGetPointsRequest{
+		&pb.MapGetPointsRequest{
 			Bounds:     "0,0,60,60",
 			Language:   schema.EnglishLanguageCode,
 			PointsOnly: true,
@@ -162,21 +95,21 @@ func TestGetPointsAxisOrder(t *testing.T) {
 	itemID := createItemWithPointAt(t, latitude, longitude)
 	wantID := fmt.Sprintf("factory%d", itemID)
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
 	// Bounds format is "lngLo,latLo,lngHi,latHi". A tight box straddling the point's real
 	// location; if bounds parsing or the stored point had swapped axes, this box - built from
 	// very different lat/lng ranges - would not intersect it.
 	res, err := client.GetPoints(
 		ctx,
-		&MapGetPointsRequest{
+		&pb.MapGetPointsRequest{
 			Bounds:   "37,55,38,56",
 			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
 
-	var found *MapPoint
+	var found *pb.MapPoint
 
 	for _, point := range res.GetPoints() {
 		if point.GetId() == wantID {
@@ -194,7 +127,7 @@ func TestGetPointsAxisOrder(t *testing.T) {
 	// did, the bounding-box polygon would itself have its axes swapped.
 	res, err = client.GetPoints(
 		ctx,
-		&MapGetPointsRequest{
+		&pb.MapGetPointsRequest{
 			Bounds:   "55,37,56,38",
 			Language: schema.EnglishLanguageCode,
 		},
@@ -223,18 +156,18 @@ func TestGetPointsWideLowZoomBounds(t *testing.T) {
 	itemID := createItemWithPointAt(t, 10, 0)
 	wantID := fmt.Sprintf("factory%d", itemID)
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
 	res, err := client.GetPoints(
 		ctx,
-		&MapGetPointsRequest{
+		&pb.MapGetPointsRequest{
 			Bounds:   "-170,-80,170,80",
 			Language: schema.EnglishLanguageCode,
 		},
 	)
 	require.NoError(t, err)
 
-	var found *MapPoint
+	var found *pb.MapPoint
 
 	for _, point := range res.GetPoints() {
 		if point.GetId() == wantID {
@@ -260,11 +193,11 @@ func TestGetPointsWorldWrapPanning(t *testing.T) {
 	itemID := createItemWithPointAt(t, 10, -40)
 	wantID := fmt.Sprintf("factory%d", itemID)
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
 	res, err := client.GetPoints(
 		ctx,
-		&MapGetPointsRequest{
+		&pb.MapGetPointsRequest{
 			// One world-width (360) east of (-60, -20), the canonical range containing -40.
 			Bounds:   "300,-80,340,80",
 			Language: schema.EnglishLanguageCode,
@@ -272,7 +205,7 @@ func TestGetPointsWorldWrapPanning(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	var found *MapPoint
+	var found *pb.MapPoint
 
 	for _, point := range res.GetPoints() {
 		if point.GetId() == wantID {
@@ -361,12 +294,12 @@ func TestGetPicturePointsSingle(t *testing.T) {
 
 	identity := createPictureWithPointAt(t, latitude, longitude)
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
-	res, err := client.GetPicturePoints(ctx, &MapGetPicturePointsRequest{Bounds: bounds})
+	res, err := client.GetPicturePoints(ctx, &pb.MapGetPicturePointsRequest{Bounds: bounds})
 	require.NoError(t, err)
 
-	var found *MapSinglePicture
+	var found *pb.MapSinglePicture
 
 	for _, point := range res.GetPoints() {
 		if picture := point.GetPicture(); picture != nil && picture.GetIdentity() == identity {
@@ -401,15 +334,15 @@ func TestGetPicturePointsCluster(t *testing.T) {
 	)
 
 	// Placed dead-center of a random interior grid cell (matching GetPicturePoints's own
-	// pictureGridSize) rather than anywhere in the viewport: near a cell edge, the small spread
+	// maps.PictureGridSize) rather than anywhere in the viewport: near a cell edge, the small spread
 	// between the pictureCount pictures below could straddle two cells and split the cluster,
 	// which happened intermittently before this fix.
-	cellLng := (boundsLngHi - boundsLngLo) / pictureGridSize
-	cellLat := (boundsLatHi - boundsLatLo) / pictureGridSize
+	cellLng := (boundsLngHi - boundsLngLo) / maps.PictureGridSize
+	cellLat := (boundsLatHi - boundsLatLo) / maps.PictureGridSize
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
-	cellLngIndex := 2 + random.Intn(pictureGridSize-4)
-	cellLatIndex := 2 + random.Intn(pictureGridSize-4)
+	cellLngIndex := 2 + random.Intn(maps.PictureGridSize-4)
+	cellLatIndex := 2 + random.Intn(maps.PictureGridSize-4)
 	baseLongitude := boundsLngLo + (float64(cellLngIndex)+0.5)*cellLng
 	baseLatitude := boundsLatLo + (float64(cellLatIndex)+0.5)*cellLat
 
@@ -417,9 +350,9 @@ func TestGetPicturePointsCluster(t *testing.T) {
 		createPictureWithPointAt(t, baseLatitude+float64(i)*0.001, baseLongitude+float64(i)*0.001)
 	}
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
-	res, err := client.GetPicturePoints(ctx, &MapGetPicturePointsRequest{Bounds: bounds})
+	res, err := client.GetPicturePoints(ctx, &pb.MapGetPicturePointsRequest{Bounds: bounds})
 	require.NoError(t, err)
 
 	// The cluster's reported location is the average of its pictures' coordinates, so the expected
@@ -428,7 +361,7 @@ func TestGetPicturePointsCluster(t *testing.T) {
 	wantLatitude := baseLatitude + float64(pictureCount-1)/2*0.001
 	wantLongitude := baseLongitude + float64(pictureCount-1)/2*0.001
 
-	var found *MapPictureCluster
+	var found *pb.MapPictureCluster
 
 	for _, point := range res.GetPoints() {
 		// Matches on both a tight location window and the exact expected count: on a shared,
@@ -483,9 +416,9 @@ func TestGetPicturePointsIndividual(t *testing.T) {
 		identities[createPictureWithPointAt(t, latitude, longitude)] = true
 	}
 
-	client := NewMapClient(conn)
+	client := pb.NewMapClient(conn)
 
-	res, err := client.GetPicturePoints(ctx, &MapGetPicturePointsRequest{Bounds: bounds, Individual: true})
+	res, err := client.GetPicturePoints(ctx, &pb.MapGetPicturePointsRequest{Bounds: bounds, Individual: true})
 	require.NoError(t, err)
 
 	found := make(map[string]bool, pictureCount)

@@ -1,0 +1,239 @@
+package messaging
+
+import (
+	"context"
+	"database/sql"
+	"math/rand"
+	"strconv"
+	"testing"
+
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/i18nbundle"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/doug-martin/goqu/v9"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
+)
+
+func createRepository(t *testing.T) *Repository {
+	t.Helper()
+
+	cfg := config.LoadConfig("../..")
+
+	db, err := sql.Open("postgres", cfg.PostgresDSN)
+	require.NoError(t, err)
+	db.SetMaxOpenConns(2)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	goquDB := goqu.New("postgres", db)
+
+	i18n, err := i18nbundle.New()
+	require.NoError(t, err)
+
+	repo := NewRepository(goquDB, func(_ context.Context, _ int64, _ int64, _ string) error {
+		return nil
+	}, func(_ context.Context, _ []int64) error {
+		return nil
+	}, i18n)
+
+	return repo
+}
+
+func TestGetUserNewMessagesCount(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, err := s.GetUserNewMessagesCount(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestGetInboxCount(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, err := s.GetInboxCount(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestGetInboxNewCount(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, err := s.GetInboxNewCount(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestGetSentCount(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, err := s.GetSentCount(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestGetSystemCount(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, err := s.GetSystemCount(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestGetSystemNewCount(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, err := s.GetSystemNewCount(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestGetDialogCount(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, err := s.GetDialogCount(t.Context(), 1, 2)
+	require.NoError(t, err)
+}
+
+func TestDeleteMessage(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	err := s.DeleteMessage(t.Context(), 1, 1)
+	require.NoError(t, err)
+}
+
+func TestClearSent(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	err := s.ClearSent(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestClearSystem(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	err := s.ClearSystem(t.Context(), 1)
+	require.NoError(t, err)
+}
+
+func TestGetInbox(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, _, err := s.GetInbox(t.Context(), 1, 1)
+	require.NoError(t, err)
+}
+
+func TestGetSentbox(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, _, err := s.GetSentbox(t.Context(), 1, 1)
+	require.NoError(t, err)
+}
+
+func TestGetSystembox(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, _, err := s.GetSystembox(t.Context(), 1, 1)
+	require.NoError(t, err)
+}
+
+func TestGetDialogbox(t *testing.T) {
+	t.Parallel()
+
+	s := createRepository(t)
+	_, _, err := s.GetDialogbox(t.Context(), 1, 2, 1)
+	require.NoError(t, err)
+}
+
+func createRandomUser(t *testing.T, repository *Repository) int64 {
+	t.Helper()
+
+	var id int64
+
+	emailAddr := "test" + strconv.Itoa(rand.Int()) + "@example.com" //nolint: gosec
+	name := "ivan"
+	success, err := repository.db.Insert(schema.UserTable).
+		Rows(goqu.Record{
+			schema.UserTableLoginColName:          nil,
+			schema.UserTableEmailColName:          emailAddr,
+			schema.UserTablePasswordColName:       nil,
+			schema.UserTableEmailToCheckColName:   nil,
+			schema.UserTableHideEmailColName:      true,
+			schema.UserTableEmailCheckCodeColName: nil,
+			schema.UserTableNameColName:           name,
+			schema.UserTableRegDateColName:        goqu.Func("NOW"),
+			schema.UserTableLastOnlineColName:     goqu.Func("NOW"),
+			schema.UserTableTimezoneColName:       "Europe/Moscow",
+			schema.UserTableLastIPColName:         goqu.Func("INET", "127.0.0.1"),
+			schema.UserTableLanguageColName:       schema.EnglishLanguageCode,
+			schema.UserTableUUIDColName:           uuid.New().String(),
+		}).
+		Returning(schema.UserTableIDCol).
+		Executor().ScanValContext(t.Context(), &id)
+	require.NoError(t, err)
+	require.True(t, success)
+
+	return id
+}
+
+func TestDialogCount(t *testing.T) { //nolint:paralleltest
+	repo := createRepository(t)
+	ctx := t.Context()
+
+	user1 := createRandomUser(t, repo)
+	user2 := createRandomUser(t, repo)
+
+	countBefore, err := repo.GetDialogCount(ctx, user1, user2)
+	require.NoError(t, err)
+
+	err = repo.CreateMessage(ctx, user1, user2, "Test message")
+	require.NoError(t, err)
+
+	countAfter, err := repo.GetDialogCount(ctx, user1, user2)
+	require.NoError(t, err)
+
+	require.Greater(t, countAfter, countBefore)
+
+	messages, _, err := repo.GetSentbox(ctx, user1, 1)
+	require.NoError(t, err)
+	require.Equal(t, countAfter, messages[0].DialogCount)
+}
+
+func TestIsBlacklisted(t *testing.T) { //nolint:paralleltest
+	repo := createRepository(t)
+	ctx := t.Context()
+
+	user1 := createRandomUser(t, repo)
+	user2 := createRandomUser(t, repo)
+
+	blacklisted, err := repo.IsBlacklisted(ctx, user1, user2)
+	require.NoError(t, err)
+	require.False(t, blacklisted)
+
+	_, err = repo.db.Insert(schema.UserUserPreferencesTable).Rows(goqu.Record{
+		schema.UserUserPreferencesTableUserIDColName:    user1,
+		schema.UserUserPreferencesTableToUserIDColName:  user2,
+		schema.UserUserPreferencesTableBlacklistColName: true,
+	}).Executor().ExecContext(ctx)
+	require.NoError(t, err)
+
+	blacklisted, err = repo.IsBlacklisted(ctx, user1, user2)
+	require.NoError(t, err)
+	require.True(t, blacklisted)
+
+	// the relation is directional
+	blacklisted, err = repo.IsBlacklisted(ctx, user2, user1)
+	require.NoError(t, err)
+	require.False(t, blacklisted)
+
+	// a zero participant is never blacklisted (system messages)
+	blacklisted, err = repo.IsBlacklisted(ctx, user1, 0)
+	require.NoError(t, err)
+	require.False(t, blacklisted)
+}

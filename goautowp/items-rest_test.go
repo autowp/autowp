@@ -13,8 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/util"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/util"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 )
@@ -35,7 +37,7 @@ func SetItemLogoRequest(t *testing.T, itemID int64, file string) *http.Request {
 		multipartWriter = multipart.NewWriter(buf)
 	)
 
-	part, err := multipartWriter.CreateFormFile(itemLogoFileField, filepath.Base(file))
+	part, err := multipartWriter.CreateFormFile("file", filepath.Base(file))
 	require.NoError(t, err)
 
 	handle, err := os.OpenFile(file, os.O_RDONLY, 0)
@@ -56,7 +58,7 @@ func SetItemLogoRequest(t *testing.T, itemID int64, file string) *http.Request {
 	require.NoError(t, err)
 
 	req.Header.Add("Content-Type", multipartWriter.FormDataContentType())
-	req.Header.Add(authorizationHeader, bearerPrefix+adminToken) //nolint:canonicalheader
+	req.Header.Add(authn.AuthorizationHeader, bearerPrefix+adminToken)
 
 	return req
 }
@@ -66,10 +68,10 @@ func TestSetItemLogo(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
@@ -87,11 +89,11 @@ func TestSetItemLogo(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, w.Code)
 
-	client := NewItemsClient(conn)
+	client := pb.NewItemsClient(conn)
 
-	brand, err := client.Item(t.Context(), &ItemRequest{
+	brand, err := client.Item(t.Context(), &pb.ItemRequest{
 		Id: brandID,
-		Fields: &ItemFields{
+		Fields: &pb.ItemFields{
 			Logo: true,
 		},
 	})
@@ -104,10 +106,10 @@ func TestSetItemLogoInvalidFile(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
@@ -131,10 +133,10 @@ func TestSetItemLogoInvalidFile2(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
@@ -158,10 +160,10 @@ func TestSetItemLogoInvalidFile3(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 

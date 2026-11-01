@@ -9,8 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -41,7 +43,7 @@ func TestGetUnits(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
 	_, err := client.GetUnits(
 		ctx,
@@ -55,7 +57,7 @@ func TestGetZones(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
 	_, err := client.GetZones(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -66,7 +68,7 @@ func TestGetAttributeTypes(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
 	_, err := client.GetAttributeTypes(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
@@ -84,11 +86,11 @@ func TestGetAttributes(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
 	_, err = client.ListAttributes(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ListAttributesRequest{ZoneId: 1},
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.ListAttributesRequest{ZoneId: 1},
 	)
 	require.NoError(t, err)
 }
@@ -98,9 +100,9 @@ func TestGetZoneAttributes(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	_, err := client.GetZoneAttributes(ctx, &AttrZoneAttributesRequest{ZoneId: 1})
+	_, err := client.GetZoneAttributes(ctx, &pb.AttrZoneAttributesRequest{ZoneId: 1})
 	require.NoError(t, err)
 }
 
@@ -116,16 +118,16 @@ func TestGetListOptions(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
 	_, err = client.GetListOptions(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrListOptionsRequest{AttributeId: 1},
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrListOptionsRequest{AttributeId: 1},
 	)
 	require.NoError(t, err)
 }
 
-func requireUserValues(t *testing.T, userValues *AttrUserValuesResponse) {
+func requireUserValues(t *testing.T, userValues *pb.AttrUserValuesResponse) {
 	t.Helper()
 
 	var (
@@ -186,7 +188,7 @@ func requireUserValues(t *testing.T, userValues *AttrUserValuesResponse) {
 	require.True(t, treeMultipleFound)
 }
 
-func requireValues(t *testing.T, values *AttrValuesResponse) {
+func requireValues(t *testing.T, values *pb.AttrValuesResponse) {
 	t.Helper()
 
 	require.NotEmpty(t, values.GetItems())
@@ -258,16 +260,16 @@ func TestGetValues(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	itemID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "TestGetValues",
 	})
 
 	values, err := client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   itemID,
 			Language: schema.EnglishLanguageCode,
 		},
@@ -278,16 +280,16 @@ func TestGetValues(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: floatAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 7.091,
 					},
@@ -295,8 +297,8 @@ func TestGetValues(t *testing.T) {
 				{
 					AttributeId: intAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
@@ -304,8 +306,8 @@ func TestGetValues(t *testing.T) {
 				{
 					AttributeId: stringAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:        AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:        pb.AttrAttributeType_STRING,
 						Valid:       true,
 						StringValue: "test",
 					},
@@ -313,8 +315,8 @@ func TestGetValues(t *testing.T) {
 				{
 					AttributeId: boolAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_BOOLEAN,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_BOOLEAN,
 						Valid:     true,
 						BoolValue: true,
 					},
@@ -322,8 +324,8 @@ func TestGetValues(t *testing.T) {
 				{
 					AttributeId: listAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{1},
 					},
@@ -331,8 +333,8 @@ func TestGetValues(t *testing.T) {
 				{
 					AttributeId: treeAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{25},
 					},
@@ -340,8 +342,8 @@ func TestGetValues(t *testing.T) {
 				{
 					AttributeId: treeMultipleAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{28, 29},
 					},
@@ -353,8 +355,8 @@ func TestGetValues(t *testing.T) {
 
 	// check values
 	values, err = client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   itemID,
 			Language: schema.EnglishLanguageCode,
 		},
@@ -364,11 +366,11 @@ func TestGetValues(t *testing.T) {
 
 	// check user values by item_id
 	userValues, err := client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: schema.EnglishLanguageCode,
-			Fields: &AttrUserValuesFields{
+			Fields: &pb.AttrUserValuesFields{
 				ValueText: true,
 			},
 		},
@@ -388,16 +390,16 @@ func TestGetEmptyValues(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	itemID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "TestGetEmptyValues",
 	})
 
 	values, err := client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   itemID,
 			Language: schema.EnglishLanguageCode,
 		},
@@ -410,16 +412,16 @@ func TestGetEmptyValues(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: floatEmptyAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_FLOAT,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -427,8 +429,8 @@ func TestGetEmptyValues(t *testing.T) {
 				{
 					AttributeId: intEmptyAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_INTEGER,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -436,8 +438,8 @@ func TestGetEmptyValues(t *testing.T) {
 				{
 					AttributeId: stringEmptyAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_STRING,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -445,8 +447,8 @@ func TestGetEmptyValues(t *testing.T) {
 				{
 					AttributeId: boolEmptyAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_BOOLEAN,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_BOOLEAN,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -454,8 +456,8 @@ func TestGetEmptyValues(t *testing.T) {
 				{
 					AttributeId: listEmptyAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -464,8 +466,8 @@ func TestGetEmptyValues(t *testing.T) {
 				{
 					AttributeId: treeEmptyAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -478,8 +480,8 @@ func TestGetEmptyValues(t *testing.T) {
 
 	// check values
 	values, err = client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   itemID,
 			Language: schema.EnglishLanguageCode,
 		},
@@ -559,16 +561,16 @@ func TestConflicts(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, adminToken)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
 	_, err = client.GetConflicts(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&AttrConflictsRequest{
-			Filter:   AttrConflictsRequest_ALL,
+		&pb.AttrConflictsRequest{
+			Filter:   pb.AttrConflictsRequest_ALL,
 			Page:     0,
 			Language: schema.EnglishLanguageCode,
 		},
@@ -578,11 +580,11 @@ func TestConflicts(t *testing.T) {
 	_, err = client.GetConflicts(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&AttrConflictsRequest{
-			Filter:   AttrConflictsRequest_MINUS_WEIGHT,
+		&pb.AttrConflictsRequest{
+			Filter:   pb.AttrConflictsRequest_MINUS_WEIGHT,
 			Page:     0,
 			Language: schema.EnglishLanguageCode,
 		},
@@ -592,11 +594,11 @@ func TestConflicts(t *testing.T) {
 	_, err = client.GetConflicts(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&AttrConflictsRequest{
-			Filter:   AttrConflictsRequest_I_DISAGREE,
+		&pb.AttrConflictsRequest{
+			Filter:   pb.AttrConflictsRequest_I_DISAGREE,
 			Page:     0,
 			Language: schema.EnglishLanguageCode,
 		},
@@ -606,11 +608,11 @@ func TestConflicts(t *testing.T) {
 	_, err = client.GetConflicts(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&AttrConflictsRequest{
-			Filter:   AttrConflictsRequest_DO_NOT_AGREE_WITH_ME,
+		&pb.AttrConflictsRequest{
+			Filter:   pb.AttrConflictsRequest_DO_NOT_AGREE_WITH_ME,
 			Page:     0,
 			Language: "en",
 		},
@@ -629,20 +631,20 @@ func TestValuesInherits(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestValuesInherits Parent",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	childItemID := createItem(t, conn, cnt, &Item{
+	childItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestValuesInherits Child",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	itemsClient := NewItemsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
 
 	// admin
 	adminToken, err := kc.Login(
@@ -659,10 +661,10 @@ func TestValuesInherits(t *testing.T) {
 	_, err = itemsClient.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: childItemID, ParentId: itemID, Catname: "vehicle1",
 		},
 	)
@@ -671,16 +673,16 @@ func TestValuesInherits(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 77,
 					},
@@ -695,10 +697,10 @@ func TestValuesInherits(t *testing.T) {
 		values, err := client.GetValues(
 			metadata.AppendToOutgoingContext(
 				ctx,
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&AttrValuesRequest{
+			&pb.AttrValuesRequest{
 				ItemId:   currentItemID,
 				Language: "en",
 			},
@@ -734,32 +736,32 @@ func TestEngineValuesApplied(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	engineItemID := createItem(t, conn, cnt, &Item{
+	engineItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestEngineValuesApplied Engine",
-		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_ENGINE,
 	})
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:         "TestEngineValuesApplied Engine",
-		ItemTypeId:   ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId:   pb.ItemType_ITEM_TYPE_VEHICLE,
 		EngineItemId: engineItemID,
 	})
 
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EngineTypeAttr,
 					ItemId:      engineItemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_TREE,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_TREE,
 						Valid:     true,
 						ListValue: []int64{104, 105},
 					},
@@ -774,10 +776,10 @@ func TestEngineValuesApplied(t *testing.T) {
 		values, err := client.GetValues(
 			metadata.AppendToOutgoingContext(
 				ctx,
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&AttrValuesRequest{
+			&pb.AttrValuesRequest{
 				ItemId:   currentItemID,
 				Language: "en",
 			},
@@ -814,11 +816,11 @@ func TestSetUserValuesList(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestSetUserValuesList",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	cases := []struct {
@@ -857,16 +859,16 @@ func TestSetUserValuesList(t *testing.T) {
 		_, err = client.SetUserValues(
 			metadata.AppendToOutgoingContext(
 				t.Context(),
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&AttrSetUserValuesRequest{
-				Items: []*AttrUserValue{
+			&pb.AttrSetUserValuesRequest{
+				Items: []*pb.AttrUserValue{
 					{
 						AttributeId: schema.EngineTypeAttr,
 						ItemId:      itemID,
-						Value: &AttrValueValue{
-							Type:      AttrAttributeType_TREE,
+						Value: &pb.AttrValueValue{
+							Type:      pb.AttrAttributeType_TREE,
 							Valid:     true,
 							IsEmpty:   testCase.IsEmpty,
 							ListValue: testCase.Input,
@@ -881,10 +883,10 @@ func TestSetUserValuesList(t *testing.T) {
 		values, err := client.GetValues(
 			metadata.AppendToOutgoingContext(
 				ctx,
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&AttrValuesRequest{
+			&pb.AttrValuesRequest{
 				ItemId:   itemID,
 				Language: "en",
 			},
@@ -926,21 +928,21 @@ func TestSetValuesRaceConditions(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestSetValuesRaceConditions",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	cases := []struct {
 		AttributeID int64
-		Value       *AttrValueValue
+		Value       *pb.AttrValueValue
 	}{
 		{
 			AttributeID: schema.EngineTypeAttr,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_TREE,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_TREE,
 				Valid:     true,
 				IsEmpty:   false,
 				ListValue: []int64{999},
@@ -948,8 +950,8 @@ func TestSetValuesRaceConditions(t *testing.T) {
 		},
 		{
 			AttributeID: schema.EngineTypeAttr,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_TREE,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_TREE,
 				Valid:     true,
 				IsEmpty:   false,
 				ListValue: []int64{1, 104, 105},
@@ -957,8 +959,8 @@ func TestSetValuesRaceConditions(t *testing.T) {
 		},
 		{
 			AttributeID: schema.EngineTypeAttr,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_TREE,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_TREE,
 				Valid:     true,
 				IsEmpty:   false,
 				ListValue: []int64{105, 104},
@@ -966,8 +968,8 @@ func TestSetValuesRaceConditions(t *testing.T) {
 		},
 		{
 			AttributeID: schema.EngineTypeAttr,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_TREE,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_TREE,
 				Valid:     true,
 				IsEmpty:   false,
 				ListValue: []int64{},
@@ -975,8 +977,8 @@ func TestSetValuesRaceConditions(t *testing.T) {
 		},
 		{
 			AttributeID: schema.EngineTypeAttr,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_TREE,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_TREE,
 				Valid:     true,
 				IsEmpty:   true,
 				ListValue: []int64{},
@@ -984,40 +986,40 @@ func TestSetValuesRaceConditions(t *testing.T) {
 		},
 		{
 			AttributeID: floatEmptyAttributeID,
-			Value: &AttrValueValue{
-				Type:    AttrAttributeType_FLOAT,
+			Value: &pb.AttrValueValue{
+				Type:    pb.AttrAttributeType_FLOAT,
 				Valid:   true,
 				IsEmpty: true,
 			},
 		},
 		{
 			AttributeID: intEmptyAttributeID,
-			Value: &AttrValueValue{
-				Type:    AttrAttributeType_INTEGER,
+			Value: &pb.AttrValueValue{
+				Type:    pb.AttrAttributeType_INTEGER,
 				Valid:   true,
 				IsEmpty: true,
 			},
 		},
 		{
 			AttributeID: stringEmptyAttributeID,
-			Value: &AttrValueValue{
-				Type:    AttrAttributeType_STRING,
+			Value: &pb.AttrValueValue{
+				Type:    pb.AttrAttributeType_STRING,
 				Valid:   true,
 				IsEmpty: true,
 			},
 		},
 		{
 			AttributeID: boolEmptyAttributeID,
-			Value: &AttrValueValue{
-				Type:    AttrAttributeType_BOOLEAN,
+			Value: &pb.AttrValueValue{
+				Type:    pb.AttrAttributeType_BOOLEAN,
 				Valid:   true,
 				IsEmpty: true,
 			},
 		},
 		{
 			AttributeID: listEmptyAttributeID,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_LIST,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_LIST,
 				Valid:     true,
 				IsEmpty:   true,
 				ListValue: []int64{},
@@ -1025,8 +1027,8 @@ func TestSetValuesRaceConditions(t *testing.T) {
 		},
 		{
 			AttributeID: treeEmptyAttributeID,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_LIST,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_LIST,
 				Valid:     true,
 				IsEmpty:   true,
 				ListValue: []int64{},
@@ -1034,56 +1036,56 @@ func TestSetValuesRaceConditions(t *testing.T) {
 		},
 		{
 			AttributeID: floatAttributeID,
-			Value: &AttrValueValue{
-				Type:       AttrAttributeType_FLOAT,
+			Value: &pb.AttrValueValue{
+				Type:       pb.AttrAttributeType_FLOAT,
 				Valid:      true,
 				FloatValue: 7.091,
 			},
 		},
 		{
 			AttributeID: intAttributeID,
-			Value: &AttrValueValue{
-				Type:     AttrAttributeType_INTEGER,
+			Value: &pb.AttrValueValue{
+				Type:     pb.AttrAttributeType_INTEGER,
 				Valid:    true,
 				IntValue: 6,
 			},
 		},
 		{
 			AttributeID: stringAttributeID,
-			Value: &AttrValueValue{
-				Type:        AttrAttributeType_STRING,
+			Value: &pb.AttrValueValue{
+				Type:        pb.AttrAttributeType_STRING,
 				Valid:       true,
 				StringValue: "test",
 			},
 		},
 		{
 			AttributeID: boolAttributeID,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_BOOLEAN,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_BOOLEAN,
 				Valid:     true,
 				BoolValue: true,
 			},
 		},
 		{
 			AttributeID: listAttributeID,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_LIST,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_LIST,
 				Valid:     true,
 				ListValue: []int64{1},
 			},
 		},
 		{
 			AttributeID: treeAttributeID,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_LIST,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_LIST,
 				Valid:     true,
 				ListValue: []int64{25},
 			},
 		},
 		{
 			AttributeID: treeMultipleAttributeID,
-			Value: &AttrValueValue{
-				Type:      AttrAttributeType_LIST,
+			Value: &pb.AttrValueValue{
+				Type:      pb.AttrAttributeType_LIST,
 				Valid:     true,
 				ListValue: []int64{28, 29},
 			},
@@ -1102,11 +1104,11 @@ func TestSetValuesRaceConditions(t *testing.T) {
 				_, err := client.SetUserValues(
 					metadata.AppendToOutgoingContext(
 						ctx,
-						authorizationHeader,
+						authn.AuthorizationHeader,
 						bearerPrefix+token.AccessToken,
 					),
-					&AttrSetUserValuesRequest{
-						Items: []*AttrUserValue{
+					&pb.AttrSetUserValuesRequest{
+						Items: []*pb.AttrUserValue{
 							{
 								AttributeId: schema.EngineTypeAttr,
 								ItemId:      itemID,
@@ -1121,10 +1123,10 @@ func TestSetValuesRaceConditions(t *testing.T) {
 				_, err = client.GetValues(
 					metadata.AppendToOutgoingContext(
 						ctx,
-						authorizationHeader,
+						authn.AuthorizationHeader,
 						bearerPrefix+token.AccessToken,
 					),
-					&AttrValuesRequest{
+					&pb.AttrValuesRequest{
 						ItemId:   itemID,
 						Language: "en",
 					},
@@ -1148,34 +1150,34 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	usersClient := NewUsersClient(conn)
+	usersClient := pb.NewUsersClient(conn)
 	me, err := usersClient.Me(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&MeRequest{},
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.MeRequest{},
 	)
 	require.NoError(t, err)
 	require.NotNil(t, me)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestValuesInheritsThroughItem item",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	childItemID := createItem(t, conn, cnt, &Item{
+	childItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestValuesInheritsThroughItem child",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	inheritorItemID := createItem(t, conn, cnt, &Item{
+	inheritorItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestValuesInheritsThroughItem interior",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	itemsClient := NewItemsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
 
 	// admin
 	adminToken, err := kc.Login(
@@ -1192,10 +1194,10 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 	_, err = itemsClient.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: childItemID, ParentId: itemID, Catname: "vehicle1",
 		},
 	)
@@ -1204,10 +1206,10 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 	_, err = itemsClient.CreateItemParent(
 		metadata.AppendToOutgoingContext(
 			ctx,
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+adminToken.AccessToken,
 		),
-		&ItemParent{
+		&pb.ItemParent{
 			ItemId: inheritorItemID, ParentId: childItemID, Catname: "vehicle1",
 		},
 	)
@@ -1216,16 +1218,16 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 77,
 					},
@@ -1240,10 +1242,10 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 		values, err := client.GetValues(
 			metadata.AppendToOutgoingContext(
 				ctx,
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&AttrValuesRequest{
+			&pb.AttrValuesRequest{
 				ItemId:   currentItemID,
 				Language: "en",
 			},
@@ -1272,10 +1274,10 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 	_, err = client.DeleteUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&DeleteAttrUserValuesRequest{
+		&pb.DeleteAttrUserValuesRequest{
 			AttributeId: intAttributeID,
 			ItemId:      itemID,
 			UserId:      me.GetId(),
@@ -1288,10 +1290,10 @@ func TestValuesInheritsThroughItem(t *testing.T) {
 		values, err := client.GetValues(
 			metadata.AppendToOutgoingContext(
 				ctx,
-				authorizationHeader,
+				authn.AuthorizationHeader,
 				bearerPrefix+token.AccessToken,
 			),
-			&AttrValuesRequest{
+			&pb.AttrValuesRequest{
 				ItemId:   currentItemID,
 				Language: "en",
 			},
@@ -1312,24 +1314,24 @@ func TestInheritedValueOverridden(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestInheritedValueOverridden",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		IsGroup:    true,
 	})
 
-	childItemID := createItem(t, conn, cnt, &Item{
+	childItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestInheritedValueOverridden child",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	itemsClient := NewItemsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
 
 	_, err = itemsClient.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.ItemParent{
 			ItemId: childItemID, ParentId: itemID, Catname: "vehicle1",
 		},
 	)
@@ -1338,16 +1340,16 @@ func TestInheritedValueOverridden(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 77,
 					},
@@ -1360,16 +1362,16 @@ func TestInheritedValueOverridden(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      childItemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 219,
 					},
@@ -1381,8 +1383,8 @@ func TestInheritedValueOverridden(t *testing.T) {
 
 	// check values
 	values, err := client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -1408,8 +1410,8 @@ func TestInheritedValueOverridden(t *testing.T) {
 
 	// check values
 	values, err = client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   childItemID,
 			Language: "en",
 		},
@@ -1445,31 +1447,31 @@ func TestMoveValues(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	srcItemID := createItem(t, conn, cnt, &Item{
+	srcItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestMoveValues",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
-	destItemID := createItem(t, conn, cnt, &Item{
+	destItemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestMoveValues dest",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      srcItemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 77,
 					},
@@ -1482,10 +1484,10 @@ func TestMoveValues(t *testing.T) {
 	_, err = client.MoveUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&MoveAttrUserValuesRequest{
+		&pb.MoveAttrUserValuesRequest{
 			SrcItemId:  srcItemID,
 			DestItemId: destItemID,
 		},
@@ -1494,8 +1496,8 @@ func TestMoveValues(t *testing.T) {
 
 	// check values
 	values, err := client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   destItemID,
 			Language: "en",
 		},
@@ -1521,8 +1523,8 @@ func TestMoveValues(t *testing.T) {
 
 	// check values
 	values, err = client.GetValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrValuesRequest{
 			ItemId:   srcItemID,
 			Language: "en",
 		},
@@ -1542,27 +1544,27 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestValueDateMustChangesWhenValueChanged",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	// set initial value
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 77,
 					},
@@ -1574,8 +1576,8 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 
 	// check values
 	values, err := client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -1597,16 +1599,16 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 78,
 					},
@@ -1618,8 +1620,8 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 
 	// check values
 	values, err = client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -1643,16 +1645,16 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: intAttributeID,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 78,
 					},
@@ -1664,8 +1666,8 @@ func TestValueDateMustChangesWhenValueChanged(t *testing.T) {
 
 	// check values
 	values, err = client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -1695,27 +1697,27 @@ func TestNonMultipleValuesFiltered(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestNonMultipleValuesFiltered",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	// set value
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: 20,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{1, 2},
 					},
@@ -1727,8 +1729,8 @@ func TestNonMultipleValuesFiltered(t *testing.T) {
 
 	// check values
 	values, err := client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -1756,27 +1758,27 @@ func TestEmptyListValueConsiderAsNonValid(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestEmptyListValueConsiderAsNonValid",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	// set value
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: 20,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{},
 					},
@@ -1788,8 +1790,8 @@ func TestEmptyListValueConsiderAsNonValid(t *testing.T) {
 
 	// check values
 	userValues, err := client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -1809,27 +1811,27 @@ func TestEmptyStringValueConsiderAsNonValid(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestEmptyStringValueConsiderAsNonValid",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	// set value
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: 8,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:        AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:        pb.AttrAttributeType_STRING,
 						Valid:       true,
 						StringValue: "",
 					},
@@ -1841,8 +1843,8 @@ func TestEmptyStringValueConsiderAsNonValid(t *testing.T) {
 
 	// check values
 	userValues, err := client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -1861,11 +1863,11 @@ func TestSpecifications(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
-	itemsClient := NewItemsClient(conn)
+	client := pb.NewAttrsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	itemID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
 	})
@@ -1874,16 +1876,16 @@ func TestSpecifications(t *testing.T) {
 	randomInt := random.Int()
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &Item{
+	engineID := createItem(t, conn, cnt, &pb.Item{
 		Name:       engineName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_ENGINE,
 	})
 
 	_, err = itemsClient.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            itemID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -1894,14 +1896,14 @@ func TestSpecifications(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = client.SetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EngineTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_TREE,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_TREE,
 						Valid:     true,
 						IsEmpty:   false,
 						ListValue: []int64{105},
@@ -1910,8 +1912,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.EngineCylinderDiameter,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_FLOAT,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -1919,8 +1921,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.WidthAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_INTEGER,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -1928,8 +1930,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.RearSuspensionType,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_STRING,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -1937,8 +1939,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.ABSAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_BOOLEAN,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_BOOLEAN,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -1946,8 +1948,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.EnginePlacementOrientationAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -1956,8 +1958,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.DriveUnitAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -1966,8 +1968,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.TurningDiameterAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 7.091,
 					},
@@ -1975,8 +1977,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.LengthAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
@@ -1984,8 +1986,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.FrontSuspensionTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:        AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:        pb.AttrAttributeType_STRING,
 						Valid:       true,
 						StringValue: "suspension test",
 					},
@@ -1993,8 +1995,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.SpeedLimiterAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_BOOLEAN,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_BOOLEAN,
 						Valid:     true,
 						BoolValue: true,
 					},
@@ -2002,8 +2004,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.EnginePlacementPlacementAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{1},
 					},
@@ -2011,8 +2013,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.FuelSupplySystemAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{25},
 					},
@@ -2020,8 +2022,8 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.FuelTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{28, 29},
 					},
@@ -2029,7 +2031,7 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.EngineConfigurationCylindersCountAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
+					Value: &pb.AttrValueValue{
 						Valid:    true,
 						IntValue: 6,
 					},
@@ -2037,7 +2039,7 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.EngineConfigurationCylindersLayoutAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
+					Value: &pb.AttrValueValue{
 						Valid:     true,
 						ListValue: []int64{8},
 					},
@@ -2045,7 +2047,7 @@ func TestSpecifications(t *testing.T) {
 				{
 					AttributeId: schema.EngineConfigurationValvesCountAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
+					Value: &pb.AttrValueValue{
 						Valid:    true,
 						IntValue: 4,
 					},
@@ -2058,10 +2060,10 @@ func TestSpecifications(t *testing.T) {
 	res, err := client.GetSpecifications(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&GetSpecificationsRequest{
+		&pb.GetSpecificationsRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -2102,33 +2104,33 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
-	itemsClient := NewItemsClient(conn)
+	client := pb.NewAttrsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	itemID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
 		IsGroup:    true,
 	})
 
-	child1ID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	child1ID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test Child 1",
 		Body:       "E31",
 	})
 
 	_, err = itemsClient.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.ItemParent{
 			ItemId:   child1ID,
 			ParentId: itemID,
 		},
 	)
 	require.NoError(t, err)
 
-	child2ID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	child2ID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test Child 1",
 		Body:       "E31",
 	})
@@ -2137,8 +2139,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	randomInt := random.Int()
 
 	_, err = itemsClient.CreateItemParent(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&ItemParent{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.ItemParent{
 			ItemId:   child2ID,
 			ParentId: itemID,
 		},
@@ -2146,16 +2148,16 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	require.NoError(t, err)
 
 	engineName := fmt.Sprintf("Peugeot-%d-Engine", randomInt)
-	engineID := createItem(t, conn, cnt, &Item{
+	engineID := createItem(t, conn, cnt, &pb.Item{
 		Name:       engineName,
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_ENGINE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_ENGINE,
 	})
 
 	_, err = itemsClient.UpdateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&UpdateItemRequest{
-			Item: &Item{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.UpdateItemRequest{
+			Item: &pb.Item{
 				Id:            child1ID,
 				EngineItemId:  engineID,
 				EngineInherit: false,
@@ -2166,14 +2168,14 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	require.NoError(t, err)
 
 	_, err = client.SetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.FuelSupplySystemAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{25},
 					},
@@ -2181,8 +2183,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.EngineCylinderDiameter,
 					ItemId:      child1ID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_FLOAT,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -2190,8 +2192,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.WidthAttr,
 					ItemId:      child2ID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_INTEGER,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -2199,8 +2201,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.ABSAttr,
 					ItemId:      child1ID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_BOOLEAN,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_BOOLEAN,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -2208,8 +2210,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.EngineTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_TREE,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_TREE,
 						Valid:     true,
 						IsEmpty:   false,
 						ListValue: []int64{105},
@@ -2218,8 +2220,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.EnginePlacementOrientationAttr,
 					ItemId:      child2ID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -2228,8 +2230,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.DriveUnitAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						IsEmpty:   true,
 						ListValue: []int64{},
@@ -2238,8 +2240,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.TurningDiameterAttr,
 					ItemId:      child1ID,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 7.091,
 					},
@@ -2247,8 +2249,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.LengthAttr,
 					ItemId:      child2ID,
-					Value: &AttrValueValue{
-						Type:     AttrAttributeType_INTEGER,
+					Value: &pb.AttrValueValue{
+						Type:     pb.AttrAttributeType_INTEGER,
 						Valid:    true,
 						IntValue: 6,
 					},
@@ -2256,8 +2258,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.FrontSuspensionTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:        AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:        pb.AttrAttributeType_STRING,
 						Valid:       true,
 						StringValue: "suspension test",
 					},
@@ -2265,8 +2267,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.RearSuspensionType,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:    AttrAttributeType_STRING,
+					Value: &pb.AttrValueValue{
+						Type:    pb.AttrAttributeType_STRING,
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -2274,8 +2276,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.SpeedLimiterAttr,
 					ItemId:      child1ID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_BOOLEAN,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_BOOLEAN,
 						Valid:     true,
 						BoolValue: true,
 					},
@@ -2283,8 +2285,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.EnginePlacementPlacementAttr,
 					ItemId:      child2ID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{1},
 					},
@@ -2293,8 +2295,8 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.FuelTypeAttr,
 					ItemId:      child1ID,
-					Value: &AttrValueValue{
-						Type:      AttrAttributeType_LIST,
+					Value: &pb.AttrValueValue{
+						Type:      pb.AttrAttributeType_LIST,
 						Valid:     true,
 						ListValue: []int64{28, 29},
 					},
@@ -2302,7 +2304,7 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.EngineConfigurationCylindersCountAttr,
 					ItemId:      child2ID,
-					Value: &AttrValueValue{
+					Value: &pb.AttrValueValue{
 						Valid:    true,
 						IntValue: 6,
 					},
@@ -2310,7 +2312,7 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.EngineConfigurationCylindersLayoutAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
+					Value: &pb.AttrValueValue{
 						Valid:     true,
 						ListValue: []int64{8},
 					},
@@ -2318,7 +2320,7 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 				{
 					AttributeId: schema.EngineConfigurationValvesCountAttr,
 					ItemId:      child1ID,
-					Value: &AttrValueValue{
+					Value: &pb.AttrValueValue{
 						Valid:    true,
 						IntValue: 4,
 					},
@@ -2331,10 +2333,10 @@ func TestChildSpecifications(t *testing.T) { //nolint: maintidx
 	res, err := client.GetChildSpecifications(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&GetSpecificationsRequest{
+		&pb.GetSpecificationsRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -2377,24 +2379,24 @@ func TestLocalizedFormat(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	itemID := createItem(t, conn, cnt, &pb.Item{
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 		Name:       "Test",
 		Body:       "E31",
 		IsGroup:    true,
 	})
 
 	_, err = client.SetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.MaxSpeedAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
-						Type:       AttrAttributeType_FLOAT,
+					Value: &pb.AttrValueValue{
+						Type:       pb.AttrAttributeType_FLOAT,
 						Valid:      true,
 						FloatValue: 250,
 					},
@@ -2407,10 +2409,10 @@ func TestLocalizedFormat(t *testing.T) {
 	res, err := client.GetSpecifications(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&GetSpecificationsRequest{
+		&pb.GetSpecificationsRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
@@ -2421,10 +2423,10 @@ func TestLocalizedFormat(t *testing.T) {
 	res, err = client.GetSpecifications(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&GetSpecificationsRequest{
+		&pb.GetSpecificationsRequest{
 			ItemId:   itemID,
 			Language: schema.RussianLanguageCode,
 		},
@@ -2444,25 +2446,25 @@ func TestSetUserValuesIsEmpty(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
-	itemID := createItem(t, conn, cnt, &Item{
+	itemID := createItem(t, conn, cnt, &pb.Item{
 		Name:       "TestSetUserValuesIsEmpty",
-		ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
 
 	_, err = client.SetUserValues(
 		metadata.AppendToOutgoingContext(
 			t.Context(),
-			authorizationHeader,
+			authn.AuthorizationHeader,
 			bearerPrefix+token.AccessToken,
 		),
-		&AttrSetUserValuesRequest{
-			Items: []*AttrUserValue{
+		&pb.AttrSetUserValuesRequest{
+			Items: []*pb.AttrUserValue{
 				{
 					AttributeId: schema.EngineTypeAttr,
 					ItemId:      itemID,
-					Value: &AttrValueValue{
+					Value: &pb.AttrValueValue{
 						Valid:   true,
 						IsEmpty: true,
 					},
@@ -2474,15 +2476,15 @@ func TestSetUserValuesIsEmpty(t *testing.T) {
 
 	// check values
 	values, err := client.GetUserValues(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&AttrUserValuesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.AttrUserValuesRequest{
 			ItemId:   itemID,
 			Language: "en",
 		},
 	)
 	require.NoError(t, err)
 
-	index := slices.IndexFunc(values.GetItems(), func(value *AttrUserValue) bool {
+	index := slices.IndexFunc(values.GetItems(), func(value *pb.AttrUserValue) bool {
 		return value.GetAttributeId() == schema.EngineTypeAttr
 	})
 	require.NotEqual(t, -1, index)
@@ -2493,7 +2495,7 @@ func TestChart(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	client := NewAttrsClient(conn)
+	client := pb.NewAttrsClient(conn)
 
 	_, err := client.GetChartParameters(
 		ctx,
@@ -2503,7 +2505,7 @@ func TestChart(t *testing.T) {
 
 	_, err = client.GetChartData(
 		ctx,
-		&ChartDataRequest{Id: schema.LengthAttr},
+		&pb.ChartDataRequest{Id: schema.LengthAttr},
 	)
 	require.NoError(t, err)
 }

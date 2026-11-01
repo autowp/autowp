@@ -28,7 +28,7 @@ function normalizePageNumber(pageNumber: number, pageCount: number): number {
 }
 
 /**
- * Mirrors goautowp/util/paginator.go's GetPages() - pageCount and current are the only inputs to
+ * Mirrors goautowp/internal/util/paginator.go's GetPages() - pageCount and current are the only inputs to
  * first/last/previous/next and the page-number window around current, so the server sends just
  * those two and this reconstructs the rest. PAGE_RANGE=10 is the only value the server ever uses;
  * keep the two in sync if that ever changes.

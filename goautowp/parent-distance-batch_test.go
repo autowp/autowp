@@ -4,10 +4,13 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/users"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/grpc/picturemapper"
+	"github.com/autowp/goautowp/internal/users"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
@@ -15,11 +18,11 @@ import (
 func TestItemParentExtractorBatchesRelatedItems(t *testing.T) {
 	t.Parallel()
 	fixture, ids, pool, logger := newParentCacheBatchTestExtractor(t)
-	extractor := NewItemParentExtractor(fixture.container)
-	user := UserContext{UserID: 7, Roles: []string{users.RoleModer}}
-	fields := &ItemParentFields{
-		Item:   &ItemFields{NameHtml: true, LinksCount: true},
-		Parent: &ItemFields{NameText: true, CommentsCount: true},
+	extractor := fixture.container.ItemParentExtractor()
+	user := authn.User{UserID: 7, Roles: []string{users.RoleModer}}
+	fields := &pb.ItemParentFields{
+		Item:   &pb.ItemFields{NameHtml: true, LinksCount: true},
+		Parent: &pb.ItemFields{NameText: true, CommentsCount: true},
 	}
 	original := proto.Clone(fields)
 	rows := make([]*items.ItemParent, 0, 5)
@@ -39,7 +42,7 @@ func TestItemParentExtractorBatchesRelatedItems(t *testing.T) {
 
 	rows = append(rows, rows[0])
 	for _, lang := range []string{"en", "ru"} {
-		expected := make([]*ItemParent, 0, len(rows))
+		expected := make([]*pb.ItemParent, 0, len(rows))
 
 		logger.queries.Store(0)
 
@@ -79,7 +82,9 @@ func TestItemParentExtractorBatchesRelatedItems(t *testing.T) {
 func TestDfDistanceBatchPreservesFilters(t *testing.T) {
 	t.Parallel()
 	fixture, db, pool, _ := newRemainingPictureExtractor(t)
-	extractor := NewDfDistanceExtractor(fixture.container)
+	extractor, err := fixture.container.DfDistanceExtractor(t.Context())
+	require.NoError(t, err)
+
 	rows := []*schema.DfDistanceRow{
 		{SrcPictureID: 7, DstPictureID: 3, Distance: 12},
 		{SrcPictureID: 5, DstPictureID: 1, Distance: 20},
@@ -87,17 +92,20 @@ func TestDfDistanceBatchPreservesFilters(t *testing.T) {
 		{SrcPictureID: 11, DstPictureID: 0},
 	}
 
-	for _, options := range []*PictureListOptions{
+	for _, options := range []*pb.PictureListOptions{
 		nil, {Id: 999, Ids: []int64{1, 3, 5}, OwnerId: 7},
 	} {
-		fields := &DfDistanceFields{
-			DstPicture: &PicturesRequest{Options: options, Fields: &PictureFields{Rights: true, Subscribed: true}},
+		fields := &pb.DfDistanceFields{
+			DstPicture: &pb.PicturesRequest{
+				Options: options,
+				Fields:  &pb.PictureFields{Rights: true, Subscribed: true},
+			},
 		}
 		original := proto.Clone(fields)
 		logger := &itemBatchQueryLogger{}
 		db.Logger(logger)
 
-		result, err := extractor.ExtractRows(t.Context(), rows, fields, "en", UserContext{UserID: 7})
+		result, err := extractor.ExtractRows(t.Context(), rows, fields, "en", authn.User{UserID: 7})
 		require.NoError(t, err)
 		db.Logger(nil)
 		require.EqualValues(t, 3, logger.queries.Load(), "one picture selection and two nested field batches")
@@ -119,25 +127,25 @@ func TestDfDistanceBatchPreservesFilters(t *testing.T) {
 		require.True(t, proto.Equal(original, fields))
 	}
 
-	for _, options := range []*PictureListOptions{
+	for _, options := range []*pb.PictureListOptions{
 		{Ids: []int64{3}},
 		{OwnerId: 8},
-		{Status: PictureStatus_PICTURE_STATUS_ACCEPTED},
+		{Status: pb.PictureStatus_PICTURE_STATUS_ACCEPTED},
 		{Identity: "one"},
 	} {
 		result, err := extractor.ExtractRows(
 			t.Context(),
 			rows,
-			&DfDistanceFields{DstPicture: &PicturesRequest{Options: options}},
+			&pb.DfDistanceFields{DstPicture: &pb.PicturesRequest{Options: options}},
 			"en",
-			UserContext{},
+			authn.User{},
 		)
 		require.ErrorIs(t, err, sql.ErrNoRows)
 		require.Nil(t, result)
 	}
 
 	result, err := extractor.ExtractRows(t.Context(), []*schema.DfDistanceRow{{DstPictureID: 999}},
-		&DfDistanceFields{DstPicture: &PicturesRequest{}}, "en", UserContext{})
+		&pb.DfDistanceFields{DstPicture: &pb.PicturesRequest{}}, "en", authn.User{})
 	require.ErrorIs(t, err, sql.ErrNoRows)
 	require.Nil(t, result)
 	repository, err := fixture.container.PicturesRepository(t.Context())
@@ -149,7 +157,7 @@ func TestDfDistanceBatchPreservesFilters(t *testing.T) {
 		[]int64{1, 3},
 		options,
 		nil,
-		convertPicturesOrder(PicturesRequest_ORDER_NONE),
+		picturemapper.OrderFromProto(pb.PicturesRequest_ORDER_NONE),
 	)
 	require.NoError(t, err)
 	require.Len(t, selected, 2, "the per-picture limit must not truncate the shared batch")
@@ -161,7 +169,7 @@ func TestDfDistanceBatchPreservesFilters(t *testing.T) {
 			[]int64{1, 3},
 			filter,
 			nil,
-			convertPicturesOrder(PicturesRequest_ORDER_NONE),
+			picturemapper.OrderFromProto(pb.PicturesRequest_ORDER_NONE),
 		)
 		require.NoError(t, err)
 		require.Len(t, selected, 1)
@@ -172,9 +180,9 @@ func TestDfDistanceBatchPreservesFilters(t *testing.T) {
 	result, err = extractor.ExtractRows(
 		t.Context(),
 		rows,
-		&DfDistanceFields{DstPicture: &PicturesRequest{}},
+		&pb.DfDistanceFields{DstPicture: &pb.PicturesRequest{}},
 		"en",
-		UserContext{},
+		authn.User{},
 	)
 	require.Error(t, err)
 	require.Nil(t, result)
@@ -182,7 +190,7 @@ func TestDfDistanceBatchPreservesFilters(t *testing.T) {
 		t.Context(),
 		&query.PictureListOptions{ID: 1},
 		nil,
-		convertPicturesOrder(PicturesRequest_ORDER_NONE),
+		picturemapper.OrderFromProto(pb.PicturesRequest_ORDER_NONE),
 	)
 	require.EqualError(t, err, singleErr.Error())
 }

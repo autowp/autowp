@@ -6,10 +6,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/items"
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/items"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/extraction"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemextractor"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemmapper"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -25,29 +31,29 @@ func TestItemExtractorParallelRelationAndFieldPreloads(t *testing.T) {
 	token, err := cnt.Keycloak().Login(ctx, keycloakClientID, "", cfg.Keycloak.Realm, adminUsername, adminPassword)
 	require.NoError(t, err)
 
-	parentID := createItem(t, conn, cnt, &Item{
-		Name: "item-preload-parent-" + uuid.NewString(), ItemTypeId: ItemType_ITEM_TYPE_VEHICLE, IsGroup: true,
+	parentID := createItem(t, conn, cnt, &pb.Item{
+		Name: "item-preload-parent-" + uuid.NewString(), ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE, IsGroup: true,
 	})
-	childID := createItem(t, conn, cnt, &Item{
-		Name: "item-preload-child-" + uuid.NewString(), ItemTypeId: ItemType_ITEM_TYPE_VEHICLE,
+	childID := createItem(t, conn, cnt, &pb.Item{
+		Name: "item-preload-child-" + uuid.NewString(), ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE,
 	})
-	apiCtx := metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken)
-	_, err = NewItemsClient(conn).CreateItemParent(apiCtx, &ItemParent{ItemId: childID, ParentId: parentID})
+	apiCtx := metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken)
+	_, err = pb.NewItemsClient(conn).CreateItemParent(apiCtx, &pb.ItemParent{ItemId: childID, ParentId: parentID})
 	require.NoError(t, err)
 
-	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", PicturePostForm{ItemID: parentID},
-		PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
-	fields := &ItemFields{
+	pictureID := addPicture(t, cnt, conn, "./test/test.jpg", pictureshttp.PicturePostForm{ItemID: parentID},
+		pb.PictureStatus_PICTURE_STATUS_ACCEPTED, token.AccessToken)
+	fields := &pb.ItemFields{
 		NameHtml: true, HasText: true, CommentsCount: true,
-		PictureItems: &PictureItemsRequest{
-			Options: &PictureItemListOptions{TypeId: PictureItemType_PICTURE_ITEM_CONTENT},
-			Fields: &PictureItemFields{
-				Item:    &ItemsRequest{Fields: &ItemFields{NameText: true}},
-				Picture: &PicturesRequest{Fields: &PictureFields{ThumbMedium: true}},
+		PictureItems: &pb.PictureItemsRequest{
+			Options: &pb.PictureItemListOptions{TypeId: pb.PictureItemType_PICTURE_ITEM_CONTENT},
+			Fields: &pb.PictureItemFields{
+				Item:    &pb.ItemsRequest{Fields: &pb.ItemFields{NameText: true}},
+				Picture: &pb.PicturesRequest{Fields: &pb.PictureFields{ThumbMedium: true}},
 			},
 		},
-		ItemParentChilds: &ItemParentsRequest{
-			Fields: &ItemParentFields{Item: &ItemFields{NameText: true, HasText: true}},
+		ItemParentChilds: &pb.ItemParentsRequest{
+			Fields: &pb.ItemParentFields{Item: &pb.ItemFields{NameText: true, HasText: true}},
 		},
 	}
 	requested := proto.Clone(fields)
@@ -63,35 +69,35 @@ func TestItemExtractorParallelRelationAndFieldPreloads(t *testing.T) {
 	require.NoError(t, err)
 	rows, _, err := repository.List(ctx, &query.ItemListOptions{
 		ItemIDs: []int64{parentID, childID}, Language: schema.EnglishLanguageCode,
-	}, convertItemFields(fields), items.OrderByNone, false)
+	}, itemmapper.FieldsFromProto(fields), items.OrderByNone, false)
 	require.NoError(t, err)
 	require.Len(t, rows, 2)
 
 	rows = append(rows, rows[0])
-	extractor := NewItemExtractor(container)
-	inlineCtx := context.WithValue(ctx, itemLookupContextKey{}, true)
-	expected, err := extractor.ExtractRows(inlineCtx, rows, fields, schema.EnglishLanguageCode, UserContext{})
+	extractor := container.ItemExtractor()
+	inlineCtx := extraction.WithInlineLookups(ctx)
+	expected, err := extractor.ExtractRows(inlineCtx, rows, fields, schema.EnglishLanguageCode, authn.User{})
 	require.NoError(t, err)
 
 	// Two relation queries and two field queries must all start before release.
 	// Wrapping preloadFields as a single task would serialize its two field reads
 	// and fail this barrier, even though the three outer stages ran concurrently.
 	logger := &itemBatchQueryLogger{}
-	unblock := blockItemExtractionQueries(t, logger, itemExtractorParallelism)
+	unblock := blockItemExtractionQueries(t, logger, extraction.DefaultParallelism)
 	goquDB.Logger(logger)
 
 	lookupCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	type extractionResult struct {
-		items []*Item
+		items []*pb.Item
 		err   error
 	}
 
 	done := make(chan extractionResult, 1)
 
 	go func() {
-		result, err := extractor.ExtractRows(lookupCtx, rows, fields, schema.EnglishLanguageCode, UserContext{})
+		result, err := extractor.ExtractRows(lookupCtx, rows, fields, schema.EnglishLanguageCode, authn.User{})
 		done <- extractionResult{items: result, err: err}
 	}()
 
@@ -123,14 +129,14 @@ func TestItemExtractorParallelRelationAndFieldPreloads(t *testing.T) {
 	canceledCtx, cancelRequest := context.WithCancel(ctx)
 	cancelRequest()
 
-	result, err := extractor.ExtractRows(canceledCtx, rows, fields, schema.EnglishLanguageCode, UserContext{})
+	result, err := extractor.ExtractRows(canceledCtx, rows, fields, schema.EnglishLanguageCode, authn.User{})
 	require.ErrorIs(t, err, context.Canceled)
 	require.Nil(t, result)
 
-	_, err = extractor.ExtractRows(ctx, rows, &ItemFields{
-		ItemParentChilds: &ItemParentsRequest{Limit: 1}, CommentsCount: true,
-	}, schema.EnglishLanguageCode, UserContext{})
-	require.ErrorIs(t, err, errPreloadNotImplemented)
+	_, err = extractor.ExtractRows(ctx, rows, &pb.ItemFields{
+		ItemParentChilds: &pb.ItemParentsRequest{Limit: 1}, CommentsCount: true,
+	}, schema.EnglishLanguageCode, authn.User{})
+	require.ErrorIs(t, err, itemextractor.ErrPreloadNotImplemented)
 }
 
 func TestItemExtractorEmptyPreloads(t *testing.T) {
@@ -139,9 +145,9 @@ func TestItemExtractorEmptyPreloads(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 
-	result, err := (&ItemExtractor{}).ExtractRows(ctx, nil, &ItemFields{
-		PictureItems: &PictureItemsRequest{}, ItemParentChilds: &ItemParentsRequest{Limit: 1}, HasText: true,
-	}, "en", UserContext{})
+	result, err := (&itemextractor.Extractor{}).ExtractRows(ctx, nil, &pb.ItemFields{
+		PictureItems: &pb.PictureItemsRequest{}, ItemParentChilds: &pb.ItemParentsRequest{Limit: 1}, HasText: true,
+	}, "en", authn.User{})
 	require.NoError(t, err)
 	require.NotNil(t, result)
 	require.Empty(t, result)

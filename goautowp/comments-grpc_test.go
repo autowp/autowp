@@ -3,8 +3,10 @@ package goautowp
 import (
 	"testing"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -15,7 +17,7 @@ func TestAddEmptyCommentShouldReturnError(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -24,10 +26,10 @@ func TestAddEmptyCommentShouldReturnError(t *testing.T) {
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
 	_, err = client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ITEM_TYPE_ID,
+			TypeId:             pb.CommentsType_ITEM_TYPE_ID,
 			Message:            "",
 			ModeratorAttention: true,
 			ParentId:           0,
@@ -42,7 +44,7 @@ func TestAddComment(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -51,10 +53,10 @@ func TestAddComment(t *testing.T) {
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
 	commentItem, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Test",
 			ModeratorAttention: false,
 			ParentId:           0,
@@ -64,10 +66,10 @@ func TestAddComment(t *testing.T) {
 	require.NoError(t, err)
 
 	r2, err := client.GetMessage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&GetMessageRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token),
+		&pb.GetMessageRequest{
 			Id: commentItem.GetId(),
-			Fields: &CommentMessageFields{
+			Fields: &pb.CommentMessageFields{
 				Preview:  true,
 				Route:    true,
 				Text:     true,
@@ -82,8 +84,8 @@ func TestAddComment(t *testing.T) {
 	require.Equal(t, "Test", r2.GetText())
 
 	r3, err := client.GetMessages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&GetMessagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token),
+		&pb.GetMessagesRequest{
 			ItemId:    r2.GetItemId(),
 			TypeId:    r2.GetTypeId(),
 			ParentId:  0,
@@ -92,7 +94,7 @@ func TestAddComment(t *testing.T) {
 			Order:     1,
 			Limit:     1,
 			Page:      1,
-			Fields: &CommentMessageFields{
+			Fields: &pb.CommentMessageFields{
 				Preview:  true,
 				Route:    true,
 				Text:     true,
@@ -107,10 +109,10 @@ func TestAddComment(t *testing.T) {
 	require.NotEmpty(t, r3.GetItems())
 
 	_, err = client.View(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&CommentsViewRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token),
+		&pb.CommentsViewRequest{
 			ItemId: 1,
-			TypeId: CommentsType_ARTICLES_TYPE_ID,
+			TypeId: pb.CommentsType_ARTICLES_TYPE_ID,
 		},
 	)
 	require.NoError(t, err)
@@ -119,7 +121,7 @@ func TestAddComment(t *testing.T) {
 func TestCommentReplyNotificationShouldBeDelivered(t *testing.T) { //nolint:paralleltest
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -128,20 +130,20 @@ func TestCommentReplyNotificationShouldBeDelivered(t *testing.T) { //nolint:para
 	user1ID, user1Token := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 	_, user2Token := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
-	_, err = NewUsersClient(conn).UpdateUser(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+user1Token),
-		&UpdateUserRequest{
-			User:       &User{Id: user1ID, Language: schema.EnglishLanguageCode},
+	_, err = pb.NewUsersClient(conn).UpdateUser(
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+user1Token),
+		&pb.UpdateUserRequest{
+			User:       &pb.User{Id: user1ID, Language: schema.EnglishLanguageCode},
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"language"}},
 		},
 	)
 	require.NoError(t, err)
 
 	response, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+user1Token),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+user1Token),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Root comment",
 			ModeratorAttention: false,
 			ParentId:           0,
@@ -152,10 +154,10 @@ func TestCommentReplyNotificationShouldBeDelivered(t *testing.T) { //nolint:para
 	require.NotEmpty(t, response.GetId())
 
 	response, err = client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+user2Token),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+user2Token),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Reply comment",
 			ModeratorAttention: false,
 			ParentId:           response.GetId(),
@@ -165,10 +167,10 @@ func TestCommentReplyNotificationShouldBeDelivered(t *testing.T) { //nolint:para
 	require.NoError(t, err)
 	require.NotEmpty(t, response.GetId())
 
-	messagesClient := NewMessagingClient(conn)
+	messagesClient := pb.NewMessagingClient(conn)
 	messages, err := messagesClient.GetMessages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+user1Token),
-		&MessagingGetMessagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+user1Token),
+		&pb.MessagingGetMessagesRequest{
 			Folder: "system",
 			Page:   1,
 		},
@@ -182,7 +184,7 @@ func TestSubscribeComment(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -191,19 +193,19 @@ func TestSubscribeComment(t *testing.T) {
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
 	_, err = client.Subscribe(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CommentsSubscribeRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.CommentsSubscribeRequest{
 			ItemId: 1,
-			TypeId: CommentsType_ARTICLES_TYPE_ID,
+			TypeId: pb.CommentsType_ARTICLES_TYPE_ID,
 		},
 	)
 	require.NoError(t, err)
 
 	_, err = client.UnSubscribe(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CommentsUnSubscribeRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.CommentsUnSubscribeRequest{
 			ItemId: 1,
-			TypeId: CommentsType_ARTICLES_TYPE_ID,
+			TypeId: pb.CommentsType_ARTICLES_TYPE_ID,
 		},
 	)
 	require.NoError(t, err)
@@ -214,7 +216,7 @@ func TestVoteComment(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -224,10 +226,10 @@ func TestVoteComment(t *testing.T) {
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	commentItem, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Test",
 			ModeratorAttention: false,
 			ParentId:           0,
@@ -238,8 +240,8 @@ func TestVoteComment(t *testing.T) {
 
 	// vote comment
 	_, err = client.VoteComment(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CommentsVoteCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.CommentsVoteCommentRequest{
 			CommentId: commentItem.GetId(),
 			Vote:      1,
 		},
@@ -247,8 +249,8 @@ func TestVoteComment(t *testing.T) {
 	require.ErrorContains(t, err, "self-vote forbidden")
 
 	_, err = client.VoteComment(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsVoteCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsVoteCommentRequest{
 			CommentId: commentItem.GetId(),
 			Vote:      1,
 		},
@@ -257,8 +259,8 @@ func TestVoteComment(t *testing.T) {
 
 	// get comment votes
 	_, err = client.GetCommentVotes(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&GetCommentVotesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.GetCommentVotesRequest{
 			CommentId: commentItem.GetId(),
 		},
 	)
@@ -266,8 +268,8 @@ func TestVoteComment(t *testing.T) {
 
 	// vote negative
 	_, err = client.VoteComment(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsVoteCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsVoteCommentRequest{
 			CommentId: commentItem.GetId(),
 			Vote:      -1,
 		},
@@ -277,8 +279,8 @@ func TestVoteComment(t *testing.T) {
 	// delete comment - author self-delete is covered by TestDeleteOwnComment; here a moderator
 	// removes it so the comment survives as a tombstone for the vote/restore checks below.
 	_, err = client.SetDeleted(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsSetDeletedRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsSetDeletedRequest{
 			CommentId: commentItem.GetId(),
 			Deleted:   true,
 		},
@@ -287,8 +289,8 @@ func TestVoteComment(t *testing.T) {
 
 	// vote deleted comment
 	_, err = client.VoteComment(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsVoteCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsVoteCommentRequest{
 			CommentId: commentItem.GetId(),
 			Vote:      1,
 		},
@@ -297,8 +299,8 @@ func TestVoteComment(t *testing.T) {
 
 	// restore comment
 	_, err = client.SetDeleted(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CommentsSetDeletedRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.CommentsSetDeletedRequest{
 			CommentId: commentItem.GetId(),
 			Deleted:   false,
 		},
@@ -306,8 +308,8 @@ func TestVoteComment(t *testing.T) {
 	require.ErrorContains(t, err, "PermissionDenied")
 
 	_, err = client.SetDeleted(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsSetDeletedRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsSetDeletedRequest{
 			CommentId: commentItem.GetId(),
 			Deleted:   false,
 		},
@@ -316,11 +318,11 @@ func TestVoteComment(t *testing.T) {
 
 	// move message
 	_, err = client.MoveComment(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsMoveCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsMoveCommentRequest{
 			CommentId: commentItem.GetId(),
 			ItemId:    2,
-			TypeId:    CommentsType_ARTICLES_TYPE_ID,
+			TypeId:    pb.CommentsType_ARTICLES_TYPE_ID,
 		},
 	)
 	require.ErrorContains(t, err, "PermissionDenied")
@@ -331,7 +333,7 @@ func TestDeleteOwnComment(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -340,10 +342,10 @@ func TestDeleteOwnComment(t *testing.T) {
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
 	commentItem, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:  1,
-			TypeId:  CommentsType_ARTICLES_TYPE_ID,
+			TypeId:  pb.CommentsType_ARTICLES_TYPE_ID,
 			Message: "to be removed by its author",
 		},
 	)
@@ -351,15 +353,15 @@ func TestDeleteOwnComment(t *testing.T) {
 
 	// the author removes their own comment - no moderator role required
 	_, err = client.SetDeleted(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CommentsSetDeletedRequest{CommentId: commentItem.GetId(), Deleted: true},
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.CommentsSetDeletedRequest{CommentId: commentItem.GetId(), Deleted: true},
 	)
 	require.NoError(t, err)
 
 	// nothing hangs off it, so it is gone entirely
 	_, err = client.GetMessage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&GetMessageRequest{Id: commentItem.GetId()},
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.GetMessageRequest{Id: commentItem.GetId()},
 	)
 	require.Error(t, err)
 }
@@ -369,7 +371,7 @@ func TestUpdateOwnComment(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -378,29 +380,29 @@ func TestUpdateOwnComment(t *testing.T) {
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
 	commentItem, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:  1,
-			TypeId:  CommentsType_ARTICLES_TYPE_ID,
+			TypeId:  pb.CommentsType_ARTICLES_TYPE_ID,
 			Message: "first revision",
 		},
 	)
 	require.NoError(t, err)
 
 	_, err = client.UpdateComment(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&UpdateCommentRequest{
-			Comment:    &CommentMessage{Id: commentItem.GetId(), Text: "second revision"},
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.UpdateCommentRequest{
+			Comment:    &pb.CommentMessage{Id: commentItem.GetId(), Text: "second revision"},
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"text"}},
 		},
 	)
 	require.NoError(t, err)
 
 	msg, err := client.GetMessage(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&GetMessageRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.GetMessageRequest{
 			Id:     commentItem.GetId(),
-			Fields: &CommentMessageFields{Text: true},
+			Fields: &pb.CommentMessageFields{Text: true},
 		},
 	)
 	require.NoError(t, err)
@@ -412,7 +414,7 @@ func TestCompleteComment(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -422,10 +424,10 @@ func TestCompleteComment(t *testing.T) {
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	commentItem, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Test",
 			ModeratorAttention: true,
 			ParentId:           0,
@@ -435,10 +437,10 @@ func TestCompleteComment(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Test",
 			ModeratorAttention: true,
 			Resolve:            true,
@@ -453,7 +455,7 @@ func TestMessagesByUserIdentity(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -462,10 +464,10 @@ func TestMessagesByUserIdentity(t *testing.T) {
 	_, token := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	_, err = client.GetMessages(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token),
-		&GetMessagesRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token),
+		&pb.GetMessagesRequest{
 			ItemId:       1,
-			TypeId:       CommentsType_ITEM_TYPE_ID,
+			TypeId:       pb.CommentsType_ITEM_TYPE_ID,
 			UserIdentity: "test",
 			Page:         2,
 		},
@@ -477,8 +479,8 @@ func TestMessagesByUserIdentity(t *testing.T) {
 func TestMoveComment(t *testing.T) {
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
-	forumsClient := NewForumsClient(conn)
+	client := pb.NewCommentsClient(conn)
+	forumsClient := pb.NewForumsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -488,9 +490,9 @@ func TestMoveComment(t *testing.T) {
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	topic, err := forumsClient.CreateTopic(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CreateTopicRequest{
-			Topic: &Topic{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.CreateTopicRequest{
+			Topic: &pb.Topic{
 				ThemeId:      2,
 				Name:         "Topic name",
 				Subscription: true,
@@ -503,10 +505,10 @@ func TestMoveComment(t *testing.T) {
 	require.NotEmpty(t, topic)
 
 	commentItem, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:             topic.GetId(),
-			TypeId:             CommentsType_FORUMS_TYPE_ID,
+			TypeId:             pb.CommentsType_FORUMS_TYPE_ID,
 			Message:            "Test",
 			ModeratorAttention: false,
 			ParentId:           0,
@@ -516,10 +518,10 @@ func TestMoveComment(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:             topic.GetId(),
-			TypeId:             CommentsType_FORUMS_TYPE_ID,
+			TypeId:             pb.CommentsType_FORUMS_TYPE_ID,
 			Message:            "Test",
 			ModeratorAttention: false,
 			ParentId:           commentItem.GetId(),
@@ -529,11 +531,11 @@ func TestMoveComment(t *testing.T) {
 	require.NoError(t, err)
 
 	topic2, err := forumsClient.CreateTopic(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&CreateTopicRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.CreateTopicRequest{
 			Message:            "Test 2 message",
 			ModeratorAttention: false,
-			Topic: &Topic{
+			Topic: &pb.Topic{
 				ThemeId:      2,
 				Name:         "Topic 2 name",
 				Subscription: true,
@@ -544,11 +546,11 @@ func TestMoveComment(t *testing.T) {
 	require.NotEmpty(t, topic)
 
 	_, err = client.MoveComment(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsMoveCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsMoveCommentRequest{
 			CommentId: commentItem.GetId(),
 			ItemId:    topic2.GetId(),
-			TypeId:    CommentsType_FORUMS_TYPE_ID,
+			TypeId:    pb.CommentsType_FORUMS_TYPE_ID,
 		},
 	)
 	require.NoError(t, err)
@@ -559,7 +561,7 @@ func TestAddCommentOfUnexpectedItemType(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -568,8 +570,8 @@ func TestAddCommentOfUnexpectedItemType(t *testing.T) {
 	_, userToken := getUserWithCleanHistory(t, conn, cfg, goquDB, testUsername, testPassword)
 
 	_, err = client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:             1,
 			TypeId:             6,
 			Message:            "Test",
@@ -586,7 +588,7 @@ func TestAddCommentToDeletedOrNotExistentParent(t *testing.T) {
 
 	ctx := t.Context()
 
-	client := NewCommentsClient(conn)
+	client := pb.NewCommentsClient(conn)
 	cfg := config.LoadConfig(".")
 
 	goquDB, err := cnt.GoquDB(t.Context())
@@ -596,10 +598,10 @@ func TestAddCommentToDeletedOrNotExistentParent(t *testing.T) {
 	_, adminToken := getUserWithCleanHistory(t, conn, cfg, goquDB, adminUsername, adminPassword)
 
 	response, err := client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+userToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+userToken),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Root comment",
 			ModeratorAttention: false,
 			ParentId:           0,
@@ -611,8 +613,8 @@ func TestAddCommentToDeletedOrNotExistentParent(t *testing.T) {
 
 	// delete comment
 	_, err = client.SetDeleted(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&CommentsSetDeletedRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.CommentsSetDeletedRequest{
 			CommentId: response.GetId(),
 			Deleted:   true,
 		},
@@ -621,10 +623,10 @@ func TestAddCommentToDeletedOrNotExistentParent(t *testing.T) {
 
 	// reply to deleted comment
 	_, err = client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Reply comment",
 			ModeratorAttention: false,
 			ParentId:           response.GetId(),
@@ -635,10 +637,10 @@ func TestAddCommentToDeletedOrNotExistentParent(t *testing.T) {
 
 	// reply to non-existent comment
 	_, err = client.Add(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+adminToken),
-		&AddCommentRequest{
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+adminToken),
+		&pb.AddCommentRequest{
 			ItemId:             1,
-			TypeId:             CommentsType_ARTICLES_TYPE_ID,
+			TypeId:             pb.CommentsType_ARTICLES_TYPE_ID,
 			Message:            "Reply comment",
 			ModeratorAttention: false,
 			ParentId:           9999999999,

@@ -2,33 +2,41 @@ package goautowp
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/query"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/schema"
+	"github.com/autowp/goautowp/internal/transport/extraction"
+	"github.com/autowp/goautowp/internal/transport/grpc/picturemapper"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
+
+var errUnexpectedExtractedDistances = errors.New("unexpected extracted distances")
 
 func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 	t.Parallel()
 
 	itemExtractor, vehicle, database, pool := newItemOfDayTestExtractor(t)
-	pictures, err := itemExtractor.orientedPictureList(t.Context(), vehicle.ID)
+	pictureRepository, err := itemExtractor.container.PicturesRepository(t.Context())
+	require.NoError(t, err)
+	links, err := pictureRepository.PictureItems(t.Context(), &query.PictureItemListOptions{ItemID: vehicle.ID}, 0, 0)
 	require.NoError(t, err)
 
-	var ids []int64
-
-	for _, picture := range pictures {
-		if picture != nil {
-			ids = append(ids, picture.ID)
-		}
+	ids := make([]int64, 0, len(links))
+	for _, link := range links {
+		ids = append(ids, link.PictureID)
 	}
 
 	require.Len(t, ids, 2)
 
-	extractor := NewDfDistanceExtractor(itemExtractor.container)
+	extractor, err := itemExtractor.container.DfDistanceExtractor(t.Context())
+	require.NoError(t, err)
+
 	rows := make([]*schema.DfDistanceRow, 1, 9)
 
 	rows[0] = &schema.DfDistanceRow{SrcPictureID: 10}
@@ -38,8 +46,8 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 		})
 	}
 
-	fields := &DfDistanceFields{DstPicture: &PicturesRequest{
-		Fields: &PictureFields{ThumbMedium: true, NameText: true},
+	fields := &pb.DfDistanceFields{DstPicture: &pb.PicturesRequest{
+		Fields: &pb.PictureFields{ThumbMedium: true, NameText: true},
 	}}
 	original := proto.Clone(fields)
 	// Retain the original per-distance reads as the reference.
@@ -49,9 +57,9 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 	individualQueries := &itemBatchQueryLogger{}
 	database.Logger(individualQueries)
 
-	expected := make([]*DfDistance, len(rows))
+	expected := make([]*pb.DfDistance, len(rows))
 	for index, row := range rows {
-		expected[index] = &DfDistance{
+		expected[index] = &pb.DfDistance{
 			SrcPictureId: row.SrcPictureID, DstPictureId: row.DstPictureID,
 			Distance: int32(row.Distance), //nolint:gosec
 		}
@@ -62,14 +70,14 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 		picture, err := repository.Picture(
 			t.Context(),
 			&query.PictureListOptions{ID: row.DstPictureID},
-			convertPictureFields(
+			picturemapper.FieldsFromProto(
 				fields.GetDstPicture().GetFields(),
 			),
-			convertPicturesOrder(fields.GetDstPicture().GetOrder()),
+			picturemapper.OrderFromProto(fields.GetDstPicture().GetOrder()),
 		)
 		require.NoError(t, err)
 		expected[index].DstPicture, err = itemExtractor.container.PictureExtractor().Extract(
-			t.Context(), picture, fields.GetDstPicture().GetFields(), "en", UserContext{})
+			t.Context(), picture, fields.GetDstPicture().GetFields(), "en", authn.User{})
 		require.NoError(t, err)
 	}
 
@@ -77,18 +85,18 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 
 	for _, limit := range []int{4, 2} {
 		ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
-		ctx = context.WithValue(ctx, pictureExtractionParallelismKey{}, limit)
+		ctx = extraction.WithPictureParallelism(ctx, limit)
 		logger := &itemBatchQueryLogger{}
 		database.Logger(logger)
 
 		done := make(chan error, 1)
 
-		var actual []*DfDistance
+		var actual []*pb.DfDistance
 
 		go func() {
 			var extractErr error
 
-			actual, extractErr = extractor.ExtractRows(ctx, rows, fields, "en", UserContext{})
+			actual, extractErr = extractor.ExtractRows(ctx, rows, fields, "en", authn.User{})
 			done <- extractErr
 		}()
 
@@ -108,7 +116,7 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 
 	database.Logger(nil)
 
-	withoutPictures, err := extractor.ExtractRows(t.Context(), rows, nil, "en", UserContext{})
+	withoutPictures, err := extractor.ExtractRows(t.Context(), rows, nil, "en", authn.User{})
 	require.NoError(t, err)
 
 	for index, row := range withoutPictures {
@@ -116,13 +124,13 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 		require.Equal(t, rows[index].DstPictureID, row.GetDstPictureId())
 	}
 
-	empty, err := extractor.ExtractRows(t.Context(), nil, fields, "en", UserContext{})
+	empty, err := extractor.ExtractRows(t.Context(), nil, fields, "en", authn.User{})
 	require.NoError(t, err)
 	require.NotNil(t, empty)
 	require.Empty(t, empty)
 
 	failed, err := extractor.ExtractRows(
-		t.Context(), []*schema.DfDistanceRow{{DstPictureID: -1}}, fields, "en", UserContext{},
+		t.Context(), []*schema.DfDistanceRow{{DstPictureID: -1}}, fields, "en", authn.User{},
 	)
 	require.Error(t, err)
 	require.Nil(t, failed)
@@ -144,9 +152,9 @@ func TestDfDistanceExtractorConcurrentRows(t *testing.T) {
 	done := make(chan error, 1)
 
 	go func() {
-		result, extractErr := extractor.ExtractRows(ctx, rows, fields, "en", UserContext{})
+		result, extractErr := extractor.ExtractRows(ctx, rows, fields, "en", authn.User{})
 		if result != nil {
-			done <- errItemNotFound
+			done <- errUnexpectedExtractedDistances
 
 			return
 		}

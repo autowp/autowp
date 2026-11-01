@@ -13,9 +13,12 @@ import (
 	"testing"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
-	"github.com/autowp/goautowp/util"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
+	"github.com/autowp/goautowp/internal/util"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
@@ -41,20 +44,20 @@ func addPicture(
 	cnt *Container,
 	conn *grpc.ClientConn,
 	filepath string, //nolint: unparam
-	data PicturePostForm,
-	status PictureStatus,
+	data pictureshttp.PicturePostForm,
+	status pb.PictureStatus,
 	token string,
 ) int64 {
 	t.Helper()
 
 	pictureID := CreatePicture(t, cnt, filepath, data, token)
 
-	picturesClient := NewPicturesClient(conn)
+	picturesClient := pb.NewPicturesClient(conn)
 
 	_, err := picturesClient.UpdatePicture(
-		metadata.AppendToOutgoingContext(t.Context(), authorizationHeader, bearerPrefix+token),
-		&UpdatePictureRequest{
-			Picture:    &Picture{Id: pictureID, Status: status},
+		metadata.AppendToOutgoingContext(t.Context(), authn.AuthorizationHeader, bearerPrefix+token),
+		&pb.UpdatePictureRequest{
+			Picture:    &pb.Picture{Id: pictureID, Status: status},
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"status"}},
 		},
 	)
@@ -81,9 +84,9 @@ func getUserWithCleanHistory(
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	user, err := NewUsersClient(conn).Me(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
-		&MeRequest{},
+	user, err := pb.NewUsersClient(conn).Me(
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
+		&pb.MeRequest{},
 	)
 	require.NoError(t, err)
 
@@ -101,7 +104,7 @@ func getUserWithCleanHistory(
 	return user.GetId(), token.AccessToken
 }
 
-func createItem(t *testing.T, conn *grpc.ClientConn, cnt *Container, row *Item) int64 {
+func createItem(t *testing.T, conn *grpc.ClientConn, cnt *Container, row *pb.Item) int64 {
 	t.Helper()
 
 	ctx := t.Context()
@@ -112,10 +115,10 @@ func createItem(t *testing.T, conn *grpc.ClientConn, cnt *Container, row *Item) 
 	require.NoError(t, err)
 	require.NotNil(t, token)
 
-	itemsClient := NewItemsClient(conn)
+	itemsClient := pb.NewItemsClient(conn)
 
 	res, err := itemsClient.CreateItem(
-		metadata.AppendToOutgoingContext(ctx, authorizationHeader, bearerPrefix+token.AccessToken),
+		metadata.AppendToOutgoingContext(ctx, authn.AuthorizationHeader, bearerPrefix+token.AccessToken),
 		row,
 	)
 	require.NoError(t, err)
@@ -130,7 +133,7 @@ func CreatePicture(
 	t *testing.T,
 	cnt *Container,
 	file string,
-	data PicturePostForm,
+	data pictureshttp.PicturePostForm,
 	token string,
 ) int64 {
 	t.Helper()
@@ -168,7 +171,7 @@ func CreatePicture(
 func CreatePictureRequest(
 	t *testing.T,
 	file string,
-	data PicturePostForm,
+	data pictureshttp.PicturePostForm,
 	token string,
 ) *http.Request {
 	t.Helper()
@@ -178,7 +181,7 @@ func CreatePictureRequest(
 		multipartWriter = multipart.NewWriter(buf)
 	)
 
-	part, err := multipartWriter.CreateFormFile(pictureFileField, filepath.Base(file))
+	part, err := multipartWriter.CreateFormFile("file", filepath.Base(file))
 	require.NoError(t, err)
 
 	handle, err := os.OpenFile(file, os.O_RDONLY, 0)
@@ -192,37 +195,37 @@ func CreatePictureRequest(
 	_, err = part.Write(fileBytes)
 	require.NoError(t, err)
 
-	part, err = multipartWriter.CreateFormField(pictureCommentField)
+	part, err = multipartWriter.CreateFormField("comment")
 	require.NoError(t, err)
 	_, err = part.Write([]byte(data.Comment))
 	require.NoError(t, err)
 
-	part, err = multipartWriter.CreateFormField(pictureItemIDField)
+	part, err = multipartWriter.CreateFormField("item_id")
 	require.NoError(t, err)
 	_, err = part.Write([]byte(strconv.FormatInt(data.ItemID, 10)))
 	require.NoError(t, err)
 
-	part, err = multipartWriter.CreateFormField(pictureReplacePictureIDField)
+	part, err = multipartWriter.CreateFormField("replace_picture_id")
 	require.NoError(t, err)
 	_, err = part.Write([]byte(strconv.FormatInt(data.ReplacePictureID, 10)))
 	require.NoError(t, err)
 
-	part, err = multipartWriter.CreateFormField(picturePerspectiveID)
+	part, err = multipartWriter.CreateFormField("perspective_id")
 	require.NoError(t, err)
 	_, err = part.Write([]byte(strconv.FormatInt(int64(data.PerspectiveID), 10)))
 	require.NoError(t, err)
 
-	part, err = multipartWriter.CreateFormField(pictureAuthorIDField)
+	part, err = multipartWriter.CreateFormField("author_id")
 	require.NoError(t, err)
 	_, err = part.Write([]byte(strconv.FormatInt(data.AuthorID, 10)))
 	require.NoError(t, err)
 
-	part, err = multipartWriter.CreateFormField(pictureLicenseIDField)
+	part, err = multipartWriter.CreateFormField("license_id")
 	require.NoError(t, err)
 	_, err = part.Write([]byte(strconv.FormatInt(int64(data.LicenseID), 10)))
 	require.NoError(t, err)
 
-	part, err = multipartWriter.CreateFormField(pictureSourceURLField)
+	part, err = multipartWriter.CreateFormField("source_url")
 	require.NoError(t, err)
 	_, err = part.Write([]byte(data.SourceURL))
 	require.NoError(t, err)
@@ -234,7 +237,7 @@ func CreatePictureRequest(
 	require.NoError(t, err)
 
 	req.Header.Add("Content-Type", multipartWriter.FormDataContentType())
-	req.Header.Add(authorizationHeader, bearerPrefix+token) //nolint:canonicalheader
+	req.Header.Add(authn.AuthorizationHeader, bearerPrefix+token)
 	req.RemoteAddr = "127.0.0.1:1234"
 
 	return req

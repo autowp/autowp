@@ -11,8 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/config"
-	"github.com/autowp/goautowp/schema"
+	"github.com/autowp/goautowp/api/pb"
+	"github.com/autowp/goautowp/internal/config"
+	"github.com/autowp/goautowp/internal/schema"
+	pictureshttp "github.com/autowp/goautowp/internal/transport/http/pictures"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
@@ -23,10 +25,10 @@ func TestUploadPictureTooSmall(t *testing.T) {
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("brand-%d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
 
@@ -55,7 +57,7 @@ func TestUploadPictureTooSmall(t *testing.T) {
 	req := CreatePictureRequest(
 		t,
 		"./test/10x10.png",
-		PicturePostForm{ItemID: brandID},
+		pictureshttp.PicturePostForm{ItemID: brandID},
 		adminToken.AccessToken,
 	)
 
@@ -107,17 +109,17 @@ func TestUploadPicture(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			brandID := createItem(t, conn, cnt, &Item{
+			brandID := createItem(t, conn, cnt, &pb.Item{
 				Name:       test.name,
 				IsGroup:    true,
-				ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+				ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 				Catname:    test.catname,
 			})
 
 			req := CreatePictureRequest(
 				t,
 				"./test/test.jpg",
-				PicturePostForm{ItemID: brandID},
+				pictureshttp.PicturePostForm{ItemID: brandID},
 				adminToken.AccessToken,
 			)
 
@@ -164,21 +166,21 @@ func TestUploadPictureWithAuthorID(t *testing.T) {
 	goquDB, err := cnt.GoquDB(ctx)
 	require.NoError(t, err)
 
-	brandID := createItem(t, conn, cnt, &Item{
+	brandID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("Brand %d", random.Int()),
 		IsGroup:    true,
-		ItemTypeId: ItemType_ITEM_TYPE_BRAND,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_BRAND,
 		Catname:    fmt.Sprintf("brand-%d", random.Int()),
 	})
-	personID := createItem(t, conn, cnt, &Item{
+	personID := createItem(t, conn, cnt, &pb.Item{
 		Name:       fmt.Sprintf("person-%d", random.Int()),
-		ItemTypeId: ItemType_ITEM_TYPE_PERSON,
+		ItemTypeId: pb.ItemType_ITEM_TYPE_PERSON,
 	})
 
 	req := CreatePictureRequest(
 		t,
 		"./test/test.jpg",
-		PicturePostForm{ItemID: brandID, AuthorID: personID},
+		pictureshttp.PicturePostForm{ItemID: brandID, AuthorID: personID},
 		adminToken.AccessToken,
 	)
 

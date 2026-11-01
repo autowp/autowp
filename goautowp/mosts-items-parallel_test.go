@@ -7,21 +7,25 @@ import (
 	"testing"
 	"time"
 
-	"github.com/autowp/goautowp/mosts"
-	"github.com/autowp/goautowp/query"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/mosts"
+	"github.com/autowp/goautowp/internal/query"
+	"github.com/autowp/goautowp/internal/transport/grpc/itemmapper"
+	mostsgrpc "github.com/autowp/goautowp/internal/transport/grpc/mosts"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
 
-func mostsExtractionTestFields() *ItemFields {
-	return &ItemFields{
+func mostsExtractionTestFields() *pb.ItemFields {
+	return &pb.ItemFields{
 		NameHtml: true, Description: true, Route: true,
-		PreviewPictures: &PreviewPicturesRequest{
+		PreviewPictures: &pb.PreviewPicturesRequest{
 			PerspectivePageId: 1,
-			Pictures: &PicturesRequest{
-				Fields: &PictureFields{NameText: true},
-				Options: &PictureListOptions{
-					PictureItem: &PictureItemListOptions{TypeId: PictureItemType_PICTURE_ITEM_CONTENT},
+			Pictures: &pb.PicturesRequest{
+				Fields: &pb.PictureFields{NameText: true},
+				Options: &pb.PictureListOptions{
+					PictureItem: &pb.PictureItemListOptions{TypeId: pb.PictureItemType_PICTURE_ITEM_CONTENT},
 				},
 			},
 		},
@@ -32,17 +36,22 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 	t.Parallel()
 
 	extractor, vehicle, db, pool := newItemOfDayTestExtractor(t)
-	secondID := createItem(t, conn, cnt, &Item{Name: "Mosts without pictures", ItemTypeId: ItemType_ITEM_TYPE_VEHICLE})
+	secondID := createItem(
+		t,
+		conn,
+		cnt,
+		&pb.Item{Name: "Mosts without pictures", ItemTypeId: pb.ItemType_ITEM_TYPE_VEHICLE},
+	)
 	repository, err := extractor.container.ItemsRepository(t.Context())
 	require.NoError(t, err)
 
 	fields := mostsExtractionTestFields()
 	requested := proto.Clone(fields)
 	first, err := repository.Item(t.Context(), &query.ItemListOptions{ItemID: vehicle.ID, Language: "en"},
-		convertItemFields(fields))
+		itemmapper.FieldsFromProto(fields))
 	require.NoError(t, err)
 	second, err := repository.Item(t.Context(), &query.ItemListOptions{ItemID: secondID, Language: "en"},
-		convertItemFields(fields))
+		itemmapper.FieldsFromProto(fields))
 	require.NoError(t, err)
 
 	list := make([]mosts.ResultItem, 7)
@@ -55,7 +64,7 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 		list[index] = mosts.ResultItem{Item: row, ValueHTML: fmt.Sprintf("%d <span>km/h</span>", 100-index)}
 	}
 
-	server := &MostsGRPCServer{extractor: extractor}
+	server := mostsgrpc.NewServer(nil, extractor, nil)
 
 	ctx, cancel := context.WithTimeout(t.Context(), 15*time.Second)
 	defer cancel()
@@ -80,12 +89,12 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 
 	done := make(chan error, 1)
 
-	var actual []*MostsItem
+	var actual []*pb.MostsItem
 
 	go func() {
 		var extractErr error
 
-		actual, extractErr = server.extractItems(ctx, list, 42, fields, "en", UserContext{})
+		actual, extractErr = server.ExtractItems(ctx, list, 42, fields, "en", authn.User{})
 		done <- extractErr
 	}()
 
@@ -98,7 +107,7 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 
 	for _, lang := range []string{"en", "ru"} {
 		if lang != "en" {
-			actual, err = server.extractItems(ctx, list, 42, fields, lang, UserContext{})
+			actual, err = server.ExtractItems(ctx, list, 42, fields, lang, authn.User{})
 			require.NoError(t, err)
 		}
 
@@ -108,7 +117,7 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 		db.Logger(individualQueries)
 
 		for index, car := range list {
-			expected, err := extractor.Extract(ctx, car.Item, fields, lang, UserContext{})
+			expected, err := extractor.Extract(ctx, car.Item, fields, lang, authn.User{})
 			require.NoError(t, err)
 			require.True(t, proto.Equal(expected, actual[index].GetItem()), "card %d, language %s", index, lang)
 			require.Equal(t, car.ValueHTML, actual[index].GetValueHtml())
@@ -121,7 +130,7 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 		batchedQueries := &itemBatchQueryLogger{}
 		db.Logger(batchedQueries)
 
-		_, err = server.extractItems(ctx, list, 42, fields, lang, UserContext{})
+		_, err = server.ExtractItems(ctx, list, 42, fields, lang, authn.User{})
 		require.NoError(t, err)
 		db.Logger(nil)
 		require.Less(t, batchedQueries.queries.Load(), individualQueries.queries.Load(),
@@ -141,12 +150,12 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 	require.True(t, withThumbnail)
 	require.True(t, proto.Equal(requested, fields))
 
-	single, err := server.extractItems(ctx, list[:1], 42, fields, "ru", UserContext{})
+	single, err := server.ExtractItems(ctx, list[:1], 42, fields, "ru", authn.User{})
 	require.NoError(t, err)
 	require.Len(t, single, 1)
 	require.True(t, proto.Equal(single[0], actual[0]))
 
-	empty, err := server.extractItems(ctx, nil, 42, fields, "en", UserContext{})
+	empty, err := server.ExtractItems(ctx, nil, 42, fields, "en", authn.User{})
 	require.NoError(t, err)
 	require.NotNil(t, empty)
 	require.Empty(t, empty)
@@ -154,7 +163,7 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 	badItem := *first
 	badItem.ID = -1
 	failedList := append([]mosts.ResultItem{{Item: &badItem}}, list...)
-	failed, err := server.extractItems(ctx, failedList, 42, fields, "en", UserContext{})
+	failed, err := server.ExtractItems(ctx, failedList, 42, fields, "en", authn.User{})
 	require.Error(t, err)
 	require.Nil(t, failed)
 	require.NoError(t, ctx.Err())
@@ -175,7 +184,7 @@ func TestMostsItemsConcurrentExtraction(t *testing.T) {
 	db.Logger(&itemBatchQueryLogger{beforeQuery: func() { started <- struct{}{} }})
 
 	go func() {
-		_, extractErr := server.extractItems(childCtx, list, 42, fields, "en", UserContext{})
+		_, extractErr := server.ExtractItems(childCtx, list, 42, fields, "en", authn.User{})
 		done <- extractErr
 	}()
 

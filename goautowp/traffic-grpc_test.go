@@ -3,7 +3,9 @@ package goautowp
 import (
 	"testing"
 
-	"github.com/autowp/goautowp/config"
+	"github.com/autowp/goautowp/api/pb"
+	authn "github.com/autowp/goautowp/internal/auth"
+	"github.com/autowp/goautowp/internal/config"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -41,17 +43,17 @@ func TestHttpBanPost(t *testing.T) {
 
 	ctx := metadata.NewIncomingContext(
 		t.Context(),
-		metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
+		metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + token.AccessToken}),
 	)
 
 	_, err = trafficSrv.DeleteTrafficBlacklistItem(
 		ctx,
-		&DeleteTrafficBlacklistItemRequest{IpAddress: bannedIP},
+		&pb.DeleteTrafficBlacklistItemRequest{IpAddress: bannedIP},
 	)
 	require.NoError(t, err)
 
-	_, err = trafficSrv.CreateTrafficBlacklistItem(ctx, &CreateTrafficBlacklistItemRequest{
-		Item: &TrafficBlacklistItem{
+	_, err = trafficSrv.CreateTrafficBlacklistItem(ctx, &pb.CreateTrafficBlacklistItemRequest{
+		Item: &pb.TrafficBlacklistItem{
 			IpAddress: bannedIP,
 			Period:    3,
 			Reason:    "Test",
@@ -59,7 +61,7 @@ func TestHttpBanPost(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	ip, err := srv.GetIP(ctx, &GetIPRequest{
+	ip, err := srv.GetIP(ctx, &pb.GetIPRequest{
 		IpAddress: bannedIP,
 		Fields:    []string{"blacklist"},
 	})
@@ -68,11 +70,11 @@ func TestHttpBanPost(t *testing.T) {
 
 	_, err = trafficSrv.DeleteTrafficBlacklistItem(
 		ctx,
-		&DeleteTrafficBlacklistItemRequest{IpAddress: bannedIP},
+		&pb.DeleteTrafficBlacklistItemRequest{IpAddress: bannedIP},
 	)
 	require.NoError(t, err)
 
-	ip, err = srv.GetIP(ctx, &GetIPRequest{IpAddress: bannedIP})
+	ip, err = srv.GetIP(ctx, &pb.GetIPRequest{IpAddress: bannedIP})
 	require.NoError(t, err)
 	require.Nil(t, ip.GetBlacklist())
 }
@@ -99,7 +101,7 @@ func TestTop(t *testing.T) {
 
 	ctx := metadata.NewIncomingContext(
 		t.Context(),
-		metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
+		metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + token.AccessToken}),
 	)
 
 	_, err = srv.GetTrafficTop(ctx, &emptypb.Empty{})
@@ -130,9 +132,9 @@ func TestWhitelist(t *testing.T) {
 	_, err = srv.CreateTrafficWhitelistItem(
 		metadata.NewIncomingContext(
 			ctx,
-			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
+			metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + token.AccessToken}),
 		),
-		&CreateTrafficWhitelistItemRequest{Item: &TrafficWhitelistItem{
+		&pb.CreateTrafficWhitelistItemRequest{Item: &pb.TrafficWhitelistItem{
 			IpAddress: "192.168.0.1",
 		}},
 	)
@@ -141,9 +143,9 @@ func TestWhitelist(t *testing.T) {
 	response, err := srv.GetTrafficWhitelistItems(
 		metadata.NewIncomingContext(
 			ctx,
-			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
+			metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + token.AccessToken}),
 		),
-		&GetTrafficWhitelistItemsRequest{},
+		&pb.GetTrafficWhitelistItemsRequest{},
 	)
 	require.NoError(t, err)
 	require.NotNil(t, response.GetPaginator())
@@ -153,9 +155,9 @@ func TestWhitelist(t *testing.T) {
 	_, err = srv.DeleteTrafficWhitelistItem(
 		metadata.NewIncomingContext(
 			ctx,
-			metadata.New(map[string]string{authorizationHeader: bearerPrefix + token.AccessToken}),
+			metadata.New(map[string]string{authn.AuthorizationHeader: bearerPrefix + token.AccessToken}),
 		),
-		&DeleteTrafficWhitelistItemRequest{IpAddress: "192.168.0.1"},
+		&pb.DeleteTrafficWhitelistItemRequest{IpAddress: "192.168.0.1"},
 	)
 	require.NoError(t, err)
 }
