@@ -40,7 +40,6 @@ require (
 	github.com/prometheus/client_golang v1.25.0
 	github.com/prometheus/client_model v0.6.3
 	github.com/rabbitmq/amqp091-go v1.16.0
-	github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/shopspring/decimal v1.6.0
 	github.com/spf13/viper v1.21.0

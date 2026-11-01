@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rainycape/unidecode"
+	"github.com/mozillazg/go-unidecode"
 )
 
 var specialCharacters = map[rune]string{
