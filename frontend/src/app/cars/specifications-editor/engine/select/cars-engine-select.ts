@@ -2,8 +2,8 @@ import type {ItemParent, Pages} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   Item,
@@ -43,7 +43,7 @@ import {CarsSelectEngineTreeItem} from './tree-item/cars-select-engine-tree-item
 
 @Component({
   selector: 'app-cars-engine-select',
-  imports: [RouterLink, CarsSelectEngineTreeItem, FormsModule, Paginator, AsyncPipe],
+  imports: [RouterLink, CarsSelectEngineTreeItem, FormField, Paginator, AsyncPipe],
   templateUrl: './cars-engine-select.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -55,7 +55,8 @@ export class CarsEngineSelect {
   readonly #toastService = inject(ToastsService);
   readonly #languageService = inject(LanguageService);
 
-  protected search = '';
+  readonly #search = signal('');
+  protected readonly search = form(this.#search);
   readonly #search$ = new BehaviorSubject<string>('');
 
   protected readonly itemID$ = this.#route.queryParamMap.pipe(
@@ -157,7 +158,7 @@ export class CarsEngineSelect {
   );
 
   protected onInput() {
-    this.#search$.next(this.search);
+    this.#search$.next(this.#search());
   }
 
   protected selectEngine(itemID: string, engineId: string) {

@@ -1,9 +1,9 @@
 import type {User} from '@grpc/spec.pb';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormsModule} from '@angular/forms';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CommentMessageFields,
@@ -44,7 +44,7 @@ import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getAchievementDescriptionTranslation, getAchievementTranslation} from '@utils/translations';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
-import {catchError, map, of, switchMap} from 'rxjs';
+import {catchError, firstValueFrom, map, of, switchMap} from 'rxjs';
 
 import {MessageDialogService} from '../../message-dialog/message-dialog.service';
 import {SocialContactList} from '../../social-contacts/social-contact-list';
@@ -53,7 +53,7 @@ import {UserLink} from '../../user/user/user-link';
 
 @Component({
   selector: 'app-users-user',
-  imports: [RouterLink, NgbTooltip, UserLink, FormsModule, AsyncPipe, DatePipe, TimeAgoPipe, SocialContactList],
+  imports: [FormField, RouterLink, NgbTooltip, UserLink, AsyncPipe, DatePipe, TimeAgoPipe, SocialContactList],
   templateUrl: './users-user.html',
   styleUrl: './users-user.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -86,8 +86,11 @@ export class UsersUser {
     {name: $localize`day`, value: 24},
     {name: $localize`2 days`, value: 48},
   ];
-  protected banPeriod = 1;
-  protected banReason: null | string = null;
+  readonly #banModel = signal({period: '1', reason: ''});
+  protected readonly banForm = form(this.#banModel, (path) => {
+    required(path.period);
+    maxLength(path.reason, 50);
+  });
   protected readonly canDeleteUser$ = this.#auth.hasRole$(Role.ADMIN);
   protected readonly canViewIp$ = this.#auth.hasRole$(Role.MODER);
   protected readonly canBan$ = this.#auth.hasRole$(Role.USERS_MODER);
@@ -392,24 +395,24 @@ export class UsersUser {
   }
 
   protected addToBlacklist(ip: string) {
-    this.#trafficClient
-      .createTrafficBlacklistItem(
-        new CreateTrafficBlacklistItemRequest({
-          item: {
-            ipAddress: ip,
-            period: this.banPeriod,
-            reason: this.banReason ?? '',
-          },
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-        },
-        next: () => {
-          this.ipResource.reload();
-        },
-      });
+    void submit(this.banForm, async () => {
+      try {
+        await firstValueFrom(
+          this.#trafficClient.createTrafficBlacklistItem(
+            new CreateTrafficBlacklistItemRequest({
+              item: {
+                ipAddress: ip,
+                period: Number(this.#banModel().period),
+                reason: this.#banModel().reason,
+              },
+            }),
+          ),
+        );
+        this.ipResource.reload();
+      } catch (response: unknown) {
+        this.#toastService.handleError(response);
+      }
+    });
   }
 
   protected getAchievementTranslation(code: string): string {

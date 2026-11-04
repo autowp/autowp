@@ -1,14 +1,15 @@
-import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, input, output, signal} from '@angular/core';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {ToastsService} from 'app/toasts/toasts.service';
+import {firstValueFrom} from 'rxjs';
 
 import {APIPictureModerVoteTemplateService} from '../../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 
 @Component({
   selector: 'app-picture-moder-vote-modal',
-  imports: [FormsModule],
+  imports: [FormField],
   templateUrl: './picture-moder-vote-modal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,39 +23,38 @@ export class PictureModerVoteModal {
   readonly vote = input.required<number>();
   readonly voted = output();
 
-  protected reason = '';
-  protected save = false;
+  readonly #model = signal({reason: '', save: false});
+  protected readonly form = form(this.#model, (path) => {
+    required(path.reason);
+    maxLength(path.reason, 50);
+  });
 
-  protected ok() {
-    const vote = this.vote();
-    if (this.save && vote) {
-      this.#templateService
-        .createTemplate$({
-          name: this.reason,
-          vote: vote,
-        })
-        .subscribe({
-          error: (error: unknown) => {
-            this.#toastService.handleError(error);
-          },
-        });
-    }
-
-    const pictureId = this.pictureId();
-    if (pictureId && vote) {
-      // Only close the modal once the vote is actually accepted - closing unconditionally would
-      // make a failed vote look identical to a successful one.
-      this.#moderVoteService.vote$(pictureId, vote, this.reason).subscribe({
-        error: (error: unknown) => {
+  protected ok(): void {
+    void submit(this.form, async () => {
+      const vote = this.vote();
+      const pictureId = this.pictureId();
+      const value = this.#model();
+      if (!pictureId || !vote) {
+        this.activeModal.close();
+        return;
+      }
+      try {
+        await firstValueFrom(this.#moderVoteService.vote$(pictureId, vote, value.reason));
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
+        return;
+      }
+      // Save the optional template only after the vote is accepted, so retrying a failed vote
+      // cannot create duplicate templates.
+      if (value.save) {
+        try {
+          await firstValueFrom(this.#templateService.createTemplate$({name: value.reason, vote}));
+        } catch (error: unknown) {
           this.#toastService.handleError(error);
-        },
-        next: () => {
-          this.voted.emit();
-          this.activeModal.close();
-        },
-      });
-    } else {
+        }
+      }
+      this.voted.emit();
       this.activeModal.close();
-    }
+    });
   }
 }

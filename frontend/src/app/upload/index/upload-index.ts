@@ -8,7 +8,7 @@ import type {Observable} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal, viewChild} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -60,12 +60,11 @@ interface UploadProgress {
 @Component({
   selector: 'app-upload-index',
   imports: [
-    FormsModule,
+    FormField,
     RouterLink,
     NgbProgressbar,
     AsyncPipe,
     InvalidParamsPipe,
-    ReactiveFormsModule,
     RemarkModule,
     PersonSearch,
     InboxPicturesGrid,
@@ -87,7 +86,8 @@ export class UploadIndex implements OnInit {
   readonly #window = browserWindow();
 
   protected files: File[] | undefined;
-  protected readonly note = new FormControl<string>('', {nonNullable: true});
+  readonly #note = signal('');
+  protected readonly note = form(this.#note);
   protected progress: UploadProgress[] = [];
   protected readonly pictures: InboxPicture[] = [];
   protected readonly formHidden = signal(false);
@@ -228,8 +228,8 @@ export class UploadIndex implements OnInit {
       map(([itemID, replace, perspectiveID]) => {
         const formData: FormData = new FormData();
         formData.append('file', file);
-        if (this.note.value) {
-          formData.append('comment', this.note.value);
+        if (this.#note()) {
+          formData.append('comment', this.#note());
         }
 
         if (itemID) {

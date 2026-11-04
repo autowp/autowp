@@ -6,7 +6,7 @@ import type {Observable} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormsModule} from '@angular/forms';
+import {form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {CreateTopicRequest, GetThemeRequest, Topic} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
@@ -26,11 +26,11 @@ import {
 } from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {RemarkModule} from 'ngx-remark';
-import {map} from 'rxjs';
+import {firstValueFrom, map} from 'rxjs';
 
 @Component({
   selector: 'app-forums-new-topic',
-  imports: [RouterLink, FormsModule, AsyncPipe, InvalidParamsPipe, RemarkModule],
+  imports: [RouterLink, FormField, AsyncPipe, InvalidParamsPipe, RemarkModule],
   templateUrl: './forums-new-topic.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -44,12 +44,16 @@ export class ForumsNewTopic implements OnInit {
   readonly #forums = inject(ForumsClient);
   readonly #grpc = inject(ForumsClient);
 
-  protected readonly form = {
+  readonly #model = signal({
     message: '',
     moderator_attention: false,
     name: '',
     subscription: false,
-  };
+  });
+  protected readonly form = form(this.#model, (path) => {
+    maxLength(path.name, 100);
+    maxLength(path.message, 4096);
+  });
   protected readonly invalidParams = signal<InvalidParams>({});
 
   readonly #themeID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('theme_id'))), {
@@ -90,33 +94,33 @@ export class ForumsNewTopic implements OnInit {
   }
 
   protected submit(theme: Theme) {
-    this.invalidParams.set({});
+    void submit(this.form, async () => {
+      this.invalidParams.set({});
 
-    this.#forums
-      .createTopic(
-        new CreateTopicRequest({
-          message: this.form.message,
-          moderatorAttention: this.form.moderator_attention,
-          topic: new Topic({
-            name: this.form.name,
-            subscription: this.form.subscription,
-            themeId: theme.id,
-          }),
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          if (response instanceof GrpcStatusEvent && response.statusCode === 3) {
-            const fieldViolations = extractFieldViolations(response);
-            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
-          } else {
-            this.#toastService.handleError(response);
-          }
-        },
-        next: (response) => {
-          void this.#router.navigate(['/forums/topic', response.id]);
-        },
-      });
+      try {
+        const response = await firstValueFrom(
+          this.#forums.createTopic(
+            new CreateTopicRequest({
+              message: this.#model().message,
+              moderatorAttention: this.#model().moderator_attention,
+              topic: new Topic({
+                name: this.#model().name,
+                subscription: this.#model().subscription,
+                themeId: theme.id,
+              }),
+            }),
+          ),
+        );
+        void this.#router.navigate(['/forums/topic', response.id]);
+      } catch (response: unknown) {
+        if (response instanceof GrpcStatusEvent && response.statusCode === 3) {
+          const fieldViolations = extractFieldViolations(response);
+          this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+        } else {
+          this.#toastService.handleError(response);
+        }
+      }
+    });
   }
 
   protected getForumsThemeTranslation(id: string): string {

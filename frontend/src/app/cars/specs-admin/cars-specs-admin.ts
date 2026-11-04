@@ -3,9 +3,9 @@ import type {AttrUserValue, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormsModule} from '@angular/forms';
+import {form, FormField, required, submit} from '@angular/forms/signals';
 import {ActivatedRoute} from '@angular/router';
 import {
   AttrUserValuesFields,
@@ -23,7 +23,7 @@ import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getUnitAbbrTranslation} from '@utils/translations';
 import {errorMessage} from 'app/grpc';
-import {forkJoin, map, of, switchMap} from 'rxjs';
+import {firstValueFrom, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {APIAttrsService} from '../../api/attrs/attrs.service';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -39,7 +39,7 @@ interface AttrUserValueListItem {
 
 @Component({
   selector: 'app-cars-specs-admin',
-  imports: [NgbTooltip, UserLink, FormsModule, DatePipe, TimeAgoPipe],
+  imports: [NgbTooltip, UserLink, FormField, DatePipe, TimeAgoPipe],
   templateUrl: './cars-specs-admin.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -52,11 +52,10 @@ export class CarsSpecsAdmin implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #attrsService = inject(APIAttrsService);
 
-  protected readonly move: {
-    item_id: string;
-  } = {
-    item_id: '',
-  };
+  readonly #moveModel = signal({itemId: ''});
+  protected readonly moveForm = form(this.#moveModel, (path) => {
+    required(path.itemId);
+  });
 
   protected readonly itemID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('item_id') ?? '')), {
     requireSync: true,
@@ -139,24 +138,20 @@ export class CarsSpecsAdmin implements OnInit {
   }
 
   protected moveValues(itemID: string) {
-    if (this.move.item_id) {
-      return;
-    }
-
-    this.#attrsClient
-      .moveUserValues(
-        new MoveAttrUserValuesRequest({
-          destItemId: this.move.item_id,
-          srcItemId: itemID,
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-        },
-        next: () => {
-          this.dataResource.reload();
-        },
-      });
+    void submit(this.moveForm, async () => {
+      try {
+        await firstValueFrom(
+          this.#attrsClient.moveUserValues(
+            new MoveAttrUserValuesRequest({
+              destItemId: this.#moveModel().itemId,
+              srcItemId: itemID,
+            }),
+          ),
+        );
+        this.dataResource.reload();
+      } catch (response: unknown) {
+        this.#toastService.handleError(response);
+      }
+    });
   }
 }

@@ -5,6 +5,7 @@ import type {Observable} from 'rxjs';
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentMessageFields,
@@ -52,7 +53,7 @@ interface CommentLink {
 
 @Component({
   selector: 'app-moder-content-reports',
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, UserLink, Paginator, AsyncPipe, DatePipe],
+  imports: [FormField, RouterLink, FormsModule, ReactiveFormsModule, UserLink, Paginator, AsyncPipe, DatePipe],
   templateUrl: './moder-content-reports.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -65,13 +66,11 @@ export class ModerContentReports implements OnInit {
   readonly #userService = inject(UserService);
   readonly #toasts = inject(ToastsService);
 
-  protected readonly status = new FormControl<ContentReportStatus>(ContentReportStatus.CONTENT_REPORT_STATUS_OPEN, {
-    nonNullable: true,
+  readonly #filterModel = signal({
+    status: `${ContentReportStatus.CONTENT_REPORT_STATUS_OPEN}`,
+    entityType: `${ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED}`,
   });
-  protected readonly entityType = new FormControl<ContentReportEntityType>(
-    ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED,
-    {nonNullable: true},
-  );
+  protected readonly filterForm = form(this.#filterModel);
 
   readonly #status$ = this.#route.queryParamMap.pipe(
     map((params) =>
@@ -110,8 +109,7 @@ export class ModerContentReports implements OnInit {
     this.#reload$,
   ]).pipe(
     switchMap(([status, entityType, page]) => {
-      this.status.setValue(status, {emitEvent: false});
-      this.entityType.setValue(entityType, {emitEvent: false});
+      this.#filterModel.set({status: `${status}`, entityType: `${entityType}`});
 
       return this.#autowpClient.getContentReports(new ContentReportsRequest({entityType, page, status}));
     }),
@@ -176,9 +174,9 @@ export class ModerContentReports implements OnInit {
   protected setFilter(): void {
     void this.#router.navigate([], {
       queryParams: {
-        entity_type: this.entityType.value || null,
+        entity_type: Number(this.#filterModel().entityType) || null,
         page: null,
-        status: this.status.value || null,
+        status: Number(this.#filterModel().status) || null,
       },
       queryParamsHandling: 'merge',
     });

@@ -11,18 +11,33 @@
       <ng-container i18n>Suppress author</ng-container>
     </button>
   } @else {
-    <form [formGroup]="suppressAuthorForm" (ngSubmit)="suppressAuthor()">
+    <form novalidate (submit)="$event.preventDefault(); suppressAuthor()">
       <div class="mb-2">
         <label class="form-label" for="suppress-author-reference" i18n>Case reference</label>
-        <input id="suppress-author-reference" type="text" class="form-control" formControlName="reference" />
+        <input
+          id="suppress-author-reference"
+          type="text"
+          class="form-control"
+          [formField]="suppressAuthorForm.reference"
+        />
       </div>
       <div class="mb-2">
         <label class="form-label" for="suppress-author-contact-email" i18n>Contact e-mail</label>
-        <input id="suppress-author-contact-email" type="email" class="form-control" formControlName="contactEmail" />
+        <input
+          id="suppress-author-contact-email"
+          type="email"
+          class="form-control"
+          [formField]="suppressAuthorForm.contactEmail"
+        />
       </div>
       <div class="mb-2">
         <label class="form-label" for="suppress-author-note" i18n>Note</label>
-        <textarea id="suppress-author-note" class="form-control" rows="2" formControlName="note"></textarea>
+        <textarea
+          id="suppress-author-note"
+          class="form-control"
+          rows="2"
+          [formField]="suppressAuthorForm.note"
+        ></textarea>
       </div>
       <div class="mb-2">
         <label class="form-label" for="suppress-author-source-text" i18n
@@ -32,16 +47,16 @@
           id="suppress-author-source-text"
           class="form-control"
           rows="4"
-          formControlName="sourceText"
+          [formField]="suppressAuthorForm.sourceText"
         ></textarea>
       </div>
-      <button type="submit" class="btn btn-danger me-2" [disabled]="suppressingAuthor()">
+      <button type="submit" class="btn btn-danger me-2" [disabled]="suppressAuthorForm().submitting()">
         <ng-container i18n>Confirm suppress author</ng-container>
       </button>
       <button
         type="button"
         class="btn btn-outline-secondary"
-        [disabled]="suppressingAuthor()"
+        [disabled]="suppressAuthorForm().submitting()"
         (click)="showSuppressAuthorForm.set(false)"
       >
         <ng-container i18n>Cancel</ng-container>

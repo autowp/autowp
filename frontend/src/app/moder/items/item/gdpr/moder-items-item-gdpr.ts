@@ -1,15 +1,16 @@
 import type {Item} from '@grpc/spec.pb';
 
 import {ChangeDetectionStrategy, Component, inject, input, output, signal} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {SuppressAuthorRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
+import {firstValueFrom} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
   selector: 'app-moder-items-item-gdpr',
-  imports: [ReactiveFormsModule],
+  imports: [FormField],
   templateUrl: './moder-items-item-gdpr.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,52 +22,41 @@ export class ModerItemsItemGdpr {
   readonly suppressed = output();
 
   protected readonly showSuppressAuthorForm = signal(false);
-  protected readonly suppressingAuthor = signal(false);
 
-  protected readonly suppressAuthorForm = new FormGroup({
-    contactEmail: new FormControl<string>('', {nonNullable: true, validators: [Validators.maxLength(255)]}),
-    note: new FormControl<string>('', {nonNullable: true, validators: [Validators.maxLength(4000)]}),
-    reference: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)],
-    }),
-    sourceText: new FormControl<string>('', {nonNullable: true}),
+  readonly #model = signal({contactEmail: '', note: '', reference: '', sourceText: ''});
+  protected readonly suppressAuthorForm = form(this.#model, (path) => {
+    maxLength(path.contactEmail, 255);
+    maxLength(path.note, 4000);
+    required(path.reference);
+    maxLength(path.reference, 255);
   });
 
   protected suppressAuthor(): void {
-    if (this.suppressAuthorForm.invalid || this.suppressingAuthor()) {
-      this.suppressAuthorForm.markAllAsTouched();
-      return;
-    }
+    void submit(this.suppressAuthorForm, async () => {
+      const value = this.#model();
 
-    this.suppressingAuthor.set(true);
+      try {
+        const response = await firstValueFrom(
+          this.#itemsClient.suppressAuthor(
+            new SuppressAuthorRequest({
+              contactEmail: value.contactEmail.trim(),
+              itemId: this.item().id,
+              note: value.note.trim(),
+              reference: value.reference.trim(),
+              sourceText: value.sourceText.trim(),
+            }),
+          ),
+        );
 
-    const value = this.suppressAuthorForm.getRawValue();
+        this.showSuppressAuthorForm.set(false);
 
-    this.#itemsClient
-      .suppressAuthor(
-        new SuppressAuthorRequest({
-          contactEmail: value.contactEmail.trim(),
-          itemId: this.item().id,
-          note: value.note.trim(),
-          reference: value.reference.trim(),
-          sourceText: value.sourceText.trim(),
-        }),
-      )
-      .subscribe({
-        error: (error: unknown) => {
-          this.suppressingAuthor.set(false);
-          this.#toastService.handleError(error);
-        },
-        next: (response) => {
-          this.suppressingAuthor.set(false);
-          this.showSuppressAuthorForm.set(false);
+        const message = $localize`Author unlinked from ${response.unlinkedPicturesCount}:unlinkedPicturesCount: picture(s) and added to the GDPR suppression list. Stored-file metadata cleanup and a search for other mentions (copyrights text / comments) are running in the background and may take a while - check the GDPR suppression list page for results.`;
 
-          const message = $localize`Author unlinked from ${response.unlinkedPicturesCount}:unlinkedPicturesCount: picture(s) and added to the GDPR suppression list. Stored-file metadata cleanup and a search for other mentions (copyrights text / comments) are running in the background and may take a while - check the GDPR suppression list page for results.`;
-
-          this.#toastService.success(message);
-          this.suppressed.emit();
-        },
-      });
+        this.#toastService.success(message);
+        this.suppressed.emit();
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
+      }
+    });
   }
 }

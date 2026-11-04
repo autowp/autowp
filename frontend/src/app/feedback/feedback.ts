@@ -3,7 +3,7 @@ import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {Router, RouterLink} from '@angular/router';
 import {CreateFeedbackRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
@@ -14,15 +14,14 @@ import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';
 import {RemarkModule} from 'ngx-remark';
+import {firstValueFrom} from 'rxjs';
 
 import {errorMessage, extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
 
-const CAPTCHA = 'captcha';
-
 @Component({
   selector: 'app-feedback',
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, RemarkModule],
+  imports: [RouterLink, FormField, RecaptchaModule, InvalidParamsPipe, RemarkModule],
   templateUrl: './feedback.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,7 +32,7 @@ export class Feedback implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
 
-  // The captcha control only ever exists after a submit the backend rejected with a captcha
+  // Captcha is only required after a submit the backend rejected with a captcha
   // violation (see submit() below) - `params` returning undefined until then keeps this resource
   // idle, so the site key isn't fetched on every page view, including the SSR pass that could
   // never render <re-captcha> anyway.
@@ -45,76 +44,59 @@ export class Feedback implements OnInit {
   });
   protected readonly invalidParams = signal<InvalidParams>({});
 
-  protected readonly form = new FormGroup({
-    captcha: new FormControl<string>('', {nonNullable: true}),
-    email: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)], // , Validators.email
-    }),
-    message: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(65536)],
-    }),
-    name: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)],
-    }),
+  readonly #model = signal({captcha: '', email: '', message: '', name: ''});
+
+  protected readonly form = form(this.#model, (path) => {
+    required(path.captcha, {when: () => this.captchaRequired()});
+    required(path.email);
+    maxLength(path.email, 255);
+    required(path.message);
+    maxLength(path.message, 65536);
+    required(path.name);
+    maxLength(path.name, 255);
   });
 
   protected readonly errorMessage = errorMessage;
 
   ngOnInit(): void {
-    this.form.removeControl(CAPTCHA as never);
-
     this.#pageEnv.set({pageId: PageId.FEEDBACK});
   }
 
-  protected submit() {
-    const formValue = this.form.getRawValue();
-    this.#autowpClient
-      .createFeedback(
-        new CreateFeedbackRequest({
-          feedback: {
-            captcha: formValue.captcha,
-            email: formValue.email,
-            message: formValue.message,
-            name: formValue.name,
-          },
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          if (response instanceof GrpcStatusEvent) {
-            const fieldViolations = extractFieldViolations(response);
-            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+  protected submit(): void {
+    void submit(this.form, async () => {
+      this.invalidParams.set({});
+      const value = this.#model();
 
-            // Object.hasOwn(), not `this.invalidParams()['captcha']`: without
-            // noUncheckedIndexedAccess, TS types a Record's index access as always-present, which
-            // would make this read as an always-true check even though the key is genuinely
-            // absent unless the backend actually returned a captcha violation.
-            if (Object.hasOwn(this.invalidParams(), 'captcha')) {
-              if (!this.form.get(CAPTCHA)) {
-                const control = new FormControl('', {nonNullable: true, validators: Validators.required});
-                this.form.addControl(CAPTCHA, control);
-              }
-              this.captchaRequired.set(true);
-            } else {
-              this.form.removeControl(CAPTCHA as never);
-              this.captchaRequired.set(false);
-            }
-          } else {
-            this.#toastService.handleError(response);
+      try {
+        await firstValueFrom(
+          this.#autowpClient.createFeedback(
+            new CreateFeedbackRequest({
+              feedback: {
+                captcha: this.captchaRequired() ? value.captcha : '',
+                email: value.email,
+                message: value.message,
+                name: value.name,
+              },
+            }),
+          ),
+        );
+        void this.#router.navigate(['/feedback/sent']);
+      } catch (response: unknown) {
+        if (response instanceof GrpcStatusEvent) {
+          this.invalidParams.set(fieldViolations2InvalidParams(extractFieldViolations(response)));
+          const captchaRequired = Object.hasOwn(this.invalidParams(), 'captcha');
+          this.captchaRequired.set(captchaRequired);
+          if (!captchaRequired) {
+            this.form.captcha().value.set('');
           }
-        },
-        next: () => {
-          void this.#router.navigate(['/feedback/sent']);
-        },
-      });
+        } else {
+          this.#toastService.handleError(response);
+        }
+      }
+    });
   }
 
-  protected resolved(captchaResponse: null | string) {
-    if (captchaResponse) {
-      this.form.get(CAPTCHA)?.setValue(captchaResponse);
-    }
+  protected resolved(captchaResponse: null | string): void {
+    this.form.captcha().value.set(captchaResponse ?? '');
   }
 }

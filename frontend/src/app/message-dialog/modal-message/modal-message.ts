@@ -1,13 +1,14 @@
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {disabled, form, FormField, required, submit} from '@angular/forms/signals';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MessageService} from '@services/message';
+import {firstValueFrom} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-modal-message',
-  imports: [FormsModule, ReactiveFormsModule],
+  imports: [FormField],
   templateUrl: './modal-message.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -18,31 +19,33 @@ export class ModalMessage {
 
   readonly userId = input.required<string>();
 
-  protected readonly text = new FormControl<string>('', {nonNullable: true});
-  protected readonly sending = signal(false);
+  readonly #model = signal({text: ''});
+  protected readonly form = form(this.#model, (path) => {
+    required(path.text);
+    disabled(path.text, {when: ({state}) => state.submitting()});
+  });
   protected readonly sent = signal(false);
 
   protected send() {
-    this.sending.set(true);
-    this.sent.set(false);
+    void submit(this.form, async () => {
+      this.sent.set(false);
 
-    const userId = this.userId();
-    if (userId) {
-      this.#messageService.send$(userId, this.text.value).subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-        },
-        next: () => {
-          this.sending.set(false);
+      const userId = this.userId();
+      if (userId) {
+        try {
+          await firstValueFrom(this.#messageService.send$(userId, this.#model().text));
+
           this.sent.set(true);
-          this.text.setValue('');
+          this.form().reset({text: ''});
 
           this.activeModal.close();
 
           this.#toastService.success('Ok');
-        },
-      });
-    }
+        } catch (response: unknown) {
+          this.#toastService.handleError(response);
+        }
+      }
+    });
   }
 
   protected keypress() {

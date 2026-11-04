@@ -3,7 +3,7 @@ import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {ContentReportReason, CreateContentReportRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -12,6 +12,7 @@ import {AuthService} from '@services/auth-service';
 import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';
+import {firstValueFrom} from 'rxjs';
 
 import {errorMessage, extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
@@ -21,7 +22,7 @@ import {ToastsService} from '../toasts/toasts.service';
 // (DSA Art. 16). Once submitted it collapses to a short acknowledgement for the session.
 @Component({
   selector: 'app-report-button',
-  imports: [ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe, NgbTooltip],
+  imports: [FormField, RecaptchaModule, InvalidParamsPipe, NgbTooltip],
   templateUrl: './report-button.html',
   styleUrl: './report-button.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,7 +38,6 @@ export class ReportButton {
   public readonly large = input(false);
 
   protected readonly open = signal(false);
-  protected readonly submitting = signal(false);
   protected readonly done = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
 
@@ -52,15 +52,15 @@ export class ReportButton {
     {label: $localize`Other`, value: ContentReportReason.CONTENT_REPORT_REASON_OTHER},
   ];
 
-  protected readonly form = new FormGroup({
-    captcha: new FormControl<string>('', {nonNullable: true}),
-    message: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(2000)],
-    }),
-    reason: new FormControl<ContentReportReason>(ContentReportReason.CONTENT_REPORT_REASON_COPYRIGHT, {
-      nonNullable: true,
-    }),
+  readonly #model = signal({
+    captcha: '',
+    message: '',
+    reason: `${ContentReportReason.CONTENT_REPORT_REASON_COPYRIGHT}`,
+  });
+
+  protected readonly form = form(this.#model, (path) => {
+    required(path.message);
+    maxLength(path.message, 2000);
   });
 
   // Only fetched once the form is open for an anonymous visitor - authenticated reports need no
@@ -78,45 +78,37 @@ export class ReportButton {
   }
 
   protected resolved(response: null | string): void {
-    if (response) {
-      this.form.controls.captcha.setValue(response);
-    }
+    this.form.captcha().value.set(response ?? '');
   }
 
   protected submit(): void {
-    if (this.submitting()) {
-      return;
-    }
+    void submit(this.form, async () => {
+      this.invalidParams.set({});
+      const value = this.#model();
 
-    this.submitting.set(true);
-    this.invalidParams.set({});
-
-    const value = this.form.getRawValue();
-
-    this.#autowp
-      .createContentReport(
-        new CreateContentReportRequest({
-          captcha: value.captcha,
-          entityId: `${this.entityId()}`,
-          entityType: this.entityType(),
-          message: value.message.trim(),
-          reason: value.reason,
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          this.submitting.set(false);
-          if (response instanceof GrpcStatusEvent) {
-            this.invalidParams.set(fieldViolations2InvalidParams(extractFieldViolations(response)));
-          } else {
-            this.#toasts.handleError(response);
-          }
-        },
-        next: () => {
-          this.submitting.set(false);
-          this.done.set(true);
-          this.open.set(false);
-        },
-      });
+      try {
+        await firstValueFrom(
+          this.#autowp.createContentReport(
+            new CreateContentReportRequest({
+              captcha: value.captcha,
+              entityId: `${this.entityId()}`,
+              entityType: this.entityType(),
+              message: value.message.trim(),
+              reason:
+                this.reasons.find((reason) => `${reason.value}` === value.reason)?.value ??
+                ContentReportReason.CONTENT_REPORT_REASON_COPYRIGHT,
+            }),
+          ),
+        );
+        this.done.set(true);
+        this.open.set(false);
+      } catch (response: unknown) {
+        if (response instanceof GrpcStatusEvent) {
+          this.invalidParams.set(fieldViolations2InvalidParams(extractFieldViolations(response)));
+        } else {
+          this.#toasts.handleError(response);
+        }
+      }
+    });
   }
 }

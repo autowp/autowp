@@ -6,12 +6,10 @@
   <textarea
     cols="65"
     rows="5"
-    name="contents"
     class="form-control"
     placeholder="Message"
     i18n-placeholder
-    [formControl]="text"
-    [disabled]="sending()"
+    [formField]="form.text"
     (keypress)="keypress()"
   ></textarea>
 </div>
@@ -19,22 +17,28 @@
   <button
     type="button"
     class="btn"
-    [disabled]="sending() || text.value.length <= 0"
+    [disabled]="form().submitting() || form().invalid()"
     [class.btn-success]="sent()"
     [class.btn-primary]="!sent()"
     (click)="send()"
   >
-    @if (sending()) {
+    @if (form().submitting()) {
       <span i18n>sending …</span>
     }
     @if (sent()) {
       <span i18n>sent</span>
     }
-    @if (!sending() && !sent()) {
+    @if (!form().submitting() && !sent()) {
       <span i18n>send</span>
     }
   </button>
-  <button type="button" class="btn btn-secondary cancel" i18n [disabled]="sending()" (click)="activeModal.dismiss()">
+  <button
+    type="button"
+    class="btn btn-secondary cancel"
+    i18n
+    [disabled]="form().submitting()"
+    (click)="activeModal.dismiss()"
+  >
     cancel
   </button>
 </div>

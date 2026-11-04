@@ -31,58 +31,64 @@
   @if (sent()) {
     <p class="alert alert-success" role="alert" i18n>Thank you — your message has been sent.</p>
   } @else if (mode() === 'report') {
-    <form [formGroup]="reportForm" (submit)="submit()">
+    <form novalidate (submit)="$event.preventDefault(); submit()">
       <div class="mb-3">
         <label class="form-label" for="copyright-reason" i18n>What are you reporting?</label>
-        <select id="copyright-reason" class="form-select" formControlName="reasonType">
+        <select id="copyright-reason" class="form-select" [formField]="reportForm.reasonType">
           @for (reason of reasons; track reason.value) {
-            <option [ngValue]="reason.value">{{ reason.label }}</option>
+            <option [value]="reason.value">{{ reason.label }}</option>
           }
         </select>
       </div>
       <div class="mb-3">
         <label class="form-label" for="copyright-url" i18n>Address (URL) of the material on the Site</label>
-        <input id="copyright-url" type="text" class="form-control" formControlName="url" />
+        <input id="copyright-url" type="text" class="form-control" [formField]="reportForm.url" />
       </div>
       <div class="mb-3">
         <label class="form-label" for="copyright-work" i18n
           >Identify the work or right, and why you believe this use isn't authorised</label
         >
-        <textarea id="copyright-work" rows="5" class="form-control" formControlName="workDescription"></textarea>
+        <textarea id="copyright-work" rows="5" class="form-control" [formField]="reportForm.workDescription"></textarea>
         @for (message of invalidParams() | invalidParams: 'message'; track message) {
           <p class="invalid-feedback d-block">{{ message }}</p>
         }
       </div>
       <div class="mb-3">
         <label class="form-label" for="copyright-capacity" i18n>Your capacity</label>
-        <select id="copyright-capacity" class="form-select" formControlName="capacity">
+        <select id="copyright-capacity" class="form-select" [formField]="reportForm.capacity">
           @for (capacity of capacities; track capacity.value) {
-            <option [ngValue]="capacity.value">{{ capacity.label }}</option>
+            <option [value]="capacity.value">{{ capacity.label }}</option>
           }
         </select>
       </div>
       <div class="mb-3">
         <label class="form-label" for="copyright-name" i18n>Your name</label>
-        <input id="copyright-name" type="text" autocomplete="name" class="form-control" formControlName="name" />
+        <input id="copyright-name" type="text" autocomplete="name" class="form-control" [formField]="reportForm.name" />
         @for (message of invalidParams() | invalidParams: 'name'; track message) {
           <p class="invalid-feedback d-block">{{ message }}</p>
         }
       </div>
       <div class="mb-3">
         <label class="form-label" for="copyright-email" i18n>Your e-mail</label>
-        <input id="copyright-email" type="text" autocomplete="email" class="form-control" formControlName="email" />
+        <input
+          id="copyright-email"
+          type="text"
+          autocomplete="email"
+          class="form-control"
+          [formField]="reportForm.email"
+        />
         @for (message of invalidParams() | invalidParams: 'email'; track message) {
           <p class="invalid-feedback d-block">{{ message }}</p>
         }
       </div>
       <div class="form-check mb-2">
-        <input id="copyright-good-faith" type="checkbox" class="form-check-input" formControlName="goodFaith" />
+        <input id="copyright-good-faith" type="checkbox" class="form-check-input" [formField]="reportForm.goodFaith" />
         <label class="form-check-label" for="copyright-good-faith" i18n
           >I believe in good faith that this use is not authorised by the rights holder, its agent, or the law</label
         >
       </div>
       <div class="form-check mb-3">
-        <input id="copyright-accurate" type="checkbox" class="form-check-input" formControlName="accurate" />
+        <input id="copyright-accurate" type="checkbox" class="form-check-input" [formField]="reportForm.accurate" />
         <label class="form-check-label" for="copyright-accurate" i18n
           >The information above is accurate, and I am the rights holder or authorised to act on their behalf</label
         >
@@ -103,28 +109,34 @@
           }
         </div>
       }
-      <button type="submit" class="btn btn-primary" i18n [disabled]="submitting() || !reportForm.valid">
+      <button type="submit" class="btn btn-primary" i18n [disabled]="submitting() || reportForm().invalid()">
         Submit notice
       </button>
     </form>
   } @else {
-    <form [formGroup]="appealForm" (submit)="submit()">
+    <form novalidate (submit)="$event.preventDefault(); submit()">
       <div class="mb-3">
         <label class="form-label" for="copyright-appeal-url" i18n
           >Address (URL) or identifier of the removed material</label
         >
-        <input id="copyright-appeal-url" type="text" class="form-control" formControlName="url" />
+        <input id="copyright-appeal-url" type="text" class="form-control" [formField]="appealForm.url" />
       </div>
       <div class="mb-3">
         <label class="form-label" for="copyright-appeal-reason" i18n>Why you believe the removal was a mistake</label>
-        <textarea id="copyright-appeal-reason" rows="5" class="form-control" formControlName="reason"></textarea>
+        <textarea id="copyright-appeal-reason" rows="5" class="form-control" [formField]="appealForm.reason"></textarea>
         @for (message of invalidParams() | invalidParams: 'message'; track message) {
           <p class="invalid-feedback d-block">{{ message }}</p>
         }
       </div>
       <div class="mb-3">
         <label class="form-label" for="copyright-appeal-name" i18n>Your name</label>
-        <input id="copyright-appeal-name" type="text" autocomplete="name" class="form-control" formControlName="name" />
+        <input
+          id="copyright-appeal-name"
+          type="text"
+          autocomplete="name"
+          class="form-control"
+          [formField]="appealForm.name"
+        />
         @for (message of invalidParams() | invalidParams: 'name'; track message) {
           <p class="invalid-feedback d-block">{{ message }}</p>
         }
@@ -136,7 +148,7 @@
           type="text"
           autocomplete="email"
           class="form-control"
-          formControlName="email"
+          [formField]="appealForm.email"
         />
         @for (message of invalidParams() | invalidParams: 'email'; track message) {
           <p class="invalid-feedback d-block">{{ message }}</p>
@@ -147,7 +159,7 @@
           id="copyright-appeal-accurate"
           type="checkbox"
           class="form-check-input"
-          formControlName="statementAccurate"
+          [formField]="appealForm.statementAccurate"
         />
         <label class="form-check-label" for="copyright-appeal-accurate" i18n>The information above is accurate</label>
       </div>
@@ -167,7 +179,7 @@
           }
         </div>
       }
-      <button type="submit" class="btn btn-primary" i18n [disabled]="submitting() || !appealForm.valid">
+      <button type="submit" class="btn btn-primary" i18n [disabled]="submitting() || appealForm().invalid()">
         Submit appeal
       </button>
     </form>

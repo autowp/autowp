@@ -4,7 +4,8 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {toObservable} from '@angular/core/rxjs-interop';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -44,7 +45,7 @@ import {UploadSelectTreeItem} from './tree-item/upload-select-tree-item';
 
 @Component({
   selector: 'app-upload-select',
-  imports: [FormsModule, RouterLink, Paginator, UploadSelectTreeItem, AsyncPipe, ReactiveFormsModule],
+  imports: [FormField, RouterLink, Paginator, UploadSelectTreeItem, AsyncPipe],
   templateUrl: './upload-select.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -56,7 +57,9 @@ export class UploadSelect implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly search = new FormControl<string>('', {nonNullable: true});
+  readonly #search = signal('');
+  protected readonly search = form(this.#search);
+  readonly #search$ = toObservable(this.#search);
   protected readonly loading = signal(false);
   protected readonly conceptsOpen = signal(false);
 
@@ -72,7 +75,7 @@ export class UploadSelect implements OnInit {
     brands: Item[][] | undefined;
     paginator: Pages | undefined;
   }> = combineLatest([
-    this.search.valueChanges.pipe(
+    this.#search$.pipe(
       startWith(''),
       map((value) => value.trim()),
       distinctUntilChanged(),

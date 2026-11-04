@@ -16,20 +16,25 @@
 <form class="row row-cols-auto g-2 align-items-end mb-3">
   <div class="col">
     <label class="form-label" for="content-report-status" i18n>Status</label>
-    <select id="content-report-status" class="form-select" [formControl]="status" (change)="setFilter()">
-      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_OPEN">Open</option>
-      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_ACCEPTED">Accepted</option>
-      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_REJECTED">Rejected</option>
-      <option i18n [ngValue]="ContentReportStatus.CONTENT_REPORT_STATUS_UNSPECIFIED">All</option>
+    <select id="content-report-status" class="form-select" [formField]="filterForm.status" (change)="setFilter()">
+      <option i18n [value]="ContentReportStatus.CONTENT_REPORT_STATUS_OPEN">Open</option>
+      <option i18n [value]="ContentReportStatus.CONTENT_REPORT_STATUS_ACCEPTED">Accepted</option>
+      <option i18n [value]="ContentReportStatus.CONTENT_REPORT_STATUS_REJECTED">Rejected</option>
+      <option i18n [value]="ContentReportStatus.CONTENT_REPORT_STATUS_UNSPECIFIED">All</option>
     </select>
   </div>
   <div class="col">
     <label class="form-label" for="content-report-entity-type" i18n>Content type</label>
-    <select id="content-report-entity-type" class="form-select" [formControl]="entityType" (change)="setFilter()">
-      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED">All</option>
-      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE">Picture</option>
-      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT">Comment</option>
-      <option i18n [ngValue]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER">Other</option>
+    <select
+      id="content-report-entity-type"
+      class="form-select"
+      [formField]="filterForm.entityType"
+      (change)="setFilter()"
+    >
+      <option i18n [value]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED">All</option>
+      <option i18n [value]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE">Picture</option>
+      <option i18n [value]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT">Comment</option>
+      <option i18n [value]="ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER">Other</option>
     </select>
   </div>
 </form>

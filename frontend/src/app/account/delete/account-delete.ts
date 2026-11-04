@@ -2,7 +2,7 @@ import type {OnInit} from '@angular/core';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {Router} from '@angular/router';
 import {DeleteUserRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
@@ -12,14 +12,14 @@ import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
-import {EMPTY, switchMap} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-account-delete',
-  imports: [FormsModule, InvalidParamsPipe, RemarkModule],
+  imports: [FormField, InvalidParamsPipe, RemarkModule],
   templateUrl: './account-delete.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,9 +30,12 @@ export class AccountDelete implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #usersGrpc = inject(UsersClient);
 
-  protected readonly form = {
+  readonly #model = signal({
     password_old: '',
-  };
+  });
+  protected readonly form = form(this.#model, (path) => {
+    maxLength(path.password_old, 50);
+  });
   protected readonly invalidParams = signal<InvalidParams>({});
 
   ngOnInit(): void {
@@ -40,34 +43,29 @@ export class AccountDelete implements OnInit {
   }
 
   protected submit() {
-    this.#auth.user$
-      .pipe(
-        switchMap((user) =>
-          user
-            ? this.#usersGrpc.deleteUser(
-                new DeleteUserRequest({
-                  password: this.form.password_old,
-                  userId: user.id,
-                }),
-              )
-            : EMPTY,
-        ),
-        // Chained into the main pipe rather than subscribed to inside the outer subscribe's
-        // `next` (a nested subscribe): composing it here keeps a single subscription lifecycle
-        // and lets signOut$() actually complete before navigating.
-        switchMap(() => this.#auth.signOut$()),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-          if (response instanceof GrpcStatusEvent && response.statusCode === 3) {
-            const fieldViolations = extractFieldViolations(response);
-            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
-          }
-        },
-        next: () => {
-          void this.#router.navigate(['/account/delete/deleted']);
-        },
-      });
+    void submit(this.form, async () => {
+      try {
+        const user = await firstValueFrom(this.#auth.user$);
+        if (!user) {
+          return;
+        }
+        await firstValueFrom(
+          this.#usersGrpc.deleteUser(
+            new DeleteUserRequest({
+              password: this.#model().password_old,
+              userId: user.id,
+            }),
+          ),
+        );
+        await firstValueFrom(this.#auth.signOut$(), {defaultValue: undefined});
+        void this.#router.navigate(['/account/delete/deleted']);
+      } catch (response: unknown) {
+        this.#toastService.handleError(response);
+        if (response instanceof GrpcStatusEvent && response.statusCode === 3) {
+          const fieldViolations = extractFieldViolations(response);
+          this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+        }
+      }
+    });
   }
 }

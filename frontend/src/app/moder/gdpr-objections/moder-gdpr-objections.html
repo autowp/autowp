@@ -26,7 +26,7 @@
     id="gdpr-objections-hits-only"
     class="form-check-input"
     type="checkbox"
-    [formControl]="hitsOnly"
+    [formField]="hitsOnly"
     (change)="setFilter()"
   />
   <label class="form-check-label" for="gdpr-objections-hits-only" i18n>Only show entries hit again</label>
@@ -272,30 +272,42 @@
 @if (isModer$ | async) {
   <div class="card card-body mb-4" style="max-width: 40rem">
     <h2 class="h5" i18n>Add entry manually</h2>
-    <form [formGroup]="createForm" (ngSubmit)="create()">
+    <form novalidate (submit)="$event.preventDefault(); create()">
       <div class="mb-2">
         <label class="form-label" for="gdpr-objection-names" i18n>Names (one spelling per line)</label>
-        <textarea id="gdpr-objection-names" class="form-control" rows="2" formControlName="names"></textarea>
+        <textarea id="gdpr-objection-names" class="form-control" rows="2" [formField]="createForm.names"></textarea>
       </div>
       <div class="mb-2">
         <label class="form-label" for="gdpr-objection-reference" i18n>Case reference</label>
-        <input id="gdpr-objection-reference" type="text" class="form-control" formControlName="reference" />
+        <input id="gdpr-objection-reference" type="text" class="form-control" [formField]="createForm.reference" />
       </div>
       <div class="mb-2">
         <label class="form-label" for="gdpr-objection-contact-email" i18n>Contact e-mail</label>
-        <input id="gdpr-objection-contact-email" type="email" class="form-control" formControlName="contactEmail" />
+        <input
+          id="gdpr-objection-contact-email"
+          type="email"
+          class="form-control"
+          [formField]="createForm.contactEmail"
+        />
       </div>
       <div class="mb-2">
         <label class="form-label" for="gdpr-objection-note" i18n>Note</label>
-        <textarea id="gdpr-objection-note" class="form-control" rows="2" formControlName="note"></textarea>
+        <textarea id="gdpr-objection-note" class="form-control" rows="2" [formField]="createForm.note"></textarea>
       </div>
       <div class="mb-2">
         <label class="form-label" for="gdpr-objection-source-text" i18n
           >Original request text (kept internal-only)</label
         >
-        <textarea id="gdpr-objection-source-text" class="form-control" rows="4" formControlName="sourceText"></textarea>
+        <textarea
+          id="gdpr-objection-source-text"
+          class="form-control"
+          rows="4"
+          [formField]="createForm.sourceText"
+        ></textarea>
       </div>
-      <button type="submit" class="btn btn-primary" i18n [disabled]="creating()">Add to suppression list</button>
+      <button type="submit" class="btn btn-primary" [disabled]="createForm().submitting()">
+        <ng-container i18n>Add to suppression list</ng-container>
+      </button>
     </form>
   </div>
 }

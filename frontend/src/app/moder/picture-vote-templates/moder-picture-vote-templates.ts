@@ -2,18 +2,19 @@ import type {OnInit} from '@angular/core';
 import type {ModerVoteTemplate} from '@grpc/spec.pb';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {ToastsService} from 'app/toasts/toasts.service';
+import {firstValueFrom} from 'rxjs';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 
 @Component({
   selector: 'app-moder-picture-vote-templates',
-  imports: [RouterLink, FormsModule, AsyncPipe],
+  imports: [RouterLink, FormField, AsyncPipe],
   templateUrl: './moder-picture-vote-templates.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,8 +24,12 @@ export class ModerPictureVoteTemplates implements OnInit {
   readonly #toastService = inject(ToastsService);
 
   protected readonly templates$ = this.#voteTemplateService.getTemplates$();
-  protected vote = -1;
-  protected name = '';
+  readonly #model = signal({vote: '-1', name: ''});
+  protected readonly form = form(this.#model, (path) => {
+    required(path.name);
+    maxLength(path.name, 50);
+    required(path.vote);
+  });
 
   ngOnInit(): void {
     this.#pageEnv.set({
@@ -42,15 +47,17 @@ export class ModerPictureVoteTemplates implements OnInit {
   }
 
   protected createTemplate() {
-    this.#voteTemplateService
-      .createTemplate$({
-        name: this.name,
-        vote: this.vote,
-      })
-      .subscribe({
-        error: (error: unknown) => {
-          this.#toastService.handleError(error);
-        },
-      });
+    void submit(this.form, async () => {
+      try {
+        await firstValueFrom(
+          this.#voteTemplateService.createTemplate$({
+            name: this.#model().name,
+            vote: Number(this.#model().vote),
+          }),
+        );
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
+      }
+    });
   }
 }

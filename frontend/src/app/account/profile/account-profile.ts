@@ -1,11 +1,11 @@
 import type {ElementRef, OnInit} from '@angular/core';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
-import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, linkedSignal, signal, viewChild} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {form, FormField, submit} from '@angular/forms/signals';
 import {environment} from '@environment/environment';
 import {DeleteUserPhotoRequest, MeRequest, UpdateUserRequest, User, UserFields} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
@@ -20,20 +20,26 @@ import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, catchError, combineLatest, EMPTY, map, of, shareReplay, switchMap, tap} from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  EMPTY,
+  firstValueFrom,
+  map,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
 import {AccountContactsEditor} from '../contacts-editor/account-contacts-editor';
 
-interface FormControls {
-  language: FormControl<string>;
-  timezone: FormControl<string>;
-}
-
 @Component({
   selector: 'app-account-profile',
-  imports: [FormsModule, AsyncPipe, InvalidParamsPipe, ReactiveFormsModule, RemarkModule, AccountContactsEditor],
+  imports: [FormField, AsyncPipe, InvalidParamsPipe, RemarkModule, AccountContactsEditor],
   templateUrl: './account-profile.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -104,15 +110,12 @@ export class AccountProfile implements OnInit {
   protected readonly votesLeft$ = this.user$.pipe(map((user) => +user.votesLeft || 0));
   protected readonly photo$ = this.user$.pipe(map((user) => user.img));
 
-  protected readonly form$: Observable<FormGroup<FormControls>> = this.user$.pipe(
-    map(
-      (user) =>
-        new FormGroup({
-          language: new FormControl<string>(user.language, {nonNullable: true}),
-          timezone: new FormControl<string>(user.timezone, {nonNullable: true}),
-        }),
-    ),
-  );
+  readonly #settingsUser = toSignal(this.user$);
+  readonly #model = linkedSignal(() => ({
+    language: this.#settingsUser()?.language ?? '',
+    timezone: this.#settingsUser()?.timezone ?? '',
+  }));
+  protected readonly form = form(this.#model);
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ACCOUNT_PROFILE});
@@ -126,33 +129,33 @@ export class AccountProfile implements OnInit {
     this.#toastService.success($localize`Data saved`);
   }
 
-  protected sendSettings(form: FormGroup<FormControls>, id: string) {
-    this.settingsInvalidParams.set({});
+  protected sendSettings(id: string) {
+    void submit(this.form, async () => {
+      this.settingsInvalidParams.set({});
 
-    this.#usersClient
-      .updateUser(
-        new UpdateUserRequest({
-          updateMask: new FieldMask({paths: ['language', 'timezone']}),
-          user: new User({
-            id,
-            language: form.controls.language.value || undefined,
-            timezone: form.controls.timezone.value || undefined,
-          }),
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          if (response instanceof GrpcStatusEvent) {
-            const fieldViolations = extractFieldViolations(response);
-            this.settingsInvalidParams.set(fieldViolations2InvalidParams(fieldViolations));
-          } else {
-            this.#toastService.handleError(response);
-          }
-        },
-        next: () => {
-          this.showSavedMessage();
-        },
-      });
+      try {
+        await firstValueFrom(
+          this.#usersClient.updateUser(
+            new UpdateUserRequest({
+              updateMask: new FieldMask({paths: ['language', 'timezone']}),
+              user: new User({
+                id,
+                language: this.#model().language || undefined,
+                timezone: this.#model().timezone || undefined,
+              }),
+            }),
+          ),
+        );
+        this.showSavedMessage();
+      } catch (response: unknown) {
+        if (response instanceof GrpcStatusEvent) {
+          const fieldViolations = extractFieldViolations(response);
+          this.settingsInvalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+        } else {
+          this.#toastService.handleError(response);
+        }
+      }
+    });
   }
 
   protected resetPhoto(id: string) {

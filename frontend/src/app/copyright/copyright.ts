@@ -1,9 +1,9 @@
 import type {OnInit} from '@angular/core';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {ContentReportEntityType, ContentReportReason, CreateContentReportRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
@@ -14,6 +14,7 @@ import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';
 import {RemarkComponent} from 'ngx-remark';
+import {firstValueFrom} from 'rxjs';
 
 import {errorMessage, extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
@@ -68,7 +69,7 @@ type Mode = 'appeal' | 'report';
 
 @Component({
   selector: 'app-copyright',
-  imports: [RouterLink, RemarkComponent, FormsModule, ReactiveFormsModule, RecaptchaModule, InvalidParamsPipe],
+  imports: [RouterLink, RemarkComponent, FormField, RecaptchaModule, InvalidParamsPipe],
   templateUrl: './copyright.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -82,7 +83,6 @@ export class Copyright implements OnInit {
 
   protected readonly mode = signal<Mode>('report');
   protected readonly sent = signal(false);
-  protected readonly submitting = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
 
   protected readonly captchaRequired = signal(false);
@@ -104,50 +104,44 @@ export class Copyright implements OnInit {
     {label: $localize`I am authorised to act on behalf of the rights holder`, value: 'agent'},
   ];
 
-  protected readonly reportForm = new FormGroup({
-    accurate: new FormControl<boolean>(false, {nonNullable: true, validators: [Validators.requiredTrue]}),
-    capacity: new FormControl<string>(this.capacities[0].value, {nonNullable: true}),
-    captcha: new FormControl<string>('', {nonNullable: true}),
-    email: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)],
-    }),
-    goodFaith: new FormControl<boolean>(false, {nonNullable: true, validators: [Validators.requiredTrue]}),
-    name: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)],
-    }),
-    reasonType: new FormControl<string>(this.reasons[0].value, {nonNullable: true}),
-    url: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(2000)],
-    }),
-    workDescription: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(65536)],
-    }),
+  readonly #reportFormModel = signal({
+    accurate: false,
+    capacity: this.capacities[0].value,
+    captcha: '',
+    email: '',
+    goodFaith: false,
+    name: '',
+    reasonType: this.reasons[0].value,
+    url: '',
+    workDescription: '',
+  });
+  protected readonly reportForm = form(this.#reportFormModel, (path) => {
+    required(path.accurate);
+    required(path.email);
+    required(path.goodFaith);
+    required(path.name);
+    required(path.url);
+    required(path.workDescription);
+    maxLength(path.email, 255);
+    maxLength(path.name, 255);
+    maxLength(path.url, 2000);
+    maxLength(path.workDescription, 65536);
   });
 
-  protected readonly appealForm = new FormGroup({
-    captcha: new FormControl<string>('', {nonNullable: true}),
-    email: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)],
-    }),
-    name: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)],
-    }),
-    reason: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(65536)],
-    }),
-    statementAccurate: new FormControl<boolean>(false, {nonNullable: true, validators: [Validators.requiredTrue]}),
-    url: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(2000)],
-    }),
+  readonly #appealFormModel = signal({captcha: '', email: '', name: '', reason: '', statementAccurate: false, url: ''});
+  protected readonly appealForm = form(this.#appealFormModel, (path) => {
+    required(path.email);
+    required(path.name);
+    required(path.reason);
+    required(path.statementAccurate);
+    required(path.url);
+    maxLength(path.email, 255);
+    maxLength(path.name, 255);
+    maxLength(path.reason, 65536);
+    maxLength(path.url, 2000);
   });
+
+  protected readonly submitting = computed(() => this.reportForm().submitting() || this.appealForm().submitting());
 
   protected readonly errorMessage = errorMessage;
 
@@ -167,7 +161,7 @@ export class Copyright implements OnInit {
 
   private buildMessage(): string {
     if (this.mode() === 'report') {
-      const value = this.reportForm.getRawValue();
+      const value = this.#reportFormModel();
 
       const reasonLabel = this.reasons.find((r) => r.value === value.reasonType)?.label ?? value.reasonType;
       const capacityLabel = this.capacities.find((c) => c.value === value.capacity)?.label ?? value.capacity;
@@ -184,7 +178,7 @@ export class Copyright implements OnInit {
       ].join('\n');
     }
 
-    const value = this.appealForm.getRawValue();
+    const value = this.#appealFormModel();
 
     return [
       '[Takedown appeal submitted via /copyright]',
@@ -200,7 +194,7 @@ export class Copyright implements OnInit {
       return ContentReportReason.CONTENT_REPORT_REASON_OTHER;
     }
 
-    switch (this.reportForm.controls.reasonType.value) {
+    switch (this.reportForm.reasonType().value()) {
       case 'copyright':
         return ContentReportReason.CONTENT_REPORT_REASON_COPYRIGHT;
       case 'privacy':
@@ -214,49 +208,59 @@ export class Copyright implements OnInit {
     if (this.submitting()) {
       return;
     }
-
-    const form = this.currentForm();
-
-    this.submitting.set(true);
-    this.invalidParams.set({});
-
-    this.#autowpClient
-      .createContentReport(
-        new CreateContentReportRequest({
-          captcha: form.controls.captcha.value,
-          entityId: '0',
-          entityType: ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER,
-          message: this.buildMessage(),
-          reason: this.reasonToProto(),
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          this.submitting.set(false);
-
-          if (response instanceof GrpcStatusEvent) {
-            const fieldViolations = extractFieldViolations(response);
-            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
-
-            if (Object.hasOwn(this.invalidParams(), 'captcha')) {
-              this.captchaRequired.set(true);
-            }
-          } else {
-            this.#toastService.handleError(response);
+    const action = async () => {
+      this.invalidParams.set({});
+      const activeForm = this.currentForm();
+      try {
+        await firstValueFrom(
+          this.#autowpClient.createContentReport(
+            new CreateContentReportRequest({
+              captcha: activeForm.captcha().value(),
+              entityId: '0',
+              entityType: ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER,
+              message: this.buildMessage(),
+              reason: this.reasonToProto(),
+            }),
+          ),
+        );
+        this.sent.set(true);
+        if (activeForm === this.reportForm) {
+          this.reportForm().reset({
+            accurate: false,
+            capacity: this.capacities[0].value,
+            captcha: '',
+            email: '',
+            goodFaith: false,
+            name: '',
+            reasonType: this.reasons[0].value,
+            url: '',
+            workDescription: '',
+          });
+        } else {
+          this.appealForm().reset({captcha: '', email: '', name: '', reason: '', statementAccurate: false, url: ''});
+        }
+        this.captchaRequired.set(false);
+      } catch (response: unknown) {
+        if (response instanceof GrpcStatusEvent) {
+          this.invalidParams.set(fieldViolations2InvalidParams(extractFieldViolations(response)));
+          if (Object.hasOwn(this.invalidParams(), 'captcha')) {
+            this.captchaRequired.set(true);
           }
-        },
-        next: () => {
-          this.submitting.set(false);
-          this.sent.set(true);
-          form.reset();
-          this.captchaRequired.set(false);
-        },
-      });
+        } else {
+          this.#toastService.handleError(response);
+        }
+      }
+    };
+    if (this.mode() === 'report') {
+      void submit(this.reportForm, action);
+    } else {
+      void submit(this.appealForm, action);
+    }
   }
 
   protected resolved(captchaResponse: null | string): void {
-    if (captchaResponse) {
-      this.currentForm().controls.captcha.setValue(captchaResponse);
-    }
+    this.currentForm()
+      .captcha()
+      .value.set(captchaResponse ?? '');
   }
 }

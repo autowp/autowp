@@ -30,7 +30,7 @@ Please note that image submissions are moderated. This means that all images wil
             />
             <div class="mv-3">
               @if (!formHidden()) {
-                <form class="form-horizontal" (submit)="submit()">
+                <form class="form-horizontal" novalidate (submit)="$event.preventDefault(); submit()">
                   <div class="mb-3 row">
                     <div class="col-md-2 col-form-label" i18n>Selection</div>
                     <div class="col-md-10">
@@ -87,7 +87,7 @@ Please note that image submissions are moderated. This means that all images wil
                   <div class="mb-3 row">
                     <label class="col-md-2 col-form-label" for="note" i18n>Note</label>
                     <div class="col-md-10">
-                      <textarea name="note" id="note" rows="3" class="form-control" [formControl]="note"></textarea>
+                      <textarea id="note" rows="3" class="form-control" [formField]="note"></textarea>
                     </div>
                   </div>
                   <div class="row">

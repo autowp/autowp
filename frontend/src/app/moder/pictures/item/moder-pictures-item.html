@@ -670,10 +670,10 @@
                   </button>
                 }
                 @if (!ip.blacklist && ip.rights?.addToBlacklist) {
-                  <form class="form-vertical">
+                  <form class="form-vertical" novalidate (submit)="$event.preventDefault()">
                     <div class="mb-3">
                       <label i18n for="period">For period</label>
-                      <select name="period" id="period" class="form-select" required [(ngModel)]="banPeriod">
+                      <select id="period" class="form-select" [formField]="banForm.period">
                         @for (period of banPeriods; track period.value) {
                           <option [value]="period.value">{{ period.name }}</option>
                         }
@@ -681,9 +681,14 @@
                     </div>
                     <div class="mb-3">
                       <label i18n for="reason">Reason</label>
-                      <input maxlength="50" class="form-control" name="reason" id="reason" [(ngModel)]="banReason" />
+                      <input class="form-control" id="reason" [formField]="banForm.reason" />
                     </div>
-                    <button type="button" class="btn btn-danger" (click)="addToBlacklist(picture.ipAddress)">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      [disabled]="banForm().submitting() || banForm().invalid()"
+                      (click)="addToBlacklist(picture.ipAddress)"
+                    >
                       <ng-container i18n>Ban</ng-container>
                     </button>
                   </form>

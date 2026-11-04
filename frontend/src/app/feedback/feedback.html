@@ -13,26 +13,25 @@
 <div class="row">
   <div class="col-md-8 offset-md-2">
     <div class="card card-body mb-4">
-      <form class="form-horizontal" [formGroup]="form" (submit)="submit()">
+      <form class="form-horizontal" novalidate (submit)="$event.preventDefault(); submit()">
         <fieldset>
           <legend i18n>Feedback</legend>
 
-          @if (form.controls.name; as control) {
+          @if (form.name(); as control) {
             <div class="mb-3 row">
               <label class="col-md-2 col-form-label" for="name" i18n>Your name</label>
               <div class="col-md-10">
                 <input
                   type="text"
                   id="name"
-                  name="name"
                   size="80"
                   autocomplete="name"
                   class="form-control"
                   placeholder="John"
                   i18n-placeholder
-                  [formControl]="control"
+                  [formField]="form.name"
                   [class.is-invalid]="
-                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (control.invalid() && (control.dirty() || control.touched())) ||
                     (invalidParams() && invalidParams()['name'])
                   "
                 />
@@ -42,22 +41,21 @@
               </div>
             </div>
           }
-          @if (form.controls.email; as control) {
+          @if (form.email(); as control) {
             <div class="mb-3 row">
               <label class="col-md-2 col-form-label" for="email" i18n>E-mail</label>
               <div class="col-md-10">
                 <input
                   type="text"
                   id="email"
-                  name="email"
                   size="80"
                   autocomplete="email"
                   class="form-control"
                   placeholder="john@example.com"
                   i18n-placeholder
-                  [formControl]="control"
+                  [formField]="form.email"
                   [class.is-invalid]="
-                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (control.invalid() && (control.dirty() || control.touched())) ||
                     (invalidParams() && invalidParams()['email'])
                   "
                 />
@@ -67,19 +65,18 @@
               </div>
             </div>
           }
-          @if (form.controls.message; as control) {
+          @if (form.message(); as control) {
             <div class="mb-3 row">
               <label class="col-md-2 col-form-label" for="message" i18n>Message</label>
               <div class="col-md-10">
                 <textarea
                   id="message"
-                  name="message"
                   cols="80"
                   rows="8"
                   class="form-control"
-                  [formControl]="control"
+                  [formField]="form.message"
                   [class.is-invalid]="
-                    (control.invalid && (control.dirty || !control.untouched)) ||
+                    (control.invalid() && (control.dirty() || control.touched())) ||
                     (invalidParams() && invalidParams()['message'])
                   "
                 ></textarea>
@@ -89,7 +86,7 @@
               </div>
             </div>
           }
-          @if (form.controls.captcha) {
+          @if (captchaRequired()) {
             <div class="mb-3 row">
               <div class="col-md-10 offset-md-2">
                 @if (recaptchaKeyResource.error(); as error) {
@@ -108,7 +105,9 @@
           <div class="mb-3 row">
             <div class="col-md-2"></div>
             <div class="col-md-10">
-              <button type="submit" class="btn btn-primary" i18n [disabled]="!form.valid">Submit</button>
+              <button type="submit" class="btn btn-primary" [disabled]="form().submitting() || form().invalid()">
+                <ng-container i18n>Submit</ng-container>
+              </button>
             </div>
           </div>
         </fieldset>

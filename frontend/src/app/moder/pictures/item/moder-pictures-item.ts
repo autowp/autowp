@@ -4,6 +4,7 @@ import type {Observable} from 'rxjs';
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CreatePictureItemRequest,
@@ -71,6 +72,7 @@ import {
   distinctUntilChanged,
   EMPTY,
   finalize,
+  firstValueFrom,
   map,
   of,
   shareReplay,
@@ -90,6 +92,7 @@ interface LastItemInfo {
 @Component({
   selector: 'app-moder-pictures-item',
   imports: [
+    FormField,
     RouterLink,
     NgbTooltip,
     ModerPicturesPerspectivePicker,
@@ -272,8 +275,11 @@ export class ModerPicturesItem {
     {name: $localize`day`, value: 24},
     {name: $localize`2 days`, value: 48},
   ];
-  protected banPeriod = 1;
-  protected banReason: null | string = null;
+  readonly #banModel = signal({period: '1', reason: ''});
+  protected readonly banForm = form(this.#banModel, (path) => {
+    required(path.period);
+    maxLength(path.reason, 50);
+  });
 
   protected readonly licenseOptions: {label: string; value: PictureLicense}[] = pictureLicenseOptions.map((value) => ({
     label: getPictureLicenseTranslation(value.toString()),
@@ -723,26 +729,23 @@ export class ModerPicturesItem {
   }
 
   protected addToBlacklist(ip: string) {
-    this.#trafficClient
-      .createTrafficBlacklistItem(
-        new CreateTrafficBlacklistItemRequest({
-          item: {
-            ipAddress: ip,
-            period: this.banPeriod,
-            reason: this.banReason ?? '',
-          },
-        }),
-      )
-      .pipe(
-        catchError((error: unknown) => {
-          this.#toastService.handleError(error);
-          return EMPTY;
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.#change$.next();
-        },
-      });
+    void submit(this.banForm, async () => {
+      try {
+        await firstValueFrom(
+          this.#trafficClient.createTrafficBlacklistItem(
+            new CreateTrafficBlacklistItemRequest({
+              item: {
+                ipAddress: ip,
+                period: Number(this.#banModel().period),
+                reason: this.#banModel().reason,
+              },
+            }),
+          ),
+        );
+        this.#change$.next();
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
+      }
+    });
   }
 }

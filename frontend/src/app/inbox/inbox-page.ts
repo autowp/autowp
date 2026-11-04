@@ -3,8 +3,8 @@ import type {Inbox, PicturesList} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   InboxRequest,
@@ -39,7 +39,7 @@ interface InboxData {
 
 @Component({
   selector: 'app-inbox',
-  imports: [RouterLink, FormsModule, Paginator, AsyncPipe, DatePipe, Thumbnail, ReactiveFormsModule],
+  imports: [RouterLink, FormField, Paginator, AsyncPipe, DatePipe, Thumbnail],
   templateUrl: './inbox-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -84,7 +84,7 @@ export class InboxPage implements OnInit {
         brandID = params.brand ? params.brand : '';
       }
 
-      this.brandID.setValue(brandID);
+      this.#brandID.set(brandID);
 
       return combineLatest([
         of(params.date),
@@ -159,7 +159,8 @@ export class InboxPage implements OnInit {
     }),
   );
 
-  protected readonly brandID = new FormControl<string>('', {nonNullable: true});
+  readonly #brandID = signal('');
+  protected readonly brandID = form(this.#brandID);
 
   protected readonly formatGrpcDate = formatGrpcDate;
   protected readonly parseGrpcDate = parseGrpcDate;
@@ -169,6 +170,6 @@ export class InboxPage implements OnInit {
   }
 
   protected changeBrand() {
-    void this.#router.navigate(['/inbox', this.brandID.value ? this.brandID.value : 'all']);
+    void this.#router.navigate(['/inbox', this.#brandID() ? this.#brandID() : 'all']);
   }
 }

@@ -1,20 +1,20 @@
 import type {CommentsType} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 
-import {ChangeDetectionStrategy, Component, effect, inject, input, output, signal} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked} from '@angular/core';
+import {form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {AddCommentRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
-import {defer, finalize} from 'rxjs';
+import {defer, firstValueFrom} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
 
 @Component({
   selector: 'app-comments-form',
-  imports: [FormsModule, InvalidParamsPipe],
+  imports: [FormField, InvalidParamsPipe],
   templateUrl: './comments-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,61 +31,54 @@ export class CommentsForm {
   readonly resolve = input<boolean>(false);
 
   protected readonly invalidParams = signal<InvalidParams>({});
-  protected readonly sending = signal(false);
-  protected readonly form = {
+
+  readonly #model = signal({
     message: '',
     moderator_attention: false,
-  };
+  });
+  protected readonly form = form(this.#model, (path) => {
+    maxLength(path.message, 16000);
+  });
 
   constructor() {
     effect(() => {
-      if (this.resolve() && this.form.message.length <= 0) {
-        this.form.message = 'Fixed';
+      if (this.resolve() && untracked(() => this.#model().message.length <= 0)) {
+        this.form.message().value.set('Fixed');
       }
     });
   }
 
   protected sendMessage() {
-    if (this.sending()) {
-      return;
-    }
+    void submit(this.form, async () => {
+      this.invalidParams.set({});
 
-    this.invalidParams.set({});
-    this.sending.set(true);
+      try {
+        const response = await firstValueFrom(
+          defer(() =>
+            this.#comments.add(
+              new AddCommentRequest({
+                itemId: this.itemID(),
+                message: this.#model().message,
+                moderatorAttention: this.#model().moderator_attention,
+                parentId: this.parentID(),
+                resolve: this.resolve(),
+                typeId: this.typeID(),
+              }),
+            ),
+          ),
+        );
+        this.form().reset({message: '', moderator_attention: false});
 
-    defer(() =>
-      this.#comments.add(
-        new AddCommentRequest({
-          itemId: this.itemID(),
-          message: this.form.message,
-          moderatorAttention: this.form.moderator_attention,
-          parentId: this.parentID(),
-          resolve: this.resolve(),
-          typeId: this.typeID(),
-        }),
-      ),
-    )
-      .pipe(
-        finalize(() => {
-          this.sending.set(false);
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          if (response instanceof GrpcStatusEvent) {
-            const fieldViolations = extractFieldViolations(response);
-            this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
-          } else {
-            this.#toastService.handleError(response);
-          }
-        },
-        next: (response) => {
-          this.form.message = '';
-          this.form.moderator_attention = false;
-
-          this.sent.emit(response.id);
-        },
-      });
+        this.sent.emit(response.id);
+      } catch (response: unknown) {
+        if (response instanceof GrpcStatusEvent) {
+          const fieldViolations = extractFieldViolations(response);
+          this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+        } else {
+          this.#toastService.handleError(response);
+        }
+      }
+    });
   }
 
   protected cancel() {

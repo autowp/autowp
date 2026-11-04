@@ -4,7 +4,8 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   AcknowledgeGdprObjectionHitRequest,
@@ -32,6 +33,7 @@ import {
   combineLatest,
   distinctUntilChanged,
   EMPTY,
+  firstValueFrom,
   map,
   of,
   shareReplay,
@@ -68,7 +70,7 @@ interface ObjectionInList {
 
 @Component({
   selector: 'app-moder-gdpr-objections',
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, Paginator, AsyncPipe, DatePipe],
+  imports: [FormField, RouterLink, FormsModule, ReactiveFormsModule, Paginator, AsyncPipe, DatePipe],
   templateUrl: './moder-gdpr-objections.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -86,7 +88,8 @@ export class ModerGdprObjections implements OnInit {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
-  protected readonly hitsOnly = new FormControl<boolean>(false, {nonNullable: true});
+  readonly #hitsOnly = signal(false);
+  protected readonly hitsOnly = form(this.#hitsOnly);
 
   readonly #hitsOnly$ = this.#route.queryParamMap.pipe(
     map((params) => params.get('hits_only') === '1'),
@@ -107,7 +110,7 @@ export class ModerGdprObjections implements OnInit {
     this.#reload$,
   ]).pipe(
     switchMap(([hitsOnly, page]) => {
-      this.hitsOnly.setValue(hitsOnly, {emitEvent: false});
+      this.#hitsOnly.set(hitsOnly);
 
       return this.#autowpClient.getGdprObjections(new GetGdprObjectionsRequest({hitsOnly, page}));
     }),
@@ -130,21 +133,14 @@ export class ModerGdprObjections implements OnInit {
     })),
   );
 
-  protected readonly createForm = new FormGroup({
-    contactEmail: new FormControl<string>('', {nonNullable: true, validators: [Validators.maxLength(255)]}),
-    names: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    note: new FormControl<string>('', {nonNullable: true, validators: [Validators.maxLength(4000)]}),
-    reference: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(255)],
-    }),
-    sourceText: new FormControl<string>('', {nonNullable: true}),
+  readonly #model = signal({contactEmail: '', names: '', note: '', reference: '', sourceText: ''});
+  protected readonly createForm = form(this.#model, (path) => {
+    maxLength(path.contactEmail, 255);
+    required(path.names);
+    maxLength(path.note, 4000);
+    required(path.reference);
+    maxLength(path.reference, 255);
   });
-
-  protected readonly creating = signal(false);
 
   protected readonly timestampToDate = timestampToDate;
 
@@ -160,7 +156,7 @@ export class ModerGdprObjections implements OnInit {
   protected setFilter(): void {
     void this.#router.navigate([], {
       queryParams: {
-        hits_only: this.hitsOnly.value ? '1' : null,
+        hits_only: this.#hitsOnly() ? '1' : null,
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -168,40 +164,32 @@ export class ModerGdprObjections implements OnInit {
   }
 
   protected create(): void {
-    if (this.createForm.invalid || this.creating()) {
-      this.createForm.markAllAsTouched();
-      return;
-    }
+    void submit(this.createForm, async () => {
+      const value = this.#model();
+      const names = value.names
+        .split('\n')
+        .map((name) => name.trim())
+        .filter((name) => name !== '');
 
-    this.creating.set(true);
+      try {
+        await firstValueFrom(
+          this.#autowpClient.createGdprObjection(
+            new CreateGdprObjectionRequest({
+              contactEmail: value.contactEmail.trim(),
+              names,
+              note: value.note.trim(),
+              reference: value.reference.trim(),
+              sourceText: value.sourceText.trim(),
+            }),
+          ),
+        );
 
-    const value = this.createForm.getRawValue();
-    const names = value.names
-      .split('\n')
-      .map((name) => name.trim())
-      .filter((name) => name !== '');
-
-    this.#autowpClient
-      .createGdprObjection(
-        new CreateGdprObjectionRequest({
-          contactEmail: value.contactEmail.trim(),
-          names,
-          note: value.note.trim(),
-          reference: value.reference.trim(),
-          sourceText: value.sourceText.trim(),
-        }),
-      )
-      .subscribe({
-        error: (error: unknown) => {
-          this.creating.set(false);
-          this.#toasts.handleError(error);
-        },
-        next: () => {
-          this.creating.set(false);
-          this.createForm.reset({contactEmail: '', names: '', note: '', reference: '', sourceText: ''});
-          this.#reload$.next();
-        },
-      });
+        this.createForm().reset({contactEmail: '', names: '', note: '', reference: '', sourceText: ''});
+        this.#reload$.next();
+      } catch (error: unknown) {
+        this.#toasts.handleError(error);
+      }
+    });
   }
 
   protected acknowledge(row: ObjectionInList): void {

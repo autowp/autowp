@@ -24,19 +24,17 @@
   } @else if (themeResource.isLoading()) {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   } @else if (themeResource.value(); as theme) {
-    <form method="post" class="form-horizontal" (submit)="submit(theme)">
+    <form method="post" class="form-horizontal" novalidate (submit)="$event.preventDefault(); submit(theme)">
       <div class="mb-3 row">
         <label class="col-md-2 col-form-label" for="name" i18n>Subject</label>
         <div class="col-md-10">
           <input
             type="text"
             id="name"
-            name="name"
             size="80"
-            maxlength="100"
             class="form-control"
             [class.is-invalid]="invalidParams() && invalidParams()['name']"
-            [(ngModel)]="form.name"
+            [formField]="form.name"
           />
           @for (message of invalidParams() | invalidParams: 'name'; track message) {
             <p class="invalid-feedback">{{ message }}</p>
@@ -48,13 +46,11 @@
         <div class="col-md-10">
           <textarea
             id="message"
-            name="message"
             cols="140"
             rows="15"
-            maxlength="4096"
             class="form-control"
             [class.is-invalid]="invalidParams() && invalidParams()['message']"
-            [(ngModel)]="form.message"
+            [formField]="form.message"
           ></textarea>
           @for (message of invalidParams() | invalidParams: 'message'; track message) {
             <p class="invalid-feedback">{{ message }}</p>
@@ -68,10 +64,8 @@
             <label>
               <input
                 type="checkbox"
-                name="moderator_attention"
-                value="1"
                 [class.is-invalid]="invalidParams() && invalidParams()['moderator_attention']"
-                [(ngModel)]="form.moderator_attention"
+                [formField]="form.moderator_attention"
               />
               &ngsp;<ng-container i18n>It requires attention of moderators</ng-container>
             </label>
@@ -88,10 +82,8 @@
             <label>
               <input
                 type="checkbox"
-                name="subscription"
-                value="1"
                 [class.is-invalid]="invalidParams() && invalidParams()['subscription']"
-                [(ngModel)]="form.subscription"
+                [formField]="form.subscription"
               />
               &ngsp;<ng-container i18n>Subscribe to new messages</ng-container>
             </label>
@@ -103,7 +95,9 @@
       </div>
       <div class="row">
         <div class="col-md-10 offset-md-2">
-          <button type="submit" class="btn btn-primary" i18n>send</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form().submitting() || form().invalid()">
+            <ng-container i18n>send</ng-container>
+          </button>
         </div>
       </div>
     </form>

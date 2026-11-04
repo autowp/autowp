@@ -52,16 +52,11 @@
   </table>
 
   @if (itemID(); as itemID) {
-    <form (submit)="moveValues(itemID)">
-      <input
-        type="text"
-        name="item_id"
-        placeholder="id"
-        class="form-control"
-        style="max-width: 200px"
-        [(ngModel)]="move.item_id"
-      />
-      <button type="submit" class="btn btn-secondary" i18n>Move</button>
+    <form novalidate (submit)="$event.preventDefault(); moveValues(itemID)">
+      <input type="text" placeholder="id" class="form-control" style="max-width: 200px" [formField]="moveForm.itemId" />
+      <button type="submit" class="btn btn-secondary" [disabled]="moveForm().submitting() || moveForm().invalid()">
+        <ng-container i18n>Move</ng-container>
+      </button>
     </form>
   }
 }

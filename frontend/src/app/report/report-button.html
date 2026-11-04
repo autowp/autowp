@@ -13,12 +13,12 @@
   </button>
 
   @if (open()) {
-    <form class="report-form mt-2" [formGroup]="form" (submit)="submit()">
+    <form class="report-form mt-2" novalidate (submit)="$event.preventDefault(); submit()">
       <div class="mb-2">
         <label class="form-label" for="report-reason" i18n>Reason</label>
-        <select id="report-reason" class="form-select form-select-sm" formControlName="reason">
+        <select id="report-reason" class="form-select form-select-sm" [formField]="form.reason">
           @for (reason of reasons; track reason.value) {
-            <option [ngValue]="reason.value">{{ reason.label }}</option>
+            <option [value]="reason.value">{{ reason.label }}</option>
           }
         </select>
       </div>
@@ -27,9 +27,8 @@
         <textarea
           id="report-message"
           rows="3"
-          maxlength="2000"
           class="form-control form-control-sm"
-          formControlName="message"
+          [formField]="form.message"
         ></textarea>
         @for (message of invalidParams() | invalidParams: 'message'; track message) {
           <p class="invalid-feedback d-block">{{ message }}</p>
@@ -51,7 +50,7 @@
           }
         </div>
       }
-      <button type="submit" class="btn btn-primary btn-sm" [disabled]="submitting() || !form.valid">
+      <button type="submit" class="btn btn-primary btn-sm" [disabled]="form().submitting() || form().invalid()">
         <ng-container i18n>Send report</ng-container>
       </button>
       <button type="button" class="btn btn-link btn-sm" (click)="toggle()">
