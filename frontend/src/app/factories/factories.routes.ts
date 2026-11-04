@@ -3,9 +3,9 @@ import type {Routes} from '@angular/router';
 export const routes: Routes = [
   {
     children: [
-      {loadComponent: () => import('./items/items.component').then((m) => m.FactoryItemsComponent), path: 'items'},
+      {loadComponent: () => import('./items/factory-items').then((m) => m.FactoryItems), path: 'items'},
       {
-        loadComponent: () => import('./factories.component').then((m) => m.FactoryComponent),
+        loadComponent: () => import('./factory').then((m) => m.Factory),
         path: '',
         pathMatch: 'full',
       },

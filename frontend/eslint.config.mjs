@@ -71,6 +71,8 @@ export default defineConfig([
           selector: "MemberExpression[property.name='defaultView']",
         },
       ],
+      // Angular's 2025 style uses role-based class names without a Component suffix.
+      '@angular-eslint/component-class-suffix': 'off',
       '@typescript-eslint/prefer-readonly': 'error',
       // Angular's own Validators.required/Validators.maxLength(...)/etc are static methods passed
       // by bare reference into a validators: [...] array - the exact pattern this rule normally

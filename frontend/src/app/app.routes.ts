@@ -109,9 +109,9 @@ export const routes: Routes = [
   },
   {loadChildren: () => import('./voting/voting.routes').then((m) => m.routes), path: 'voting'},
   {loadChildren: () => import('./index/index.routes').then((m) => m.routes), path: ''},
-  {loadComponent: () => import('./not-found.component').then((m) => m.PageNotFoundComponent), path: 'error-404'},
-  {loadComponent: () => import('./forbidden.component').then((m) => m.ForbiddenComponent), path: 'error-403'},
-  {loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent), path: 'login'},
+  {loadComponent: () => import('./page-not-found').then((m) => m.PageNotFound), path: 'error-404'},
+  {loadComponent: () => import('./forbidden').then((m) => m.Forbidden), path: 'error-403'},
+  {loadComponent: () => import('./login/login').then((m) => m.Login), path: 'login'},
   {
     loadChildren: () => import('./catalogue/catalogue.routes').then((m) => m.routes),
     // matcher: cataloguePathMatcher,

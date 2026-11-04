@@ -1,0 +1,26 @@
+import {AsyncPipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {GetTopCategoriesListRequest} from '@grpc/spec.pb';
+import {ItemsClient} from '@grpc/spec.pbsc';
+import {LanguageService} from '@services/language';
+import {RemarkModule} from 'ngx-remark';
+
+import {IndexCategoriesCategory} from './category/index-categories-category';
+
+@Component({
+  selector: 'app-index-categories',
+  imports: [RouterLink, IndexCategoriesCategory, AsyncPipe, RemarkModule],
+  templateUrl: './index-categories.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class IndexCategories {
+  readonly #items = inject(ItemsClient);
+  readonly #languageService = inject(LanguageService);
+
+  protected readonly result$ = this.#items.getTopCategoriesList(
+    new GetTopCategoriesListRequest({
+      language: this.#languageService.language,
+    }),
+  );
+}

@@ -5,7 +5,7 @@ import {pictureCanonicalGuard} from './picture-canonical.guard';
 export const routes: Routes = [
   {
     canActivate: [pictureCanonicalGuard],
-    loadComponent: () => import('./picture-page.component').then((m) => m.PicturePageComponent),
+    loadComponent: () => import('./picture-page').then((m) => m.PicturePage),
     path: ':identity',
   },
 ];

@@ -5,7 +5,7 @@ export const routes: Routes = [
     data: {
       authors: true,
     },
-    loadComponent: () => import('./persons.component').then((m) => m.PersonsComponent),
+    loadComponent: () => import('./persons').then((m) => m.Persons),
     path: 'authors',
     title: $localize`Persons`,
   },
@@ -15,13 +15,13 @@ export const routes: Routes = [
         children: [
           {
             loadComponent: () =>
-              import('./person/author/gallery/gallery.component').then((m) => m.PersonsPersonAuthorGalleryComponent),
+              import('./person/author/gallery/persons-person-author-gallery').then((m) => m.PersonsPersonAuthorGallery),
             path: 'gallery/:identity',
             pathMatch: 'full',
           },
           {
             loadComponent: () =>
-              import('./person/author/picture/picture.component').then((m) => m.PersonsPersonAuthorPictureComponent),
+              import('./person/author/picture/persons-person-author-picture').then((m) => m.PersonsPersonAuthorPicture),
             path: ':identity',
             pathMatch: 'full',
           },
@@ -29,27 +29,27 @@ export const routes: Routes = [
         path: 'author',
       },
       {
-        loadComponent: () => import('./person/gallery/gallery.component').then((m) => m.PersonsPersonGalleryComponent),
+        loadComponent: () => import('./person/gallery/persons-person-gallery').then((m) => m.PersonsPersonGallery),
         path: 'gallery/:identity',
         pathMatch: 'full',
       },
       {
-        loadComponent: () => import('./person/picture/picture.component').then((m) => m.PersonsPersonPictureComponent),
+        loadComponent: () => import('./person/picture/persons-person-picture').then((m) => m.PersonsPersonPicture),
         path: ':identity',
         pathMatch: 'full',
       },
       {
-        loadComponent: () => import('./person/info/info.component').then((m) => m.PersonsPersonInfoComponent),
+        loadComponent: () => import('./person/info/persons-person-info').then((m) => m.PersonsPersonInfo),
         path: '',
         pathMatch: 'full',
       },
     ],
-    loadComponent: () => import('./person/person.component').then((m) => m.PersonsPersonComponent),
+    loadComponent: () => import('./person/persons-person').then((m) => m.PersonsPerson),
     path: ':id',
     title: $localize`Persons`,
   },
   {
-    loadComponent: () => import('./persons.component').then((m) => m.PersonsComponent),
+    loadComponent: () => import('./persons').then((m) => m.Persons),
     path: '',
     title: $localize`Persons`,
   },

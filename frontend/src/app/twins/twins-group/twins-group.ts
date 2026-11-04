@@ -1,0 +1,82 @@
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {ItemFields, ItemRequest} from '@grpc/spec.pb';
+import {ItemsClient} from '@grpc/spec.pbsc';
+import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
+import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
+import {map} from 'rxjs';
+
+@Component({
+  selector: 'app-twins-group',
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  templateUrl: './twins-group.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class TwinsGroup {
+  readonly #route = inject(ActivatedRoute);
+  protected readonly pageEnv = inject(PageEnvService);
+  readonly #notFound = inject(NotFoundService);
+  readonly #itemsClient = inject(ItemsClient);
+  readonly #languageService = inject(LanguageService);
+
+  readonly #groupID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('group') ?? '')), {
+    requireSync: true,
+  });
+
+  protected readonly groupResource = rxResource({
+    // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
+    // Suffixed with the group id read once at construction time - a static id would let a
+    // second instance of this component, created by navigating away and to a different twins
+    // group's page before Angular's whenStable() ever resolves, match TransferState's
+    // still-present entry from the first group and seed itself with the wrong data.
+    id: `twins-group-${this.#groupID()}`,
+    params: () => this.#groupID(),
+    stream: ({params: groupID}) => {
+      if (!groupID) {
+        return notFoundError();
+      }
+      return this.#itemsClient.item(
+        new ItemRequest({
+          fields: new ItemFields({
+            acceptedPicturesCount: true,
+            hasChildSpecs: true,
+            nameHtml: true,
+            nameText: true,
+          }),
+          id: groupID,
+          language: this.#languageService.language,
+        }),
+      );
+    },
+  });
+
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the constructor effect() below doesn't blow up on a non-NOT_FOUND
+  // groupResource error (surfaced generically by the template instead).
+  protected readonly groupData = computed(() =>
+    this.groupResource.hasValue() ? this.groupResource.value() : undefined,
+  );
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.groupResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      const group = this.groupData();
+      if (group) {
+        this.pageEnv.set({
+          pageId: PageId.TWINS_GROUP,
+          title: group.nameText,
+        });
+      }
+    });
+  }
+
+  protected readonly errorMessage = errorMessage;
+}

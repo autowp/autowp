@@ -49,7 +49,7 @@ export class ToastsService {
   public show(options: Toast) {
     // Nothing shows a toast during server-side rendering - nobody is there to see it, and the
     // rendered markup is thrown away on hydration anyway - but rendering one is far from free:
-    // NgbToast's autohide timer (5s, see toasts/container/container.component.html) is a zone
+    // NgbToast's autohide timer (5s, see toasts/container/toast-container.html) is a zone
     // macrotask, and @angular/ssr only flushes the HTML once the zone is stable. One failing gRPC
     // call was therefore enough to turn a 0.25s render into a 5.3s one, with the whole component
     // tree and its responses pinned in the heap for those five seconds.

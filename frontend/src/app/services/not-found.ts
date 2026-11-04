@@ -8,7 +8,7 @@ import {NavigationStart, Router} from '@angular/router';
  * fired mid-render: the navigation's pending tasks can register after `whenStable()` has already
  * resolved, and the outlet serializes mid-transition as a blank page.
  *
- * `report()` instead flips a signal that `AppComponent` reads to render `<app-page-not-found>` in
+ * `report()` instead flips a signal that `App` reads to render `<app-page-not-found>` in
  * place of the router outlet, and - during SSR - sets the response status to 404. The signal is
  * cleared on the next navigation, so moving to a real page restores the outlet.
  */

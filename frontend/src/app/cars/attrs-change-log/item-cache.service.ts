@@ -7,8 +7,8 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {shareReplay} from 'rxjs';
 
-// Not autoProvided/root-scoped: provided by CarsAttrsChangeLogComponent so its cache lives only
-// for that page visit, shared by every CarsAttrsChangeLogRowComponent underneath it - the change
+// Not autoProvided/root-scoped: provided by CarsAttrsChangeLog so its cache lives only
+// for that page visit, shared by every CarsAttrsChangeLogRow underneath it - the change
 // log commonly lists many rows for the same item (e.g. filtered to one item_id), and each row
 // resourcing its own item fetch independently would otherwise refetch that same item N times.
 @Service({autoProvided: false})

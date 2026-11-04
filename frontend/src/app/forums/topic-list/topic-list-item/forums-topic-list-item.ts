@@ -1,0 +1,161 @@
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {CommentMessage, User} from '@grpc/spec.pb';
+
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, output} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
+import {CommentsType, CommentsUnSubscribeRequest, GetTopicRequest, Topic, UpdateTopicRequest} from '@grpc/spec.pb';
+import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
+import {FieldMask} from '@ngx-grpc/well-known-types';
+import {UserService} from '@services/user';
+import {PastTimeIndicator} from '@utils/past-time-indicator/past-time-indicator';
+import {timestampToDate} from '@utils/timestamp';
+import {isNotFoundError} from 'app/grpc';
+import {ToastsService} from 'app/toasts/toasts.service';
+import {UserLink} from 'app/user/user/user-link';
+import {catchError, of, throwError} from 'rxjs';
+
+@Component({
+  // Attribute selector on tr, not an element selector - see the identical note on
+  // CarsAttrsChangeLogRow in cars/attrs-change-log/row/cars-attrs-change-log-row.ts.
+  // eslint-disable-next-line @angular-eslint/component-selector -- attribute selector needed on tr, see above
+  selector: 'tr[app-forums-topic-list-item]',
+  imports: [RouterLink, PastTimeIndicator, UserLink],
+  templateUrl: './forums-topic-list-item.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ForumsTopicListItem implements OnInit {
+  readonly #comments = inject(CommentsClient);
+  readonly #toastService = inject(ToastsService);
+  readonly #userService = inject(UserService);
+  readonly #grpc = inject(ForumsClient);
+  readonly #injector = inject(Injector);
+
+  // A required input isn't readable at construction time, so (like Comments) these
+  // resources are built in ngOnInit() with an explicit injector rather than as field initializers.
+  readonly topic = input.required<Topic>();
+  readonly showSubscribe = input(false);
+  readonly forumAdmin = input(false);
+
+  readonly reload = output();
+
+  protected authorResource!: ResourceRef<null | undefined | User>;
+  protected lastMessageResource!: ResourceRef<CommentMessage | null | undefined>;
+  protected lastMessageAuthorResource!: ResourceRef<null | undefined | User>;
+
+  protected readonly createdAt = computed(() => timestampToDate(this.topic().createTime));
+
+  // A row nested inside a table with no natural slot for an inline error message - resource.value()
+  // throws while its resource is in an error state, so each is read through a hasValue()-guarded
+  // accessor below and just renders nothing on a transient error rather than taking the whole
+  // topic list down with it.
+  protected readonly authorData = computed(() =>
+    this.authorResource.hasValue() ? this.authorResource.value() : undefined,
+  );
+  protected readonly lastMessageData = computed(() =>
+    this.lastMessageResource.hasValue() ? this.lastMessageResource.value() : undefined,
+  );
+  protected readonly lastMessageAuthorData = computed(() =>
+    this.lastMessageAuthorResource.hasValue() ? this.lastMessageAuthorResource.value() : undefined,
+  );
+
+  protected readonly lastMessageDate = computed(() => timestampToDate(this.lastMessageData()?.createTime));
+
+  ngOnInit(): void {
+    this.authorResource = rxResource({
+      id: `forums-topic-list-item-author-${this.topic().id}`,
+      injector: this.#injector,
+      params: () => this.topic().userId,
+      stream: ({params: userId}) => this.#userService.getUser$(userId),
+    });
+
+    this.lastMessageResource = rxResource({
+      id: `forums-topic-list-item-last-message-${this.topic().id}`,
+      injector: this.#injector,
+      params: () => this.topic().id,
+      stream: ({params: id}) =>
+        this.#grpc
+          .getLastMessage(new GetTopicRequest({id}))
+          .pipe(catchError((error: unknown) => (isNotFoundError(error) ? of(null) : throwError(() => error)))),
+    });
+
+    this.lastMessageAuthorResource = rxResource({
+      id: `forums-topic-list-item-last-message-author-${this.topic().id}`,
+      injector: this.#injector,
+      params: () => this.lastMessageResource.value()?.authorId,
+      stream: ({params: authorId}) => this.#userService.getUser$(authorId),
+    });
+  }
+
+  protected unsubscribe() {
+    this.#comments
+      .unSubscribe(
+        new CommentsUnSubscribeRequest({
+          itemId: this.topic().id,
+          typeId: CommentsType.FORUMS_TYPE_ID,
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
+          this.reload.emit();
+        },
+      });
+  }
+
+  protected openTopic() {
+    this.#grpc
+      .updateTopic(
+        new UpdateTopicRequest({
+          topic: new Topic({id: this.topic().id, status: 'normal'}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
+          this.topic().status = 'normal';
+        },
+      });
+  }
+
+  protected closeTopic() {
+    this.#grpc
+      .updateTopic(
+        new UpdateTopicRequest({
+          topic: new Topic({id: this.topic().id, status: 'closed'}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
+          this.topic().status = 'closed';
+        },
+      });
+  }
+
+  protected deleteTopic() {
+    this.#grpc
+      .updateTopic(
+        new UpdateTopicRequest({
+          topic: new Topic({id: this.topic().id, status: 'deleted'}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
+          this.reload.emit();
+        },
+      });
+  }
+}

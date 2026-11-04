@@ -30,7 +30,7 @@ export const serverRoutes: ServerRoute[] = [
 
   {path: 'account/**', renderMode: RenderMode.Client}, // Keycloak never runs server-side
 
-  // Not prerendered, though it looks as static as policy or telegram: AchievementsComponent calls
+  // Not prerendered, though it looks as static as policy or telegram: Achievements calls
   // AchievementsClient.getAchievementStats() for live per-achievement user counts, so prerendering
   // would both freeze those counts until the next deploy and require the backend to be reachable
   // during `ng build` in CI, which it isn't.
@@ -81,7 +81,7 @@ export const serverRoutes: ServerRoute[] = [
 
   {path: 'inbox/**', renderMode: RenderMode.Client}, // auth-gated, no SSR value
 
-  // info/spec is content; InfoTextComponent renders Monaco's DiffEditorComponent directly in its
+  // info/spec is content; TextRevisionPage renders Monaco's DiffEditorComponent directly in its
   // template, with no @defer or platform guard.
   {path: 'info/**', renderMode: RenderMode.Server},
   {path: 'info/text/**', renderMode: RenderMode.Client},
@@ -97,7 +97,7 @@ export const serverRoutes: ServerRoute[] = [
   {path: 'login/**', renderMode: RenderMode.Client}, // Keycloak never runs server-side
 
   // Leaflet, no platform guard yet - unlike factories/** and museums/**, whose own Leaflet usage is
-  // isolated in FactoryMapComponent/MuseumMapComponent, used only inside an @defer block, so it
+  // isolated in FactoryMap/MuseumMap, used only inside an @defer block, so it
   // never loads server-side.
   {path: 'map/**', renderMode: RenderMode.Client},
 
@@ -156,7 +156,7 @@ export const serverRoutes: ServerRoute[] = [
   {path: ':brand/concepts/**', renderMode: RenderMode.Server},
   {path: ':brand/logotypes/**', renderMode: RenderMode.Server},
   {path: ':brand/mixed/**', renderMode: RenderMode.Server},
-  // MostsContentsComponent, which this renders, is the same one behind the top-level mosts/**
+  // MostsContents, which this renders, is the same one behind the top-level mosts/**
   // route that has been server-rendered all along.
   {path: ':brand/mosts/**', renderMode: RenderMode.Server},
   {path: ':brand/other/**', renderMode: RenderMode.Server},

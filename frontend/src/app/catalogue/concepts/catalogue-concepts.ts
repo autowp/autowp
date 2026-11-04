@@ -1,0 +1,237 @@
+import type {Item, Pages} from '@grpc/spec.pb';
+import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/catalogue-item-card';
+import type {Observable} from 'rxjs';
+
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {
+  ItemFields,
+  ItemListOptions,
+  ItemParentCacheListOptions,
+  ItemsRequest,
+  PictureItemListOptions,
+  PictureItemType,
+  PictureListOptions,
+  PicturesRequest,
+  PictureStatus,
+  PreviewPicturesRequest,
+} from '@grpc/spec.pb';
+import {ItemsClient} from '@grpc/spec.pbsc';
+import {AuthService} from '@services/auth-service';
+import {LanguageService} from '@services/language';
+import {NotFoundService} from '@services/not-found';
+import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
+import {CatalogueItemCard} from '@utils/list-item/catalogue-item-card';
+import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
+import {map, of, switchMap} from 'rxjs';
+
+import {Paginator} from '../../paginator/paginator/paginator';
+
+@Component({
+  selector: 'app-catalogue-concepts',
+  imports: [RouterLink, Paginator, CatalogueItemCard],
+  templateUrl: './catalogue-concepts.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CatalogueConcepts {
+  readonly #pageEnv = inject(PageEnvService);
+  readonly #route = inject(ActivatedRoute);
+  readonly #notFound = inject(NotFoundService);
+  readonly #itemsClient = inject(ItemsClient);
+  readonly #languageService = inject(LanguageService);
+  readonly #auth = inject(AuthService);
+
+  // Folded into dataResource's id and params: the list carries per-user fields (canEditSpecs),
+  // and a server-side render is anonymous. Without this, hydration adopts the anonymous cached
+  // list on the `id` string alone and never refetches once auth resolves. See the long comment
+  // on CatalogueIndex.brandResource.
+  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+
+  readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
+    requireSync: true,
+  });
+
+  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
+    requireSync: true,
+  });
+
+  // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
+  // than an imperative Router.navigate() inside the stream - see the constructor effect() below,
+  // which is the single place that navigates off this resource's error() signal.
+  protected readonly brandResource = rxResource({
+    id: `catalogue-concepts-brand-${this.#catname() ?? ''}`,
+    params: () => this.#catname(),
+    stream: ({params: catname}): Observable<Item> => {
+      if (!catname) {
+        return notFoundError();
+      }
+      return this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameOnly: true,
+            }),
+            language: this.#languageService.language,
+            limit: 1,
+            options: new ItemListOptions({
+              catname,
+            }),
+          }),
+        )
+        .pipe(
+          switchMap((response) => {
+            if (!response.items || response.items.length <= 0) {
+              return notFoundError();
+            }
+            return of(response.items[0]);
+          }),
+        );
+    },
+  });
+
+  // Reading a resource's value() while it's in an error state throws - dataResource's params()
+  // below reads brandResource's data through this signal instead of the resource directly, so a
+  // real (non-NOT_FOUND) failure here degrades dataResource to its "no data yet" branch instead of
+  // taking the whole component down. The error itself is shown inline in the template
+  // (catalogue-concepts.html), not swallowed here.
+  protected readonly brandData = computed(() =>
+    this.brandResource.hasValue() ? this.brandResource.value() : undefined,
+  );
+
+  protected readonly title = computed<string | undefined>(() => {
+    const brand = this.brandData();
+    return brand ? $localize`${brand.nameOnly} concepts & prototypes` : undefined;
+  });
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      const title = this.title();
+      if (title === undefined) {
+        return;
+      }
+
+      this.#pageEnv.set({
+        pageId: PageId.CATALOGUE_CONCEPTS,
+        title,
+      });
+    });
+  }
+
+  protected readonly dataResource = rxResource({
+    id: `catalogue-concepts-data-${this.#catname() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
+    params: () => ({authenticated: this.#authenticated(), brand: this.brandData(), page: this.#page()}),
+    stream: ({
+      params: {brand, page},
+    }): Observable<undefined | {items: CatalogueListItem[]; paginator: Pages | undefined}> => {
+      if (!brand) {
+        return of(undefined);
+      }
+
+      return this.#itemsClient
+        .list(
+          new ItemsRequest({
+            fields: new ItemFields({
+              acceptedPicturesCount: true,
+              canEditSpecs: true,
+              categories: new ItemsRequest({
+                fields: new ItemFields({nameHtml: true}),
+              }),
+              childsCount: true,
+              description: true,
+              design: true,
+              engineVehicles: new ItemsRequest({
+                fields: new ItemFields({nameHtml: true, route: true}),
+              }),
+              hasText: true,
+              nameDefault: true,
+              nameHtml: true,
+              previewPictures: new PreviewPicturesRequest({
+                pictures: new PicturesRequest({
+                  options: new PictureListOptions({
+                    pictureItem: new PictureItemListOptions({typeId: PictureItemType.PICTURE_ITEM_CONTENT}),
+                    status: PictureStatus.PICTURE_STATUS_ACCEPTED,
+                  }),
+                }),
+              }),
+              route: true,
+              routeBrandId: brand.id,
+              specsRoute: true,
+              twins: new ItemsRequest(),
+            }),
+            language: this.#languageService.language,
+            limit: 7,
+            options: new ItemListOptions({
+              ancestor: new ItemParentCacheListOptions({parentId: brand.id}),
+              isConcept: true,
+              isNotConceptInherited: true,
+            }),
+            order: ItemsRequest.Order.AGE,
+            page,
+          }),
+        )
+        .pipe(
+          map((response) => {
+            const items: CatalogueListItem[] = (response.items ?? []).map((item) => {
+              const largeFormat = !!item.previewPictures?.largeFormat;
+
+              const pictures: CatalogueListItemPicture[] = (item.previewPictures?.pictures ?? []).map(
+                (picture, idx) => {
+                  let thumb = null;
+                  if (picture.picture) {
+                    thumb = largeFormat && idx == 0 ? picture.picture.thumbLarge : picture.picture.thumbMedium;
+                  }
+                  return {
+                    picture: picture.picture ?? null,
+                    routerLink: picture.picture ? item.route.concat(['pictures', picture.picture.identity]) : [],
+                    thumb,
+                  };
+                },
+              );
+
+              return {
+                acceptedPicturesCount: item.acceptedPicturesCount,
+                canEditSpecs: item.canEditSpecs,
+                categories: item.categories,
+                childsCounts: null,
+                description: item.description,
+                design: item.design,
+                details: {
+                  count: item.childsCount,
+                  routerLink: item.route,
+                },
+                engineVehicles: item.engineVehicles,
+                hasText: item.hasText,
+                id: item.id,
+                itemTypeId: item.itemTypeId,
+                nameDefault: item.nameDefault,
+                nameHtml: item.nameHtml,
+                picturesRouterLink: item.route.length ? item.route.concat(['pictures']) : null,
+                previewPictures: {
+                  largeFormat: !!item.previewPictures?.largeFormat,
+                  pictures,
+                },
+                produced: item.produced?.value,
+                producedExactly: item.producedExactly,
+                specsRouterLink: null,
+              };
+            });
+
+            return {
+              items,
+              paginator: response.paginator,
+            };
+          }),
+        );
+    },
+  });
+
+  protected readonly errorMessage = errorMessage;
+}

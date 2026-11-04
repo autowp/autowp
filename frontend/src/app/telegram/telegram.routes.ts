@@ -2,7 +2,7 @@ import type {Routes} from '@angular/router';
 
 export const routes: Routes = [
   {
-    loadComponent: () => import('./telegram.component').then((m) => m.TelegramComponent),
+    loadComponent: () => import('./telegram').then((m) => m.Telegram),
     path: '',
     pathMatch: 'full',
     title: $localize`Telegram`,

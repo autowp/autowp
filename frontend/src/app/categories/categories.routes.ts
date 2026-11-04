@@ -8,12 +8,12 @@ export const routes: Routes = [
       {
         children: [
           {
-            loadComponent: () => import('./category/picture/picture.component').then((m) => m.CategoryPictureComponent),
+            loadComponent: () => import('./category/picture/category-picture').then((m) => m.CategoryPicture),
             path: ':identity',
           },
           {
             loadComponent: () =>
-              import('./category/pictures/pictures.component').then((m) => m.CategoriesCategoryPicturesComponent),
+              import('./category/pictures/categories-category-pictures').then((m) => m.CategoriesCategoryPictures),
             path: '',
             pathMatch: 'full',
             title: $localize`Pictures`,
@@ -22,21 +22,21 @@ export const routes: Routes = [
         path: 'pictures',
       },
       {
-        loadComponent: () => import('./category/gallery/gallery.component').then((m) => m.CategoryGalleryComponent),
+        loadComponent: () => import('./category/gallery/category-gallery').then((m) => m.CategoryGallery),
         path: 'gallery/:identity',
         pathMatch: 'full',
       },
       {
-        loadComponent: () => import('./category/item/item.component').then((m) => m.CategoriesCategoryItemComponent),
+        loadComponent: () => import('./category/item/categories-category-item').then((m) => m.CategoriesCategoryItem),
         path: '',
         pathMatch: 'full',
       },
     ],
-    loadComponent: () => import('./category/category.component').then((m) => m.CategoriesCategoryComponent),
+    loadComponent: () => import('./category/categories-category').then((m) => m.CategoriesCategory),
     matcher: categoriesPathMatcher,
   },
   {
-    loadComponent: () => import('./index.component').then((m) => m.CategoriesIndexComponent),
+    loadComponent: () => import('./categories-index').then((m) => m.CategoriesIndex),
     path: '',
     pathMatch: 'full',
     title: $localize`Categories`,

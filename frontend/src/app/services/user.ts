@@ -140,7 +140,7 @@ export class UserService {
     // A microtask, deliberately not a timer: it coalesces everything a single change-detection
     // pass asks for, while still being tracked as pending work by SSR's whenStable() - a
     // setTimeout-based delay ahead of the first HTTP call is exactly what stops being tracked
-    // under zoneless change detection (see the note on CommentsComponent.dataResource).
+    // under zoneless change detection (see the note on Comments.dataResource).
     return from(Promise.resolve()).pipe(
       switchMap(() => {
         const ids = lane.batchIds;

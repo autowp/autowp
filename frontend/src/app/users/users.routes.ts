@@ -4,11 +4,11 @@ export const routes: Routes = [
   {
     children: [
       {
-        loadComponent: () => import('./rating/rating.component').then((m) => m.UsersRatingComponent),
+        loadComponent: () => import('./rating/users-rating').then((m) => m.UsersRating),
         path: ':rating',
       },
       {
-        loadComponent: () => import('./rating/rating.component').then((m) => m.UsersRatingComponent),
+        loadComponent: () => import('./rating/users-rating').then((m) => m.UsersRating),
         path: '',
       },
     ],
@@ -18,7 +18,7 @@ export const routes: Routes = [
   {
     children: [
       {
-        loadComponent: () => import('./user/comments/comments.component').then((m) => m.UsersUserCommentsComponent),
+        loadComponent: () => import('./user/comments/users-user-comments').then((m) => m.UsersUserComments),
         path: 'comments',
         title: $localize`Comments`,
       },
@@ -26,18 +26,18 @@ export const routes: Routes = [
         children: [
           {
             loadComponent: () =>
-              import('./user/pictures/brand/brand.component').then((m) => m.UsersUserPicturesBrandComponent),
+              import('./user/pictures/brand/users-user-pictures-brand').then((m) => m.UsersUserPicturesBrand),
             path: ':brand',
           },
           {
-            loadComponent: () => import('./user/pictures/pictures.component').then((m) => m.UsersUserPicturesComponent),
+            loadComponent: () => import('./user/pictures/users-user-pictures').then((m) => m.UsersUserPictures),
             path: '',
           },
         ],
         path: 'pictures',
         title: $localize`User's pictures`,
       },
-      {loadComponent: () => import('./user/user.component').then((m) => m.UsersUserComponent), path: ''},
+      {loadComponent: () => import('./user/users-user').then((m) => m.UsersUser), path: ''},
     ],
     path: ':identity',
   },

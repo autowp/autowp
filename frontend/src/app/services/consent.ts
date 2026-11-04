@@ -19,7 +19,7 @@ export interface ConsentDecision {
  *
  * The choice lives in `localStorage`, which is itself exempt from consent (strictly necessary to
  * honour the visitor's own preference). Nothing here loads a tracker - a consumer watches
- * `analyticsAllowed()` and acts on it (see the GA loader wired up in AppComponent).
+ * `analyticsAllowed()` and acts on it (see the GA loader wired up in App).
  *
  * SSR has no `localStorage`, so `decision()` starts `null` on the server and the banner is only
  * rendered in the browser.

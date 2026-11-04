@@ -2,7 +2,7 @@ import type {Routes} from '@angular/router';
 
 export const routes: Routes = [
   {
-    loadComponent: () => import('./authors/authors.component').then((m) => m.CutawayAuthorsComponent),
+    loadComponent: () => import('./authors/cutaway-authors').then((m) => m.CutawayAuthors),
     path: 'authors',
     pathMatch: 'full',
     title: $localize`Cutaway`,
@@ -10,13 +10,13 @@ export const routes: Routes = [
   {
     children: [
       {
-        loadComponent: () => import('./brands/brand/brand.component').then((m) => m.CutawayBrandsBrandComponent),
+        loadComponent: () => import('./brands/brand/cutaway-brands-brand').then((m) => m.CutawayBrandsBrand),
         path: ':brand',
         pathMatch: 'full',
         title: $localize`Cutaway`,
       },
       {
-        loadComponent: () => import('./brands/brands.component').then((m) => m.CutawayBrandsComponent),
+        loadComponent: () => import('./brands/cutaway-brands').then((m) => m.CutawayBrands),
         path: '',
         pathMatch: 'full',
         title: $localize`Cutaway`,
@@ -25,7 +25,7 @@ export const routes: Routes = [
     path: 'brands',
   },
   {
-    loadComponent: () => import('./cutaway.component').then((m) => m.CutawayComponent),
+    loadComponent: () => import('./cutaway').then((m) => m.Cutaway),
     path: '',
     pathMatch: 'full',
     title: $localize`Cutaway`,

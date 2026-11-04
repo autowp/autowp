@@ -1,0 +1,140 @@
+import type {OnInit} from '@angular/core';
+import type {AttrAttribute, AttrConflict, AttrConflictValue, Item, Pages, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {AsyncPipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {AttrConflictsRequest, ItemFields, ItemRequest} from '@grpc/spec.pb';
+import {AttrsClient, ItemsClient} from '@grpc/spec.pbsc';
+import {AuthService} from '@services/auth-service';
+import {LanguageService} from '@services/language';
+import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
+import {UserService} from '@services/user';
+import {getAttrsTranslation, getUnitAbbrTranslation} from '@utils/translations';
+import {combineLatest, distinctUntilChanged, map, shareReplay, switchMap} from 'rxjs';
+
+import {APIAttrsService} from '../../api/attrs/attrs.service';
+import {Paginator} from '../../paginator/paginator/paginator';
+import {UserLink} from '../../user/user/user-link';
+
+interface APIAttrConflictInList {
+  attribute$: Observable<AttrAttribute | undefined>;
+  conflict: AttrConflict;
+  item$: Observable<Item | null>;
+  unitName$: Observable<null | string>;
+  values: APIAttrConflictValueInList[];
+}
+
+interface APIAttrConflictValueInList {
+  own: boolean;
+  user$: null | Observable<null | User>;
+  value: AttrConflictValue;
+}
+
+function mapFilter(filter: null | string): AttrConflictsRequest.Filter {
+  switch (filter) {
+    case '-1':
+      return AttrConflictsRequest.Filter.I_DISAGREE;
+    case '0':
+      return AttrConflictsRequest.Filter.ALL;
+    case '1':
+      return AttrConflictsRequest.Filter.DO_NOT_AGREE_WITH_ME;
+    case 'minus-weight':
+      return AttrConflictsRequest.Filter.MINUS_WEIGHT;
+  }
+
+  return AttrConflictsRequest.Filter.ALL;
+}
+
+@Component({
+  selector: 'app-account-specs-conflicts',
+  imports: [RouterLink, UserLink, Paginator, AsyncPipe],
+  templateUrl: './account-specs-conflicts.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AccountSpecsConflicts implements OnInit {
+  readonly #languageService = inject(LanguageService);
+  readonly #userService = inject(UserService);
+  protected readonly auth = inject(AuthService);
+  readonly #route = inject(ActivatedRoute);
+  readonly #pageEnv = inject(PageEnvService);
+  readonly #attrsClient = inject(AttrsClient);
+  readonly #itemsClient = inject(ItemsClient);
+  readonly #attrsService = inject(APIAttrsService);
+
+  protected readonly page$ = this.#route.queryParamMap.pipe(
+    map((params) => parseInt(params.get('page') ?? '', 10)),
+    distinctUntilChanged(),
+  );
+
+  protected readonly filter$: Observable<AttrConflictsRequest.Filter> = this.#route.queryParamMap.pipe(
+    map((params) => params.get('filter')),
+    distinctUntilChanged(),
+    map((filter) => mapFilter(filter)),
+  );
+
+  protected readonly user$: Observable<null | User> = this.auth.user$;
+
+  readonly #itemsCache = new Map<string, Observable<Item>>();
+
+  private getItem$(id: string): Observable<Item | null> {
+    let o$ = this.#itemsCache.get(id);
+    if (!o$) {
+      o$ = this.#itemsClient
+        .item(new ItemRequest({fields: new ItemFields({nameHtml: true}), id, language: this.#languageService.language}))
+        .pipe(shareReplay({bufferSize: 1, refCount: false}));
+      this.#itemsCache.set(id, o$);
+    }
+    return o$;
+  }
+
+  protected readonly data$: Observable<{conflicts: APIAttrConflictInList[]; paginator: Pages | undefined}> =
+    combineLatest([this.page$, this.filter$]).pipe(
+      switchMap(([page, filter]) =>
+        combineLatest([
+          this.#attrsClient.getConflicts(
+            new AttrConflictsRequest({
+              filter,
+              language: this.#languageService.language,
+              page,
+            }),
+          ),
+          this.user$,
+        ]),
+      ),
+      map(([data, user]) => ({
+        conflicts: (data.items ?? []).map((conflict): APIAttrConflictInList => {
+          const attribute$ = this.#attrsService.getAttribute$(conflict.attributeId);
+          return {
+            attribute$,
+            conflict,
+            item$: this.getItem$(conflict.itemId),
+            unitName$: attribute$.pipe(
+              map((attr) => (attr?.unitId && attr.unitId !== '0' ? getUnitAbbrTranslation(attr.unitId) : null)),
+            ),
+            values: (conflict.values ?? []).map((value) => {
+              const own = user?.id === value.userId;
+              return {
+                own,
+                user$: own ? null : this.#userService.getUser$(value.userId),
+                value,
+              };
+            }),
+          };
+        }),
+        paginator: data.paginator,
+      })),
+    );
+
+  protected readonly AttrConflictsRequest = AttrConflictsRequest;
+
+  protected getAttrsTranslation(id: string): string {
+    return getAttrsTranslation(id);
+  }
+
+  ngOnInit(): void {
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_SPECS_CONFLICTS});
+  }
+}

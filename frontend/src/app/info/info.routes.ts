@@ -2,12 +2,12 @@ import type {Routes} from '@angular/router';
 
 export const routes: Routes = [
   {
-    loadComponent: () => import('./spec/spec.component').then((m) => m.InfoSpecComponent),
+    loadComponent: () => import('./spec/info-spec').then((m) => m.InfoSpec),
     path: 'spec',
     title: $localize`Specs`,
   },
   {
-    loadComponent: () => import('./text/text.component').then((m) => m.InfoTextComponent),
+    loadComponent: () => import('./text/text-revision-page').then((m) => m.TextRevisionPage),
     path: 'text/:id',
     title: $localize`Text history`,
   },

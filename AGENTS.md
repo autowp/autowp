@@ -347,6 +347,11 @@ in `angular.json`) — don't assume Karma/Jest is set up.
 
 ### Frontend conventions
 
+- **Component naming** — follow the Angular 2025 style: `UserProfile` in `user-profile.ts`,
+  with matching `user-profile.html` and `user-profile.scss`. Omit the `Component` suffix.
+  Choose descriptive names such as `UserLink` or `MapPage` when a shorter name conflicts with
+  a domain/API type. Keep existing selectors stable when renaming.
+
 - **`preserveWhitespaces: false`** — set globally in `tsconfig.json`'s `angularCompilerOptions`
   (Angular's SSR recommendation); no component overrides it, and none should. When a template edit
   drops an inline gap that used to come from template whitespace, restore it with `&ngsp;` (a
@@ -360,7 +365,7 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   `router.navigate(['/error-404'])` from an `effect()` or lifecycle hook: an imperative navigation
   fired mid-render is not honoured by Angular SSR (`whenStable()` can serialize the router outlet
   mid-transition, producing a blank page instead of the 404). `report()` flips a signal
-  `AppComponent` reads to render `<app-page-not-found>` in place of `<router-outlet>` and sets
+  `App` reads to render `<app-page-not-found>` in place of `<router-outlet>` and sets
   `RESPONSE_INIT.status = 404` under SSR, working identically client/server. Likewise a
   **data-dependent redirect** (e.g. canonical-URL normalisation) belongs in a `CanActivateFn`
   returning `new RedirectCommand(router.createUrlTree(route), {replaceUrl: true})`, not an

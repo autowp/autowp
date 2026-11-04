@@ -54,7 +54,7 @@ const PUBLIC_GRPC_PATH_PREFIXES = [
   // The whole service, unlike the rule above: all eight Rating methods are ratings over public
   // data, and not one of them calls auth.ValidateGRPC.
   '/goautowp.Rating/',
-  // Items mixes public and moderator-gated methods (Item, List, GetItemParents and friends all
+  // Items mixes public and moderator-gated methods (Item, ArticleList, GetItemParents and friends all
   // branch on roles), so these are listed one by one - each of their handlers takes no user
   // context at all.
   '/goautowp.Items/GetItemOfDay',

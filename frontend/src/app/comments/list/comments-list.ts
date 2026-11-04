@@ -1,0 +1,261 @@
+import type {OnInit, ResourceRef} from '@angular/core';
+import type {CommentsType, User} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {DatePipe} from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  inject,
+  Injector,
+  input,
+  output,
+} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {FormsModule} from '@angular/forms';
+import {RouterLink} from '@angular/router';
+import {
+  CommentMessage,
+  CommentMessageFields,
+  CommentsSetDeletedRequest,
+  CommentsVoteCommentRequest,
+  ContentReportEntityType,
+  GetMessageRequest,
+  ModeratorAttention,
+  UpdateCommentRequest,
+} from '@grpc/spec.pb';
+import {CommentsClient} from '@grpc/spec.pbsc';
+import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {FieldMask} from '@ngx-grpc/well-known-types';
+import {AuthService, Role} from '@services/auth-service';
+import {UserService} from '@services/user';
+import {getModalComponentRef} from '@utils/modal-component-ref';
+import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import {timestampToDate} from '@utils/timestamp';
+import {UserText} from '@utils/user-text/user-text';
+import {catchError, EMPTY, map, of, switchMap} from 'rxjs';
+
+import {ReportButton} from '../../report/report-button';
+import {ToastsService} from '../../toasts/toasts.service';
+import {UserLink} from '../../user/user/user-link';
+import {CommentsForm} from '../form/comments-form';
+import {CommentsVotes} from '../votes/comments-votes';
+
+export interface CommentInList extends CommentMessage {
+  editText?: string;
+  resolve?: boolean;
+  showEdit?: boolean;
+  showReply?: boolean;
+}
+
+@Component({
+  selector: 'app-comments-list',
+  imports: [NgbTooltip, UserLink, RouterLink, UserText, CommentsForm, DatePipe, TimeAgoPipe, FormsModule, ReportButton],
+  templateUrl: './comments-list.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CommentsList implements OnInit {
+  protected readonly auth = inject(AuthService);
+  readonly #modalService = inject(NgbModal);
+  readonly #toastService = inject(ToastsService);
+  readonly #commentsGrpc = inject(CommentsClient);
+  readonly #userService = inject(UserService);
+  readonly #injector = inject(Injector);
+  readonly #cdr = inject(ChangeDetectorRef);
+
+  readonly itemID = input.required<string>();
+  readonly typeID = input.required<CommentsType>();
+  readonly messages = input.required<CommentInList[]>();
+  readonly deep = input.required<number>();
+
+  readonly sent = output<string>();
+
+  protected readonly currentUser = toSignal(this.auth.user$, {initialValue: null});
+
+  // Chained off the messages input signal directly rather than a raw Observable stored on an
+  // object and subscribed lazily by the template via `| async` (the previous shape here): that
+  // pattern races Angular's SSR whenStable() check the same way the Articles list author lookup
+  // did. resource() registers its pending task through Angular's reactive graph instead.
+  //
+  // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:
+  // itemID/typeID are *required* inputs, unreadable until Angular has bound them, which happens
+  // after construction but before ngOnInit.
+  protected usersResource!: ResourceRef<Record<string, User> | undefined>;
+
+  ngOnInit(): void {
+    this.usersResource = rxResource({
+      // Suffixed with typeID/itemID read once at construction time - see the identical note on
+      // Comments.dataResource in ../comments/comments.ts.
+      id: `comments-list-users-${this.typeID()}-${this.itemID()}`,
+      injector: this.#injector,
+      // A comma-joined string rather than the id array: a resource compares params by identity,
+      // and a fresh array every recomputation makes it restart on hydration - throwing away the
+      // value that arrived over TransferState and blanking every author on the page until the
+      // refetch lands (or for good, if it comes back empty).
+      params: () => [...new Set(this.messages().map((message) => message.authorId))].join(','),
+      // A plain object rather than a Map: TransferState round-trips resource values through
+      // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+      // enumerable properties, no toJSON), losing all entries.
+      stream: ({params: userIds}): Observable<Record<string, User>> => {
+        if (userIds.length === 0) {
+          return of({});
+        }
+        return this.#userService.getUserMap$(userIds.split(',')).pipe(
+          map((userMap) => Object.fromEntries(userMap)),
+          // getUserMap$ leaves out users the backend doesn't return (deleted or anonymous), so
+          // this only catches a genuine RPC failure - degrade to showing no user rather than
+          // erroring the whole resource over it.
+          catchError(() => of({})),
+        );
+      },
+    });
+  }
+
+  protected readonly rows = computed(() => {
+    const usersById = this.usersResource.value() ?? {};
+    const currentUser = this.currentUser();
+
+    return this.messages().map((message) => ({
+      // Author acting on their own comment: edit and delete, but not once it is deleted or a
+      // moderator has flagged it (the backend rejects those too).
+      canManageOwn:
+        currentUser?.id === message.authorId &&
+        !message.deleted &&
+        message.moderatorAttention !== ModeratorAttention.REQUIRED,
+      canVote: !!(currentUser && currentUser.id !== message.authorId),
+      // Computed here (from seconds/nanos) rather than via message.createTime.toDate() in the
+      // template: after this component is recreated from a TransferState-seeded resource on
+      // hydration, `message` is a plain JSON-shaped object, not a real CommentMessage class
+      // instance, so createTime has no .toDate() method even though it still has seconds/nanos.
+      createdDate: timestampToDate(message.createTime),
+      message,
+      updatedDate: timestampToDate(message.updateTime),
+      user: usersById[message.authorId] ?? null,
+    }));
+  });
+
+  protected readonly canRemoveComments = toSignal(this.auth.hasRole$(Role.COMMENTS_MODER), {initialValue: false});
+  protected readonly canMoveMessage = toSignal(this.auth.hasRole$(Role.FORUMS_MODER), {initialValue: false});
+  protected readonly isModer = toSignal(this.auth.hasRole$(Role.MODER), {initialValue: false});
+  protected readonly authenticated = toSignal(this.auth.authenticated$, {initialValue: false});
+
+  protected readonly ModeratorAttention = ModeratorAttention;
+  protected readonly ContentReportEntityType = ContentReportEntityType;
+
+  protected vote(message: CommentMessage, value: number) {
+    this.#commentsGrpc
+      .voteComment(
+        new CommentsVoteCommentRequest({
+          commentId: message.id,
+          vote: value,
+        }),
+      )
+      .pipe(
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return EMPTY;
+        }),
+        switchMap(() => {
+          message.userVote = value;
+
+          return this.#commentsGrpc.getMessage(
+            new GetMessageRequest({fields: new CommentMessageFields({vote: true}), id: message.id}),
+          );
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: (response) => {
+          message.vote = response.vote;
+          this.#cdr.markForCheck();
+        },
+      });
+
+    return false;
+  }
+
+  protected setIsDeleted(message: CommentMessage, value: boolean) {
+    this.#commentsGrpc
+      .setDeleted(
+        new CommentsSetDeletedRequest({
+          commentId: message.id,
+          deleted: value,
+        }),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: () => {
+          message.deleted = value;
+          this.#cdr.markForCheck();
+        },
+      });
+  }
+
+  protected reply(message: CommentInList, resolve: boolean) {
+    message.showReply = true;
+    message.resolve = resolve;
+  }
+
+  protected startEdit(message: CommentInList) {
+    message.editText = message.text;
+    message.showEdit = true;
+  }
+
+  protected cancelEdit(message: CommentInList) {
+    message.showEdit = false;
+  }
+
+  protected saveEdit(message: CommentInList) {
+    this.#commentsGrpc
+      .updateComment(
+        new UpdateCommentRequest({
+          comment: new CommentMessage({id: message.id, text: (message.editText ?? '').trim()}),
+          updateMask: new FieldMask({paths: ['text']}),
+        }),
+      )
+      .pipe(
+        // Re-fetch so the "edited" marker and text come from the server (the silent grace period
+        // is enforced there - the client can't know whether this edit set update_time).
+        switchMap(() =>
+          this.#commentsGrpc.getMessage(
+            new GetMessageRequest({fields: new CommentMessageFields({text: true}), id: message.id}),
+          ),
+        ),
+      )
+      .subscribe({
+        error: (response: unknown) => {
+          this.#toastService.handleError(response);
+        },
+        next: (response) => {
+          message.text = response.text;
+          message.updateTime = response.updateTime;
+          message.showEdit = false;
+          this.#cdr.markForCheck();
+        },
+      });
+  }
+
+  protected showVotes(message: CommentMessage) {
+    const modalRef = this.#modalService.open(CommentsVotes, {
+      centered: true,
+      size: 'lg',
+    });
+    const componentRef = getModalComponentRef<CommentsVotes>(modalRef);
+    componentRef.setInput('messageID', message.id);
+    return false;
+  }
+
+  protected onSent(id: string) {
+    this.sent.emit(id);
+  }
+
+  protected onCancel(message: CommentInList) {
+    message.showReply = false;
+  }
+}

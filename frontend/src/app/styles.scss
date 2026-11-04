@@ -473,7 +473,7 @@ iframe {
 // Leaflet builds these marker icons via its own DOM APIs (L.divIcon/L.icon), entirely outside
 // Angular's template compiler, so they never receive the auto-generated _ngcontent-* attribute
 // Angular's default view encapsulation uses to scope component styles - these have to live in the
-// global stylesheet to actually apply. See src/app/map/map.component.ts.
+// global stylesheet to actually apply. See src/app/map/map-page.ts.
 .map-picture-marker {
   display: block;
   width: 100%;
@@ -505,7 +505,7 @@ iframe {
 }
 
 // Content of the popup shown when a cluster can no longer be split apart by zooming further (see
-// resolveStuckCluster in map.component.ts) - also Leaflet-managed DOM, same reasoning as above.
+// resolveStuckCluster in map-page.ts) - also Leaflet-managed DOM, same reasoning as above.
 // A fixed width (not just max-width) with an explicit column count is used rather than
 // flex-wrap: Leaflet sizes .leaflet-popup-content to its content's natural width, which left a
 // flex-wrap container free to lay everything out in a single column instead of wrapping.

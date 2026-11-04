@@ -1,0 +1,78 @@
+import type {OnInit} from '@angular/core';
+import type {Contact} from '@grpc/spec.pb';
+import type {Observable} from 'rxjs';
+
+import {AsyncPipe, DatePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {DeleteContactRequest} from '@grpc/spec.pb';
+import {ContactsClient} from '@grpc/spec.pbsc';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {Empty} from '@ngx-grpc/well-known-types';
+import {AuthService} from '@services/auth-service';
+import {LanguageService} from '@services/language';
+import {PageEnvService} from '@services/page-env.service';
+import {PageId} from '@services/page-id';
+import {browserWindow} from '@utils/browser-window';
+import {TimeAgoPipe} from '@utils/time-ago.pipe';
+import Keycloak from 'keycloak-js';
+import {BehaviorSubject, catchError, EMPTY, map, of, switchMap} from 'rxjs';
+
+import {ToastsService} from '../../toasts/toasts.service';
+import {UserLink} from '../../user/user/user-link';
+
+@Component({
+  selector: 'app-account-contacts',
+  imports: [RouterLink, UserLink, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
+  templateUrl: './account-contacts.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AccountContacts implements OnInit {
+  readonly #pageEnv = inject(PageEnvService);
+  readonly #toastService = inject(ToastsService);
+  readonly #auth = inject(AuthService);
+  readonly #contactsClient = inject(ContactsClient);
+  readonly #languageService = inject(LanguageService);
+  readonly #keycloak = inject(Keycloak);
+  readonly #window = browserWindow();
+
+  readonly #reload$ = new BehaviorSubject<void>(void 0);
+
+  protected readonly items$: Observable<Contact[]> = this.#auth.authenticated$.pipe(
+    switchMap((authenticated) => {
+      if (!authenticated) {
+        if (this.#window) {
+          void this.#keycloak.login({
+            locale: this.#languageService.language,
+            redirectUri: this.#window.location.href,
+          });
+        }
+        return EMPTY;
+      }
+      return of(authenticated);
+    }),
+    switchMap(() => this.#reload$),
+    switchMap(() => this.#contactsClient.getContacts(new Empty())),
+    catchError((error: unknown) => {
+      this.#toastService.handleError(error);
+      return EMPTY;
+    }),
+    map((response) => response.items ?? []),
+  );
+
+  ngOnInit(): void {
+    this.#pageEnv.set({pageId: PageId.ACCOUNT_CONTACTS});
+  }
+
+  protected deleteContact(userId: string) {
+    this.#contactsClient.deleteContact(new DeleteContactRequest({userId})).subscribe({
+      error: (response: unknown) => {
+        this.#toastService.handleError(response);
+      },
+      next: () => {
+        this.#reload$.next(void 0);
+      },
+    });
+    return false;
+  }
+}

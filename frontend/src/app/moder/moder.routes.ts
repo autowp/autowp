@@ -5,27 +5,25 @@ import {moderGuard} from '../moder.guard';
 export const routes: Routes = [
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./comments/comments.component').then((m) => m.ModerCommentsComponent),
+    loadComponent: () => import('./comments/moder-comments').then((m) => m.ModerComments),
     path: 'comments',
     title: $localize`Comments`,
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () =>
-      import('./content-reports/content-reports.component').then((m) => m.ModerContentReportsComponent),
+    loadComponent: () => import('./content-reports/moder-content-reports').then((m) => m.ModerContentReports),
     path: 'content-reports',
     title: $localize`Content reports`,
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () =>
-      import('./gdpr-objections/gdpr-objections.component').then((m) => m.ModerGdprObjectionsComponent),
+    loadComponent: () => import('./gdpr-objections/moder-gdpr-objections').then((m) => m.ModerGdprObjections),
     path: 'gdpr-objections',
     title: $localize`GDPR suppression list`,
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./item-parent/item-parent.component').then((m) => m.ModerItemParentComponent),
+    loadComponent: () => import('./item-parent/moder-item-parent').then((m) => m.ModerItemParent),
     path: 'item-parent/:item_id/:parent_id',
   },
   {
@@ -34,16 +32,14 @@ export const routes: Routes = [
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./perspectives/perspectives.component').then((m) => m.ModerPerspectivesComponent),
+    loadComponent: () => import('./perspectives/moder-perspectives').then((m) => m.ModerPerspectives),
     path: 'perspectives',
     title: $localize`Perspectives`,
   },
   {
     canActivate: [moderGuard],
     loadComponent: () =>
-      import('./picture-vote-templates/picture-vote-templates.component').then(
-        (m) => m.ModerPictureVoteTemplatesComponent,
-      ),
+      import('./picture-vote-templates/moder-picture-vote-templates').then((m) => m.ModerPictureVoteTemplates),
     path: 'picture-vote-templates',
     title: $localize`Picture vote templates`,
   },
@@ -53,7 +49,7 @@ export const routes: Routes = [
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./stat/stat.component').then((m) => m.ModerStatComponent),
+    loadComponent: () => import('./stat/moder-stat').then((m) => m.ModerStat),
     path: 'stat',
     title: $localize`Statistics`,
   },
@@ -63,7 +59,7 @@ export const routes: Routes = [
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./users/users.component').then((m) => m.ModerUsersComponent),
+    loadComponent: () => import('./users/moder-users').then((m) => m.ModerUsers),
     path: 'users',
     title: $localize`Users`,
   },
@@ -71,18 +67,17 @@ export const routes: Routes = [
     children: [
       {
         canActivate: [moderGuard],
-        loadComponent: () =>
-          import('./attrs/attribute/attribute.component').then((m) => m.ModerAttrsAttributeComponent),
+        loadComponent: () => import('./attrs/attribute/moder-attrs-attribute').then((m) => m.ModerAttrsAttribute),
         path: 'attribute/:id',
       },
       {
         canActivate: [moderGuard],
-        loadComponent: () => import('./attrs/zone/zone.component').then((m) => m.ModerAttrsZoneComponent),
+        loadComponent: () => import('./attrs/zone/moder-attrs-zone').then((m) => m.ModerAttrsZone),
         path: 'zone/:id',
       },
       {
         canActivate: [moderGuard],
-        loadComponent: () => import('./attrs/attrs.component').then((m) => m.ModerAttrsComponent),
+        loadComponent: () => import('./attrs/moder-attrs').then((m) => m.ModerAttrs),
         path: '',
       },
     ],
@@ -91,7 +86,7 @@ export const routes: Routes = [
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./index/index.component').then((m) => m.ModerIndexComponent),
+    loadComponent: () => import('./index/moder-index').then((m) => m.ModerIndex),
     path: '',
     title: $localize`Moderator page`,
   },

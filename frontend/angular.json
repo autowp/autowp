@@ -226,7 +226,8 @@
   },
   "schematics": {
     "@schematics/angular:component": {
-      "type": "component"
+      "type": "",
+      "style": "scss"
     },
     "@schematics/angular:directive": {
       "type": "directive"

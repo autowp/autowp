@@ -5,19 +5,19 @@ import {moderGuard} from '../../moder.guard';
 export const routes: Routes = [
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./alpha/alpha.component').then((m) => m.ModerItemsAlphaComponent),
+    loadComponent: () => import('./alpha/moder-items-alpha').then((m) => m.ModerItemsAlpha),
     path: 'alpha',
     title: $localize`Alphabetical vehicles list`,
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./too-big/too-big.component').then((m) => m.ModerItemsTooBigComponent),
+    loadComponent: () => import('./too-big/moder-items-too-big').then((m) => m.ModerItemsTooBig),
     path: 'too-big',
     title: $localize`Too big`,
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./new/new.component').then((m) => m.ModerItemsNewComponent),
+    loadComponent: () => import('./new/moder-items-new').then((m) => m.ModerItemsNew),
     path: 'new',
   },
   {
@@ -25,27 +25,29 @@ export const routes: Routes = [
       {
         canActivate: [moderGuard],
         loadComponent: () =>
-          import('./item/catalogue/organize/organize.component').then((m) => m.ModerItemsItemOrganizeComponent),
+          import('./item/catalogue/organize/moder-items-item-organize').then((m) => m.ModerItemsItemOrganize),
         path: 'organize',
         title: $localize`Organize`,
       },
       {
         canActivate: [moderGuard],
         loadComponent: () =>
-          import('./item/pictures/organize/organize.component').then((m) => m.ModerItemsItemPicturesOrganizeComponent),
+          import('./item/pictures/organize/moder-items-item-pictures-organize').then(
+            (m) => m.ModerItemsItemPicturesOrganize,
+          ),
         path: 'organize-pictures',
         title: $localize`Organize pictures`,
       },
       {
         canActivate: [moderGuard],
         loadComponent: () =>
-          import('./item/select-parent/select-parent.component').then((m) => m.ModerItemsItemSelectParentComponent),
+          import('./item/select-parent/moder-items-item-select-parent').then((m) => m.ModerItemsItemSelectParent),
         path: 'select-parent',
         title: $localize`Parent selection`,
       },
       {
         canActivate: [moderGuard],
-        loadComponent: () => import('./item/item.component').then((m) => m.ModerItemsItemComponent),
+        loadComponent: () => import('./item/moder-items-item').then((m) => m.ModerItemsItem),
         path: '',
       },
     ],
@@ -53,7 +55,7 @@ export const routes: Routes = [
   },
   {
     canActivate: [moderGuard],
-    loadComponent: () => import('./items.component').then((m) => m.ModerItemsComponent),
+    loadComponent: () => import('./moder-items').then((m) => m.ModerItems),
     path: '',
     title: $localize`Items`,
   },

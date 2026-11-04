@@ -384,7 +384,7 @@ func TestGetPicturePointsCluster(t *testing.T) {
 
 // GetPicturePoints with individual: true must skip grid clustering entirely and return every
 // matching picture as a flat MapSinglePicture, even when they'd otherwise fragment into several
-// small sub-clusters within a tight bbox. This is what resolveStuckCluster in map.component.ts
+// small sub-clusters within a tight bbox. This is what resolveStuckCluster in map-page.ts
 // relies on: without it, re-querying a small bbox around a max-zoom cluster could still come back
 // with several tiny sub-clusters, rendered as a popup full of unusable "+N" placeholders instead
 // of a clickable list of pictures.
@@ -393,7 +393,7 @@ func TestGetPicturePointsIndividual(t *testing.T) {
 
 	ctx := t.Context()
 
-	// Tight enough (comparable to CLUSTER_RESOLVE_DELTA in map.component.ts) that a plain
+	// Tight enough (comparable to CLUSTER_RESOLVE_DELTA in map-page.ts) that a plain
 	// grid-clustered request over it would fragment even a handful of pictures into multiple small
 	// sub-clusters instead of individual points.
 	const (

@@ -2,7 +2,7 @@ import type {Routes} from '@angular/router';
 
 export const routes: Routes = [
   {
-    loadComponent: () => import('./mascots.component').then((m) => m.MascotsComponent),
+    loadComponent: () => import('./mascots').then((m) => m.Mascots),
     path: '',
     pathMatch: 'full',
     title: $localize`Mascots`,

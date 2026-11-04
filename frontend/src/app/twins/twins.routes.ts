@@ -7,12 +7,12 @@ export const routes: Routes = [
         children: [
           {
             loadComponent: () =>
-              import('./twins-group/pictures/picture/picture.component').then((m) => m.TwinsGroupPictureComponent),
+              import('./twins-group/pictures/picture/twins-group-picture').then((m) => m.TwinsGroupPicture),
             path: ':identity',
           },
           {
             loadComponent: () =>
-              import('./twins-group/pictures/list/list.component').then((m) => m.TwinsGroupPicturesListComponent),
+              import('./twins-group/pictures/list/twins-group-pictures-list').then((m) => m.TwinsGroupPicturesList),
             path: '',
             pathMatch: 'full',
           },
@@ -22,13 +22,11 @@ export const routes: Routes = [
       {
         children: [
           {
-            loadComponent: () =>
-              import('./twins-group/gallery/twins-group-gallery.component').then((m) => m.TwinsGroupGalleryComponent),
+            loadComponent: () => import('./twins-group/gallery/twins-group-gallery').then((m) => m.TwinsGroupGallery),
             path: ':identity',
           },
           {
-            loadComponent: () =>
-              import('./twins-group/gallery/twins-group-gallery.component').then((m) => m.TwinsGroupGalleryComponent),
+            loadComponent: () => import('./twins-group/gallery/twins-group-gallery').then((m) => m.TwinsGroupGallery),
             path: '',
             pathMatch: 'full',
           },
@@ -37,31 +35,29 @@ export const routes: Routes = [
       },
       {
         loadComponent: () =>
-          import('./twins-group/specifications/specifications.component').then(
-            (m) => m.TwinsGroupSpecificationsComponent,
-          ),
+          import('./twins-group/specifications/twins-group-specifications').then((m) => m.TwinsGroupSpecifications),
         path: 'specifications',
       },
       {
-        loadComponent: () => import('./twins-group/items/items.component').then((m) => m.TwinsGroupItemsComponent),
+        loadComponent: () => import('./twins-group/items/twins-group-items').then((m) => m.TwinsGroupItems),
         path: '',
       },
     ],
-    loadComponent: () => import('./twins-group/twins-group.component').then((m) => m.TwinsGroupComponent),
+    loadComponent: () => import('./twins-group/twins-group').then((m) => m.TwinsGroup),
     path: 'group/:group',
   },
   {
-    loadComponent: () => import('./twins.component').then((m) => m.TwinsComponent),
+    loadComponent: () => import('./twins').then((m) => m.Twins),
     path: 'all',
     title: $localize`Twins`,
   },
   {
-    loadComponent: () => import('./twins.component').then((m) => m.TwinsComponent),
+    loadComponent: () => import('./twins').then((m) => m.Twins),
     path: ':brand',
     title: $localize`Twins`,
   },
   {
-    loadComponent: () => import('./twins-index/twins-index.component').then((m) => m.TwinsIndexComponent),
+    loadComponent: () => import('./twins-index/twins-index').then((m) => m.TwinsIndex),
     path: '',
     pathMatch: 'full',
     title: $localize`Twins`,

@@ -1,5 +1,3 @@
 import type {Routes} from '@angular/router';
 
-export const routes: Routes = [
-  {loadComponent: () => import('./voting.component').then((m) => m.VotingComponent), path: ':id'},
-];
+export const routes: Routes = [{loadComponent: () => import('./voting-page').then((m) => m.VotingPage), path: ':id'}];

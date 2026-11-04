@@ -7,21 +7,21 @@ import {cataloguePathMatcher} from './matcher';
 
 export const routes: Routes = [
   {
-    loadComponent: () => import('./recent/recent.component').then((m) => m.CatalogueRecentComponent),
+    loadComponent: () => import('./recent/catalogue-recent').then((m) => m.CatalogueRecent),
     path: 'recent',
   },
   {
     children: [
       {
-        loadComponent: () => import('./mixed/gallery/gallery.component').then((m) => m.CatalogueMixedGalleryComponent),
+        loadComponent: () => import('./mixed/gallery/catalogue-mixed-gallery').then((m) => m.CatalogueMixedGallery),
         path: 'gallery/:identity',
       },
       {
-        loadComponent: () => import('./mixed/picture/picture.component').then((m) => m.CatalogueMixedPictureComponent),
+        loadComponent: () => import('./mixed/picture/catalogue-mixed-picture').then((m) => m.CatalogueMixedPicture),
         path: ':identity',
       },
       {
-        loadComponent: () => import('./mixed/mixed.component').then((m) => m.CatalogueMixedComponent),
+        loadComponent: () => import('./mixed/catalogue-mixed').then((m) => m.CatalogueMixed),
         path: '',
         pathMatch: 'full',
       },
@@ -41,15 +41,15 @@ export const routes: Routes = [
   {
     children: [
       {
-        loadComponent: () => import('./mixed/gallery/gallery.component').then((m) => m.CatalogueMixedGalleryComponent),
+        loadComponent: () => import('./mixed/gallery/catalogue-mixed-gallery').then((m) => m.CatalogueMixedGallery),
         path: 'gallery/:identity',
       },
       {
-        loadComponent: () => import('./mixed/picture/picture.component').then((m) => m.CatalogueMixedPictureComponent),
+        loadComponent: () => import('./mixed/picture/catalogue-mixed-picture').then((m) => m.CatalogueMixedPicture),
         path: ':identity',
       },
       {
-        loadComponent: () => import('./mixed/mixed.component').then((m) => m.CatalogueMixedComponent),
+        loadComponent: () => import('./mixed/catalogue-mixed').then((m) => m.CatalogueMixed),
         path: '',
         pathMatch: 'full',
       },
@@ -69,15 +69,15 @@ export const routes: Routes = [
   {
     children: [
       {
-        loadComponent: () => import('./mixed/gallery/gallery.component').then((m) => m.CatalogueMixedGalleryComponent),
+        loadComponent: () => import('./mixed/gallery/catalogue-mixed-gallery').then((m) => m.CatalogueMixedGallery),
         path: 'gallery/:identity',
       },
       {
-        loadComponent: () => import('./mixed/picture/picture.component').then((m) => m.CatalogueMixedPictureComponent),
+        loadComponent: () => import('./mixed/picture/catalogue-mixed-picture').then((m) => m.CatalogueMixedPicture),
         path: ':identity',
       },
       {
-        loadComponent: () => import('./mixed/mixed.component').then((m) => m.CatalogueMixedComponent),
+        loadComponent: () => import('./mixed/catalogue-mixed').then((m) => m.CatalogueMixed),
         path: '',
         pathMatch: 'full',
       },
@@ -95,21 +95,21 @@ export const routes: Routes = [
     path: 'logotypes',
   },
   {
-    loadComponent: () => import('./engines/engines.component').then((m) => m.CatalogueEnginesComponent),
+    loadComponent: () => import('./engines/catalogue-engines').then((m) => m.CatalogueEngines),
     path: 'engines',
   },
   {
-    loadComponent: () => import('./concepts/concepts.component').then((m) => m.CatalogueConceptsComponent),
+    loadComponent: () => import('./concepts/catalogue-concepts').then((m) => m.CatalogueConcepts),
     path: 'concepts',
   },
   {
     children: [
       {
-        loadComponent: () => import('./cars/cars.component').then((m) => m.CatalogueCarsComponent),
+        loadComponent: () => import('./cars/catalogue-cars').then((m) => m.CatalogueCars),
         path: ':vehicle_type',
       },
       {
-        loadComponent: () => import('./cars/cars.component').then((m) => m.CatalogueCarsComponent),
+        loadComponent: () => import('./cars/catalogue-cars').then((m) => m.CatalogueCars),
         path: '',
         pathMatch: 'full',
       },
@@ -119,19 +119,19 @@ export const routes: Routes = [
   {
     children: [
       {
-        loadComponent: () => import('./mosts/mosts.component').then((m) => m.CatalogueMostsComponent),
+        loadComponent: () => import('./mosts/catalogue-mosts').then((m) => m.CatalogueMosts),
         path: '',
       },
       {
-        loadComponent: () => import('./mosts/mosts.component').then((m) => m.CatalogueMostsComponent),
+        loadComponent: () => import('./mosts/catalogue-mosts').then((m) => m.CatalogueMosts),
         path: ':rating_catname',
       },
       {
-        loadComponent: () => import('./mosts/mosts.component').then((m) => m.CatalogueMostsComponent),
+        loadComponent: () => import('./mosts/catalogue-mosts').then((m) => m.CatalogueMosts),
         path: ':rating_catname/:type_catname',
       },
       {
-        loadComponent: () => import('./mosts/mosts.component').then((m) => m.CatalogueMostsComponent),
+        loadComponent: () => import('./mosts/catalogue-mosts').then((m) => m.CatalogueMosts),
         path: ':rating_catname/:type_catname/:years_catname',
       },
     ],
@@ -143,21 +143,21 @@ export const routes: Routes = [
         children: [
           {
             loadComponent: () =>
-              import('./vehicles/gallery/gallery.component').then((m) => m.CatalogueVehiclesGalleryComponent),
+              import('./vehicles/gallery/catalogue-vehicles-gallery').then((m) => m.CatalogueVehiclesGallery),
             path: 'gallery/:identity',
           },
           {
             children: [
               {
                 loadComponent: () =>
-                  import('./vehicles/pictures/picture/picture.component').then(
-                    (m) => m.CatalogueVehiclesPicturesPictureComponent,
+                  import('./vehicles/pictures/picture/catalogue-vehicles-pictures-picture').then(
+                    (m) => m.CatalogueVehiclesPicturesPicture,
                   ),
                 path: ':identity',
               },
               {
                 loadComponent: () =>
-                  import('./vehicles/pictures/pictures.component').then((m) => m.CatalogueVehiclesPicturesComponent),
+                  import('./vehicles/pictures/catalogue-vehicles-pictures').then((m) => m.CatalogueVehiclesPictures),
                 path: '',
                 pathMatch: 'full',
               },
@@ -172,7 +172,7 @@ export const routes: Routes = [
       },
       {
         loadComponent: () =>
-          import('./vehicles/gallery/gallery.component').then((m) => m.CatalogueVehiclesGalleryComponent),
+          import('./vehicles/gallery/catalogue-vehicles-gallery').then((m) => m.CatalogueVehiclesGallery),
         path: 'gallery/:identity',
         pathMatch: 'full',
       },
@@ -180,14 +180,14 @@ export const routes: Routes = [
         children: [
           {
             loadComponent: () =>
-              import('./vehicles/pictures/picture/picture.component').then(
-                (m) => m.CatalogueVehiclesPicturesPictureComponent,
+              import('./vehicles/pictures/picture/catalogue-vehicles-pictures-picture').then(
+                (m) => m.CatalogueVehiclesPicturesPicture,
               ),
             path: ':identity',
           },
           {
             loadComponent: () =>
-              import('./vehicles/pictures/pictures.component').then((m) => m.CatalogueVehiclesPicturesComponent),
+              import('./vehicles/pictures/catalogue-vehicles-pictures').then((m) => m.CatalogueVehiclesPictures),
             path: '',
             pathMatch: 'full',
           },
@@ -196,14 +196,14 @@ export const routes: Routes = [
       },
       {
         loadComponent: () =>
-          import('./vehicles/specifications/specifications.component').then(
-            (m) => m.CatalogueVehiclesSpecificationsComponent,
+          import('./vehicles/specifications/catalogue-vehicles-specifications').then(
+            (m) => m.CatalogueVehiclesSpecifications,
           ),
         path: 'specifications',
         pathMatch: 'full',
       },
       {
-        loadComponent: () => import('./vehicles/vehicles.component').then((m) => m.CatalogueVehiclesComponent),
+        loadComponent: () => import('./vehicles/catalogue-vehicles').then((m) => m.CatalogueVehicles),
         path: '',
         pathMatch: 'full',
       },
@@ -211,7 +211,7 @@ export const routes: Routes = [
     matcher: cataloguePathMatcher,
   },
   {
-    loadComponent: () => import('./index/index.component').then((m) => m.CatalogueIndexComponent),
+    loadComponent: () => import('./index/catalogue-index').then((m) => m.CatalogueIndex),
     path: '',
     pathMatch: 'full',
   },
