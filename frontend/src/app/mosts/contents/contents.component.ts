@@ -108,7 +108,7 @@ export class MostsContentsComponent implements OnInit {
 
     this.itemsResource = rxResource({
       // `id` carries every input the items query varies on. The rating/type/years levels are four
-      // separate route configs (see mosts-routing.module.ts and catalogue-routing.module.ts), so
+      // separate route configs (see mosts.routes.ts and catalogue.routes.ts), so
       // picking a different rating from the dropdown destroys and recreates this component rather
       // than just changing its inputs - a static id would seed the new rating's resource with the
       // previous rating's items, and it would never fetch.

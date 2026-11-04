@@ -29,7 +29,7 @@ export const routes: Routes = [
     path: 'item-parent/:item_id/:parent_id',
   },
   {
-    loadChildren: () => import('./items/items-routing.module').then((m) => m.routes),
+    loadChildren: () => import('./items/items.routes').then((m) => m.routes),
     path: 'items',
   },
   {
@@ -48,7 +48,7 @@ export const routes: Routes = [
     title: $localize`Picture vote templates`,
   },
   {
-    loadChildren: () => import('./pictures/pictures-routing.module').then((m) => m.routes),
+    loadChildren: () => import('./pictures/pictures.routes').then((m) => m.routes),
     path: 'pictures',
   },
   {
@@ -58,7 +58,7 @@ export const routes: Routes = [
     title: $localize`Statistics`,
   },
   {
-    loadChildren: () => import('./traffic/traffic-routing.module').then((m) => m.routes),
+    loadChildren: () => import('./traffic/traffic.routes').then((m) => m.routes),
     path: 'traffic',
   },
   {

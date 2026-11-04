@@ -271,7 +271,7 @@
         <source>About us</source>
         <target state="translated">Über uns</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/about/about-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/about/about.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -467,7 +467,7 @@
           <context context-type="linenumber">4,10</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/index/index-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/index/index.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -1443,7 +1443,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
           <context context-type="linenumber">2,5</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
         <context-group purpose="location">
@@ -1475,7 +1475,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>My accounts</source>
         <target state="translated">Meine Konten</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
@@ -1491,7 +1491,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>Contacts</source>
         <target state="translated">Kontakte</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
         <context-group purpose="location">
@@ -1511,7 +1511,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>Account deleted</source>
         <target state="translated">Konto gelöscht</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
@@ -1519,7 +1519,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>Account delete</source>
         <target state="translated">Konto löschen</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
         <context-group purpose="location">
@@ -1531,7 +1531,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>My e-mail</source>
         <target state="translated">Meine E-Mail</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
         <context-group purpose="location">
@@ -1547,7 +1547,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>Unmoderated</source>
         <target state="translated">Nicht moderiert</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">53</context>
         </context-group>
         <context-group purpose="location">
@@ -1563,7 +1563,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>Profile</source>
         <target state="translated">Profil</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
         <context-group purpose="location">
@@ -1583,7 +1583,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>Conflicts</source>
         <target state="translated">Konflikte</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
         <context-group purpose="location">
@@ -1599,7 +1599,7 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
         <source>Account</source>
         <target state="translated">Konto</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/account/account-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/account/account.routes.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
@@ -1671,15 +1671,15 @@ Beteilige dich an [the translation of the site](https://github.com/autowp/autowp
           <context context-type="linenumber">79</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/inbox/inbox-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/inbox/inbox.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/inbox/inbox-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/inbox/inbox.routes.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/inbox/inbox-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/inbox/inbox.routes.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
@@ -2145,7 +2145,7 @@ Viel Glück.</target>
         <source>Achievements</source>
         <target state="translated">Errungenschaften</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/achievements/achievements-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/achievements/achievements.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2237,11 +2237,11 @@ Viel Glück.</target>
           <context context-type="linenumber">8,15</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/twins/twins-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/twins/twins.routes.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/twins/twins-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/twins/twins.routes.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
@@ -2277,19 +2277,19 @@ Viel Glück.</target>
           <context context-type="linenumber">21,22</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/mosts/mosts-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/mosts/mosts.routes.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/mosts/mosts-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/mosts/mosts.routes.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/mosts/mosts-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/mosts/mosts.routes.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/mosts/mosts-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/mosts/mosts.routes.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
@@ -2301,7 +2301,7 @@ Viel Glück.</target>
           <context context-type="linenumber">47,49</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/categories/categories-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/categories/categories.routes.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
         <context-group purpose="location">
@@ -2345,7 +2345,7 @@ Viel Glück.</target>
           <context context-type="linenumber">8,10</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/map/map-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/map/map.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2369,23 +2369,23 @@ Viel Glück.</target>
           <context context-type="linenumber">111,113</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
         <context-group purpose="location">
@@ -2469,11 +2469,11 @@ Viel Glück.</target>
           <context context-type="linenumber">144,149</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/upload/upload-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/upload/upload.routes.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/upload/upload-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/upload/upload.routes.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
@@ -2489,7 +2489,7 @@ Viel Glück.</target>
           <context context-type="linenumber">214,215</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/feedback/feedback-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/feedback/feedback.routes.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
         <context-group purpose="location">
@@ -2553,11 +2553,11 @@ Viel Glück.</target>
           <context context-type="linenumber">221,225</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/donate/donate-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/donate/donate.routes.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/donate/donate-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/donate/donate.routes.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
         <context-group purpose="location">
@@ -2609,7 +2609,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
           <context context-type="linenumber">12,13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tos/terms-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/tos/terms.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2625,7 +2625,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
           <context context-type="linenumber">252,254</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/policy/policy-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/policy/policy.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2653,7 +2653,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
           <context context-type="linenumber">254,256</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/licenses/licenses-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/licenses/licenses.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2669,7 +2669,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
           <context context-type="linenumber">255,256</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/legal-notice/legal-notice-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/legal-notice/legal-notice.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2693,7 +2693,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
           <context context-type="linenumber">7,13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/articles/articles-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/articles/articles.routes.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
         <context-group purpose="location">
@@ -2757,7 +2757,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
         <source>All brands</source>
         <target state="translated">Alle Marken</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/brands/brands-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/brands/brands.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2793,7 +2793,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
           <context context-type="linenumber">10,14</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cars/cars-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/cars/cars.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -2881,7 +2881,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
         <source>Dateless</source>
         <target state="translated">Ohne Datum</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cars/cars-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/cars/cars.routes.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
@@ -2893,7 +2893,7 @@ Alle Bilder werden zu Bildungszwecken veröffentlicht.</target>
         <source>Specifications Admin</source>
         <target state="translated">Spezifikationen-Admin</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cars/cars-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/cars/cars.routes.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
@@ -3445,11 +3445,11 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
           <context context-type="linenumber">155,159</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
         <context-group purpose="location">
@@ -3485,11 +3485,11 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
         <source>Miscellaneous</source>
         <target state="translated">Verschiedenes</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/catalogue-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/catalogue/catalogue.routes.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/catalogue-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/catalogue/catalogue.routes.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
@@ -3497,11 +3497,11 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
         <source>Unsorted</source>
         <target state="translated">Unsortiert</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/catalogue-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/catalogue/catalogue.routes.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/catalogue-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/catalogue/catalogue.routes.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
       </trans-unit>
@@ -3509,11 +3509,11 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
         <source>Logotypes</source>
         <target state="translated">Logos</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/catalogue-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/catalogue/catalogue.routes.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/catalogue/catalogue-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/catalogue/catalogue.routes.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
       </trans-unit>
@@ -3565,23 +3565,23 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
           <context context-type="linenumber">7,10</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/new/new-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/new/new.routes.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/new/new-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/new/new.routes.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/new/new-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/new/new.routes.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/new/new-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/new/new.routes.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/new/new-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/new/new.routes.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
         <context-group purpose="location">
@@ -3861,7 +3861,7 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
         <source>Pictures</source>
         <target state="translated">Bilder</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/categories/categories-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/categories/categories.routes.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
         <context-group purpose="location">
@@ -3925,7 +3925,7 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
           <context context-type="linenumber">10,13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/pictures/pictures-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.routes.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
         <context-group purpose="location">
@@ -4069,7 +4069,7 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
         <source>Charts</source>
         <target state="translated">Diagramme</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chart/chart-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/chart/chart.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
       </trans-unit>
@@ -4097,7 +4097,7 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
           <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">10</context>
         </context-group>
         <context-group purpose="location">
@@ -4117,7 +4117,7 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
           <context context-type="linenumber">15,19</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/users/users-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/users/users.routes.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
@@ -4365,7 +4365,7 @@ Alle hier eingegebenen Werte werden auf der Seite in den Spezifikationen angezei
         <source>Copyright and content complaints</source>
         <target state="translated">Urheberrecht und Inhaltsbeschwerden</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/copyright/copyright-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/copyright/copyright.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -4675,19 +4675,19 @@ Verwenden Sie dieselbe Schaltfläche, dasselbe Formular oder dieselbe E-Mail-Adr
           <context context-type="linenumber">10,15</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cutaway/cutaway-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/cutaway/cutaway.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cutaway/cutaway-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/cutaway/cutaway.routes.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cutaway/cutaway-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/cutaway/cutaway.routes.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/cutaway/cutaway-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/cutaway/cutaway.routes.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
         <context-group purpose="location">
@@ -4767,7 +4767,7 @@ Verwenden Sie dieselbe Schaltfläche, dasselbe Formular oder dieselbe E-Mail-Adr
         <source>Donate log</source>
         <target state="translated">Spendenprotokoll</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/donate/donate-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/donate/donate.routes.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
@@ -4779,11 +4779,11 @@ Verwenden Sie dieselbe Schaltfläche, dasselbe Formular oder dieselbe E-Mail-Adr
         <source>Donate success</source>
         <target state="translated">Spende erfolgreich</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/donate/donate-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/donate/donate.routes.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/donate/donate-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/donate/donate.routes.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
         <context-group purpose="location">
@@ -5145,7 +5145,7 @@ Wir freuen uns, wenn Sie eine [perform selfless donation](/donate) in beliebiger
         <source>Products</source>
         <target state="translated">Produkte</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/factories/factories-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/factories/factories.routes.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
         <context-group purpose="location">
@@ -5181,7 +5181,7 @@ Wir freuen uns, wenn Sie eine [perform selfless donation](/donate) in beliebiger
         <source>Message sent</source>
         <target state="translated">Nachricht gesendet</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/feedback/feedback-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/feedback/feedback.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -5333,7 +5333,7 @@ Wir freuen uns, wenn Sie eine [perform selfless donation](/donate) in beliebiger
         <source>New topic</source>
         <target state="translated">Neues Thema</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forums/forums-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/forums/forums.routes.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
@@ -5717,7 +5717,7 @@ Wenn Sie noch nicht registriert sind, tun Sie dies jetzt bitte [on the registrat
           <context context-type="linenumber">85,87</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/mascots/mascots-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/mascots/mascots.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -5777,7 +5777,7 @@ Wenn Sie noch nicht registriert sind, tun Sie dies jetzt bitte [on the registrat
           <context context-type="linenumber">114,117</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
         <context-group purpose="location">
@@ -5789,7 +5789,7 @@ Wenn Sie noch nicht registriert sind, tun Sie dies jetzt bitte [on the registrat
           <context context-type="linenumber">10,14</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/users/users-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/users/users.routes.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
@@ -5805,7 +5805,7 @@ Wenn Sie noch nicht registriert sind, tun Sie dies jetzt bitte [on the registrat
         <source>Specs</source>
         <target state="translated">Spezifikationen</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/info/info-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/info/info.routes.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
@@ -5821,7 +5821,7 @@ Wenn Sie noch nicht registriert sind, tun Sie dies jetzt bitte [on the registrat
         <source>Text history</source>
         <target state="translated">Textverlauf</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/info/info-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/info/info.routes.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
         <context-group purpose="location">
@@ -5973,7 +5973,7 @@ dort angegebenen Lizenz veröffentlicht.
         <source>Log of events</source>
         <target state="translated">Ereignisprotokoll</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/log/log-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/log/log.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -6125,7 +6125,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">23,29</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
         <context-group purpose="location">
@@ -6205,7 +6205,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">10,16</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
@@ -6489,7 +6489,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">77</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
       </trans-unit>
@@ -6705,7 +6705,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">10,13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/items-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/items/items.routes.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
         <context-group purpose="location">
@@ -6741,7 +6741,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">16,20</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/items-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/items/items.routes.ts</context>
           <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
@@ -6857,7 +6857,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">105,108</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
         <context-group purpose="location">
@@ -6873,7 +6873,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">111,114</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
@@ -6897,7 +6897,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">120,123</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
         <context-group purpose="location">
@@ -6913,7 +6913,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">123,126</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pulse/pulse-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/pulse/pulse.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -7417,7 +7417,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">22,24</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/items-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/items/items.routes.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
@@ -7647,7 +7647,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">21,25</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/items-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/items/items.routes.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
@@ -7679,7 +7679,7 @@ dort angegebenen Lizenz veröffentlicht.
         <source>Too big</source>
         <target state="translated">Zu groß</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/items-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/items/items.routes.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
@@ -7691,7 +7691,7 @@ dort angegebenen Lizenz veröffentlicht.
         <source>Organize pictures</source>
         <target state="translated">Bilder ordnen</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/items/items-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/items/items.routes.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
@@ -7991,7 +7991,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">56</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/pictures/pictures-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.routes.ts</context>
           <context context-type="linenumber">10</context>
         </context-group>
         <context-group purpose="location">
@@ -8083,11 +8083,11 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">21,26</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/pictures/pictures-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.routes.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/pictures/pictures-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.routes.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
         <context-group purpose="location">
@@ -8765,7 +8765,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">19,23</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/pictures/pictures-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.routes.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
@@ -8797,15 +8797,15 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">8,13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/persons/persons-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/persons/persons.routes.ts</context>
           <context context-type="linenumber">10</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/persons/persons-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/persons/persons.routes.ts</context>
           <context context-type="linenumber">49</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/persons/persons-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/persons/persons.routes.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
         <context-group purpose="location">
@@ -8881,7 +8881,7 @@ dort angegebenen Lizenz veröffentlicht.
           <context context-type="linenumber">22,26</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/pictures/pictures-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/pictures/pictures.routes.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
@@ -9345,11 +9345,11 @@ dort angegebenen Lizenz veröffentlicht.
         <source>Traffic</source>
         <target state="translated">Verkehr</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/traffic/traffic-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/traffic/traffic.routes.ts</context>
           <context context-type="linenumber">10</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/traffic/traffic-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/traffic/traffic.routes.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
@@ -10019,7 +10019,7 @@ Fragen zu dieser Erklärung oder zu Ihren personenbezogenen Daten: [autowp@gmail
         <source>Rules</source>
         <target state="translated">Regeln</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/rules/rules-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/rules/rules.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -10107,7 +10107,7 @@ Fragen zu dieser Erklärung oder zu Ihren personenbezogenen Daten: [autowp@gmail
         <source>Telegram</source>
         <target state="translated">Telegram</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/telegram/telegram-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/telegram/telegram.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
@@ -10301,7 +10301,7 @@ Wobei `ХХХХХХХХХХХХХХХХ` der Code ist, der Ihnen über [das priv
         <source>Top View</source>
         <target state="translated">Draufsicht</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/top-view/top-view-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/top-view/top-view.routes.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
       </trans-unit>
@@ -10769,7 +10769,7 @@ Bitte beachten Sie, dass das Hinzufügen von Bildern moderiert wird. Das heißt,
           <context context-type="linenumber">2,6</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/upload/upload-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/upload/upload.routes.ts</context>
           <context context-type="linenumber">9</context>
         </context-group>
       </trans-unit>
@@ -10877,7 +10877,7 @@ Bitte beachten Sie, dass das Hinzufügen von Bildern moderiert wird. Das heißt,
           <context context-type="linenumber">71,75</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/users/users-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/users/users.routes.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
@@ -17043,7 +17043,7 @@ Getriebe wird nicht berücksichtigt</target>
           <context context-type="linenumber">92</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/moder/moder-routing.module.ts</context>
+          <context context-type="sourcefile">src/app/moder/moder.routes.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
         <target state="translated">GDPR-Sperrliste</target>
