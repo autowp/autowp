@@ -63,6 +63,9 @@ export class ModerItemsItemSelectParentTreeItem {
 
   protected readonly isDisabled = computed(() => this.item().id === this.disableItemID());
 
+  protected readonly ItemParentType = ItemParentType;
+  protected readonly ItemParentsRequest = ItemParentsRequest;
+
   protected onSelect(itemID: string) {
     this.selected.emit(itemID);
     return false;
@@ -72,7 +75,4 @@ export class ModerItemsItemSelectParentTreeItem {
     this.open.set(!this.open());
     return false;
   }
-
-  protected readonly ItemParentType = ItemParentType;
-  protected readonly ItemParentsRequest = ItemParentsRequest;
 }

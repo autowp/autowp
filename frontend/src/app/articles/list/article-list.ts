@@ -43,10 +43,6 @@ export class ArticleList implements OnInit {
   readonly #articlesClient = inject(ArticlesClient);
   readonly #userService = inject(UserService);
 
-  ngOnInit(): void {
-    this.#pageEnv.set({pageId: PageId.ARTICLES});
-  }
-
   readonly #page = toSignal(
     this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10) || 1)),
     {requireSync: true},
@@ -102,6 +98,12 @@ export class ArticleList implements OnInit {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
+  ngOnInit(): void {
+    this.#pageEnv.set({pageId: PageId.ARTICLES});
+  }
+
   #mapArticle(article: Article): ArticleListItem {
     return {
       authorId: article.authorId,
@@ -113,6 +115,4 @@ export class ArticleList implements OnInit {
       routerLink: ['/articles', article.catname],
     };
   }
-
-  protected readonly errorMessage = errorMessage;
 }

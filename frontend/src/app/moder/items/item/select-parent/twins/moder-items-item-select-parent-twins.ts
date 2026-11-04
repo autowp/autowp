@@ -117,11 +117,11 @@ export class ModerItemsItemSelectParentTwins {
     },
   });
 
+  protected readonly ItemParentsRequest = ItemParentsRequest;
+  protected readonly errorMessage = errorMessage;
+
   protected onSelect(itemID: string) {
     this.selected.emit(itemID);
     return false;
   }
-
-  protected readonly ItemParentsRequest = ItemParentsRequest;
-  protected readonly errorMessage = errorMessage;
 }

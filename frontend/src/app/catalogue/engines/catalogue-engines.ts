@@ -96,25 +96,6 @@ export class CatalogueEngines {
     return brand ? $localize`${brand.nameOnly} Engines` : undefined;
   });
 
-  constructor() {
-    effect(() => {
-      if (isNotFoundError(this.brandResource.error())) {
-        this.#notFound.report();
-        return;
-      }
-
-      const title = this.title();
-      if (title === undefined) {
-        return;
-      }
-
-      this.#pageEnv.set({
-        pageId: PageId.CATALOGUE_ENGINES,
-        title,
-      });
-    });
-  }
-
   protected readonly dataResource = rxResource({
     id: `catalogue-engines-data-${this.#catname() ?? ''}`,
     params: () => ({brand: this.brandData(), page: this.#page()}),
@@ -220,4 +201,23 @@ export class CatalogueEngines {
   });
 
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      const title = this.title();
+      if (title === undefined) {
+        return;
+      }
+
+      this.#pageEnv.set({
+        pageId: PageId.CATALOGUE_ENGINES,
+        title,
+      });
+    });
+  }
 }

@@ -33,6 +33,8 @@ export class PersonsPersonAuthorGallery {
     {requireSync: true},
   );
 
+  protected readonly PictureItemType = PictureItemType;
+
   constructor() {
     effect(() => {
       if (!this.identity()) {
@@ -50,6 +52,4 @@ export class PersonsPersonAuthorGallery {
       });
     }
   }
-
-  protected readonly PictureItemType = PictureItemType;
 }

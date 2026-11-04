@@ -32,12 +32,12 @@ export class ModerAttrs implements OnInit {
     stream: () => this.#attrsService.zones$,
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
       pageId: PageId.MODER_ATTRS,
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

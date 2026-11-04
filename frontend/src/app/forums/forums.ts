@@ -65,6 +65,8 @@ export class Forums {
   // non-NOT_FOUND dataResource error (surfaced generically by the template instead).
   protected readonly dataData = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       const data = this.dataData();
@@ -90,6 +92,4 @@ export class Forums {
   protected reload() {
     this.topicsResource.reload();
   }
-
-  protected readonly errorMessage = errorMessage;
 }

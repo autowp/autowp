@@ -27,9 +27,9 @@ export class InfoSpec implements OnInit {
     stream: () => this.#itemsClient.getSpecs(new Empty()),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.INFO_SPEC});
   }
-
-  protected readonly errorMessage = errorMessage;
 }

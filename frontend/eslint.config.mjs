@@ -8,6 +8,8 @@ import sonarjs from 'eslint-plugin-sonarjs';
 import {defineConfig, globalIgnores} from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
+import angularStyle from './tools/eslint/angular-style.mjs';
+
 export default defineConfig([
   globalIgnores([
     'dist',
@@ -34,6 +36,7 @@ export default defineConfig([
     // Set the custom processor which will allow us to have our inline Component templates extracted
     // and treated as if they are HTML files (and therefore have the .html config below applied to them)
     processor: angular.processInlineTemplates,
+    plugins: {'local-angular': angularStyle},
     languageOptions: {
       // Required for the *TypeChecked rule sets above - they need real TypeScript type info, not
       // just syntax. `projectService` auto-discovers and builds the program from tsconfig.json
@@ -73,6 +76,10 @@ export default defineConfig([
       ],
       // Angular's 2025 style uses role-based class names without a Component suffix.
       '@angular-eslint/component-class-suffix': 'off',
+      'local-angular/component-names': 'error',
+      // Unlike member-ordering, the local rule keeps arrow-function properties in the field group.
+      '@typescript-eslint/member-ordering': 'off',
+      'local-angular/member-order': 'error',
       '@typescript-eslint/prefer-readonly': 'error',
       // Angular's own Validators.required/Validators.maxLength(...)/etc are static methods passed
       // by bare reference into a validators: [...] array - the exact pattern this rule normally

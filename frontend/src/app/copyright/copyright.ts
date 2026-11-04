@@ -149,6 +149,8 @@ export class Copyright implements OnInit {
     }),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.HOME});
   }
@@ -257,6 +259,4 @@ export class Copyright implements OnInit {
       this.currentForm().controls.captcha.setValue(captchaResponse);
     }
   }
-
-  protected readonly errorMessage = errorMessage;
 }

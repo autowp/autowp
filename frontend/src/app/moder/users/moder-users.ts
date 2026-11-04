@@ -49,12 +49,12 @@ export class ModerUsers implements OnInit {
       ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
       pageId: PageId.MODER_USERS,
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

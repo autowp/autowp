@@ -62,6 +62,8 @@ export class Comments implements OnInit {
 
   protected readonly CommentsType = CommentsType;
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.dataResource = rxResource({
       // Suffixed with typeID/itemID read once at construction time - this component is recreated
@@ -140,8 +142,6 @@ export class Comments implements OnInit {
         }
       });
   }
-
-  protected readonly errorMessage = errorMessage;
 
   protected load$(
     itemID: string,

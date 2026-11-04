@@ -143,6 +143,8 @@ export class DonateVod implements OnInit {
     }),
   );
 
+  protected readonly usdToRub = usdToRub;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.DONATE});
   }
@@ -152,6 +154,4 @@ export class DonateVod implements OnInit {
       e.target.submit();
     }
   }
-
-  protected readonly usdToRub = usdToRub;
 }

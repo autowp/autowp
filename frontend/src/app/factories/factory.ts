@@ -109,6 +109,8 @@ export class Factory {
     this.picturesResource.hasValue() ? this.picturesResource.value() : undefined,
   );
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
@@ -125,6 +127,4 @@ export class Factory {
       }
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

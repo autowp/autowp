@@ -94,24 +94,6 @@ export class CatalogueMixed {
     },
   });
 
-  constructor() {
-    effect(() => {
-      if (isNotFoundError(this.brandResource.error())) {
-        this.#notFound.report();
-        return;
-      }
-
-      if (!this.brandResource.hasValue()) {
-        return;
-      }
-
-      this.#pageEnv.set({
-        pageId: this.data().page_id,
-        title: this.data().title,
-      });
-    });
-  }
-
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
   // guard against that, so picturesResource's params() below doesn't blow up on a non-NOT_FOUND
   // brandResource error (surfaced generically by the template instead).
@@ -168,4 +150,22 @@ export class CatalogueMixed {
   });
 
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      if (!this.brandResource.hasValue()) {
+        return;
+      }
+
+      this.#pageEnv.set({
+        pageId: this.data().page_id,
+        title: this.data().title,
+      });
+    });
+  }
 }

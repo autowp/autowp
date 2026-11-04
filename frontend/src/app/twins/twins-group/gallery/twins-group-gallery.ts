@@ -61,6 +61,8 @@ export class TwinsGroupGallery {
     requireSync: true,
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.groupResource.error())) {
@@ -93,6 +95,4 @@ export class TwinsGroupGallery {
       });
     }
   }
-
-  protected readonly errorMessage = errorMessage;
 }

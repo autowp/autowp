@@ -84,6 +84,8 @@ export class CategoriesCategory {
     }));
   });
 
+  protected readonly ItemType = ItemType;
+
   constructor() {
     effect(() => {
       const current = this.categoryData()?.current;
@@ -129,6 +131,4 @@ export class CategoriesCategory {
         });
     }
   }
-
-  protected readonly ItemType = ItemType;
 }

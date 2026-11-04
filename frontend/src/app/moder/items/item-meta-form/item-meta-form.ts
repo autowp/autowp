@@ -212,7 +212,7 @@ export class ItemMetaForm {
 
   readonly pictures = input<PictureItem[]>([]);
   // pictures has a default value ([]), so the input itself is never nullish.
-  readonly picturesData = computed(() => {
+  protected readonly picturesData = computed(() => {
     const pictures = this.pictures();
     return pictures.length > 0
       ? pictures.map((p) => ({

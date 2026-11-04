@@ -109,6 +109,8 @@ export class CutawayBrandsBrand {
       ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
@@ -118,6 +120,4 @@ export class CutawayBrandsBrand {
 
     this.#pageEnv.set({pageId: PageId.CUTAWAY});
   }
-
-  protected readonly errorMessage = errorMessage;
 }

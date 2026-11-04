@@ -260,35 +260,6 @@ export class Jcrop {
   protected readonly dragbars = dragbarOrdinals.map((ord, i) => ({ord, zIndex: DRAGBAR_Z_BASE + i}));
   protected readonly handles = handleOrdinals.map((ord, i) => ({ord, zIndex: HANDLE_Z_BASE + i}));
 
-  constructor() {
-    // Feature-detects the window. #window can be null during SSR, but touch support is meaningless
-    // there anyway, so false is a harmless fallback.
-    this.#touchSupport = this.#window
-      ? 'ontouchstart' in this.#window || this.#window.navigator.maxTouchPoints > 0
-      : false;
-
-    // Reacts only to pictureWidth/pictureHeight (a new picture is what should reset the selection,
-    // not just a new initialCrop/minSize for the current one) - everything else is read via
-    // untracked() so it doesn't also trigger: initialCrop especially, since a host page that feeds
-    // cropChange back in as [initialCrop] (e.g. moder/pictures/item/area) would otherwise re-fire
-    // this on every drag frame.
-    effect(() => {
-      const pictureWidth = this.pictureWidth();
-      const pictureHeight = this.pictureHeight();
-
-      untracked(() => {
-        const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
-
-        this.#initialized = true;
-
-        this.#setSelect([initial.x, initial.y, initial.x + initial.w, initial.y + initial.h]);
-        // Rounds x1/y1/x2/y2 to whole pixels in case the min-size clamp in #coordsFixed left them
-        // fractional - #setSelect() above doesn't do that rounding itself.
-        this.#selectionRefresh();
-      });
-    });
-  }
-
   // Read directly by .jcrop-handles-holder's [style.display] binding (jcrop.html).
   protected readonly handlesVisible = signal(false);
 
@@ -352,6 +323,72 @@ export class Jcrop {
   // Pointer position #selectionMove last saw during an active move gesture - unlike #dragStartFc/
   // #dragStartOrd above, updated on every move event, not just once at gesture start.
   #moveLastPos!: Point;
+
+  // A pure derivation of #x1/#y1/#x2/#y2 - clamps a local working copy (never the signals themselves)
+  // to the min-size and in-bounds constraints, then normalizes via flipCoords/makeObj. Callers persist
+  // the clamp themselves via #setCoordsPressed()/#setCoordsCurrent(). Inherently branchy - splitting
+  // it up to satisfy the complexity budget below would risk the geometry itself.
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  readonly #coordsFixed = computed<FixedCrop>(() => {
+    let x1 = this.#x1(),
+      x2 = this.#x2(),
+      y1 = this.#y1(),
+      y2 = this.#y2();
+    const xsize = x2 - x1,
+      ysize = y2 - y1;
+    const xscale = this.#xscale(),
+      yscale = this.#yscale();
+    const [xmin, ymin] = this.minSize();
+    const displayWidth = this.displayWidth();
+    const displayHeight = this.displayHeight();
+
+    if (ymin / yscale && Math.abs(ysize) < ymin / yscale) {
+      y2 = ysize > 0 ? y1 + ymin / yscale : y1 - ymin / yscale;
+    }
+    if (xmin / xscale && Math.abs(xsize) < xmin / xscale) {
+      x2 = xsize > 0 ? x1 + xmin / xscale : x1 - xmin / xscale;
+    }
+
+    if (x1 < 0) [x1, x2] = slideToBound(x1, x2, x1, 0);
+    if (y1 < 0) [y1, y2] = slideToBound(y1, y2, y1, 0);
+    if (x2 < 0) [x1, x2] = slideToBound(x1, x2, x2, 0);
+    if (y2 < 0) [y1, y2] = slideToBound(y1, y2, y2, 0);
+    if (x2 > displayWidth) [x1, x2] = slideToBound(x1, x2, x2, displayWidth);
+    if (y2 > displayHeight) [y1, y2] = slideToBound(y1, y2, y2, displayHeight);
+    if (x1 > displayWidth) [x1, x2] = slideToBound(x1, x2, x1, displayWidth);
+    if (y1 > displayHeight) [y1, y2] = slideToBound(y1, y2, y1, displayHeight);
+
+    return makeObj(flipCoords(x1, y1, x2, y2));
+  });
+
+  constructor() {
+    // Feature-detects the window. #window can be null during SSR, but touch support is meaningless
+    // there anyway, so false is a harmless fallback.
+    this.#touchSupport = this.#window
+      ? 'ontouchstart' in this.#window || this.#window.navigator.maxTouchPoints > 0
+      : false;
+
+    // Reacts only to pictureWidth/pictureHeight (a new picture is what should reset the selection,
+    // not just a new initialCrop/minSize for the current one) - everything else is read via
+    // untracked() so it doesn't also trigger: initialCrop especially, since a host page that feeds
+    // cropChange back in as [initialCrop] (e.g. moder/pictures/item/area) would otherwise re-fire
+    // this on every drag frame.
+    effect(() => {
+      const pictureWidth = this.pictureWidth();
+      const pictureHeight = this.pictureHeight();
+
+      untracked(() => {
+        const initial = this.initialCrop() ?? {h: pictureHeight, w: pictureWidth, x: 0, y: 0};
+
+        this.#initialized = true;
+
+        this.#setSelect([initial.x, initial.y, initial.x + initial.w, initial.y + initial.h]);
+        // Rounds x1/y1/x2/y2 to whole pixels in case the min-size clamp in #coordsFixed left them
+        // fractional - #setSelect() above doesn't do that rounding itself.
+        this.#selectionRefresh();
+      });
+    });
+  }
 
   // Called by the host page's own "select all" button via viewChild() - each crop dialog keeps that
   // button in its own layout, since positioning differs per page.
@@ -552,43 +589,6 @@ export class Jcrop {
 
     return [Math.round(px0), Math.round(py0)];
   }
-
-  // A pure derivation of #x1/#y1/#x2/#y2 - clamps a local working copy (never the signals themselves)
-  // to the min-size and in-bounds constraints, then normalizes via flipCoords/makeObj. Callers persist
-  // the clamp themselves via #setCoordsPressed()/#setCoordsCurrent(). Inherently branchy - splitting
-  // it up to satisfy the complexity budget below would risk the geometry itself.
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  readonly #coordsFixed = computed<FixedCrop>(() => {
-    let x1 = this.#x1(),
-      x2 = this.#x2(),
-      y1 = this.#y1(),
-      y2 = this.#y2();
-    const xsize = x2 - x1,
-      ysize = y2 - y1;
-    const xscale = this.#xscale(),
-      yscale = this.#yscale();
-    const [xmin, ymin] = this.minSize();
-    const displayWidth = this.displayWidth();
-    const displayHeight = this.displayHeight();
-
-    if (ymin / yscale && Math.abs(ysize) < ymin / yscale) {
-      y2 = ysize > 0 ? y1 + ymin / yscale : y1 - ymin / yscale;
-    }
-    if (xmin / xscale && Math.abs(xsize) < xmin / xscale) {
-      x2 = xsize > 0 ? x1 + xmin / xscale : x1 - xmin / xscale;
-    }
-
-    if (x1 < 0) [x1, x2] = slideToBound(x1, x2, x1, 0);
-    if (y1 < 0) [y1, y2] = slideToBound(y1, y2, y1, 0);
-    if (x2 < 0) [x1, x2] = slideToBound(x1, x2, x2, 0);
-    if (y2 < 0) [y1, y2] = slideToBound(y1, y2, y2, 0);
-    if (x2 > displayWidth) [x1, x2] = slideToBound(x1, x2, x2, displayWidth);
-    if (y2 > displayHeight) [y1, y2] = slideToBound(y1, y2, y2, displayHeight);
-    if (x1 > displayWidth) [x1, x2] = slideToBound(x1, x2, x1, displayWidth);
-    if (y1 > displayHeight) [y1, y2] = slideToBound(y1, y2, y1, displayHeight);
-
-    return makeObj(flipCoords(x1, y1, x2, y2));
-  });
 
   #setSelect(rect: number[]): void {
     this.#setCoordsPressed([(rect[0] ?? 0) / this.#xscale(), (rect[1] ?? 0) / this.#yscale()]);

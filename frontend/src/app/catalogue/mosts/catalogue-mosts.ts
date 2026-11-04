@@ -83,6 +83,8 @@ export class CatalogueMosts {
     this.brandResource.hasValue() ? this.brandResource.value() : undefined,
   );
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
@@ -102,6 +104,4 @@ export class CatalogueMosts {
       }
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

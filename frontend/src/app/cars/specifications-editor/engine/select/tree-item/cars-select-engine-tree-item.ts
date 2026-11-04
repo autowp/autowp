@@ -54,6 +54,9 @@ export class CarsSelectEngineTreeItem {
       ),
   });
 
+  protected readonly ItemParentType = ItemParentType;
+  protected readonly errorMessage = errorMessage;
+
   protected selectEngine(engineId: string) {
     this.selected.emit(engineId);
     return false;
@@ -64,7 +67,4 @@ export class CarsSelectEngineTreeItem {
 
     return false;
   }
-
-  protected readonly ItemParentType = ItemParentType;
-  protected readonly errorMessage = errorMessage;
 }

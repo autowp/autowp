@@ -151,6 +151,8 @@ export class ModerPicturesSimilar implements OnInit {
         ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
@@ -202,6 +204,4 @@ export class ModerPicturesSimilar implements OnInit {
         },
       });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

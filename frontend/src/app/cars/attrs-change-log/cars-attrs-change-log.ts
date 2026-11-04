@@ -94,6 +94,11 @@ export class CarsAttrsChangeLog {
       }),
     );
 
+  protected readonly userQuery = this.#control;
+  protected readonly hasUserID = computed(() => !!this.#userID());
+
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     this.#pageEnv.set({pageId: PageId.SPECS_ADMIN});
 
@@ -105,9 +110,6 @@ export class CarsAttrsChangeLog {
       this.#control.setValue(userID ? '#' + userID : '');
     });
   }
-
-  protected readonly userQuery = this.#control;
-  protected readonly hasUserID = computed(() => !!this.#userID());
 
   protected userFormatter(x: string | User) {
     return x instanceof User ? x.name : x;
@@ -134,6 +136,4 @@ export class CarsAttrsChangeLog {
       queryParamsHandling: 'merge',
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

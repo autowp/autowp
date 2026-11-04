@@ -43,6 +43,8 @@ export class ModerTrafficWhitelist implements OnInit {
       this.#trafficClient.getTrafficWhitelistItems(new GetTrafficWhitelistItemsRequest({page})),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemsResource.error())) {
@@ -65,6 +67,4 @@ export class ModerTrafficWhitelist implements OnInit {
       pageId: PageId.MODER_TRAFFIC,
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

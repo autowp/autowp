@@ -113,14 +113,6 @@ export class UsersRating implements OnInit {
     },
   });
 
-  #mapUser(user: UsersRatingUser): RatingRow {
-    return {
-      userId: user.userId,
-      volume: user.volume,
-      weight: user.weight,
-    };
-  }
-
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
   // guard against that, so the chained resources/computeds below don't blow up on a non-NOT_FOUND
   // usersResource error (surfaced generically by the template instead).
@@ -231,6 +223,14 @@ export class UsersRating implements OnInit {
   protected readonly Rating = Rating;
   protected readonly EXPANDED_ROWS_COUNT = EXPANDED_ROWS_COUNT;
   protected readonly errorMessage = errorMessage;
+
+  #mapUser(user: UsersRatingUser): RatingRow {
+    return {
+      userId: user.userId,
+      volume: user.volume,
+      weight: user.weight,
+    };
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.USERS_RATING});

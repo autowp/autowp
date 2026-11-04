@@ -117,6 +117,8 @@ export class CatalogueVehiclesSpecifications {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.catalogueResource.error()) || isNotFoundError(this.htmlResource.error())) {
@@ -135,6 +137,4 @@ export class CatalogueVehiclesSpecifications {
       });
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -75,11 +75,11 @@ export class DonateVodSelectItem {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
+  protected readonly ItemParentType = ItemParentType;
+
   protected toggleItem() {
     this.expanded.set(!this.expanded());
 
     return false;
   }
-
-  protected readonly ItemParentType = ItemParentType;
 }

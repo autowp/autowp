@@ -343,6 +343,9 @@ export class ModerItems implements OnInit {
     }),
   );
 
+  protected readonly ItemType = ItemType;
+  protected readonly ItemsRequest = ItemsRequest;
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
@@ -485,7 +488,4 @@ export class ModerItems implements OnInit {
       queryParamsHandling: 'merge',
     });
   }
-
-  protected readonly ItemType = ItemType;
-  protected readonly ItemsRequest = ItemsRequest;
 }

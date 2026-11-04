@@ -89,6 +89,8 @@ export class PicturePage {
 
   protected readonly CommentsType = CommentsType;
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     // NOT_FOUND is reported to NotFoundService (App renders <app-page-not-found> in place
     // of the outlet, with a 404 status on SSR) rather than via Router.navigate(['/error-404']): SSR
@@ -133,6 +135,4 @@ export class PicturePage {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
-
-  protected readonly errorMessage = errorMessage;
 }

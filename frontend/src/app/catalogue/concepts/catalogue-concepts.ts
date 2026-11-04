@@ -106,25 +106,6 @@ export class CatalogueConcepts {
     return brand ? $localize`${brand.nameOnly} concepts & prototypes` : undefined;
   });
 
-  constructor() {
-    effect(() => {
-      if (isNotFoundError(this.brandResource.error())) {
-        this.#notFound.report();
-        return;
-      }
-
-      const title = this.title();
-      if (title === undefined) {
-        return;
-      }
-
-      this.#pageEnv.set({
-        pageId: PageId.CATALOGUE_CONCEPTS,
-        title,
-      });
-    });
-  }
-
   protected readonly dataResource = rxResource({
     id: `catalogue-concepts-data-${this.#catname() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => ({authenticated: this.#authenticated(), brand: this.brandData(), page: this.#page()}),
@@ -234,4 +215,23 @@ export class CatalogueConcepts {
   });
 
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      const title = this.title();
+      if (title === undefined) {
+        return;
+      }
+
+      this.#pageEnv.set({
+        pageId: PageId.CATALOGUE_CONCEPTS,
+        title,
+      });
+    });
+  }
 }

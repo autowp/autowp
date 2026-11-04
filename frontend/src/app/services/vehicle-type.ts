@@ -15,6 +15,15 @@ export class VehicleTypeService {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
+  readonly #typesPlain$ = this.#types$.pipe(
+    map((types) => {
+      const result: VehicleType[] = [];
+      this.walkTypes(types, (type) => result.push(type));
+      return result;
+    }),
+    shareReplay({bufferSize: 1, refCount: false}),
+  );
+
   private walkTypes(types: VehicleType[], callback: (type: VehicleType) => void) {
     for (const type of types) {
       callback(type);
@@ -25,15 +34,6 @@ export class VehicleTypeService {
   public getTypes$(): Observable<VehicleType[]> {
     return this.#types$;
   }
-
-  readonly #typesPlain$ = this.#types$.pipe(
-    map((types) => {
-      const result: VehicleType[] = [];
-      this.walkTypes(types, (type) => result.push(type));
-      return result;
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
 
   public getTypesPlain$(): Observable<VehicleType[]> {
     return this.#typesPlain$;

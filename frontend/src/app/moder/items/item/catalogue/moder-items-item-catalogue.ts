@@ -170,6 +170,8 @@ export class ModerItemsItemCatalogue {
     map((response) => response.items ?? []),
   );
 
+  protected readonly ItemParentType = ItemParentType;
+
   protected itemFormatter(x: Item) {
     return x.nameText;
   }
@@ -232,6 +234,4 @@ export class ModerItemsItemCatalogue {
   protected deleteParent(item: Item, parentId: string) {
     this.deleteItemParent(item.id, parentId);
   }
-
-  protected readonly ItemParentType = ItemParentType;
 }

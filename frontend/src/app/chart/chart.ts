@@ -86,6 +86,8 @@ export class Chart implements OnInit {
     labels: [],
   };
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.HOME});
   }
@@ -146,6 +148,4 @@ export class Chart implements OnInit {
 
     return false;
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -39,10 +39,10 @@ export class ModerItemsItemSelectParentTree {
     ),
   );
 
+  protected readonly ItemParentsRequest = ItemParentsRequest;
+
   protected onSelect(itemID: string) {
     this.selected.emit(itemID);
     return false;
   }
-
-  protected readonly ItemParentsRequest = ItemParentsRequest;
 }

@@ -143,37 +143,6 @@ export class CatalogueIndex {
     },
   });
 
-  constructor() {
-    // NOT_FOUND is reported to NotFoundService (App renders <app-page-not-found> in place
-    // of the outlet) rather than via Router.navigate(['/error-404']): SSR doesn't honour an
-    // imperative navigation fired mid-render - whenStable() can serialize a blank outlet before it
-    // registers. Non-NOT_FOUND errors aren't toasted here - the template already renders
-    // `errorMessage(brandResource.error())` inline, so a toast would just duplicate it.
-    effect(() => {
-      if (isNotFoundError(this.brandResource.error())) {
-        this.#notFound.report();
-        return;
-      }
-
-      // resource.value() throws while its resource is in an error state - hasValue() is the
-      // reactive guard against that.
-      if (!this.brandResource.hasValue()) {
-        return;
-      }
-
-      const brand = this.brandResource.value();
-      this.#meta.updateTag({property: 'og:title', content: brand.nameText});
-      if (brand.logo120) {
-        this.#meta.updateTag({property: 'og:image', content: brand.logo120.src});
-      }
-
-      this.#pageEnv.set({
-        pageId: PageId.CATALOGUE_INDEX,
-        title: brand.nameText,
-      });
-    });
-  }
-
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
   // guard against that, so the chained resources below don't blow up on a non-NOT_FOUND
   // brandResource error (surfaced generically by the template instead).
@@ -318,4 +287,35 @@ export class CatalogueIndex {
   });
 
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    // NOT_FOUND is reported to NotFoundService (App renders <app-page-not-found> in place
+    // of the outlet) rather than via Router.navigate(['/error-404']): SSR doesn't honour an
+    // imperative navigation fired mid-render - whenStable() can serialize a blank outlet before it
+    // registers. Non-NOT_FOUND errors aren't toasted here - the template already renders
+    // `errorMessage(brandResource.error())` inline, so a toast would just duplicate it.
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that.
+      if (!this.brandResource.hasValue()) {
+        return;
+      }
+
+      const brand = this.brandResource.value();
+      this.#meta.updateTag({property: 'og:title', content: brand.nameText});
+      if (brand.logo120) {
+        this.#meta.updateTag({property: 'og:image', content: brand.logo120.src});
+      }
+
+      this.#pageEnv.set({
+        pageId: PageId.CATALOGUE_INDEX,
+        title: brand.nameText,
+      });
+    });
+  }
 }

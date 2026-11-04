@@ -161,6 +161,9 @@ export class InboxPage implements OnInit {
 
   protected readonly brandID = new FormControl<string>('', {nonNullable: true});
 
+  protected readonly formatGrpcDate = formatGrpcDate;
+  protected readonly parseGrpcDate = parseGrpcDate;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.INBOX});
   }
@@ -168,7 +171,4 @@ export class InboxPage implements OnInit {
   protected changeBrand() {
     void this.#router.navigate(['/inbox', this.brandID.value ? this.brandID.value : 'all']);
   }
-
-  protected readonly formatGrpcDate = formatGrpcDate;
-  protected readonly parseGrpcDate = parseGrpcDate;
 }

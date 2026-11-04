@@ -55,6 +55,8 @@ export class PersonsPerson {
         .pipe(switchMap((item) => (item.itemTypeId === ItemType.ITEM_TYPE_PERSON ? of(item) : notFoundError()))),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
@@ -75,6 +77,4 @@ export class PersonsPerson {
       });
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

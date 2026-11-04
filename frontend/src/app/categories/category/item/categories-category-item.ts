@@ -273,6 +273,8 @@ export class CategoriesCategoryItem {
   // Same reasoning as categoryData above.
   protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       const current = this.categoryData()?.current;
@@ -282,6 +284,4 @@ export class CategoriesCategoryItem {
       });
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

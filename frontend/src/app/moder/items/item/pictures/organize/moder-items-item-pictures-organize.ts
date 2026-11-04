@@ -144,6 +144,8 @@ export class ModerItemsItemPicturesOrganize implements OnInit {
     return newItem;
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
@@ -249,6 +251,4 @@ export class ModerItemsItemPicturesOrganize implements OnInit {
         });
       });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

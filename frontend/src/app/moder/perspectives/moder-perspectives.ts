@@ -26,6 +26,8 @@ export class ModerPerspectives implements OnInit {
     stream: () => this.#picturesClient.getPerspectivePages(new Empty()),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
@@ -36,6 +38,4 @@ export class ModerPerspectives implements OnInit {
   protected getPerspectiveTranslation(id: string): string {
     return getPerspectiveTranslation(id);
   }
-
-  protected readonly errorMessage = errorMessage;
 }

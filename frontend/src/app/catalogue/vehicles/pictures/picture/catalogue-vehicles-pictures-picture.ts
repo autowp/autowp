@@ -190,6 +190,8 @@ export class CatalogueVehiclesPicturesPicture {
       ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.catalogueResource.error()) || isNotFoundError(this.pictureResource.error())) {
@@ -227,6 +229,4 @@ export class CatalogueVehiclesPicturesPicture {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
-
-  protected readonly errorMessage = errorMessage;
 }

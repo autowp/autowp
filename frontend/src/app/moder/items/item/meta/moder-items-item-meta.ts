@@ -47,6 +47,14 @@ export class ModerItemsItemMeta implements OnInit {
   // construction but before ngOnInit.
   protected vehicleTypeIDsResource!: ResourceRef<string[] | undefined>;
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the template below doesn't blow up on a non-NOT_FOUND
+  // vehicleTypeIDsResource error (this form section has no inline slot for an error message, so it
+  // just stays hidden instead).
+  protected readonly vehicleTypeIDsData = computed(() =>
+    this.vehicleTypeIDsResource.hasValue() ? this.vehicleTypeIDsResource.value() : undefined,
+  );
+
   ngOnInit(): void {
     this.vehicleTypeIDsResource = rxResource({
       // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
@@ -78,14 +86,6 @@ export class ModerItemsItemMeta implements OnInit {
       },
     });
   }
-
-  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
-  // guard against that, so the template below doesn't blow up on a non-NOT_FOUND
-  // vehicleTypeIDsResource error (this form section has no inline slot for an error message, so it
-  // just stays hidden instead).
-  protected readonly vehicleTypeIDsData = computed(() =>
-    this.vehicleTypeIDsResource.hasValue() ? this.vehicleTypeIDsResource.value() : undefined,
-  );
 
   protected saveMeta(item: Item, event: ItemMetaFormResult) {
     if (this.loadingNumber()) {

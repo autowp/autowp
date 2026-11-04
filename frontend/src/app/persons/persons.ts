@@ -134,6 +134,8 @@ export class Persons implements OnInit {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.PERSONS});
   }
@@ -186,6 +188,4 @@ export class Persons implements OnInit {
       };
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

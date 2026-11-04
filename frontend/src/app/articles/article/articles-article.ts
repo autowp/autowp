@@ -43,6 +43,8 @@ export class ArticlesArticle {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.articleResource.error())) {
@@ -65,6 +67,4 @@ export class ArticlesArticle {
       this.#meta.updateTag({property: 'og:title', content: article.name});
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

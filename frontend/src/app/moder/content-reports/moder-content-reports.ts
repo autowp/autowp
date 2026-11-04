@@ -134,6 +134,20 @@ export class ModerContentReports implements OnInit {
 
   readonly #commentLinkCache = new Map<string, Observable<CommentLink | null>>();
 
+  protected readonly ContentReportEntityType = ContentReportEntityType;
+  protected readonly ContentReportReason = ContentReportReason;
+  protected readonly ContentReportStatus = ContentReportStatus;
+
+  protected readonly reasons: Record<number, string> = {
+    [ContentReportReason.CONTENT_REPORT_REASON_COPYRIGHT]: $localize`Copyright infringement`,
+    [ContentReportReason.CONTENT_REPORT_REASON_ILLEGAL]: $localize`Illegal or prohibited content`,
+    [ContentReportReason.CONTENT_REPORT_REASON_SPAM]: $localize`Spam or advertising`,
+    [ContentReportReason.CONTENT_REPORT_REASON_PRIVACY]: $localize`Disclosure of private information`,
+    [ContentReportReason.CONTENT_REPORT_REASON_OTHER]: $localize`Other`,
+  };
+
+  protected readonly timestampToDate = timestampToDate;
+
   protected getCommentLink$(id: string): Observable<CommentLink | null> {
     let o$ = this.#commentLinkCache.get(id);
     if (!o$) {
@@ -151,20 +165,6 @@ export class ModerContentReports implements OnInit {
 
     return o$;
   }
-
-  protected readonly ContentReportEntityType = ContentReportEntityType;
-  protected readonly ContentReportReason = ContentReportReason;
-  protected readonly ContentReportStatus = ContentReportStatus;
-
-  protected readonly reasons: Record<number, string> = {
-    [ContentReportReason.CONTENT_REPORT_REASON_COPYRIGHT]: $localize`Copyright infringement`,
-    [ContentReportReason.CONTENT_REPORT_REASON_ILLEGAL]: $localize`Illegal or prohibited content`,
-    [ContentReportReason.CONTENT_REPORT_REASON_SPAM]: $localize`Spam or advertising`,
-    [ContentReportReason.CONTENT_REPORT_REASON_PRIVACY]: $localize`Disclosure of private information`,
-    [ContentReportReason.CONTENT_REPORT_REASON_OTHER]: $localize`Other`,
-  };
-
-  protected readonly timestampToDate = timestampToDate;
 
   ngOnInit(): void {
     this.#pageEnv.set({

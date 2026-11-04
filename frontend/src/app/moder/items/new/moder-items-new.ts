@@ -121,6 +121,18 @@ export class ModerItemsNew {
     }),
   );
 
+  protected readonly formParams$: Observable<{
+    item: Item;
+    parentIsConcept: ParentIsConcept;
+    vehicleTypeIDs: string[];
+  }> = combineLatest([this.item$, this.parent$, this.#vehicleTypeIDs$]).pipe(
+    map(([item, parent, vehicleTypeIDs]) => ({
+      item,
+      parentIsConcept: {isConcept: parent ? parent.isConcept : false},
+      vehicleTypeIDs,
+    })),
+  );
+
   protected submit(itemTypeID: ItemType, event: ItemMetaFormResult) {
     if (this.sending()) {
       return;
@@ -190,16 +202,4 @@ export class ModerItemsNew {
         },
       });
   }
-
-  protected readonly formParams$: Observable<{
-    item: Item;
-    parentIsConcept: ParentIsConcept;
-    vehicleTypeIDs: string[];
-  }> = combineLatest([this.item$, this.parent$, this.#vehicleTypeIDs$]).pipe(
-    map(([item, parent, vehicleTypeIDs]) => ({
-      item,
-      parentIsConcept: {isConcept: parent ? parent.isConcept : false},
-      vehicleTypeIDs,
-    })),
-  );
 }

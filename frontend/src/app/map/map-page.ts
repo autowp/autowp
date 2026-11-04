@@ -143,6 +143,20 @@ export class MapPage implements OnDestroy, OnInit {
   readonly #mode$ = toObservable(this.mode);
   readonly #bounds$ = new BehaviorSubject<LatLngBounds | null>(null);
 
+  protected readonly options: MapOptions = {
+    center: this.initialCenter(),
+    doubleClickZoom: true,
+    dragging: true,
+    layers: [
+      tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+      }),
+    ],
+    zoom: this.initialZoom(),
+    zoomAnimation: true,
+    zoomControl: true,
+  };
+
   // Read once at construction time (via the route snapshot, not the reactive queryParamMap) so
   // the map is centered correctly on first render - by the time ngOnInit/onMapReady run, Leaflet
   // needs its initial options already in hand.
@@ -158,20 +172,6 @@ export class MapPage implements OnDestroy, OnInit {
   private initialZoom(): number {
     return parseQueryParamNumber(this.#route.snapshot.queryParamMap.get('zoom'), DEFAULT_ZOOM, 0, 18);
   }
-
-  public readonly options: MapOptions = {
-    center: this.initialCenter(),
-    doubleClickZoom: true,
-    dragging: true,
-    layers: [
-      tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-      }),
-    ],
-    zoom: this.initialZoom(),
-    zoomAnimation: true,
-    zoomControl: true,
-  };
 
   // Mirrors the map's current view into the URL (merged with the existing mode param) so a
   // refresh or a switch between objects/pictures mode restores the same view instead of resetting

@@ -96,6 +96,8 @@ export class CarsSpecsAdmin implements OnInit {
         ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   #mapUserValue(userValue: AttrUserValue): Observable<AttrUserValueListItem> {
     const attr$ = this.#attrsService.getAttribute$(userValue.attributeId);
     return forkJoin([
@@ -157,6 +159,4 @@ export class CarsSpecsAdmin implements OnInit {
         },
       });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

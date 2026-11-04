@@ -86,6 +86,8 @@ export class CarsSpecificationsEditor {
     }),
   );
 
+  protected readonly ItemType = ItemType;
+
   protected onEngineChanged() {
     this.#change$.next();
   }
@@ -105,6 +107,4 @@ export class CarsSpecificationsEditor {
       },
     });
   }
-
-  protected readonly ItemType = ItemType;
 }

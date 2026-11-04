@@ -68,6 +68,15 @@ export class Brands implements OnInit {
       ),
   });
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, since the template reads iconsResource.value() without an error() check
+  // of its own (a missing icon set just leaves the brand icons unrendered).
+  protected readonly iconsData = computed(() =>
+    this.iconsResource.hasValue() ? this.iconsResource.value() : undefined,
+  );
+
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.BRANDS});
   }
@@ -82,13 +91,4 @@ export class Brands implements OnInit {
       element.scrollIntoView({behavior: 'smooth'});
     }
   }
-
-  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
-  // guard against that, since the template reads iconsResource.value() without an error() check
-  // of its own (a missing icon set just leaves the brand icons unrendered).
-  protected readonly iconsData = computed(() =>
-    this.iconsResource.hasValue() ? this.iconsResource.value() : undefined,
-  );
-
-  protected readonly errorMessage = errorMessage;
 }

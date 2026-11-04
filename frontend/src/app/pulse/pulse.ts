@@ -97,6 +97,8 @@ export class Pulse implements OnInit {
     }),
   );
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.PULSE});
   }
@@ -110,6 +112,4 @@ export class Pulse implements OnInit {
 
     return false;
   }
-
-  protected readonly errorMessage = errorMessage;
 }

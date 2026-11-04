@@ -396,6 +396,9 @@ export class CatalogueVehicles {
     },
   });
 
+  protected readonly convertChildsCounts = convertChildsCounts;
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.catalogueResource.error()) || isNotFoundError(this.itemResource.error())) {
@@ -471,7 +474,4 @@ export class CatalogueVehicles {
   protected getItemTypeTranslation(id: number, type: string) {
     return getItemTypeTranslation(id, type);
   }
-
-  protected readonly convertChildsCounts = convertChildsCounts;
-  protected readonly errorMessage = errorMessage;
 }

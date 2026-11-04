@@ -148,6 +148,8 @@ export class PersonsPersonInfo {
         .pipe(catchError(() => of(null))),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
@@ -168,6 +170,4 @@ export class PersonsPersonInfo {
       });
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -91,6 +91,8 @@ export class UsersUserComments {
     {apiValue: GetMessagesRequest.Order.VOTE_ASC, name: $localize`Negative`, value: 'vote_asc'},
   ];
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error())) {
@@ -109,6 +111,4 @@ export class UsersUserComments {
     const o = this.orders.find((o) => o.value === order);
     return o ? o.apiValue : undefined;
   }
-
-  protected readonly errorMessage = errorMessage;
 }

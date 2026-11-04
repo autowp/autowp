@@ -61,6 +61,8 @@ export class TwinsGroup {
     this.groupResource.hasValue() ? this.groupResource.value() : undefined,
   );
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.groupResource.error())) {
@@ -77,6 +79,4 @@ export class TwinsGroup {
       }
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

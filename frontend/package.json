@@ -7,6 +7,7 @@
     "start": "ng serve",
     "build": "ng build --configuration production",
     "lint": "ng lint --cache",
+    "lint:rules": "node --test tools/eslint/*.test.mjs",
     "proto:generate": "protoc --plugin=protoc-gen-ng=./node_modules/.bin/protoc-gen-ng --ng_out=config=./ngx-grpc.conf.js:generated -I ../goautowp spec.proto",
     "serve:ssr:wheelsage": "node dist/server/server.js"
   },

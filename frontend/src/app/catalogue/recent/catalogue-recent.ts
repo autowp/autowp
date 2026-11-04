@@ -106,47 +106,6 @@ export class CatalogueRecent {
     },
   });
 
-  constructor() {
-    effect(() => {
-      if (isNotFoundError(this.brandResource.error())) {
-        this.#notFound.report();
-        return;
-      }
-
-      if (!this.brandResource.hasValue()) {
-        return;
-      }
-
-      this.#pageEnv.set({
-        pageId: PageId.CATALOGUE_RECENT,
-        title: $localize`Last pictures of ${this.brandResource.value().nameText}`,
-      });
-    });
-
-    // Beyond the last page there is nothing to paginate to, so a page number past it names no
-    // distinct resource - redirect callers straight to the one that does, rather than rendering an
-    // empty page for every number above it.
-    effect(() => {
-      const page = this.#page();
-      const last = this.picturesResource.value()?.paginator?.pageCount;
-
-      if (last === undefined || !Number.isFinite(page) || page <= last) {
-        return;
-      }
-
-      if (this.#response) {
-        this.#response.status = 301;
-        this.#response.statusText = 'Moved Permanently';
-      }
-
-      void this.#router.navigate([], {
-        queryParams: {page: last},
-        queryParamsHandling: 'merge',
-        replaceUrl: true,
-      });
-    });
-  }
-
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
   // guard against that, so picturesResource's params() below doesn't blow up on a non-NOT_FOUND
   // brandResource error (surfaced generically by the template instead).
@@ -207,4 +166,45 @@ export class CatalogueRecent {
   });
 
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      if (!this.brandResource.hasValue()) {
+        return;
+      }
+
+      this.#pageEnv.set({
+        pageId: PageId.CATALOGUE_RECENT,
+        title: $localize`Last pictures of ${this.brandResource.value().nameText}`,
+      });
+    });
+
+    // Beyond the last page there is nothing to paginate to, so a page number past it names no
+    // distinct resource - redirect callers straight to the one that does, rather than rendering an
+    // empty page for every number above it.
+    effect(() => {
+      const page = this.#page();
+      const last = this.picturesResource.value()?.paginator?.pageCount;
+
+      if (last === undefined || !Number.isFinite(page) || page <= last) {
+        return;
+      }
+
+      if (this.#response) {
+        this.#response.status = 301;
+        this.#response.statusText = 'Moved Permanently';
+      }
+
+      void this.#router.navigate([], {
+        queryParams: {page: last},
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    });
+  }
 }

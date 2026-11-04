@@ -125,6 +125,8 @@ export class ModerItemsItemSelectParentCatalogue {
     ),
   );
 
+  protected readonly ItemParentsRequest = ItemParentsRequest;
+
   protected doSearch(search: string) {
     void this.#router.navigate([], {
       queryParams: {search},
@@ -136,6 +138,4 @@ export class ModerItemsItemSelectParentCatalogue {
     this.selected.emit(itemID);
     return false;
   }
-
-  protected readonly ItemParentsRequest = ItemParentsRequest;
 }

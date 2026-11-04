@@ -75,6 +75,8 @@ export class TwinsGroupSpecifications {
     return response ? this.#sanitizer.bypassSecurityTrustHtml(response.html) : null;
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.groupResource.error())) {
@@ -96,6 +98,4 @@ export class TwinsGroupSpecifications {
       });
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

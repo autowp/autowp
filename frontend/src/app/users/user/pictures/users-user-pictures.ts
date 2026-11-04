@@ -130,6 +130,8 @@ export class UsersUserPictures implements OnInit {
     this.brandsResource.hasValue() ? this.brandsResource.value() : undefined,
   );
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error())) {
@@ -155,6 +157,4 @@ export class UsersUserPictures implements OnInit {
   protected cssClass(item: Item) {
     return item.catname.replace(/\./g, '_');
   }
-
-  protected readonly errorMessage = errorMessage;
 }

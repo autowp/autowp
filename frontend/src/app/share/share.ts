@@ -15,7 +15,7 @@ export class Share {
   readonly url = input.required<string>();
   readonly text = input.required<string>();
 
-  buildURL(url: string, params: Record<string, string>): string {
+  protected buildURL(url: string, params: Record<string, string>): string {
     let p = new HttpParams();
     for (const key of Object.keys(params)) {
       p = p.set(key, params[key]);

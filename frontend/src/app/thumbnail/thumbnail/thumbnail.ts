@@ -69,6 +69,8 @@ export class Thumbnail implements OnInit {
     this.ownerResource.hasValue() ? this.ownerResource.value() : undefined,
   );
 
+  protected readonly PictureStatus = PictureStatus;
+
   ngOnInit(): void {
     // `id` (keyed by the owner) makes this resource seed itself from TransferState on hydration.
     // Without it the owner line in the template - rendered inside an `@if (ownerData(); as owner)`
@@ -110,6 +112,4 @@ export class Thumbnail implements OnInit {
     picture.selected = !picture.selected;
     this.selected.emit(picture.selected);
   }
-
-  protected readonly PictureStatus = PictureStatus;
 }

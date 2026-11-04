@@ -97,6 +97,8 @@ export class TwinsGroupPicturesList {
       ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.groupResource.error())) {
@@ -118,6 +120,4 @@ export class TwinsGroupPicturesList {
       });
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

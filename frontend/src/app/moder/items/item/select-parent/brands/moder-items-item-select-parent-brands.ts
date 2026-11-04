@@ -68,6 +68,8 @@ export class ModerItemsItemSelectParentBrands {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   protected doSearch(search: string) {
     void this.#router.navigate([], {
       queryParams: {search},
@@ -79,6 +81,4 @@ export class ModerItemsItemSelectParentBrands {
     this.selected.emit(itemID);
     return false;
   }
-
-  protected readonly errorMessage = errorMessage;
 }

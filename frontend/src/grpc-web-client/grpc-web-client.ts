@@ -75,6 +75,18 @@ export class NgGrpcWebClientFactory implements GrpcClientFactory<NgGrpcWebClient
 export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
   readonly #withCredentials: boolean;
 
+  public serverStream = () => {
+    throw new Error('Server streaming not supported');
+  };
+
+  public clientStream = () => {
+    throw new Error('Client streaming not supported');
+  };
+
+  public bidiStream = () => {
+    throw new Error('Bidirectional streaming not supported');
+  };
+
   constructor(
     private readonly settings: NgGrpcWebClientSettings,
     private readonly httpClient: HttpClient,
@@ -310,18 +322,6 @@ export class NgGrpcWebClient implements GrpcClient<NgGrpcWebClientSettings> {
   private handleError_(error: RpcError): GrpcStatusEvent {
     return new GrpcStatusEvent(error.code, decodeURIComponent(error.message || ''), new GrpcMetadata(error.metadata));
   }
-
-  public serverStream = () => {
-    throw new Error('Server streaming not supported');
-  };
-
-  public clientStream = () => {
-    throw new Error('Client streaming not supported');
-  };
-
-  public bidiStream = () => {
-    throw new Error('Bidirectional streaming not supported');
-  };
 
   /**
    * Encode the grpc-web request

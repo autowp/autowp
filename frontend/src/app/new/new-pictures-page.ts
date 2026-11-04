@@ -126,9 +126,9 @@ export class NewPicturesPage implements OnInit {
     })),
   );
 
+  protected readonly formatDate = formatDate;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ITEM_NEW});
   }
-
-  protected readonly formatDate = formatDate;
 }

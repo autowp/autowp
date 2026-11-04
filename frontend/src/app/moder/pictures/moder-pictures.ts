@@ -647,6 +647,8 @@ export class ModerPictures implements OnDestroy, OnInit {
     .getTemplates$()
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
 
+  protected readonly PicturesRequest = PicturesRequest;
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
@@ -841,6 +843,4 @@ export class ModerPictures implements OnDestroy, OnInit {
       this.#change$.next();
     });
   }
-
-  protected readonly PicturesRequest = PicturesRequest;
 }

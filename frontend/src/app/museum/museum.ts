@@ -112,6 +112,8 @@ export class Museum {
 
   protected readonly CommentsType = CommentsType;
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.itemResource.error())) {
@@ -128,6 +130,4 @@ export class Museum {
       }
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

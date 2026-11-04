@@ -26,6 +26,8 @@ export class ItemCard {
 
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
 
+  protected readonly ItemType = ItemType;
+
   protected havePhoto(item: Item) {
     return (item.previewPictures?.pictures ?? []).length > 0;
   }
@@ -47,6 +49,4 @@ export class ItemCard {
 
     return 'col-6 col-lg-3';
   }
-
-  protected readonly ItemType = ItemType;
 }

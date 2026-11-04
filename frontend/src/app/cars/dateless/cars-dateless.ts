@@ -87,9 +87,9 @@ export class CarsDateless implements OnInit {
       ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.HOME});
   }
-
-  protected readonly errorMessage = errorMessage;
 }

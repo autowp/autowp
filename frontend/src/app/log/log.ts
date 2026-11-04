@@ -119,6 +119,8 @@ export class Log implements OnInit {
         ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   #fetchPictures$(ids: string[]): Observable<Map<string, Picture>> {
     if (ids.length === 0) {
       return of(new Map<string, Picture>());
@@ -179,6 +181,4 @@ export class Log implements OnInit {
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.LOG});
   }
-
-  protected readonly errorMessage = errorMessage;
 }

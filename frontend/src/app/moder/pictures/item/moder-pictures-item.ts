@@ -229,10 +229,6 @@ export class ModerPicturesItem {
     }),
   );
 
-  protected getUser$(id: string): Observable<null | User> {
-    return this.#userService.getUser$(id, {authenticated: true});
-  }
-
   protected readonly lastItem$: Observable<LastItemInfo> = this.picture$.pipe(
     switchMap((picture) => {
       const localStorage = this.#window?.localStorage;
@@ -293,6 +289,10 @@ export class ModerPicturesItem {
     value: null | number;
   }[];
 
+  protected readonly ItemType = ItemType;
+  protected readonly PictureItemType = PictureItemType;
+  protected readonly PictureStatus = PictureStatus;
+
   constructor() {
     this.monthOptions = [
       {
@@ -326,6 +326,10 @@ export class ModerPicturesItem {
         value: i,
       });
     }
+  }
+
+  protected getUser$(id: string): Observable<null | User> {
+    return this.#userService.getUser$(id, {authenticated: true});
   }
 
   protected savePerspective(perspectiveId: null | number, item: PictureItem) {
@@ -741,8 +745,4 @@ export class ModerPicturesItem {
         },
       });
   }
-
-  protected readonly ItemType = ItemType;
-  protected readonly PictureItemType = PictureItemType;
-  protected readonly PictureStatus = PictureStatus;
 }

@@ -49,6 +49,8 @@ export class CategoryGallery implements OnInit {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.dataResource.error())) {
@@ -86,6 +88,4 @@ export class CategoryGallery implements OnInit {
       });
     }
   }
-
-  protected readonly errorMessage = errorMessage;
 }

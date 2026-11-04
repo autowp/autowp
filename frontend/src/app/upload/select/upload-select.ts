@@ -113,6 +113,9 @@ export class UploadSelect implements OnInit {
     })),
   );
 
+  protected readonly perspectiveIDLogotype = perspectiveIDLogotype;
+  protected readonly perspectiveIDMixed = perspectiveIDMixed;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.UPLOAD_SELECT});
   }
@@ -248,7 +251,4 @@ export class UploadSelect implements OnInit {
         ),
     ]);
   }
-
-  protected readonly perspectiveIDLogotype = perspectiveIDLogotype;
-  protected readonly perspectiveIDMixed = perspectiveIDMixed;
 }

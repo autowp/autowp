@@ -220,19 +220,6 @@ export class CarsSpecificationsEditorSpec {
     }),
   );
 
-  private applyUserValues(userValues: Map<string, AttrUserValueWithUser[]>, items: AttrUserValue[]) {
-    for (const userValue of items) {
-      const v: AttrUserValueWithUser = {user$: this.#userService.getUser$(userValue.userId), userValue};
-      const values = userValues.get(userValue.attributeId);
-      if (values === undefined) {
-        userValues.set(userValue.attributeId, [v]);
-      } else {
-        values.push(v);
-        userValues.set(userValue.attributeId, values);
-      }
-    }
-  }
-
   protected readonly values$ = combineLatest([this.item$, this.#change$]).pipe(
     // item is a required input(), always defined here.
     switchMap(([item]) =>
@@ -276,6 +263,30 @@ export class CarsSpecificationsEditorSpec {
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
+
+  readonly #listOptions$: Observable<{attributeId: string; id: string; name: string; parentId: string}[]> =
+    this.#attrsService.getListOptions$(undefined).pipe(
+      map((response) =>
+        (response.items ?? []).map((i) => ({
+          ...i.toObject(),
+          name: getAttrListOptionsTranslation(i.name),
+        })),
+      ),
+      shareReplay({bufferSize: 1, refCount: false}),
+    );
+
+  private applyUserValues(userValues: Map<string, AttrUserValueWithUser[]>, items: AttrUserValue[]) {
+    for (const userValue of items) {
+      const v: AttrUserValueWithUser = {user$: this.#userService.getUser$(userValue.userId), userValue};
+      const values = userValues.get(userValue.attributeId);
+      if (values === undefined) {
+        userValues.set(userValue.attributeId, [v]);
+      } else {
+        values.push(v);
+        userValues.set(userValue.attributeId, values);
+      }
+    }
+  }
 
   protected saveSpecs(item: Item, form: FormArray<AttrFormControls>) {
     const items = form.controls.map((control) => {
@@ -359,17 +370,6 @@ export class CarsSpecificationsEditorSpec {
       },
     });
   }
-
-  readonly #listOptions$: Observable<{attributeId: string; id: string; name: string; parentId: string}[]> =
-    this.#attrsService.getListOptions$(undefined).pipe(
-      map((response) =>
-        (response.items ?? []).map((i) => ({
-          ...i.toObject(),
-          name: getAttrListOptionsTranslation(i.name),
-        })),
-      ),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
 
   private listOptionsTree(items: AttrListOption.AsObject[], parentID: string): ListOption[] {
     const result: ListOption[] = [];

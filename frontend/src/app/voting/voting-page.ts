@@ -52,6 +52,8 @@ export class VotingPage {
 
   protected readonly CommentsType = CommentsType;
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.votingResource.error())) {
@@ -151,6 +153,4 @@ export class VotingPage {
 
     return false;
   }
-
-  protected readonly errorMessage = errorMessage;
 }

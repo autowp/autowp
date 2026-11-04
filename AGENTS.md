@@ -351,6 +351,15 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   with matching `user-profile.html` and `user-profile.scss`. Omit the `Component` suffix.
   Choose descriptive names such as `UserLink` or `MapPage` when a shorter name conflicts with
   a domain/API type. Keep existing selectors stable when renaming.
+- **Class member order** — declare fields before the constructor and methods. Preserve field
+  initialization order; do not sort fields by visibility or alphabetically. ESLint checks the
+  groups with `local-angular/member-order` (arrow functions remain fields); the generic
+  `@typescript-eslint/member-ordering` and `perfectionist/sort-classes` rules stay disabled.
+- **Component template API** — use `protected` for members used only by the component and its
+  template. Inputs, outputs, models and methods called by consumers remain public. Check callers
+  before narrowing visibility; this distinction is reviewed manually.
+- **Naming checks** — the local ESLint `local-angular/component-names` rule checks component class,
+  filename and colocated template/style names. Run `npm run lint:rules` when changing lint rules.
 
 - **`preserveWhitespaces: false`** — set globally in `tsconfig.json`'s `angularCompilerOptions`
   (Angular's SSR recommendation); no component overrides it, and none should. When a template edit

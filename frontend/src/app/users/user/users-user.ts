@@ -266,6 +266,8 @@ export class UsersUser {
     this.userPreferencesResource.hasValue() ? this.userPreferencesResource.value().blockedByTarget : false,
   );
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error())) {
@@ -417,6 +419,4 @@ export class UsersUser {
   protected getAchievementDescriptionTranslation(code: string): string {
     return getAchievementDescriptionTranslation(code);
   }
-
-  protected readonly errorMessage = errorMessage;
 }

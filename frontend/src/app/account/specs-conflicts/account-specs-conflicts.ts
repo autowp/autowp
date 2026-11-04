@@ -79,17 +79,6 @@ export class AccountSpecsConflicts implements OnInit {
 
   readonly #itemsCache = new Map<string, Observable<Item>>();
 
-  private getItem$(id: string): Observable<Item | null> {
-    let o$ = this.#itemsCache.get(id);
-    if (!o$) {
-      o$ = this.#itemsClient
-        .item(new ItemRequest({fields: new ItemFields({nameHtml: true}), id, language: this.#languageService.language}))
-        .pipe(shareReplay({bufferSize: 1, refCount: false}));
-      this.#itemsCache.set(id, o$);
-    }
-    return o$;
-  }
-
   protected readonly data$: Observable<{conflicts: APIAttrConflictInList[]; paginator: Pages | undefined}> =
     combineLatest([this.page$, this.filter$]).pipe(
       switchMap(([page, filter]) =>
@@ -129,6 +118,17 @@ export class AccountSpecsConflicts implements OnInit {
     );
 
   protected readonly AttrConflictsRequest = AttrConflictsRequest;
+
+  private getItem$(id: string): Observable<Item | null> {
+    let o$ = this.#itemsCache.get(id);
+    if (!o$) {
+      o$ = this.#itemsClient
+        .item(new ItemRequest({fields: new ItemFields({nameHtml: true}), id, language: this.#languageService.language}))
+        .pipe(shareReplay({bufferSize: 1, refCount: false}));
+      this.#itemsCache.set(id, o$);
+    }
+    return o$;
+  }
 
   protected getAttrsTranslation(id: string): string {
     return getAttrsTranslation(id);

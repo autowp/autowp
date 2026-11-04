@@ -119,6 +119,8 @@ export class PersonsPersonAuthorPicture {
 
   protected readonly CommentsType = CommentsType;
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.pictureResource.error())) {
@@ -158,6 +160,4 @@ export class PersonsPersonAuthorPicture {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
-
-  protected readonly errorMessage = errorMessage;
 }

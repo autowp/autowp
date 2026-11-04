@@ -163,15 +163,7 @@ export class Twins {
     };
   });
 
-  private static hasMoreImages(group: Item): boolean {
-    let count = 0;
-    for (const itemParent of group.itemParentChilds?.items ?? []) {
-      if (itemParent.childDescendantPictures?.items?.length) {
-        count++;
-      }
-    }
-    return group.acceptedPicturesCount > count;
-  }
+  protected readonly errorMessage = errorMessage;
 
   constructor() {
     effect(() => {
@@ -191,5 +183,13 @@ export class Twins {
     });
   }
 
-  protected readonly errorMessage = errorMessage;
+  private static hasMoreImages(group: Item): boolean {
+    let count = 0;
+    for (const itemParent of group.itemParentChilds?.items ?? []) {
+      if (itemParent.childDescendantPictures?.items?.length) {
+        count++;
+      }
+    }
+    return group.acceptedPicturesCount > count;
+  }
 }

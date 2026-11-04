@@ -76,6 +76,48 @@ export class MostsContents implements OnInit {
   protected menuResource!: ResourceRef<MostsMenuData | undefined>;
   protected itemsResource!: ResourceRef<MostsItem[] | undefined>;
 
+  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
+  // guard against that, so the computeds below don't blow up when menuResource errors (the page
+  // just renders nothing, since ratingCatnameNormalized() falls through to undefined too).
+  protected readonly menuData = computed(() => (this.menuResource.hasValue() ? this.menuResource.value() : undefined));
+
+  protected readonly years = computed(() => this.menuData()?.years);
+  protected readonly ratings = computed(() => this.menuData()?.ratings);
+  protected readonly vehicleTypes = computed(() => this.menuData()?.vehicleTypes);
+
+  protected readonly defaultTypeCatname = computed(() => this.vehicleTypes()?.[0]?.catname);
+
+  // ratingCatname() is '' (not null) when the route has no rating_catname param - see
+  // mosts.ts's `?? ''` at the source - so the empty-string case must fall through to
+  // the first rating exactly like a real "unset" would. ?? wouldn't treat '' as unset.
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  protected readonly ratingCatnameNormalized = computed(() => this.ratingCatname() || this.ratings()?.[0]?.catname);
+
+  protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    // A rating or years range the backend doesn't know is a bad URL, not a failure worth an error
+    // panel: /mosts/** is walked by crawlers with mangled catnames (and by clients that resolve a
+    // page's relative asset links against the current path), and without this the page answered
+    // HTTP 200 with an error message on every one of them.
+    effect(() => {
+      if (isNotFoundError(this.itemsResource.error())) {
+        this.#notFound.report();
+      }
+    });
+
+    // Mirrors the original tap()-before-fetch placement: Mosts's own ngOnInit only runs
+    // once (Angular reuses this component instance across in-place /mosts/** param navigations),
+    // so this effect is what keeps pageEnv correctly set to pageId 21 on every subsequent
+    // rating/type/years change, independent of whether the items fetch below has resolved yet.
+    effect(() => {
+      this.ratingCatnameNormalized();
+      this.typeCatname();
+      this.yearsCatname();
+      this.#pageEnv.set({pageId: PageId.MOSTS});
+    });
+  }
+
   ngOnInit(): void {
     this.menuResource = rxResource({
       // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
@@ -141,46 +183,6 @@ export class MostsContents implements OnInit {
     });
   }
 
-  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
-  // guard against that, so the computeds below don't blow up when menuResource errors (the page
-  // just renders nothing, since ratingCatnameNormalized() falls through to undefined too).
-  protected readonly menuData = computed(() => (this.menuResource.hasValue() ? this.menuResource.value() : undefined));
-
-  protected readonly years = computed(() => this.menuData()?.years);
-  protected readonly ratings = computed(() => this.menuData()?.ratings);
-  protected readonly vehicleTypes = computed(() => this.menuData()?.vehicleTypes);
-
-  protected readonly defaultTypeCatname = computed(() => this.vehicleTypes()?.[0]?.catname);
-
-  // ratingCatname() is '' (not null) when the route has no rating_catname param - see
-  // mosts.ts's `?? ''` at the source - so the empty-string case must fall through to
-  // the first rating exactly like a real "unset" would. ?? wouldn't treat '' as unset.
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  protected readonly ratingCatnameNormalized = computed(() => this.ratingCatname() || this.ratings()?.[0]?.catname);
-
-  constructor() {
-    // A rating or years range the backend doesn't know is a bad URL, not a failure worth an error
-    // panel: /mosts/** is walked by crawlers with mangled catnames (and by clients that resolve a
-    // page's relative asset links against the current path), and without this the page answered
-    // HTTP 200 with an error message on every one of them.
-    effect(() => {
-      if (isNotFoundError(this.itemsResource.error())) {
-        this.#notFound.report();
-      }
-    });
-
-    // Mirrors the original tap()-before-fetch placement: Mosts's own ngOnInit only runs
-    // once (Angular reuses this component instance across in-place /mosts/** param navigations),
-    // so this effect is what keeps pageEnv correctly set to pageId 21 on every subsequent
-    // rating/type/years change, independent of whether the items fetch below has resolved yet.
-    effect(() => {
-      this.ratingCatnameNormalized();
-      this.typeCatname();
-      this.yearsCatname();
-      this.#pageEnv.set({pageId: PageId.MOSTS});
-    });
-  }
-
   protected getUnitAbbrTranslation(id: string): string {
     return getUnitAbbrTranslation(id);
   }
@@ -200,6 +202,4 @@ export class MostsContents implements OnInit {
   protected getMostsPeriodsTranslation(id: string): string {
     return getMostsPeriodsTranslation(id);
   }
-
-  protected readonly errorMessage = errorMessage;
 }

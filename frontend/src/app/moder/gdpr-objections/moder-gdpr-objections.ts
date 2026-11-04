@@ -148,6 +148,8 @@ export class ModerGdprObjections implements OnInit {
 
   protected readonly timestampToDate = timestampToDate;
 
+  readonly #commentLinkCache = new Map<string, Observable<CommentLink | null>>();
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
@@ -385,8 +387,6 @@ export class ModerGdprObjections implements OnInit {
         },
       });
   }
-
-  readonly #commentLinkCache = new Map<string, Observable<CommentLink | null>>();
 
   protected getCommentLink$(id: string): Observable<CommentLink | null> {
     let o$ = this.#commentLinkCache.get(id);

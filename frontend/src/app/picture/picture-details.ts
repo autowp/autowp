@@ -206,6 +206,79 @@ export class PictureDetails implements OnInit {
   protected readonly fillLicense = signal<PictureLicense>(PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED);
   protected readonly fillSourceUrl = signal('');
 
+  protected factoriesResource!: ResourceRef<Item[] | undefined>;
+  protected categoriesResource!: ResourceRef<Item[] | undefined>;
+  protected twinsResource!: ResourceRef<Item[] | undefined>;
+  protected brandsResource!: ResourceRef<Item[] | undefined>;
+  protected pictureItemsResource!: ResourceRef<PictureItem[] | undefined>;
+
+  // Same reasoning as ownerData above.
+  protected readonly factoriesData = computed(() =>
+    this.factoriesResource.hasValue() ? this.factoriesResource.value() : undefined,
+  );
+  protected readonly categoriesData = computed(() =>
+    this.categoriesResource.hasValue() ? this.categoriesResource.value() : undefined,
+  );
+  protected readonly twinsData = computed(() =>
+    this.twinsResource.hasValue() ? this.twinsResource.value() : undefined,
+  );
+  protected readonly brandsData = computed(() =>
+    this.brandsResource.hasValue() ? this.brandsResource.value() : undefined,
+  );
+  protected readonly pictureItemsData = computed(() =>
+    this.pictureItemsResource.hasValue() ? this.pictureItemsResource.value() : undefined,
+  );
+
+  protected readonly contentItems = computed(() =>
+    (this.pictureItemsData() ?? []).filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT),
+  );
+
+  protected readonly hasAuthorCredit = computed(() =>
+    (this.pictureItemsData() ?? []).some((item) => item.type === PictureItemType.PICTURE_ITEM_AUTHOR),
+  );
+
+  protected linksResource!: ResourceRef<ItemLink[] | undefined>;
+
+  // Same reasoning as ownerData above.
+  protected readonly linksData = computed(() =>
+    this.linksResource.hasValue() ? this.linksResource.value() : undefined,
+  );
+
+  protected readonly takenDate = computed<null | {date: Date; format: string}>(() => {
+    const date = this.picture().takenDate;
+    if (!date) {
+      return null;
+    }
+
+    if (date.year) {
+      const resDate = new Date();
+      resDate.setFullYear(date.year, 0, 1);
+      let format = 'yyyy';
+      if (date.month) {
+        resDate.setFullYear(date.year, date.month - 1, 1);
+        format = 'MM.yyyy';
+        if (date.day) {
+          resDate.setFullYear(date.year, date.month - 1, date.day);
+          format = 'dd.MM.yyyy';
+        }
+      }
+      return {date: resDate, format};
+    }
+
+    return null;
+  });
+
+  protected readonly PictureItemType = PictureItemType;
+  protected readonly PictureStatus = PictureStatus;
+  protected readonly ContentReportEntityType = ContentReportEntityType;
+  protected readonly ItemType = ItemType;
+  protected readonly specsItemTypes = new Set([
+    ItemType.ITEM_TYPE_CATEGORY,
+    ItemType.ITEM_TYPE_ENGINE,
+    ItemType.ITEM_TYPE_TWINS,
+    ItemType.ITEM_TYPE_VEHICLE,
+  ]);
+
   constructor() {
     effect(() => {
       this.#picturesClient.view(new PicturesViewRequest({pictureId: this.picture().id})).subscribe();
@@ -580,77 +653,4 @@ export class PictureDetails implements OnInit {
         this.#cdr.markForCheck();
       });
   }
-
-  protected factoriesResource!: ResourceRef<Item[] | undefined>;
-  protected categoriesResource!: ResourceRef<Item[] | undefined>;
-  protected twinsResource!: ResourceRef<Item[] | undefined>;
-  protected brandsResource!: ResourceRef<Item[] | undefined>;
-  protected pictureItemsResource!: ResourceRef<PictureItem[] | undefined>;
-
-  // Same reasoning as ownerData above.
-  protected readonly factoriesData = computed(() =>
-    this.factoriesResource.hasValue() ? this.factoriesResource.value() : undefined,
-  );
-  protected readonly categoriesData = computed(() =>
-    this.categoriesResource.hasValue() ? this.categoriesResource.value() : undefined,
-  );
-  protected readonly twinsData = computed(() =>
-    this.twinsResource.hasValue() ? this.twinsResource.value() : undefined,
-  );
-  protected readonly brandsData = computed(() =>
-    this.brandsResource.hasValue() ? this.brandsResource.value() : undefined,
-  );
-  protected readonly pictureItemsData = computed(() =>
-    this.pictureItemsResource.hasValue() ? this.pictureItemsResource.value() : undefined,
-  );
-
-  protected readonly contentItems = computed(() =>
-    (this.pictureItemsData() ?? []).filter((item) => item.type === PictureItemType.PICTURE_ITEM_CONTENT),
-  );
-
-  protected readonly hasAuthorCredit = computed(() =>
-    (this.pictureItemsData() ?? []).some((item) => item.type === PictureItemType.PICTURE_ITEM_AUTHOR),
-  );
-
-  protected linksResource!: ResourceRef<ItemLink[] | undefined>;
-
-  // Same reasoning as ownerData above.
-  protected readonly linksData = computed(() =>
-    this.linksResource.hasValue() ? this.linksResource.value() : undefined,
-  );
-
-  protected readonly takenDate = computed<null | {date: Date; format: string}>(() => {
-    const date = this.picture().takenDate;
-    if (!date) {
-      return null;
-    }
-
-    if (date.year) {
-      const resDate = new Date();
-      resDate.setFullYear(date.year, 0, 1);
-      let format = 'yyyy';
-      if (date.month) {
-        resDate.setFullYear(date.year, date.month - 1, 1);
-        format = 'MM.yyyy';
-        if (date.day) {
-          resDate.setFullYear(date.year, date.month - 1, date.day);
-          format = 'dd.MM.yyyy';
-        }
-      }
-      return {date: resDate, format};
-    }
-
-    return null;
-  });
-
-  protected readonly PictureItemType = PictureItemType;
-  protected readonly PictureStatus = PictureStatus;
-  protected readonly ContentReportEntityType = ContentReportEntityType;
-  protected readonly ItemType = ItemType;
-  protected readonly specsItemTypes = new Set([
-    ItemType.ITEM_TYPE_CATEGORY,
-    ItemType.ITEM_TYPE_ENGINE,
-    ItemType.ITEM_TYPE_TWINS,
-    ItemType.ITEM_TYPE_VEHICLE,
-  ]);
 }

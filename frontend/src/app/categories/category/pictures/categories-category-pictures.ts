@@ -130,6 +130,8 @@ export class CategoriesCategoryPictures {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (this.picturesResource.hasValue()) {
@@ -137,6 +139,4 @@ export class CategoriesCategoryPictures {
       }
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -43,6 +43,8 @@ export class ModerItemsItemLinks implements OnInit {
   // construction but before ngOnInit.
   protected linksResource!: ResourceRef<ItemLinks | undefined>;
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.linksResource = rxResource({
       // Seeds status as resolved from TransferState on hydration. Suffixed with item().id read
@@ -131,6 +133,4 @@ export class ModerItemsItemLinks implements OnInit {
       next: () => this.linksResource.reload(),
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -177,6 +177,8 @@ export class CatalogueMixedPicture {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     // NOT_FOUND is reported to NotFoundService (App renders <app-page-not-found> in place
     // of the outlet) rather than via Router.navigate(['/error-404']): SSR doesn't honour an
@@ -221,6 +223,4 @@ export class CatalogueMixedPicture {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -59,9 +59,9 @@ export class Cutaway implements OnInit {
       ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.CUTAWAY});
   }
-
-  protected readonly errorMessage = errorMessage;
 }

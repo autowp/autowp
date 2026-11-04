@@ -84,35 +84,6 @@ export class CommentsList implements OnInit {
   // after construction but before ngOnInit.
   protected usersResource!: ResourceRef<Record<string, User> | undefined>;
 
-  ngOnInit(): void {
-    this.usersResource = rxResource({
-      // Suffixed with typeID/itemID read once at construction time - see the identical note on
-      // Comments.dataResource in ../comments/comments.ts.
-      id: `comments-list-users-${this.typeID()}-${this.itemID()}`,
-      injector: this.#injector,
-      // A comma-joined string rather than the id array: a resource compares params by identity,
-      // and a fresh array every recomputation makes it restart on hydration - throwing away the
-      // value that arrived over TransferState and blanking every author on the page until the
-      // refetch lands (or for good, if it comes back empty).
-      params: () => [...new Set(this.messages().map((message) => message.authorId))].join(','),
-      // A plain object rather than a Map: TransferState round-trips resource values through
-      // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
-      // enumerable properties, no toJSON), losing all entries.
-      stream: ({params: userIds}): Observable<Record<string, User>> => {
-        if (userIds.length === 0) {
-          return of({});
-        }
-        return this.#userService.getUserMap$(userIds.split(',')).pipe(
-          map((userMap) => Object.fromEntries(userMap)),
-          // getUserMap$ leaves out users the backend doesn't return (deleted or anonymous), so
-          // this only catches a genuine RPC failure - degrade to showing no user rather than
-          // erroring the whole resource over it.
-          catchError(() => of({})),
-        );
-      },
-    });
-  }
-
   protected readonly rows = computed(() => {
     const usersById = this.usersResource.value() ?? {};
     const currentUser = this.currentUser();
@@ -143,6 +114,35 @@ export class CommentsList implements OnInit {
 
   protected readonly ModeratorAttention = ModeratorAttention;
   protected readonly ContentReportEntityType = ContentReportEntityType;
+
+  ngOnInit(): void {
+    this.usersResource = rxResource({
+      // Suffixed with typeID/itemID read once at construction time - see the identical note on
+      // Comments.dataResource in ../comments/comments.ts.
+      id: `comments-list-users-${this.typeID()}-${this.itemID()}`,
+      injector: this.#injector,
+      // A comma-joined string rather than the id array: a resource compares params by identity,
+      // and a fresh array every recomputation makes it restart on hydration - throwing away the
+      // value that arrived over TransferState and blanking every author on the page until the
+      // refetch lands (or for good, if it comes back empty).
+      params: () => [...new Set(this.messages().map((message) => message.authorId))].join(','),
+      // A plain object rather than a Map: TransferState round-trips resource values through
+      // JSON.stringify/JSON.parse for hydration, and Map instances serialize to '{}' (no own
+      // enumerable properties, no toJSON), losing all entries.
+      stream: ({params: userIds}): Observable<Record<string, User>> => {
+        if (userIds.length === 0) {
+          return of({});
+        }
+        return this.#userService.getUserMap$(userIds.split(',')).pipe(
+          map((userMap) => Object.fromEntries(userMap)),
+          // getUserMap$ leaves out users the backend doesn't return (deleted or anonymous), so
+          // this only catches a genuine RPC failure - degrade to showing no user rather than
+          // erroring the whole resource over it.
+          catchError(() => of({})),
+        );
+      },
+    });
+  }
 
   protected vote(message: CommentMessage, value: number) {
     this.#commentsGrpc

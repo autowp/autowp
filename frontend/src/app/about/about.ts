@@ -144,9 +144,9 @@ export class About implements OnInit {
     return about && users ? {about, users} : undefined;
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ABOUT});
   }
-
-  protected readonly errorMessage = errorMessage;
 }

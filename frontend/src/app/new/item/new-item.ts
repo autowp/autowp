@@ -69,23 +69,6 @@ export class NewItem {
       ),
   });
 
-  constructor() {
-    effect(() => {
-      // resource.value() throws while its resource is in an error state - hasValue() is the
-      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
-      // template instead) doesn't blow up this effect.
-      if (!this.itemResource.hasValue()) {
-        return;
-      }
-
-      const item = this.itemResource.value();
-      this.#pageEnv.set({
-        pageId: PageId.ITEM_NEW_CHILD,
-        title: item.nameText,
-      });
-    });
-  }
-
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: `new-item-detail-pictures-${this.#itemID()}`,
@@ -119,4 +102,21 @@ export class NewItem {
   });
 
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    effect(() => {
+      // resource.value() throws while its resource is in an error state - hasValue() is the
+      // reactive guard against that, so a non-NOT_FOUND error (surfaced generically by the
+      // template instead) doesn't blow up this effect.
+      if (!this.itemResource.hasValue()) {
+        return;
+      }
+
+      const item = this.itemResource.value();
+      this.#pageEnv.set({
+        pageId: PageId.ITEM_NEW_CHILD,
+        title: item.nameText,
+      });
+    });
+  }
 }

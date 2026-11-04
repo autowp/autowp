@@ -163,25 +163,6 @@ export class CatalogueCars {
     }));
   });
 
-  constructor() {
-    effect(() => {
-      if (isNotFoundError(this.brandResource.error())) {
-        this.#notFound.report();
-        return;
-      }
-
-      const title = this.title();
-      if (title === undefined) {
-        return;
-      }
-
-      this.#pageEnv.set({
-        pageId: this.currentVehicleType() ? PageId.CATALOGUE_CARS_VEHICLE_TYPE : PageId.CATALOGUE_CARS,
-        title,
-      });
-    });
-  }
-
   // `id` is suffixed with the vehicle-type catname as well as the brand: `/:brand/cars` and
   // `/:brand/cars/:vehicle_type` are sibling route configs sharing this component, so switching
   // between them destroys and recreates the instance. Without the vehicle type in the key, the
@@ -307,4 +288,23 @@ export class CatalogueCars {
   });
 
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    effect(() => {
+      if (isNotFoundError(this.brandResource.error())) {
+        this.#notFound.report();
+        return;
+      }
+
+      const title = this.title();
+      if (title === undefined) {
+        return;
+      }
+
+      this.#pageEnv.set({
+        pageId: this.currentVehicleType() ? PageId.CATALOGUE_CARS_VEHICLE_TYPE : PageId.CATALOGUE_CARS,
+        title,
+      });
+    });
+  }
 }

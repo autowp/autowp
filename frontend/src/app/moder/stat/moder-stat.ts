@@ -26,12 +26,12 @@ export class ModerStat implements OnInit {
     stream: () => this.#itemsClient.getStats(new Empty()),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({
       layout: {isAdminPage: true},
       pageId: PageId.MODER_STAT,
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -75,6 +75,8 @@ export class ForumsNewTopic implements OnInit {
     this.themeResource.hasValue() ? this.themeResource.value() : undefined,
   );
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.themeResource.error())) {
@@ -120,6 +122,4 @@ export class ForumsNewTopic implements OnInit {
   protected getForumsThemeTranslation(id: string): string {
     return getForumsThemeTranslation(id);
   }
-
-  protected readonly errorMessage = errorMessage;
 }

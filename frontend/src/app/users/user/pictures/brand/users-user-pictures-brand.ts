@@ -135,6 +135,8 @@ export class UsersUserPicturesBrand {
       ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.userResource.error()) || isNotFoundError(this.brandResource.error())) {
@@ -151,6 +153,4 @@ export class UsersUserPicturesBrand {
       }
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

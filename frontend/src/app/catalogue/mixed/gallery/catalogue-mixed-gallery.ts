@@ -80,6 +80,8 @@ export class CatalogueMixedGallery {
     },
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.brandResource.error())) {
@@ -97,6 +99,4 @@ export class CatalogueMixedGallery {
       });
     }
   }
-
-  protected readonly errorMessage = errorMessage;
 }

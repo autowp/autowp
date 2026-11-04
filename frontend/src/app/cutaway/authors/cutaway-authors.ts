@@ -93,6 +93,8 @@ export class CutawayAuthors implements OnInit {
         ),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.GALLERIES});
   }
@@ -142,6 +144,4 @@ export class CutawayAuthors implements OnInit {
       };
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

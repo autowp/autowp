@@ -162,6 +162,8 @@ export class CategoryPicture {
 
   protected readonly CommentsType = CommentsType;
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.categoryDataResource.error()) || isNotFoundError(this.pictureResource.error())) {
@@ -202,6 +204,4 @@ export class CategoryPicture {
   protected reloadPicture() {
     this.pictureResource.reload();
   }
-
-  protected readonly errorMessage = errorMessage;
 }

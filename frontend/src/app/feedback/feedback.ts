@@ -61,6 +61,8 @@ export class Feedback implements OnInit {
     }),
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.form.removeControl(CAPTCHA as never);
 
@@ -115,6 +117,4 @@ export class Feedback implements OnInit {
       this.form.get(CAPTCHA)?.setValue(captchaResponse);
     }
   }
-
-  protected readonly errorMessage = errorMessage;
 }

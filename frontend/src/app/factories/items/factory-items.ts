@@ -189,6 +189,8 @@ export class FactoryItems {
     };
   });
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.factoryResource.error())) {
@@ -201,6 +203,4 @@ export class FactoryItems {
       }
     });
   }
-
-  protected readonly errorMessage = errorMessage;
 }

@@ -80,6 +80,8 @@ export class ForumsTopic {
     this.themeResource.hasValue() ? this.themeResource.value() : undefined,
   );
 
+  protected readonly errorMessage = errorMessage;
+
   constructor() {
     effect(() => {
       if (isNotFoundError(this.topicResource.error())) {
@@ -136,6 +138,4 @@ export class ForumsTopic {
   protected getForumsThemeTranslation(id: string): string {
     return getForumsThemeTranslation(id);
   }
-
-  protected readonly errorMessage = errorMessage;
 }

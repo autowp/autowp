@@ -54,6 +54,8 @@ export class CategoriesListItem {
     });
   });
 
+  protected readonly ItemType = ItemType;
+
   protected isHavePhoto(item: Item) {
     if (item.previewPictures) {
       for (const picture of item.previewPictures.pictures ?? []) {
@@ -64,6 +66,4 @@ export class CategoriesListItem {
     }
     return false;
   }
-
-  protected readonly ItemType = ItemType;
 }

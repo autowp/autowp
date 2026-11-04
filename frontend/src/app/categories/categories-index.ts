@@ -53,9 +53,9 @@ export class CategoriesIndex implements OnInit {
     return items ? chunkBy(items, 4) : null;
   });
 
+  protected readonly errorMessage = errorMessage;
+
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.CATEGORIES});
   }
-
-  protected readonly errorMessage = errorMessage;
 }

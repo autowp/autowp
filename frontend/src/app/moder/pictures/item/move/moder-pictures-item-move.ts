@@ -107,13 +107,6 @@ export class ModerPicturesItemMove implements OnInit {
     map(([id, srcItemID, srcType]) => ({id, srcItemID, srcType})),
   );
 
-  private isSrcTypeOrEmpty$(pictureItemType: PictureItemType) {
-    return this.#srcType$.pipe(
-      map((srcType) => !srcType || srcType === pictureItemType),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
-  }
-
   readonly #isContentTypeOrEmpty$ = this.isSrcTypeOrEmpty$(PictureItemType.PICTURE_ITEM_CONTENT);
   protected readonly showBrands$ = this.#isContentTypeOrEmpty$;
   protected readonly showFactories$ = this.#isContentTypeOrEmpty$;
@@ -135,20 +128,6 @@ export class ModerPicturesItemMove implements OnInit {
         showBrands && showFactories && showMuseums && showPersons && showAuthors && showCopyrights,
     ),
   );
-
-  private tabActive$(param: string, pictureItemType: PictureItemType) {
-    return combineLatest([
-      this.isSrcTypeOrEmpty$(pictureItemType),
-      this.#srcItemID$,
-      this.#route.queryParamMap.pipe(
-        map((params) => !!params.get(param)),
-        distinctUntilChanged(),
-      ),
-    ]).pipe(
-      map(([srcTypeIsContentOrEmpty, srcItemID, active]) => srcTypeIsContentOrEmpty && active && !srcItemID),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
-  }
 
   protected readonly factoriesActive$ = this.tabActive$('show_factories', PictureItemType.PICTURE_ITEM_CONTENT);
   protected readonly museumsActive$ = this.tabActive$('show_museums', PictureItemType.PICTURE_ITEM_CONTENT);
@@ -202,28 +181,6 @@ export class ModerPicturesItemMove implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  private getItems$(
-    request: ItemsRequest,
-    selectionType: PictureItemType,
-  ): Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> {
-    return combineLatest([this.src$, this.#itemsClient.list(new ItemsRequest(request))]).pipe(
-      map(([src, {items, paginator}]) => ({
-        items: (items ?? []).map((item) => ({
-          html: item.nameHtml,
-          selection: {
-            selection: {
-              itemId: item.id,
-              perspectiveId: 0,
-              type: selectionType,
-            },
-            src,
-          },
-        })),
-        paginator,
-      })),
-    );
-  }
-
   protected readonly museums$ = this.#page$.pipe(
     switchMap((page) =>
       this.getItems$(
@@ -257,34 +214,6 @@ export class ModerPicturesItemMove implements OnInit {
       ),
     ),
   );
-
-  private authorsAndPersons$(
-    searchControl: FormControl<null | string>,
-    selectionType: PictureItemType,
-  ): Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> {
-    return combineLatest([
-      this.#page$,
-      searchControl.valueChanges.pipe(startWith(''), distinctUntilChanged(), debounceTime(30)),
-    ]).pipe(
-      switchMap(([page, search]) => {
-        const trimmed = search?.trim() ?? '';
-
-        return this.getItems$(
-          new ItemsRequest({
-            fields: new ItemFields({nameHtml: true}),
-            language: this.#languageService.language,
-            limit: 50,
-            options: new ItemListOptions({
-              name: trimmed ? '%' + trimmed + '%' : undefined,
-              typeId: ItemType.ITEM_TYPE_PERSON,
-            }),
-            page,
-          }),
-          selectionType,
-        );
-      }),
-    );
-  }
 
   protected readonly persons$: Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> =
     this.authorsAndPersons$(this.searchPersonControl, PictureItemType.PICTURE_ITEM_CONTENT);
@@ -421,6 +350,77 @@ export class ModerPicturesItemMove implements OnInit {
   );
 
   protected readonly PictureItemType = PictureItemType;
+
+  private isSrcTypeOrEmpty$(pictureItemType: PictureItemType) {
+    return this.#srcType$.pipe(
+      map((srcType) => !srcType || srcType === pictureItemType),
+      shareReplay({bufferSize: 1, refCount: false}),
+    );
+  }
+
+  private tabActive$(param: string, pictureItemType: PictureItemType) {
+    return combineLatest([
+      this.isSrcTypeOrEmpty$(pictureItemType),
+      this.#srcItemID$,
+      this.#route.queryParamMap.pipe(
+        map((params) => !!params.get(param)),
+        distinctUntilChanged(),
+      ),
+    ]).pipe(
+      map(([srcTypeIsContentOrEmpty, srcItemID, active]) => srcTypeIsContentOrEmpty && active && !srcItemID),
+      shareReplay({bufferSize: 1, refCount: false}),
+    );
+  }
+
+  private getItems$(
+    request: ItemsRequest,
+    selectionType: PictureItemType,
+  ): Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> {
+    return combineLatest([this.src$, this.#itemsClient.list(new ItemsRequest(request))]).pipe(
+      map(([src, {items, paginator}]) => ({
+        items: (items ?? []).map((item) => ({
+          html: item.nameHtml,
+          selection: {
+            selection: {
+              itemId: item.id,
+              perspectiveId: 0,
+              type: selectionType,
+            },
+            src,
+          },
+        })),
+        paginator,
+      })),
+    );
+  }
+
+  private authorsAndPersons$(
+    searchControl: FormControl<null | string>,
+    selectionType: PictureItemType,
+  ): Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> {
+    return combineLatest([
+      this.#page$,
+      searchControl.valueChanges.pipe(startWith(''), distinctUntilChanged(), debounceTime(30)),
+    ]).pipe(
+      switchMap(([page, search]) => {
+        const trimmed = search?.trim() ?? '';
+
+        return this.getItems$(
+          new ItemsRequest({
+            fields: new ItemFields({nameHtml: true}),
+            language: this.#languageService.language,
+            limit: 50,
+            options: new ItemListOptions({
+              name: trimmed ? '%' + trimmed + '%' : undefined,
+              typeId: ItemType.ITEM_TYPE_PERSON,
+            }),
+            page,
+          }),
+          selectionType,
+        );
+      }),
+    );
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({
