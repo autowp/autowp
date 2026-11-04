@@ -4,7 +4,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {PictureService} from '@services/picture';
 import {map} from 'rxjs';
 

@@ -31,7 +31,7 @@ import {
   UsersClient,
 } from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {AppContactsService} from '@services/contacts';
 import {IpService} from '@services/ip';
 import {LanguageService} from '@services/language';

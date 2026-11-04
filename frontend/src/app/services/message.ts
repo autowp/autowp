@@ -19,7 +19,7 @@ import {
 } from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
-import {AuthService} from './auth.service';
+import {AuthService} from './auth-service';
 import {MessagingWebSocketService} from './messaging-ws.service';
 
 @Service()
@@ -53,11 +53,12 @@ export class MessageService {
         return of(null);
       }
 
-      return this.#messagingClient.getMessagesNewCount(new Empty());
-    }),
-    catchError((response: unknown) => {
-      this.#toasts.handleError(response);
-      return of(null);
+      return this.#messagingClient.getMessagesNewCount(new Empty()).pipe(
+        catchError((response: unknown) => {
+          this.#toasts.handleError(response);
+          return of(null);
+        }),
+      );
     }),
     map((response) => (response ? response.count : null)),
   );

@@ -472,14 +472,19 @@
             type="button"
             class="btn btn-success"
             i18n
-            [disabled]="!hasSelectedItem()"
+            [disabled]="!hasSelectedItem() || bulkUpdating()"
             (click)="acceptPictures(data.pictures)"
           >
             Accept
           </button>
         }
         <div class="btn-group" ngbDropdown>
-          <button class="btn btn-success" ngbDropdownToggle type="button" [disabled]="!hasSelectedItem()">
+          <button
+            class="btn btn-success"
+            ngbDropdownToggle
+            type="button"
+            [disabled]="!hasSelectedItem() || bulkUpdating()"
+          >
             <ng-container i18n>Want accept</ng-container>
             <span class="caret" aria-hidden="true"></span>
           </button>
@@ -502,7 +507,12 @@
           }
         </div>
         <div class="btn-group" ngbDropdown>
-          <button class="btn btn-danger" ngbDropdownToggle type="button" [disabled]="!hasSelectedItem()">
+          <button
+            class="btn btn-danger"
+            ngbDropdownToggle
+            type="button"
+            [disabled]="!hasSelectedItem() || bulkUpdating()"
+          >
             <ng-container i18n>Want delete</ng-container>
             <span class="caret" aria-hidden="true"></span>
           </button>
@@ -528,7 +538,7 @@
           type="button"
           class="btn btn-secondary"
           i18n
-          [disabled]="!hasSelectedItem()"
+          [disabled]="!hasSelectedItem() || bulkUpdating()"
           (click)="openBulkEditModal()"
         >
           Set licence, source, author…

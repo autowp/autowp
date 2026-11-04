@@ -8,7 +8,7 @@ import {ContentReportReason, CreateContentReportRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {ReCaptchaService} from '@services/recaptcha';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RecaptchaModule} from 'ng-recaptcha-2';

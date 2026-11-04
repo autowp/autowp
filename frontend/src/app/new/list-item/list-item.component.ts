@@ -3,7 +3,7 @@ import type {Item, Picture} from '@grpc/spec.pb';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
 

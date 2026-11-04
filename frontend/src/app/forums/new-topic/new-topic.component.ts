@@ -11,7 +11,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {CreateTopicRequest, GetThemeRequest, Topic} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

@@ -6,7 +6,7 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ItemFields, ItemRequest, ItemType, RefreshInheritanceRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';

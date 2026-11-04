@@ -6,7 +6,7 @@ import Keycloak from 'keycloak-js';
 import {defer, EMPTY, map, repeat, retry, share, startWith, switchMap} from 'rxjs';
 import {webSocket} from 'rxjs/webSocket';
 
-import {AuthService} from './auth.service';
+import {AuthService} from './auth-service';
 
 const RECONNECT_DELAY_MS = 3000;
 

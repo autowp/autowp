@@ -7,7 +7,7 @@ import {RouterLink} from '@angular/router';
 import {Item, ItemFields, ItemRequest, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {of, shareReplay, switchMap} from 'rxjs';
 

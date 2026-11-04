@@ -6,7 +6,7 @@ import {ChangeDetectionStrategy, Component, computed, inject, Injector, input} f
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';

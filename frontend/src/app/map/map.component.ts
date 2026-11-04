@@ -3,8 +3,16 @@ import type {MapPictureCluster, MapPicturePoint, MapPoint, MapSinglePicture} fro
 import type {LatLng, LatLngBounds, Map, MapOptions, Marker} from 'leaflet';
 
 import {DOCUMENT} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal, ViewContainerRef} from '@angular/core';
-import {toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+  ViewContainerRef,
+} from '@angular/core';
+import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {MapGetPicturePointsRequest, MapGetPointsRequest} from '@grpc/spec.pb';
@@ -12,7 +20,7 @@ import {MapClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {divIcon, icon, latLng, marker, Popup, tileLayer} from 'leaflet';
-import {BehaviorSubject, combineLatest, debounceTime, EMPTY, map, switchMap} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, debounceTime, EMPTY, map, switchMap} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {MapPopupComponent} from './popup/popup.component';
@@ -101,6 +109,7 @@ function createClusterMarker(cluster: MapPictureCluster, onClick: () => void): M
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapComponent implements OnDestroy, OnInit {
+  readonly #destroyRef = inject(DestroyRef);
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
@@ -200,18 +209,28 @@ export class MapComponent implements OnDestroy, OnInit {
           if (mode === 'pictures') {
             return this.#mapClient
               .getPicturePoints(new MapGetPicturePointsRequest({bounds: bounds.toBBoxString()}))
-              .pipe(map((response): [MapMode, MapPicturePoint[]] => ['pictures', response.points ?? []]));
+              .pipe(
+                map((response): [MapMode, MapPicturePoint[]] => ['pictures', response.points ?? []]),
+                catchError((error: unknown) => {
+                  this.#toastService.handleError(error);
+                  return EMPTY;
+                }),
+              );
           }
 
           return this.#mapClient
             .getPoints(new MapGetPointsRequest({bounds: bounds.toBBoxString(), pointsOnly: false}))
-            .pipe(map((response): [MapMode, MapPoint[]] => ['objects', response.points ?? []]));
+            .pipe(
+              map((response): [MapMode, MapPoint[]] => ['objects', response.points ?? []]),
+              catchError((error: unknown) => {
+                this.#toastService.handleError(error);
+                return EMPTY;
+              }),
+            );
         }),
+        takeUntilDestroyed(this.#destroyRef),
       )
       .subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-        },
         next: ([mode, points]) => {
           if (mode === 'pictures') {
             this.renderPictureData(points as MapPicturePoint[]);

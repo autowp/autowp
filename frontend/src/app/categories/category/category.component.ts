@@ -7,7 +7,7 @@ import {ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet} from '@angul
 import {ItemFields, ItemListOptions, ItemParentListOptions, ItemsRequest, ItemType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

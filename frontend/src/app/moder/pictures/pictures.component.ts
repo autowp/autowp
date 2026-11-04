@@ -1,7 +1,6 @@
 import type {OnDestroy, OnInit} from '@angular/core';
 import type {Item, Pages, User, VehicleType} from '@grpc/spec.pb';
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
-import type {Empty} from '@ngx-grpc/well-known-types';
 import type {Observable, Subscription} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
@@ -49,14 +48,17 @@ import {
   BehaviorSubject,
   catchError,
   debounceTime,
+  defer,
   distinctUntilChanged,
   EMPTY,
-  forkJoin,
+  finalize,
+  from,
   map,
+  mergeMap,
   of,
   shareReplay,
   switchMap,
-  tap,
+  toArray,
 } from 'rxjs';
 
 import {APIPerspectiveService} from '../../api/perspective/perspective.service';
@@ -66,6 +68,8 @@ import {PaginatorComponent} from '../../paginator/paginator/paginator.component'
 import {ThumbnailComponent} from '../../thumbnail/thumbnail/thumbnail.component';
 import {ToastsService} from '../../toasts/toasts.service';
 import {ModerPicturesBulkEditModalComponent} from './bulk-edit-modal/bulk-edit-modal.component';
+
+const BULK_MODERATION_CONCURRENCY = 4;
 
 type LicenseFilter = 'all-rights-reserved' | 'cc' | 'pd' | null;
 
@@ -151,6 +155,7 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   readonly #modalService = inject(NgbModal);
 
   protected readonly hasSelectedItem = signal(false);
+  protected readonly bulkUpdating = signal(false);
   #selected: string[] = [];
 
   protected readonly status = signal<null | string>(null);
@@ -615,18 +620,26 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
       });
 
       return this.#change$.pipe(
-        switchMap(() => this.#picturesClient.getPictures(qParams)),
-        catchError((response: unknown) => {
-          this.#toastService.handleError(response);
-          return EMPTY;
-        }),
+        switchMap(() =>
+          this.#picturesClient.getPictures(qParams).pipe(
+            catchError((response: unknown) => {
+              this.#toastService.handleError(response);
+              return EMPTY;
+            }),
+          ),
+        ),
       );
     }),
-    map((response) => ({
-      chunks: chunkBy<Picture>(response.items ?? [], 3),
-      paginator: response.paginator,
-      pictures: response.items ?? [],
-    })),
+    map((response) => {
+      const pictures = (response.items ?? []).map((picture) =>
+        Object.assign(picture, {selected: this.#selected.includes(picture.id)}),
+      );
+      return {
+        chunks: chunkBy<Picture>(pictures, 3),
+        paginator: response.paginator,
+        pictures,
+      };
+    }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
@@ -760,62 +773,64 @@ export class ModerPicturesComponent implements OnDestroy, OnInit {
   }
 
   protected votePictures(pictures: Picture[], vote: number, reason: string) {
-    for (const id of this.#selected) {
-      const promises: Observable<Empty>[] = [];
-      for (const picture of pictures) {
-        if (picture.id === id) {
-          const q$ = this.#moderVoteService.vote$(picture.id, vote, reason).pipe(
-            catchError((err: unknown) => {
-              this.#toastService.handleError(err);
-              return EMPTY;
-            }),
-          );
-          promises.push(q$);
-        }
-      }
-
-      forkJoin(promises).subscribe(() => {
-        this.#change$.next();
-      });
-    }
-    this.#selected = [];
-    this.hasSelectedItem.set(false);
+    this.moderatePictures(pictures, (picture) => this.#moderVoteService.vote$(picture.id, vote, reason));
   }
 
   protected acceptPictures(pictures: Picture[]) {
-    for (const id of this.#selected) {
-      const promises: Observable<void>[] = [];
-      for (const picture of pictures) {
-        if (picture.id === id) {
-          promises.push(
-            this.#picturesClient
-              .updatePicture(
-                new UpdatePictureRequest({
-                  picture: new Picture({id: picture.id, status: PictureStatus.PICTURE_STATUS_ACCEPTED}),
-                  updateMask: new FieldMask({paths: ['status']}),
-                }),
-              )
-              .pipe(
-                catchError((err: unknown) => {
-                  this.#toastService.handleError(err);
-                  return EMPTY;
-                }),
-                tap(() => (picture.status = PictureStatus.PICTURE_STATUS_ACCEPTED)),
-                map(() => void 0),
-              ),
-          );
-        }
-      }
+    this.moderatePictures(pictures, (picture) =>
+      this.#picturesClient.updatePicture(
+        new UpdatePictureRequest({
+          picture: new Picture({id: picture.id, status: PictureStatus.PICTURE_STATUS_ACCEPTED}),
+          updateMask: new FieldMask({paths: ['status']}),
+        }),
+      ),
+    );
+  }
 
-      forkJoin(promises).subscribe(() => {
+  private moderatePictures(pictures: Picture[], update: (picture: Picture) => Observable<unknown>): void {
+    if (this.bulkUpdating()) {
+      return;
+    }
+
+    const selected = pictures.filter((picture) => this.#selected.includes(picture.id));
+    if (selected.length === 0) {
+      return;
+    }
+
+    this.bulkUpdating.set(true);
+    // Finish the finite mutation batch even if the user leaves the page. Cancelling a request
+    // does not establish whether the server committed it, so mutations are never retried here.
+    from(selected)
+      .pipe(
+        mergeMap(
+          (picture) =>
+            defer(() => update(picture)).pipe(
+              map(() => picture.id),
+              catchError((error: unknown) => {
+                this.#toastService.handleError(error);
+                return EMPTY;
+              }),
+            ),
+          BULK_MODERATION_CONCURRENCY,
+        ),
+        toArray(),
+        finalize(() => {
+          this.bulkUpdating.set(false);
+        }),
+      )
+      .subscribe((completedIds) => {
+        const completed = new Set(completedIds);
+        this.#selected = this.#selected.filter((id) => !completed.has(id));
+        this.hasSelectedItem.set(this.#selected.length > 0);
         this.#change$.next();
       });
-    }
-    this.#selected = [];
-    this.hasSelectedItem.set(false);
   }
 
   protected openBulkEditModal(): void {
+    if (this.bulkUpdating()) {
+      return;
+    }
+
     const modalRef = this.#modalService.open(ModerPicturesBulkEditModalComponent, {centered: true, size: 'lg'});
     const componentRef = getModalComponentRef<ModerPicturesBulkEditModalComponent>(modalRef);
     componentRef.setInput('pictureIds', [...this.#selected]);

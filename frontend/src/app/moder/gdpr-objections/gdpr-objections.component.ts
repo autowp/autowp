@@ -21,7 +21,7 @@ import {
   ResolveGdprObjectionCleanupCandidateRequest,
 } from '@grpc/spec.pb';
 import {AutowpClient, CommentsClient} from '@grpc/spec.pbsc';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';

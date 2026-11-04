@@ -21,7 +21,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {

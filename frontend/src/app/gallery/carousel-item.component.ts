@@ -16,7 +16,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {RouterLink} from '@angular/router';
 import {PicturesVoteRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {NgMathPipesModule} from 'ngx-pipes';
 import {catchError, EMPTY} from 'rxjs';
 

@@ -13,7 +13,7 @@ import {
   GetMessagesRequest,
 } from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {errorMessage} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, ignoreElements, map, merge, of} from 'rxjs';

@@ -11,7 +11,7 @@ import {DeleteUserPhotoRequest, MeRequest, UpdateUserRequest, User, UserFields} 
 import {UsersClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

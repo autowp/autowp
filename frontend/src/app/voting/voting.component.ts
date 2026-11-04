@@ -8,7 +8,7 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {CommentsType, CreateVoteRequest, VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

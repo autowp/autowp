@@ -21,7 +21,7 @@ import {
   PreviewPicturesRequest,
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';

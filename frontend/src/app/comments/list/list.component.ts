@@ -29,7 +29,7 @@ import {
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {FieldMask} from '@ngx-grpc/well-known-types';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {UserService} from '@services/user';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';

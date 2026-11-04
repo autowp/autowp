@@ -12,7 +12,7 @@ import {
   GetTopicRequest,
 } from '@grpc/spec.pb';
 import {CommentsClient, ForumsClient} from '@grpc/spec.pbsc';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

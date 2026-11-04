@@ -22,7 +22,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';

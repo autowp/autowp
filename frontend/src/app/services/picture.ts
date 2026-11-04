@@ -7,7 +7,7 @@ import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {map, of, shareReplay, switchMap} from 'rxjs';
 
-import {AuthService, Role} from './auth.service';
+import {AuthService, Role} from './auth-service';
 
 export const perspectiveIDLogotype = 22,
   perspectiveIDMixed = 25;

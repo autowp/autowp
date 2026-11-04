@@ -26,7 +26,7 @@ import {
   NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import {skipAuthMetadata} from '@services/api.service';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {ConsentService} from '@services/consent';
 import {loadGoogleAnalytics} from '@services/google-analytics';
 import {LanguageService} from '@services/language';

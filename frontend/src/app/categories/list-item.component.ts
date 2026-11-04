@@ -4,7 +4,7 @@ import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {ItemHeaderComponent} from '@utils/item-header/item-header.component';
 import {RemarkModule} from 'ngx-remark';
 

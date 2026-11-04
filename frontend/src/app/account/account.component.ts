@@ -3,7 +3,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

@@ -32,7 +32,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {GRPC_INTERCEPTORS, GrpcCoreModule} from '@ngx-grpc/core';
 import {authInterceptor$, GrpcLogInterceptor} from '@services/api.service';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {AppContactsService} from '@services/contacts';
 import {ContentLanguageService} from '@services/content-language';
 import {GrpcBannedInterceptor} from '@services/grpc-banned.interceptor';

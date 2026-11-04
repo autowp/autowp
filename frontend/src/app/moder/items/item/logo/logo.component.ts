@@ -5,7 +5,7 @@ import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, switchMap} from 'rxjs';

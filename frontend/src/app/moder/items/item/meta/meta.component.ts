@@ -11,7 +11,7 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {ItemService} from '@services/item';
 import {catchError, EMPTY, map, of, switchMap, tap} from 'rxjs';
 

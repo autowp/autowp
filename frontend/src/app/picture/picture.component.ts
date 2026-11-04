@@ -54,7 +54,7 @@ import {
   NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import {FieldMask} from '@ngx-grpc/well-known-types';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';

@@ -2,7 +2,7 @@ import type {CanActivateFn} from '@angular/router';
 
 import {inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {browserWindow} from '@utils/browser-window';
 import Keycloak from 'keycloak-js';

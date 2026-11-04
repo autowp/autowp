@@ -7,7 +7,7 @@ import {ChangeDetectionStrategy, Component, inject, LOCALE_ID} from '@angular/co
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {ItemFields, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

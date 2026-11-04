@@ -16,7 +16,7 @@ import {
 } from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';

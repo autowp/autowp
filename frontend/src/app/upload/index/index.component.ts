@@ -24,7 +24,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient, PicturesClient} from '@grpc/spec.pbsc';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

@@ -9,7 +9,7 @@ import {DeleteContactRequest} from '@grpc/spec.pb';
 import {ContactsClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

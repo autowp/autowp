@@ -7,7 +7,7 @@ import {Router} from '@angular/router';
 import {DeleteUserRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';

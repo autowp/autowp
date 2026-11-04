@@ -9,7 +9,7 @@ import {RouterLink} from '@angular/router';
 import {PictureItem, PictureItemType, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {UserService} from '@services/user';
 import {APIPerspectiveService} from 'app/api/perspective/perspective.service';
 import {ToastsService} from 'app/toasts/toasts.service';

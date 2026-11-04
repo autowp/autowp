@@ -3,7 +3,7 @@ import type {Observable} from 'rxjs';
 import {inject, Service} from '@angular/core';
 import {GetMessagesRequest, ModeratorAttention} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
-import {AuthService, Role} from '@services/auth.service';
+import {AuthService, Role} from '@services/auth-service';
 import {map, of, shareReplay, switchMap} from 'rxjs';
 
 @Service()

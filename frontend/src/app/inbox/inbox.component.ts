@@ -16,7 +16,7 @@ import {
   PictureStatus,
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';

@@ -4,7 +4,7 @@ import {inject, Service} from '@angular/core';
 import {DeleteModerVoteTemplateRequest, ModerVoteTemplate} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {AuthService} from '@services/auth.service';
+import {AuthService} from '@services/auth-service';
 import {BehaviorSubject, combineLatest, map, shareReplay, switchMap, tap} from 'rxjs';
 
 export interface APIPictureModerVoteTemplatePostData {
