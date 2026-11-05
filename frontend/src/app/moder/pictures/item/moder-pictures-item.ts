@@ -172,6 +172,12 @@ export class ModerPicturesItem {
     numericEnumValue(PictureLicense, Number(this.#licenseModel().license), PictureLicense.PICTURE_LICENSE_UNKNOWN),
   );
 
+  readonly #copyrightsModel = signal('');
+  protected readonly copyrightsForm = form(this.#copyrightsModel, (path) => {
+    maxLength(path, 65536);
+    disabled(path, {when: () => this.copyrightsLoading()});
+  });
+
   protected readonly picture$ = combineLatest([this.id$, this.#change$]).pipe(
     switchMap(([id]) =>
       this.#picturesClient.getPicture(
@@ -230,6 +236,7 @@ export class ModerPicturesItem {
       return EMPTY;
     }),
     tap((picture) => {
+      this.#copyrightsModel.set(picture.copyrights);
       this.#settingsModel.set({
         year: picture.takenDate?.year ? String(picture.takenDate.year) : '',
         month: String(picture.takenDate?.month ?? 0),
@@ -487,12 +494,14 @@ export class ModerPicturesItem {
   }
 
   protected saveCopyrights(picture: Picture) {
+    if (this.copyrightsLoading() || this.copyrightsForm().invalid()) return;
+    const copyrights = this.#copyrightsModel();
     this.copyrightsLoading.set(true);
 
     this.#picturesClient
       .updatePicture(
         new UpdatePictureRequest({
-          picture: new Picture({copyrights: picture.copyrights, id: picture.id}),
+          picture: new Picture({copyrights, id: picture.id}),
           updateMask: new FieldMask({paths: ['copyrights']}),
         }),
       )
@@ -505,6 +514,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
+          picture.copyrights = copyrights;
           this.copyrightsLoading.set(false);
         },
       });

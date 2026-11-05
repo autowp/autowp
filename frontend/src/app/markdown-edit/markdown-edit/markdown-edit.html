@@ -1,16 +1,24 @@
-<ul #nav="ngbNav" ngbNav class="nav-tabs">
-  <li ngbNavItem>
+<ul #nav="ngbNav" ngbNav class="nav-tabs" [(activeId)]="activeTab">
+  <li ngbNavItem="edit">
     <a ngbNavLink i18n>Edit</a>
     <ng-template ngbNavContent>
       @let control = textForm;
-      <textarea class="form-control" rows="1" aria-label="Text" cdkTextareaAutosize [formField]="control"></textarea>
+      <textarea
+        #textarea
+        class="form-control"
+        rows="1"
+        aria-label="Text"
+        cdkTextareaAutosize
+        [formField]="control"
+        (blur)="touch.emit()"
+      ></textarea>
     </ng-template>
   </li>
-  <li ngbNavItem [disabled]="!text() || !text().length">
+  <li ngbNavItem="preview" [disabled]="!value() || !value().length">
     <a ngbNavLink i18n>Preview</a>
     <ng-template ngbNavContent>
       <div class="card card-body">
-        <remark [markdown]="text()" />
+        <remark [markdown]="value()" />
       </div>
     </ng-template>
   </li>

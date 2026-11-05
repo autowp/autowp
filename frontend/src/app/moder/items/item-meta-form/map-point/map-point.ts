@@ -1,8 +1,19 @@
-import type {ControlValueAccessor} from '@angular/forms';
+import type {ElementRef} from '@angular/core';
+import type {FormValueControl} from '@angular/forms/signals';
 import type {LatLng, Layer, LeafletMouseEvent, Map, MapOptions} from 'leaflet';
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
-import {NG_VALUE_ACCESSOR} from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  effect,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import {disabled, form, FormField} from '@angular/forms/signals';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
@@ -20,7 +31,7 @@ const normalizeValue = (value: null | number | string | undefined): null | numbe
     return null;
   }
   value = typeof value !== 'number' ? parseFloat(value) : value;
-  return isNaN(value) ? null : value;
+  return Number.isFinite(value) ? value : null;
 };
 
 const center = (lat: null | number | string, lng: null | number | string): LatLng => {
@@ -44,23 +55,20 @@ const center = (lat: null | number | string, lng: null | number | string): LatLn
   imports: [FormField, LeafletModule],
   templateUrl: './map-point.html',
   styleUrl: './map-point.scss',
-  providers: [
-    {
-      multi: true,
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: MapPoint,
-    },
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MapPoint implements ControlValueAccessor {
+export class MapPoint implements FormValueControl<Point> {
   readonly #cdr = inject(ChangeDetectorRef);
 
   protected markers: Layer[] = [];
-  readonly #disabled = signal(false);
+  readonly value = model<Point>({lat: 0, lng: 0});
+  readonly disabled = input(false);
+  readonly touch = output();
+  private readonly latitude = viewChild.required<ElementRef<HTMLInputElement>>('latitude');
+  #lastEmittedPoint: Point | undefined;
   readonly #coordinates = signal({lat: '', lng: ''});
   protected readonly coordinatesForm = form(this.#coordinates, (path) => {
-    disabled(path, {when: () => this.#disabled()});
+    disabled(path, {when: () => this.disabled()});
   });
 
   protected center = center(null, null);
@@ -76,15 +84,23 @@ export class MapPoint implements ControlValueAccessor {
     zoom: 8,
   };
 
-  private onChange?: (_: Point) => void;
+  constructor() {
+    effect(() => {
+      const point = this.value();
+      // Keep the user's coordinate text while our own value change propagates back.
+      const emitted = point === this.#lastEmittedPoint;
+      this.#lastEmittedPoint = undefined;
+      if (!emitted) this.syncPoint(point);
+    });
+  }
 
-  private onTouched?: () => void;
+  focus(options?: FocusOptions): void {
+    this.latitude().nativeElement.focus(options);
+  }
 
-  private touched = false;
-
-  writeValue(point: null | Point): void {
-    const lat = normalizeValue(point?.lat);
-    const lng = normalizeValue(point?.lng);
+  private syncPoint(point: Point): void {
+    const lat = normalizeValue(point.lat);
+    const lng = normalizeValue(point.lng);
 
     this.#coordinates.set({lat: lat === null ? '' : String(lat), lng: lng === null ? '' : String(lng)});
 
@@ -99,22 +115,9 @@ export class MapPoint implements ControlValueAccessor {
     this.#cdr.markForCheck();
   }
 
-  registerOnChange(onChange: (_: Point) => void): void {
-    this.onChange = onChange;
-  }
-
-  registerOnTouched(onTouched: () => void): void {
-    this.onTouched = onTouched;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    this.#disabled.set(isDisabled);
-    this.#cdr.markForCheck();
-  }
-
   protected onMapReady(lmap: Map) {
     lmap.on('click', (event: LeafletMouseEvent) => {
-      if (this.#disabled()) return;
+      if (this.disabled()) return;
       this.center = event.latlng;
       this.mapOptions.center = event.latlng;
       this.setMarker(event.latlng);
@@ -122,15 +125,14 @@ export class MapPoint implements ControlValueAccessor {
       this.#coordinates.set({lat: String(event.latlng.lat), lng: String(event.latlng.lng)});
 
       this.markAsTouched();
-      if (this.onChange) {
-        this.onChange({lat: event.latlng.lat, lng: event.latlng.lng});
-      }
+      this.emitPoint({lat: event.latlng.lat, lng: event.latlng.lng});
 
       this.#cdr.markForCheck();
     });
   }
 
   protected coordsChanged() {
+    if (this.disabled()) return;
     const lat = normalizeValue(this.#coordinates().lat);
     const lng = normalizeValue(this.#coordinates().lng);
 
@@ -143,25 +145,20 @@ export class MapPoint implements ControlValueAccessor {
 
     this.setMarker(ll);
 
-    this.markAsTouched();
     if (lat !== null && lng !== null) {
-      if (this.onChange) {
-        this.onChange({lat, lng});
-      }
+      this.emitPoint({lat, lng});
     }
 
     this.#cdr.markForCheck();
   }
 
-  markAsTouched() {
-    if (!this.touched) {
-      if (this.onTouched) {
-        this.onTouched();
-      }
-      this.touched = true;
-    }
+  protected markAsTouched(): void {
+    this.touch.emit();
+  }
 
-    this.#cdr.markForCheck();
+  private emitPoint(point: Point): void {
+    this.#lastEmittedPoint = point;
+    this.value.set(point);
   }
 
   protected setMarker(ll: LatLng | null) {

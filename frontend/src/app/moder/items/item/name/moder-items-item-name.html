@@ -22,11 +22,7 @@
             <div class="mb-3 row">
               <label class="col-md-2 col-form-label" for="short_description" i18n>Short description</label>
               <div class="col-md-10">
-                <app-markdown-edit
-                  id="short_description"
-                  [text]="value.text"
-                  (textChange)="language.text().value.set($event)"
-                />
+                <app-markdown-edit id="short_description" [formField]="language.text" />
                 @if (value.textId) {
                   <p class="text-end">
                     <a i18n [routerLink]="['/info/text', value.textId]">History</a>
@@ -37,11 +33,7 @@
             <div class="mb-3 row">
               <label class="col-md-2 col-form-label" for="full_description" i18n>Full description</label>
               <div class="col-md-10">
-                <app-markdown-edit
-                  id="full_description"
-                  [text]="value.fullText"
-                  (textChange)="language.fullText().value.set($event)"
-                />
+                <app-markdown-edit id="full_description" [formField]="language.fullText" />
                 @if (value.fullTextId) {
                   <p class="text-end">
                     <a i18n [routerLink]="['/info/text', value.fullTextId]">History</a>

@@ -375,8 +375,15 @@
 
   Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*"
           />
-          <app-markdown-edit [(text)]="picture.copyrights" />
-          <button type="button" class="btn btn-primary" i18n (click)="saveCopyrights(picture)">Submit</button>
+          <app-markdown-edit [formField]="copyrightsForm" />
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="copyrightsLoading() || copyrightsForm().invalid()"
+            (click)="saveCopyrights(picture)"
+          >
+            <ng-container i18n>Submit</ng-container>
+          </button>
           @if (picture.copyrightsTextId) {
             <p>
               <a i18n [routerLink]="['/info/text', picture.copyrightsTextId]">History</a>
