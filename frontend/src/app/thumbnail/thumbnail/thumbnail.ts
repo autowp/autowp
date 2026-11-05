@@ -2,9 +2,18 @@ import type {OnInit, ResourceRef} from '@angular/core';
 import type {Picture, User} from '@grpc/spec.pb';
 
 import {AsyncPipe, DecimalPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  Injector,
+  input,
+  linkedSignal,
+  output,
+} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormsModule} from '@angular/forms';
+import {applyEach, disabled, form, FormField, submit} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {PictureItem, PictureItemType, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
@@ -14,7 +23,7 @@ import {UserService} from '@services/user';
 import {APIPerspectiveService} from 'app/api/perspective/perspective.service';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserLink} from 'app/user/user/user-link';
-import {catchError, EMPTY} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 
 interface ThumbnailAPIPicture extends Picture {
   selected?: boolean;
@@ -22,7 +31,7 @@ interface ThumbnailAPIPicture extends Picture {
 
 @Component({
   selector: 'app-thumbnail',
-  imports: [RouterLink, UserLink, FormsModule, AsyncPipe, DecimalPipe],
+  imports: [RouterLink, UserLink, FormField, AsyncPipe, DecimalPipe],
   templateUrl: './thumbnail.html',
   styleUrl: './thumbnail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,6 +65,15 @@ export class Thumbnail implements OnInit {
     ),
   );
 
+  readonly #perspectiveModel = linkedSignal(() =>
+    this.contentPictureItems().map((item) => ({perspective: String(item.perspectiveId)})),
+  );
+  protected readonly perspectiveForm = form(this.#perspectiveModel, (path) => {
+    applyEach(path, (row) => {
+      disabled(row, {when: ({state}) => state.submitting()});
+    });
+  });
+
   // Built in ngOnInit() (with an explicit injector) rather than as a field initializer, like
   // Comments's: its TransferState `id` has to be derived from `picture`, a *required*
   // input, which Angular's compiler forbids reading at field-initializer time.
@@ -86,26 +104,30 @@ export class Thumbnail implements OnInit {
     });
   }
 
-  protected savePerspective(pictureItem: PictureItem) {
-    this.#picturesClient
-      .updatePictureItem(
-        new UpdatePictureItemRequest({
-          pictureItem: new PictureItem({
-            itemId: pictureItem.itemId,
-            perspectiveId: pictureItem.perspectiveId,
-            pictureId: pictureItem.pictureId,
-            type: pictureItem.type,
-          }),
-          updateMask: new FieldMask({paths: ['perspective_id']}),
-        }),
-      )
-      .pipe(
-        catchError((error: unknown) => {
-          this.#toastService.handleError(error);
-          return EMPTY;
-        }),
-      )
-      .subscribe();
+  protected savePerspective(pictureItem: PictureItem, index: number): void {
+    const field = this.perspectiveForm[index];
+    void submit(field, async () => {
+      const perspectiveId = Number(field.perspective().value());
+      try {
+        await firstValueFrom(
+          this.#picturesClient.updatePictureItem(
+            new UpdatePictureItemRequest({
+              pictureItem: new PictureItem({
+                itemId: pictureItem.itemId,
+                perspectiveId,
+                pictureId: pictureItem.pictureId,
+                type: pictureItem.type,
+              }),
+              updateMask: new FieldMask({paths: ['perspective_id']}),
+            }),
+          ),
+        );
+        pictureItem.perspectiveId = perspectiveId;
+      } catch (error: unknown) {
+        field.perspective().value.set(String(pictureItem.perspectiveId));
+        this.#toastService.handleError(error);
+      }
+    });
   }
 
   protected onPictureSelect(picture: ThumbnailAPIPicture) {

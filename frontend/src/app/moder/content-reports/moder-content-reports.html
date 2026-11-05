@@ -13,7 +13,7 @@
   <h1 i18n>Content reports</h1>
 </div>
 
-<form class="row row-cols-auto g-2 align-items-end mb-3">
+<form class="row row-cols-auto g-2 align-items-end mb-3" novalidate (submit)="$event.preventDefault()">
   <div class="col">
     <label class="form-label" for="content-report-status" i18n>Status</label>
     <select id="content-report-status" class="form-select" [formField]="filterForm.status" (change)="setFilter()">
@@ -95,13 +95,13 @@
               class="form-control"
               i18n-placeholder
               placeholder="Resolution note"
-              [formControl]="row.resolution"
+              [formField]="row.resolution"
             />
             <button
               type="button"
               class="btn btn-success"
               i18n
-              [disabled]="row.submitting()"
+              [disabled]="row.resolution().submitting()"
               (click)="resolve(row, true)"
             >
               Accept
@@ -110,7 +110,7 @@
               type="button"
               class="btn btn-outline-danger"
               i18n
-              [disabled]="row.submitting()"
+              [disabled]="row.resolution().submitting()"
               (click)="resolve(row, false)"
             >
               Reject

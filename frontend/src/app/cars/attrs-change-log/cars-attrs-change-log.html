@@ -11,7 +11,7 @@
 </div>
 
 <div class="card card-body">
-  <form class="form-horizontal">
+  <form class="form-horizontal" (submit)="$event.preventDefault()">
     <div class="mb-3 row">
       <label class="col-md-2 col-form-label" for="user_id" i18n>User</label>
       <div class="col-md-10">
@@ -20,22 +20,16 @@
         </ng-template>
         <div class="input-group mb-3">
           <input
-            name="user"
             class="form-control"
             id="user_id"
             [ngbTypeahead]="usersDataSource"
-            [formControl]="userQuery"
+            [formField]="userQuery"
             [inputFormatter]="userFormatter"
             [resultTemplate]="userTemplate"
             [class.border-primary]="hasUserID()"
             (selectItem)="userOnSelect($event)"
           />
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            [disabled]="!hasUserID()"
-            (click)="clearUser(userQuery)"
-          >
+          <button class="btn btn-outline-secondary" type="button" [disabled]="!hasUserID()" (click)="clearUser()">
             <span class="bi bi-x" aria-hidden="true"></span>
           </button>
         </div>

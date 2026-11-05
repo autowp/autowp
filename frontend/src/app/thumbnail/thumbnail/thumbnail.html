@@ -126,12 +126,12 @@
             }
             <select
               class="form-select form-select-sm me-1 mb-2"
-              [(ngModel)]="pictureItem.perspectiveId"
-              (change)="savePerspective(pictureItem)"
+              [formField]="perspectiveForm[$index].perspective"
+              (change)="savePerspective(pictureItem, $index)"
             >
-              <option [ngValue]="0">--</option>
+              <option [value]="0">--</option>
               @for (item of perspectiveOptions$ | async; track item.id) {
-                <option [ngValue]="item.id">{{ item.name }}</option>
+                <option [value]="item.id">{{ item.name }}</option>
               }
             </select>
           }

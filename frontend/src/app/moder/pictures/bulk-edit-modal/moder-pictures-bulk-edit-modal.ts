@@ -3,7 +3,7 @@ import type {PersonSearchSelection} from '@utils/person-search/person-search';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, inject, input, output, signal} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {disabled, form, FormField, maxLength} from '@angular/forms/signals';
 import {
   CreatePictureItemRequest,
   DeletePictureItemRequest,
@@ -26,10 +26,11 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {pictureLicenseOptions} from '@utils/license-badge/license-badge';
 import {LicenseHelpModal} from '@utils/license-help-modal/license-help-modal';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {PersonSearch} from '@utils/person-search/person-search';
 import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {catchError, EMPTY, forkJoin, of, switchMap} from 'rxjs';
+import {catchError, EMPTY, forkJoin, map, of, switchMap, tap} from 'rxjs';
 
 interface PictureSummary {
   author: null | {id: string; nameHtml: string};
@@ -40,7 +41,7 @@ interface PictureSummary {
 
 @Component({
   selector: 'app-moder-pictures-bulk-edit-modal',
-  imports: [FormsModule, PersonSearch, NgbProgressbar],
+  imports: [FormField, PersonSearch, NgbProgressbar],
   templateUrl: './moder-pictures-bulk-edit-modal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -66,10 +67,18 @@ export class ModerPicturesBulkEditModal implements OnInit {
     value,
   }));
 
-  // null in each of these three means "leave as is" - the default, so opening this dialog to
-  // change only one of the three fields can never silently blank out the other two.
-  protected readonly licenseChoice = signal<null | PictureLicense>(null);
-  protected readonly sourceUrlChoice = signal('');
+  // Empty licence/URL and a null author mean "leave as is".
+  readonly #editModel = signal({license: '', sourceUrl: ''});
+  protected readonly editForm = form(this.#editModel, (path) => {
+    maxLength(path.sourceUrl, 500);
+    disabled(path, {when: () => this.saving()});
+  });
+  protected readonly licenseChoice = computed(() =>
+    this.#editModel().license === ''
+      ? null
+      : numericEnumValue(PictureLicense, Number(this.#editModel().license), PictureLicense.PICTURE_LICENSE_UNKNOWN),
+  );
+  protected readonly sourceUrlChoice = computed(() => this.#editModel().sourceUrl);
   protected readonly authorChoice = signal<null | PersonSearchSelection>(null);
 
   // Counts of already-selected photos whose current value differs from what is about to be
@@ -160,7 +169,7 @@ export class ModerPicturesBulkEditModal implements OnInit {
     if (licenses.size === 1) {
       const only = [...licenses].at(0);
       if (only !== undefined && only !== PictureLicense.PICTURE_LICENSE_UNKNOWN) {
-        this.licenseChoice.set(only);
+        this.editForm.license().value.set(String(only));
       }
     }
 
@@ -168,7 +177,7 @@ export class ModerPicturesBulkEditModal implements OnInit {
     if (urls.size === 1) {
       const only = [...urls].at(0);
       if (only) {
-        this.sourceUrlChoice.set(only);
+        this.editForm.sourceUrl().value.set(only);
       }
     }
 
@@ -194,7 +203,7 @@ export class ModerPicturesBulkEditModal implements OnInit {
   }
 
   protected apply(): void {
-    if (this.licenseNeedsSourceCount() > 0 || this.saving()) {
+    if (this.licenseNeedsSourceCount() > 0 || this.saving() || this.loading() || this.editForm().invalid()) {
       return;
     }
 
@@ -204,11 +213,21 @@ export class ModerPicturesBulkEditModal implements OnInit {
     const sourceUrl = this.sourceUrlChoice().trim();
     const author = this.authorChoice();
 
-    const requests = this.pictures().map((picture) => this.#applyToPicture$(picture, license, sourceUrl, author));
+    const requests = this.pictures().map((picture) =>
+      this.#applyToPicture$(picture, license, sourceUrl, author).pipe(
+        map(() => true),
+        catchError((error: unknown) => {
+          this.#toastService.handleError(error);
+          return of(false);
+        }),
+      ),
+    );
 
-    forkJoin(requests.length > 0 ? requests : [of(null)]).subscribe({
-      complete: () => {
+    forkJoin(requests.length > 0 ? requests : [of(true)]).subscribe({
+      next: (results) => {
+        this.pictures.update((pictures) => [...pictures]);
         this.saving.set(false);
+        if (results.some((success) => !success)) return;
         this.applied.emit();
         this.activeModal.close();
       },
@@ -241,9 +260,9 @@ export class ModerPicturesBulkEditModal implements OnInit {
         ? this.#picturesClient
             .updatePicture(new UpdatePictureRequest({picture: patch, updateMask: new FieldMask({paths})}))
             .pipe(
-              catchError((error: unknown) => {
-                this.#toastService.handleError(error);
-                return EMPTY;
+              tap(() => {
+                if (license !== null) picture.license = license;
+                if (sourceUrl !== '') picture.sourceUrl = sourceUrl;
               }),
             )
         : of(null);
@@ -261,9 +280,8 @@ export class ModerPicturesBulkEditModal implements OnInit {
         }),
       )
       .pipe(
-        catchError((error: unknown) => {
-          this.#toastService.handleError(error);
-          return EMPTY;
+        tap(() => {
+          picture.author = {id: author.id, nameHtml: author.nameHtml};
         }),
       );
 
@@ -277,9 +295,8 @@ export class ModerPicturesBulkEditModal implements OnInit {
             }),
           )
           .pipe(
-            catchError((error: unknown) => {
-              this.#toastService.handleError(error);
-              return EMPTY;
+            tap(() => {
+              picture.author = null;
             }),
             switchMap(() => link$),
           )

@@ -14,7 +14,6 @@ import {
   provideAppInitializer,
   runInInjectionContext,
 } from '@angular/core';
-import {FormsModule} from '@angular/forms';
 import {
   BrowserModule,
   provideClientHydration,
@@ -134,7 +133,6 @@ export const appConfig: ApplicationConfig = {
     provideMonacoEditor(),
     importProvidersFrom(
       BrowserModule,
-      FormsModule,
       NgPipesModule,
       NgbTooltipModule,
       NgbCollapseModule,

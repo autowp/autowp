@@ -1,15 +1,14 @@
-@if (data$ | async; as languages) {
+@if (editForm$ | async; as editForm) {
   <div class="card card-body">
-    <ul #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="languages[0].language">
-      @for (language of languages; track language.language) {
-        <li [ngbNavItem]="language.language">
+    <ul #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="editForm().value().languages[0]?.language">
+      @for (language of editForm.languages; track language().value().language) {
+        @let value = language().value();
+        <li [ngbNavItem]="value.language">
           <a ngbNavLink>
-            {{ language.language | uppercase }}
-            @if (language.name || language.text || language.fullText) {
+            {{ value.language | uppercase }}
+            @if (value.name || value.text || value.fullText) {
               <span class="badge rounded-pill text-bg-secondary">
-                {{
-                  (language.name.length ? 1 : 0) + (language.text.length ? 1 : 0) + (language.fullText.length ? 1 : 0)
-                }}
+                {{ (value.name.length ? 1 : 0) + (value.text.length ? 1 : 0) + (value.fullText.length ? 1 : 0) }}
               </span>
             }
           </a>
@@ -17,23 +16,20 @@
             <div class="mb-3 row mt-4">
               <label class="col-md-2 col-form-label" for="name" i18n>Name</label>
               <div class="col-md-10">
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  maxlength="255"
-                  class="form-control"
-                  [(ngModel)]="language.name"
-                />
+                <input type="text" id="name" class="form-control" [formField]="language.name" />
               </div>
             </div>
             <div class="mb-3 row">
               <label class="col-md-2 col-form-label" for="short_description" i18n>Short description</label>
               <div class="col-md-10">
-                <app-markdown-edit id="short_description" [(text)]="language.text" />
-                @if (language.textId) {
+                <app-markdown-edit
+                  id="short_description"
+                  [text]="value.text"
+                  (textChange)="language.text().value.set($event)"
+                />
+                @if (value.textId) {
                   <p class="text-end">
-                    <a i18n [routerLink]="['/info/text', language.textId]">History</a>
+                    <a i18n [routerLink]="['/info/text', value.textId]">History</a>
                   </p>
                 }
               </div>
@@ -41,10 +37,14 @@
             <div class="mb-3 row">
               <label class="col-md-2 col-form-label" for="full_description" i18n>Full description</label>
               <div class="col-md-10">
-                <app-markdown-edit id="full_description" [(text)]="language.fullText" />
-                @if (language.fullTextId) {
+                <app-markdown-edit
+                  id="full_description"
+                  [text]="value.fullText"
+                  (textChange)="language.fullText().value.set($event)"
+                />
+                @if (value.fullTextId) {
                   <p class="text-end">
-                    <a i18n [routerLink]="['/info/text', language.fullTextId]">History</a>
+                    <a i18n [routerLink]="['/info/text', value.fullTextId]">History</a>
                   </p>
                 }
               </div>
@@ -53,9 +53,14 @@
         </li>
       }
     </ul>
-    <div [ngbNavOutlet]="nav"></div>
-    <button type="submit" class="btn btn-primary" [disabled]="loadingNumber()" (click)="saveLanguages(languages)">
-      @if (loadingNumber()) {
+    <fieldset [disabled]="editForm().submitting()"><div [ngbNavOutlet]="nav"></div></fieldset>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="editForm().submitting()"
+      (click)="saveLanguages(editForm)"
+    >
+      @if (editForm().submitting()) {
         <span>
           <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
         </span>

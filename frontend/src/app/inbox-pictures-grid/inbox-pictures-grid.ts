@@ -1,10 +1,20 @@
 import type {DoCheck} from '@angular/core';
+import type {FieldTree} from '@angular/forms/signals';
 import type {Image, PictureAuthorSuggestion} from '@grpc/spec.pb';
 import type {PersonSearchSelection} from '@utils/person-search/person-search';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, signal} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  inject,
+  Injector,
+  input,
+  signal,
+} from '@angular/core';
+import {disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {
   CreatePictureItemRequest,
   DeletePictureItemRequest,
@@ -24,11 +34,12 @@ import {LanguageService} from '@services/language';
 import {LicenseBadge, pictureLicenseOptions} from '@utils/license-badge/license-badge';
 import {LicenseHelpModal} from '@utils/license-help-modal/license-help-modal';
 import {getModalComponentRef} from '@utils/modal-component-ref';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {PersonSearch} from '@utils/person-search/person-search';
 import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {Thumbnail} from 'app/thumbnail/thumbnail/thumbnail';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {catchError, EMPTY, merge, switchMap, tap, toArray} from 'rxjs';
+import {catchError, EMPTY, firstValueFrom, merge, switchMap, tap, toArray} from 'rxjs';
 
 import {UploadCrop} from '../upload/crop/upload-crop';
 
@@ -72,7 +83,7 @@ const cascadeStickyThreshold = 20;
 
 @Component({
   selector: 'app-inbox-pictures-grid',
-  imports: [Thumbnail, PersonSearch, LicenseBadge, FormsModule],
+  imports: [Thumbnail, PersonSearch, LicenseBadge, FormField],
   templateUrl: './inbox-pictures-grid.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -82,6 +93,7 @@ export class InboxPicturesGrid implements DoCheck {
   readonly #languageService = inject(LanguageService);
   readonly #toastService = inject(ToastsService);
   readonly #cdr = inject(ChangeDetectorRef);
+  readonly #injector = inject(Injector);
 
   readonly pictures = input.required<InboxPicture[]>();
 
@@ -97,8 +109,16 @@ export class InboxPicturesGrid implements DoCheck {
   protected readonly cascadeSticky = signal(false);
   protected readonly editingAuthor = signal<null | string>(null);
 
-  protected readonly batchLicense = signal<PictureLicense>(PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED);
-  protected readonly batchSourceUrl = signal('');
+  readonly #batchModel = signal({license: String(PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED), sourceUrl: ''});
+  protected readonly batchForm = form(this.#batchModel, (path) => {
+    maxLength(path.sourceUrl, 500);
+    disabled(path, {when: ({state}) => state.submitting()});
+  });
+  protected readonly batchLicense = computed(() =>
+    numericEnumValue(PictureLicense, Number(this.#batchModel().license), PictureLicense.PICTURE_LICENSE_UNKNOWN),
+  );
+  protected readonly batchSourceUrl = computed(() => this.#batchModel().sourceUrl);
+  protected readonly licenseForms = new Map<string, FieldTree<{license: string; sourceUrl: string}>>();
   protected readonly editingLicense = signal<null | string>(null);
 
   // suggestionKey → chosen person: once a suggestion is accepted on one photo, every later photo
@@ -113,6 +133,17 @@ export class InboxPicturesGrid implements DoCheck {
       if (this.#seen.has(upload.picture.id)) {
         continue;
       }
+      this.licenseForms.set(
+        upload.picture.id,
+        form(
+          signal({license: String(upload.picture.license), sourceUrl: upload.picture.sourceUrl}),
+          (path) => {
+            maxLength(path.sourceUrl, 500);
+            disabled(path, {when: ({state}) => state.submitting() || this.batchForm().submitting()});
+          },
+          {injector: this.#injector},
+        ),
+      );
       this.#seen.add(upload.picture.id);
       this.#applyBatchChoice(upload);
       added = true;
@@ -304,50 +335,65 @@ export class InboxPicturesGrid implements DoCheck {
   }
 
   #updateLicense$(pictureId: string, license: PictureLicense, sourceUrl: string): Observable<unknown> {
-    return this.#picturesClient
-      .updatePicture(
-        new UpdatePictureRequest({
-          picture: new Picture({id: pictureId, license, sourceUrl}),
-          updateMask: new FieldMask({paths: ['license', 'source_url']}),
-        }),
-      )
-      .pipe(
-        catchError((response: unknown) => {
-          this.#toastService.handleError(response);
-          return EMPTY;
-        }),
-      );
+    return this.#picturesClient.updatePicture(
+      new UpdatePictureRequest({
+        picture: new Picture({id: pictureId, license, sourceUrl}),
+        updateMask: new FieldMask({paths: ['license', 'source_url']}),
+      }),
+    );
   }
 
-  protected chooseLicense(upload: InboxPicture, license: PictureLicense, sourceUrl: string): void {
-    if (this.licenseNeedsSource(license, sourceUrl)) {
-      return;
-    }
+  protected rowLicenseNeedsSource(field: FieldTree<{license: string; sourceUrl: string}>): boolean {
+    return pictureLicenseRequiresSourceUrl(field.license().value()) && field.sourceUrl().value().trim() === '';
+  }
 
-    this.editingLicense.set(null);
-
-    this.#updateLicense$(upload.picture.id, license, sourceUrl).subscribe(() => {
-      upload.picture.license = license;
-      upload.picture.sourceUrl = sourceUrl;
-      this.#cdr.markForCheck();
+  protected chooseLicense(upload: InboxPicture): void {
+    const field = this.licenseForms.get(upload.picture.id);
+    if (!field || this.batchForm().submitting() || this.rowLicenseNeedsSource(field)) return;
+    void submit(field, async () => {
+      const license = numericEnumValue(
+        PictureLicense,
+        Number(field.license().value()),
+        PictureLicense.PICTURE_LICENSE_UNKNOWN,
+      );
+      const sourceUrl = field.sourceUrl().value();
+      try {
+        await firstValueFrom(this.#updateLicense$(upload.picture.id, license, sourceUrl));
+        upload.picture.license = license;
+        upload.picture.sourceUrl = sourceUrl;
+        if (this.editingLicense() === upload.picture.id) this.editingLicense.set(null);
+        this.#cdr.markForCheck();
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
+      }
     });
   }
 
   protected applyLicenseToAll(): void {
     const license = this.batchLicense();
     const sourceUrl = this.batchSourceUrl();
-
-    if (this.licenseNeedsSource(license, sourceUrl)) {
+    if (
+      this.licenseNeedsSource(license, sourceUrl) ||
+      [...this.licenseForms.values()].some((field) => field().submitting())
+    )
       return;
-    }
-
-    for (const upload of this.pictures()) {
-      this.#updateLicense$(upload.picture.id, license, sourceUrl).subscribe(() => {
-        upload.picture.license = license;
-        upload.picture.sourceUrl = sourceUrl;
-        this.#cdr.markForCheck();
-      });
-    }
+    void submit(this.batchForm, async () => {
+      await Promise.all(
+        this.pictures().map(async (upload) => {
+          try {
+            await firstValueFrom(this.#updateLicense$(upload.picture.id, license, sourceUrl));
+            upload.picture.license = license;
+            upload.picture.sourceUrl = sourceUrl;
+            this.licenseForms
+              .get(upload.picture.id)?.()
+              .value.set({license: String(license), sourceUrl});
+            this.#cdr.markForCheck();
+          } catch (error: unknown) {
+            this.#toastService.handleError(error);
+          }
+        }),
+      );
+    });
   }
 
   protected toggleEditLicense(pictureId: string): void {

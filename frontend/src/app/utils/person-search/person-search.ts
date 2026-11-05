@@ -2,8 +2,8 @@ import type {Item, PictureItemType} from '@grpc/spec.pb';
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, input, output, signal} from '@angular/core';
+import {form, FormField} from '@angular/forms/signals';
 import {ItemFields, ItemListOptions, ItemsRequest, ItemType, PictureItemListOptions} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
@@ -19,7 +19,7 @@ export interface PersonSearchSelection {
 
 @Component({
   selector: 'app-person-search',
-  imports: [ReactiveFormsModule, NgbTypeahead],
+  imports: [FormField, NgbTypeahead],
   templateUrl: './person-search.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -35,7 +35,7 @@ export class PersonSearch {
 
   readonly selected = output<PersonSearchSelection>();
 
-  protected readonly query = new FormControl<string>('', {nonNullable: true});
+  protected readonly query = form(signal(''));
 
   protected readonly dataSource: (text$: Observable<string>) => Observable<Item[]> = (text$) =>
     text$.pipe(
@@ -82,11 +82,11 @@ export class PersonSearch {
     // ng-bootstrap types the event item as `any`; dataSource is the only feed and resolves Item[].
     const item = event.item as Item;
     this.selected.emit({id: item.id, nameHtml: item.nameHtml, nameText: item.nameText});
-    this.query.setValue('', {emitEvent: false});
+    this.query().value.set('');
     event.preventDefault();
   }
 
   public clear(): void {
-    this.query.setValue('', {emitEvent: false});
+    this.query().value.set('');
   }
 }

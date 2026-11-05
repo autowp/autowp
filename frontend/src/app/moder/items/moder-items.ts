@@ -5,8 +5,8 @@ import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
+import {form, FormField, maxLength} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -89,7 +89,7 @@ const defaultOrder = ItemsRequest.Order.ID_DESC;
 
 @Component({
   selector: 'app-items',
-  imports: [RouterLink, FormsModule, NgbTypeahead, Paginator, AsyncPipe, CatalogueItemCard],
+  imports: [RouterLink, FormField, NgbTypeahead, Paginator, AsyncPipe, CatalogueItemCard],
   templateUrl: './moder-items.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -104,30 +104,25 @@ export class ModerItems implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #cdr = inject(ChangeDetectorRef);
 
-  protected name = '';
-
-  protected nameExclude = '';
-
-  protected itemTypeID: ItemType = ItemType.ITEM_TYPE_UNKNOWN;
-
-  protected vehicleTypeID: null | number | string = null;
-
-  protected vehicleChildsTypeID: null | number = null;
-
-  protected specID: null | number = null;
-
-  protected noParent: boolean | null = null;
-
-  protected text = '';
-
-  protected fromYear: null | number = null;
-
-  protected toYear: null | number = null;
-
-  protected order: ItemsRequest.Order = defaultOrder;
-
+  readonly #filterModel = signal({
+    name: '',
+    nameExclude: '',
+    itemTypeID: '0',
+    vehicleTypeID: '',
+    vehicleChildsTypeID: '',
+    specID: '',
+    noParent: false,
+    text: '',
+    fromYear: '',
+    toYear: '',
+    order: String(defaultOrder),
+    ancestorQuery: '',
+  });
+  protected readonly filterForm = form(this.#filterModel, (path) => {
+    maxLength(path.fromYear, 4);
+    maxLength(path.toYear, 4);
+  });
   protected ancestorID: null | number = null;
-  protected ancestorQuery = '';
   protected readonly ancestorsDataSource: (text$: Observable<string>) => Observable<Item[]> = (
     text$: Observable<string>,
   ) =>
@@ -200,17 +195,20 @@ export class ModerItems implements OnInit {
     })),
     distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
     tap((params) => {
-      this.name = params.name;
-      this.nameExclude = params.nameExclude;
-      this.itemTypeID = params.itemTypeID;
-      this.vehicleTypeID = params.vehicleTypeID;
-      this.vehicleChildsTypeID = params.vehicleChildsTypeID;
-      this.specID = params.specID;
-      this.noParent = params.noParent;
-      this.text = params.text;
-      this.fromYear = params.fromYear;
-      this.toYear = params.toYear;
-      this.order = params.order;
+      this.#filterModel.update((current) => ({
+        ...current,
+        name: params.name,
+        nameExclude: params.nameExclude,
+        itemTypeID: String(params.itemTypeID),
+        vehicleTypeID: String(params.vehicleTypeID ?? ''),
+        vehicleChildsTypeID: String(params.vehicleChildsTypeID ?? ''),
+        specID: String(params.specID ?? ''),
+        noParent: params.noParent,
+        text: params.text,
+        fromYear: String(params.fromYear ?? ''),
+        toYear: String(params.toYear ?? ''),
+        order: String(params.order),
+      }));
       this.ancestorID = params.ancestorID;
       this.#cdr.markForCheck();
     }),
@@ -353,14 +351,16 @@ export class ModerItems implements OnInit {
     });
   }
 
-  protected ancestorFormatter(x: Item) {
-    return x.nameText;
+  protected ancestorFormatter(x: Item | string) {
+    return typeof x === 'string' ? x : x.nameText;
   }
 
   protected ancestorOnSelect(e: NgbTypeaheadSelectItemEvent): void {
     // e.item is typed `any` by ng-bootstrap - ancestorsDataSource above is the only source
     // feeding this typeahead, and it resolves Item[].
     const selected = e.item as Item;
+    e.preventDefault();
+    this.filterForm.ancestorQuery().value.set(selected.nameText);
     void this.#router.navigate([], {
       queryParams: {
         ancestor_id: selected.id,
@@ -370,7 +370,7 @@ export class ModerItems implements OnInit {
   }
 
   protected clearAncestor(): void {
-    this.ancestorQuery = '';
+    this.filterForm.ancestorQuery().value.set('');
     void this.#router.navigate([], {
       queryParams: {
         ancestor_id: null,
@@ -382,7 +382,7 @@ export class ModerItems implements OnInit {
   protected onNameChanged() {
     void this.#router.navigate([], {
       queryParams: {
-        name: this.name.length ? this.name : null,
+        name: this.#filterModel().name.length ? this.#filterModel().name : null,
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -392,7 +392,7 @@ export class ModerItems implements OnInit {
   protected onNameExcludeChanged() {
     void this.#router.navigate([], {
       queryParams: {
-        name_exclude: this.nameExclude.length ? this.nameExclude : null,
+        name_exclude: this.#filterModel().nameExclude.length ? this.#filterModel().nameExclude : null,
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -402,7 +402,7 @@ export class ModerItems implements OnInit {
   protected onItemTypeChanged() {
     void this.#router.navigate([], {
       queryParams: {
-        item_type_id: this.itemTypeID ? this.itemTypeID : null,
+        item_type_id: Number(this.#filterModel().itemTypeID) ? this.#filterModel().itemTypeID : null,
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -413,7 +413,7 @@ export class ModerItems implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        vehicle_type_id: this.vehicleTypeID ?? null,
+        vehicle_type_id: this.#filterModel().vehicleTypeID || null,
       },
       queryParamsHandling: 'merge',
     });
@@ -423,7 +423,7 @@ export class ModerItems implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        vehicle_childs_type_id: this.vehicleChildsTypeID ?? null,
+        vehicle_childs_type_id: this.#filterModel().vehicleChildsTypeID || null,
       },
       queryParamsHandling: 'merge',
     });
@@ -433,7 +433,7 @@ export class ModerItems implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        spec_id: this.specID ?? null,
+        spec_id: this.#filterModel().specID || null,
       },
       queryParamsHandling: 'merge',
     });
@@ -442,7 +442,7 @@ export class ModerItems implements OnInit {
   protected onNoParentChanged() {
     void this.#router.navigate([], {
       queryParams: {
-        no_parent: this.noParent ? '1' : null,
+        no_parent: this.#filterModel().noParent ? '1' : null,
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -453,7 +453,7 @@ export class ModerItems implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        text: this.text ? this.text : null,
+        text: this.#filterModel().text ? this.#filterModel().text : null,
       },
       queryParamsHandling: 'merge',
     });
@@ -462,7 +462,7 @@ export class ModerItems implements OnInit {
   protected onFromYearChanged() {
     void this.#router.navigate([], {
       queryParams: {
-        from_year: this.fromYear ?? null,
+        from_year: this.#filterModel().fromYear || null,
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -473,7 +473,7 @@ export class ModerItems implements OnInit {
     void this.#router.navigate([], {
       queryParams: {
         page: null,
-        to_year: this.toYear ?? null,
+        to_year: this.#filterModel().toYear || null,
       },
       queryParamsHandling: 'merge',
     });
@@ -482,7 +482,7 @@ export class ModerItems implements OnInit {
   protected onOrderChanged() {
     void this.#router.navigate([], {
       queryParams: {
-        order: this.order ? this.order : null,
+        order: this.#filterModel().order ? this.#filterModel().order : null,
         page: null,
       },
       queryParamsHandling: 'merge',

@@ -35,58 +35,55 @@
   }
 </p>
 
-@if (itemParent$ | async; as itemParent) {
-  @if (languages$ | async; as languages) {
-    <form method="post" class="form-horizontal" (submit)="save(itemParent, languages)">
+@if (editor$ | async; as editor) {
+  @let editForm = editor.form;
+  <form method="post" class="form-horizontal" novalidate (submit)="$event.preventDefault(); save(editor)">
+    <div class="mb-3 row">
+      <label class="col-md-2 col-form-label" for="catname">Catname</label>
+      <div class="col-md-10">
+        <input type="text" id="catname" class="form-control" [formField]="editForm.catname" />
+      </div>
+    </div>
+    <div class="mb-3 row">
+      <label class="col-md-2 col-form-label" for="type">Type</label>
+      <div class="col-md-10">
+        <select class="form-select" id="type" [formField]="editForm.type">
+          @for (option of typeOptions; track option.value) {
+            <option [value]="option.value">{{ option.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    @for (language of editForm.languages; track language().value().language) {
+      @let errors = editor.errors()[language().value().language] ?? {};
       <div class="mb-3 row">
-        <label class="col-md-2 col-form-label" for="catname">Catname</label>
+        <label class="col-md-2 col-form-label" [for]="'name' + language().value().language"
+          >{{ language().value().language | uppercase }} Name</label
+        >
         <div class="col-md-10">
           <input
             type="text"
-            name="catname"
-            id="catname"
-            maxlength="150"
             class="form-control"
-            [(ngModel)]="itemParent.catname"
+            [class.is-invalid]="(errors | invalidParams: 'name').length > 0"
+            [id]="'name' + language().value().language"
+            [formField]="language.name"
           />
+          @for (message of errors | invalidParams: 'name'; track message) {
+            <p class="invalid-feedback">{{ message }}</p>
+          }
         </div>
       </div>
-      <div class="mb-3 row">
-        <label class="col-md-2 col-form-label" for="type">Type</label>
-        <div class="col-md-10">
-          <select name="type_id" class="form-select" id="type" [(ngModel)]="itemParent.type">
-            @for (option of typeOptions; track option.value) {
-              <option [value]="option.value">{{ option.name }}</option>
-            }
-          </select>
-        </div>
+    }
+    <div class="row">
+      <div class="col-md-10 offset-md-2">
+        <input
+          type="submit"
+          class="btn btn-primary"
+          value="Submit"
+          i18n-value
+          [disabled]="editForm().submitting() || editForm().invalid()"
+        />
       </div>
-      @for (language of languages; track language.language) {
-        <div class="mb-3 row">
-          <label class="col-md-2 col-form-label" [for]="'name' + language.language"
-            >{{ language.language | uppercase }} Name</label
-          >
-          <div class="col-md-10">
-            <input
-              type="text"
-              maxlength="255"
-              class="form-control"
-              [class.is-invalid]="(language.invalidParams | invalidParams: 'name').length > 0"
-              [id]="'name' + language.language"
-              [name]="'name' + language.language"
-              [(ngModel)]="language.name"
-            />
-            @for (message of language.invalidParams | invalidParams: 'name'; track message) {
-              <p class="invalid-feedback">{{ message }}</p>
-            }
-          </div>
-        </div>
-      }
-      <div class="row">
-        <div class="col-md-10 offset-md-2">
-          <input type="submit" name="submit" class="btn btn-primary" value="Submit" i18n-value />
-        </div>
-      </div>
-    </form>
-  }
+    </div>
+  </form>
 }

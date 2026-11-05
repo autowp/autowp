@@ -1,4 +1,5 @@
 import type {OnInit, ResourceRef} from '@angular/core';
+import type {FieldTree} from '@angular/forms/signals';
 import type {CommentsType, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
@@ -8,13 +9,15 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
+  effect,
   inject,
   Injector,
   input,
   output,
+  signal,
 } from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormsModule} from '@angular/forms';
+import {disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {
   CommentMessage,
@@ -35,7 +38,7 @@ import {getModalComponentRef} from '@utils/modal-component-ref';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {UserText} from '@utils/user-text/user-text';
-import {catchError, EMPTY, map, of, switchMap} from 'rxjs';
+import {catchError, EMPTY, firstValueFrom, map, of, switchMap} from 'rxjs';
 
 import {ReportButton} from '../../report/report-button';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -44,15 +47,13 @@ import {CommentsForm} from '../form/comments-form';
 import {CommentsVotes} from '../votes/comments-votes';
 
 export interface CommentInList extends CommentMessage {
-  editText?: string;
   resolve?: boolean;
-  showEdit?: boolean;
   showReply?: boolean;
 }
 
 @Component({
   selector: 'app-comments-list',
-  imports: [NgbTooltip, UserLink, RouterLink, UserText, CommentsForm, DatePipe, TimeAgoPipe, FormsModule, ReportButton],
+  imports: [NgbTooltip, UserLink, RouterLink, UserText, CommentsForm, DatePipe, TimeAgoPipe, FormField, ReportButton],
   templateUrl: './comments-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -84,9 +85,12 @@ export class CommentsList implements OnInit {
   // after construction but before ngOnInit.
   protected usersResource!: ResourceRef<Record<string, User> | undefined>;
 
+  protected readonly editForms = signal(new Map<string, FieldTree<string>>());
+
   protected readonly rows = computed(() => {
     const usersById = this.usersResource.value() ?? {};
     const currentUser = this.currentUser();
+    const editForms = this.editForms();
 
     return this.messages().map((message) => ({
       // Author acting on their own comment: edit and delete, but not once it is deleted or a
@@ -101,6 +105,7 @@ export class CommentsList implements OnInit {
       // hydration, `message` is a plain JSON-shaped object, not a real CommentMessage class
       // instance, so createTime has no .toDate() method even though it still has seconds/nanos.
       createdDate: timestampToDate(message.createTime),
+      editForm: editForms.get(message.id),
       message,
       updatedDate: timestampToDate(message.updateTime),
       user: usersById[message.authorId] ?? null,
@@ -114,6 +119,13 @@ export class CommentsList implements OnInit {
 
   protected readonly ModeratorAttention = ModeratorAttention;
   protected readonly ContentReportEntityType = ContentReportEntityType;
+
+  constructor() {
+    effect(() => {
+      const ids = new Set(this.messages().map((message) => message.id));
+      this.editForms.update((forms) => new Map([...forms].filter(([id]) => ids.has(id))));
+    });
+  }
 
   ngOnInit(): void {
     this.usersResource = rxResource({
@@ -202,43 +214,68 @@ export class CommentsList implements OnInit {
     message.resolve = resolve;
   }
 
-  protected startEdit(message: CommentInList) {
-    message.editText = message.text;
-    message.showEdit = true;
+  protected startEdit(message: CommentInList): void {
+    if (this.editForms().has(message.id)) {
+      return;
+    }
+    const editForm = form(
+      signal(message.text),
+      (path) => {
+        maxLength(path, 16000);
+        disabled(path, {when: ({state}) => state.submitting()});
+      },
+      {injector: this.#injector},
+    );
+    this.editForms.update((forms) => new Map(forms).set(message.id, editForm));
   }
 
-  protected cancelEdit(message: CommentInList) {
-    message.showEdit = false;
+  protected cancelEdit(message: CommentInList): void {
+    if (this.editForms().get(message.id)?.().submitting()) {
+      return;
+    }
+    this.editForms.update((forms) => {
+      const next = new Map(forms);
+      next.delete(message.id);
+      return next;
+    });
   }
 
-  protected saveEdit(message: CommentInList) {
-    this.#commentsGrpc
-      .updateComment(
-        new UpdateCommentRequest({
-          comment: new CommentMessage({id: message.id, text: (message.editText ?? '').trim()}),
-          updateMask: new FieldMask({paths: ['text']}),
-        }),
-      )
-      .pipe(
-        // Re-fetch so the "edited" marker and text come from the server (the silent grace period
-        // is enforced there - the client can't know whether this edit set update_time).
-        switchMap(() =>
+  protected saveEdit(message: CommentInList): void {
+    const editForm = this.editForms().get(message.id);
+    if (!editForm) {
+      return;
+    }
+    void submit(editForm, async () => {
+      try {
+        await firstValueFrom(
+          this.#commentsGrpc.updateComment(
+            new UpdateCommentRequest({
+              comment: new CommentMessage({id: message.id, text: editForm().value().trim()}),
+              updateMask: new FieldMask({paths: ['text']}),
+            }),
+          ),
+        );
+        // Re-fetch the server's text and edit timestamp, including its silent grace period.
+        const response = await firstValueFrom(
           this.#commentsGrpc.getMessage(
             new GetMessageRequest({fields: new CommentMessageFields({text: true}), id: message.id}),
           ),
-        ),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-        },
-        next: (response) => {
-          message.text = response.text;
-          message.updateTime = response.updateTime;
-          message.showEdit = false;
-          this.#cdr.markForCheck();
-        },
-      });
+        );
+        const currentMessage = this.messages().find((row) => row.id === message.id);
+        if (currentMessage) {
+          currentMessage.text = response.text;
+          currentMessage.updateTime = response.updateTime;
+        }
+        this.editForms.update((forms) => {
+          const next = new Map(forms);
+          next.delete(message.id);
+          return next;
+        });
+        this.#cdr.markForCheck();
+      } catch (response: unknown) {
+        this.#toastService.handleError(response);
+      }
+    });
   }
 
   protected showVotes(message: CommentMessage) {

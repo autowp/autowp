@@ -21,7 +21,7 @@
   >
 </p>
 
-<form class="form-check mb-3">
+<form class="form-check mb-3" novalidate (submit)="$event.preventDefault()">
   <input
     id="gdpr-objections-hits-only"
     class="form-check-input"
@@ -192,7 +192,11 @@
                   </button>
                 }
                 @if (isModer$ | async) {
-                  <form class="d-flex gap-1 mt-1" (ngSubmit)="addCleanupCandidate(row)">
+                  <form
+                    class="d-flex gap-1 mt-1"
+                    novalidate
+                    (submit)="$event.preventDefault(); addCleanupCandidate(row)"
+                  >
                     <input
                       type="text"
                       inputmode="numeric"
@@ -200,14 +204,14 @@
                       style="max-width: 8rem"
                       placeholder="Picture ID"
                       i18n-placeholder
-                      [formControl]="row.addCandidatePictureId"
+                      [formField]="row.addCandidatePictureId"
                     />
                     <button
                       type="submit"
                       class="btn btn-sm btn-outline-secondary"
-                      [disabled]="row.addingCandidate() || !row.addCandidatePictureId.value.trim()"
+                      [disabled]="row.addCandidatePictureId().submitting() || row.addCandidatePictureId().invalid()"
                     >
-                      @if (row.addingCandidate()) {
+                      @if (row.addCandidatePictureId().submitting()) {
                         <span class="spinner-border spinner-border-sm me-1" role="status">
                           <span class="visually-hidden" i18n>Loading…</span>
                         </span>

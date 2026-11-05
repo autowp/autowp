@@ -36,9 +36,9 @@
   </div>
   <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
     <span class="text-muted" i18n>Set licence on every photo:</span>
-    <select class="form-select form-select-sm w-auto" [(ngModel)]="batchLicense">
+    <select class="form-select form-select-sm w-auto" [formField]="batchForm.license">
       @for (option of licenseOptions; track option.value) {
-        <option [ngValue]="option.value">{{ option.label }}</option>
+        <option [value]="option.value">{{ option.label }}</option>
       }
     </select>
     <button
@@ -55,14 +55,15 @@
       class="form-control form-control-sm w-auto"
       placeholder="Source URL"
       i18n-placeholder
-      maxlength="500"
-      [(ngModel)]="batchSourceUrl"
+      [formField]="batchForm.sourceUrl"
     />
     <button
       type="button"
       class="btn btn-sm btn-outline-primary"
       i18n
-      [disabled]="licenseNeedsSource(batchLicense(), batchSourceUrl())"
+      [disabled]="
+        batchForm().submitting() || batchForm().invalid() || licenseNeedsSource(batchLicense(), batchSourceUrl())
+      "
       (click)="applyLicenseToAll()"
     >
       Apply to all
@@ -158,42 +159,43 @@
           </button>
         </div>
         @if (editingLicense() === picture.picture.id) {
-          <div class="d-flex flex-wrap align-items-center gap-1 mt-1">
-            <select class="form-select form-select-sm w-auto" [(ngModel)]="picture.picture.license">
-              @for (option of licenseOptions; track option.value) {
-                <option [ngValue]="option.value">{{ option.label }}</option>
+          @if (licenseForms.get(picture.picture.id); as licenseForm) {
+            <div class="d-flex flex-wrap align-items-center gap-1 mt-1">
+              <select class="form-select form-select-sm w-auto" [formField]="licenseForm.license">
+                @for (option of licenseOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm"
+                title="What do these mean?"
+                i18n-title
+                (click)="showLicenseHelp()"
+              >
+                <i class="bi bi-question-circle" aria-hidden="true"></i>
+              </button>
+              <input
+                type="url"
+                class="form-control form-control-sm w-auto"
+                placeholder="Source URL"
+                i18n-placeholder
+                [formField]="licenseForm.sourceUrl"
+              />
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                i18n
+                [disabled]="licenseForm().disabled() || licenseForm().invalid() || rowLicenseNeedsSource(licenseForm)"
+                (click)="chooseLicense(picture)"
+              >
+                save
+              </button>
+              @if (rowLicenseNeedsSource(licenseForm)) {
+                <span class="text-danger small" i18n>A source URL is required for this licence.</span>
               }
-            </select>
-            <button
-              type="button"
-              class="btn btn-outline-secondary btn-sm"
-              title="What do these mean?"
-              i18n-title
-              (click)="showLicenseHelp()"
-            >
-              <i class="bi bi-question-circle" aria-hidden="true"></i>
-            </button>
-            <input
-              type="url"
-              class="form-control form-control-sm w-auto"
-              placeholder="Source URL"
-              i18n-placeholder
-              maxlength="500"
-              [(ngModel)]="picture.picture.sourceUrl"
-            />
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary"
-              i18n
-              [disabled]="licenseNeedsSource(picture.picture.license, picture.picture.sourceUrl)"
-              (click)="chooseLicense(picture, picture.picture.license, picture.picture.sourceUrl)"
-            >
-              save
-            </button>
-            @if (licenseNeedsSource(picture.picture.license, picture.picture.sourceUrl)) {
-              <span class="text-danger small" i18n>A source URL is required for this licence.</span>
-            }
-          </div>
+            </div>
+          }
         }
       </div>
     </div>

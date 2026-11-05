@@ -1,9 +1,9 @@
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {AttrUserValuesFields, AttrUserValuesRequest, User, UsersRequest} from '@grpc/spec.pb';
 import {AttrsClient, UsersClient} from '@grpc/spec.pbsc';
@@ -21,7 +21,7 @@ import {CarsAttrsChangeLogRow} from './row/cars-attrs-change-log-row';
 
 @Component({
   selector: 'app-cars-attrs-change-log',
-  imports: [RouterLink, FormsModule, NgbTypeahead, ReactiveFormsModule, CarsAttrsChangeLogRow],
+  imports: [RouterLink, NgbTypeahead, FormField, CarsAttrsChangeLogRow],
   templateUrl: './cars-attrs-change-log.html',
   styleUrl: './cars-attrs-change-log.scss',
   providers: [CarsAttrsChangeLogItemCacheService],
@@ -62,7 +62,7 @@ export class CarsAttrsChangeLog {
         .pipe(map((response) => response.items ?? [])),
   });
 
-  readonly #control = new FormControl<string>('', {nonNullable: true});
+  readonly #control = form(signal(''));
 
   protected readonly usersDataSource: (text$: Observable<string>) => Observable<(null | User)[]> = (
     text$: Observable<string>,
@@ -102,12 +102,12 @@ export class CarsAttrsChangeLog {
   constructor() {
     this.#pageEnv.set({pageId: PageId.SPECS_ADMIN});
 
-    // Syncs the reactive FormControl's displayed value from the URL param (rather than the other
+    // Syncs the displayed value from the URL param (rather than the other
     // way around) - clearUser()/userOnSelect() below both drive user_id through the router, and
     // this keeps the typeahead input reflecting whatever the URL currently says.
     effect(() => {
       const userID = this.#userID();
-      this.#control.setValue(userID ? '#' + userID : '');
+      this.#control().value.set(userID ? '#' + userID : '');
     });
   }
 
@@ -119,6 +119,8 @@ export class CarsAttrsChangeLog {
     // e.item is typed `any` by ng-bootstrap - usersDataSource above is the only source feeding
     // this typeahead, and it resolves (null | User)[].
     const selected = e.item as null | User;
+    e.preventDefault();
+    this.#control().value.set(selected?.name ?? '');
     void this.#router.navigate([], {
       queryParams: {
         user_id: selected?.id,
@@ -127,8 +129,8 @@ export class CarsAttrsChangeLog {
     });
   }
 
-  protected clearUser(control: FormControl<string>): void {
-    control.setValue('');
+  protected clearUser(): void {
+    this.#control().value.set('');
     void this.#router.navigate([], {
       queryParams: {
         user_id: null,

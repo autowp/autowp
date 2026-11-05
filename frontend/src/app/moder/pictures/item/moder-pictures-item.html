@@ -304,7 +304,7 @@
     <div class="row">
       <div class="col-md-6">
         <h3 i18n>Settings</h3>
-        <form class="card card-body form-vertical mb-4">
+        <form class="card card-body form-vertical mb-4" (submit)="$event.preventDefault()">
           @if (picture.takenDate) {
             <div class="mb-3 row">
               <label class="col-md-3 col-form-label" i18n for="taken_year">Date of photo</label>
@@ -312,41 +312,27 @@
                 <div class="row">
                   <div class="col-3">
                     <input
-                      type="number"
-                      name="taken_year"
+                      type="text"
+                      inputmode="numeric"
                       id="taken_year"
                       placeholder="Year"
                       i18n-placeholder
                       class="form-control"
-                      [min]="1800"
-                      [max]="2030"
-                      [attr.maxlength]="4"
-                      [(ngModel)]="picture.takenDate.year"
+                      [formField]="settingsForm.year"
+                      [class.is-invalid]="settingsForm.year().touched() && settingsForm.year().invalid()"
                     />
                   </div>
                   <div class="col-6">
-                    <select
-                      name="taken_month"
-                      title="Month"
-                      i18n-title
-                      class="form-select"
-                      [(ngModel)]="picture.takenDate.month"
-                    >
+                    <select title="Month" i18n-title class="form-select" [formField]="settingsForm.month">
                       @for (month of monthOptions; track month.value) {
-                        <option [ngValue]="month.value">{{ month.name }}</option>
+                        <option [value]="month.value">{{ month.name }}</option>
                       }
                     </select>
                   </div>
                   <div class="col-3">
-                    <select
-                      name="taken_day"
-                      title="Day"
-                      i18n-title
-                      class="form-select"
-                      [(ngModel)]="picture.takenDate.day"
-                    >
+                    <select title="Day" i18n-title class="form-select" [formField]="settingsForm.day">
                       @for (day of dayOptions; track day.value) {
-                        <option [ngValue]="day.value">{{ day.name }}</option>
+                        <option [value]="day.value">{{ day.name }}</option>
                       }
                     </select>
                   </div>
@@ -360,17 +346,17 @@
           </div>
           <div class="mb-3">
             <label i18n for="special_name">Special name</label>
-            <input
-              type="text"
-              class="form-control"
-              maxlength="255"
-              name="special_name"
-              id="special_name"
-              [(ngModel)]="picture.specialName"
-            />
+            <input type="text" class="form-control" id="special_name" [formField]="settingsForm.specialName" />
           </div>
           <div>
-            <button type="button" class="btn btn-primary" i18n (click)="saveSpecialName(picture)">Submit</button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="specialNameLoading() || settingsForm().invalid()"
+              (click)="saveSpecialName(picture)"
+            >
+              <ng-container i18n>Submit</ng-container>
+            </button>
           </div>
           @if (specialNameLoading()) {
             <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" />
@@ -405,9 +391,9 @@
           <div class="mb-3">
             <label i18n for="picture_license">Licence</label>
             <div class="d-flex align-items-center gap-2">
-              <select id="picture_license" class="form-select" name="license" [(ngModel)]="picture.license">
+              <select id="picture_license" class="form-select" [formField]="licenseForm.license">
                 @for (option of licenseOptions; track option.value) {
-                  <option [ngValue]="option.value">{{ option.label }}</option>
+                  <option [value]="option.value">{{ option.label }}</option>
                 }
               </select>
               <button
@@ -423,14 +409,7 @@
           </div>
           <div class="mb-3">
             <label i18n for="picture_source_url">Source</label>
-            <input
-              type="url"
-              class="form-control"
-              id="picture_source_url"
-              name="sourceUrl"
-              maxlength="500"
-              [(ngModel)]="picture.sourceUrl"
-            />
+            <input type="url" class="form-control" id="picture_source_url" [formField]="licenseForm.sourceUrl" />
             @if (picture.changeSourceUrlUserId && picture.changeSourceUrlUserId !== '0') {
               <div class="small">
                 @if (getUser$(picture.changeSourceUrlUserId) | async; as sourceUrlUser) {
@@ -445,12 +424,16 @@
           <button
             type="button"
             class="btn btn-primary"
-            [disabled]="licenseNeedsSource(picture.license, picture.sourceUrl)"
+            [disabled]="
+              licenseLoading() ||
+              licenseForm().invalid() ||
+              licenseNeedsSource(selectedLicense(), licenseForm.sourceUrl().value())
+            "
             (click)="saveLicense(picture)"
           >
             <ng-container i18n>Submit</ng-container>
           </button>
-          @if (licenseNeedsSource(picture.license, picture.sourceUrl)) {
+          @if (licenseNeedsSource(selectedLicense(), licenseForm.sourceUrl().value())) {
             <p class="text-danger small mb-0" i18n>A source URL is required for this licence.</p>
           }
           @if (licenseLoading()) {

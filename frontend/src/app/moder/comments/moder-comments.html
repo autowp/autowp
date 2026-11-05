@@ -16,19 +16,18 @@
 <div class="row">
   <div class="col-md-4">
     <h2 i18n>Filter</h2>
-    <form class="card card-body form-vertical">
+    <form class="card card-body form-vertical" (submit)="$event.preventDefault()">
       <div class="mb-3">
         <ng-template #userTemplate let-model="result">
           <span [innerHTML]="model.name"></span>
         </ng-template>
         <div class="input-group">
           <input
-            name="user"
             i18n-placeholder
             placeholder="User №"
             class="form-control"
             [ngbTypeahead]="usersDataSource"
-            [formControl]="userQuery"
+            [formField]="userQuery"
             [inputFormatter]="userFormatter"
             [resultTemplate]="userTemplate"
             [class.border-primary]="!!(userID$ | async)"
@@ -48,15 +47,14 @@
         <label i18n for="moderator_attention">Moderator attention</label>
         <select
           id="moderator_attention"
-          name="moderator_attention"
           class="form-select"
-          [formControl]="moderatorAttention"
-          [class.border-primary]="moderatorAttention.value !== ModeratorAttention.NONE"
+          [formField]="moderatorAttention"
+          [class.border-primary]="moderatorAttention().value() !== ModeratorAttention.NONE.toString()"
           (change)="setModeratorAttention()"
         >
-          <option i18n [ngValue]="ModeratorAttention.NONE">Not matters</option>
-          <option i18n [ngValue]="ModeratorAttention.REQUIRED">Required</option>
-          <option i18n [ngValue]="ModeratorAttention.COMPLETE">Resolved</option>
+          <option i18n [value]="ModeratorAttention.NONE">Not matters</option>
+          <option i18n [value]="ModeratorAttention.REQUIRED">Required</option>
+          <option i18n [value]="ModeratorAttention.COMPLETE">Resolved</option>
         </select>
       </div>
       <div class="mb-3">
@@ -65,12 +63,11 @@
         </ng-template>
         <div class="input-group">
           <input
-            name="item"
             i18n-placeholder
             placeholder="Item"
             class="form-control"
             [ngbTypeahead]="itemsDataSource"
-            [formControl]="itemQuery"
+            [formField]="itemQuery"
             [inputFormatter]="itemFormatter"
             [resultTemplate]="itemTemplate"
             [class.border-primary]="itemID()"

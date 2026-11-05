@@ -1,11 +1,11 @@
 import type {OnInit, WritableSignal} from '@angular/core';
+import type {FieldTree} from '@angular/forms/signals';
 import type {GdprObjection, GdprObjectionCleanupCandidate, Pages} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
+import {ChangeDetectionStrategy, Component, inject, Injector, signal} from '@angular/core';
+import {disabled, form, FormField, maxLength, pattern, required, submit} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   AcknowledgeGdprObjectionHitRequest,
@@ -55,8 +55,7 @@ interface CleanupCandidateInList {
 
 interface ObjectionInList {
   readonly acknowledging: WritableSignal<boolean>;
-  readonly addCandidatePictureId: FormControl<string>;
-  readonly addingCandidate: WritableSignal<boolean>;
+  readonly addCandidatePictureId: FieldTree<string>;
   readonly affectedPictureIdentities: WritableSignal<null | string[]>;
   readonly affectedPictureIds: WritableSignal<null | string[]>;
   readonly affectedPicturesLoading: WritableSignal<boolean>;
@@ -70,11 +69,12 @@ interface ObjectionInList {
 
 @Component({
   selector: 'app-moder-gdpr-objections',
-  imports: [FormField, RouterLink, FormsModule, ReactiveFormsModule, Paginator, AsyncPipe, DatePipe],
+  imports: [FormField, RouterLink, Paginator, AsyncPipe, DatePipe],
   templateUrl: './moder-gdpr-objections.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerGdprObjections implements OnInit {
+  readonly #injector = inject(Injector);
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
@@ -104,6 +104,8 @@ export class ModerGdprObjections implements OnInit {
 
   readonly #reload$ = new BehaviorSubject<void>(undefined);
 
+  readonly #rowForms = new Map<string, FieldTree<string>>();
+
   protected readonly data$: Observable<{objections: ObjectionInList[]; paginator?: Pages}> = combineLatest([
     this.#hitsOnly$,
     this.#page$,
@@ -114,23 +116,40 @@ export class ModerGdprObjections implements OnInit {
 
       return this.#autowpClient.getGdprObjections(new GetGdprObjectionsRequest({hitsOnly, page}));
     }),
-    map((response) => ({
-      objections: (response.items ?? []).map((objection): ObjectionInList => ({
-        acknowledging: signal(false),
-        addCandidatePictureId: new FormControl<string>('', {nonNullable: true}),
-        addingCandidate: signal(false),
-        affectedPictureIdentities: signal(null),
-        affectedPictureIds: signal(null),
-        affectedPicturesLoading: signal(false),
-        cleanupCandidates: signal(null),
-        cleanupCandidatesLoading: signal(false),
-        deleting: signal(false),
-        objection,
-        sourceText: signal(null),
-        sourceTextLoading: signal(false),
-      })),
-      paginator: response.paginator,
-    })),
+    map((response) => {
+      const previousForms = new Map(this.#rowForms);
+      this.#rowForms.clear();
+      return {
+        objections: (response.items ?? []).map((objection): ObjectionInList => {
+          const addCandidatePictureId =
+            previousForms.get(objection.id) ??
+            form(
+              signal(''),
+              (path) => {
+                required(path);
+                pattern(path, /^\s*\d+\s*$/);
+                disabled(path, {when: ({state}) => state.submitting()});
+              },
+              {injector: this.#injector},
+            );
+          this.#rowForms.set(objection.id, addCandidatePictureId);
+          return {
+            acknowledging: signal(false),
+            addCandidatePictureId,
+            affectedPictureIdentities: signal(null),
+            affectedPictureIds: signal(null),
+            affectedPicturesLoading: signal(false),
+            cleanupCandidates: signal(null),
+            cleanupCandidatesLoading: signal(false),
+            deleting: signal(false),
+            objection,
+            sourceText: signal(null),
+            sourceTextLoading: signal(false),
+          };
+        }),
+        paginator: response.paginator,
+      };
+    }),
   );
 
   readonly #model = signal({contactEmail: '', names: '', note: '', reference: '', sourceText: ''});
@@ -350,30 +369,23 @@ export class ModerGdprObjections implements OnInit {
   // found/uploaded afterwards - that a moderator spots by hand (e.g. searching the inbox) and
   // wants tracked against the case alongside the automatically found hits.
   protected addCleanupCandidate(row: ObjectionInList): void {
-    const pictureId = row.addCandidatePictureId.value.trim();
-
-    if (row.addingCandidate() || !/^\d+$/.test(pictureId)) {
-      return;
-    }
-
-    row.addingCandidate.set(true);
-
-    this.#autowpClient
-      .addGdprObjectionCleanupCandidate(
-        new AddGdprObjectionCleanupCandidateRequest({objectionId: row.objection.id, pictureId}),
-      )
-      .subscribe({
-        error: (error: unknown) => {
-          row.addingCandidate.set(false);
-          this.#toasts.handleError(error);
-        },
-        next: () => {
-          row.addingCandidate.set(false);
-          row.addCandidatePictureId.setValue('');
-          row.cleanupCandidates.set(null);
-          this.loadCleanupCandidates(row);
-        },
-      });
+    void submit(row.addCandidatePictureId, async () => {
+      try {
+        await firstValueFrom(
+          this.#autowpClient.addGdprObjectionCleanupCandidate(
+            new AddGdprObjectionCleanupCandidateRequest({
+              objectionId: row.objection.id,
+              pictureId: row.addCandidatePictureId().value().trim(),
+            }),
+          ),
+        );
+        row.addCandidatePictureId().reset('');
+        row.cleanupCandidates.set(null);
+        this.loadCleanupCandidates(row);
+      } catch (error: unknown) {
+        this.#toasts.handleError(error);
+      }
+    });
   }
 
   protected getCommentLink$(id: string): Observable<CommentLink | null> {

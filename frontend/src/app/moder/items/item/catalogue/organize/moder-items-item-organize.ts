@@ -214,7 +214,7 @@ export class ModerItemsItemOrganize implements OnInit {
                 .moveItemParent(
                   new MoveItemParentRequest({
                     destParentId: newItem.id,
-                    itemId: '' + child,
+                    itemId: child,
                     parentId: item.id,
                   }),
                 )

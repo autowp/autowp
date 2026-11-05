@@ -1,8 +1,8 @@
 import type {AfterViewInit} from '@angular/core';
 
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
-import {ChangeDetectionStrategy, Component, computed, model, viewChild} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, model, viewChild} from '@angular/core';
+import {form, FormField, maxLength} from '@angular/forms/signals';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
 import {RemarkModule} from 'ngx-remark';
 
@@ -14,9 +14,8 @@ import {RemarkModule} from 'ngx-remark';
     NgbNavLink,
     NgbNavLinkBase,
     NgbNavContent,
-    FormsModule,
     NgbNavOutlet,
-    ReactiveFormsModule,
+    FormField,
     CdkTextareaAutosize,
     RemarkModule,
   ],
@@ -26,18 +25,13 @@ import {RemarkModule} from 'ngx-remark';
 export class MarkdownEdit implements AfterViewInit {
   readonly text = model.required<string>();
 
-  protected readonly control = computed(() => new FormControl<string>(this.text(), {nonNullable: true}));
+  protected readonly textForm = form(this.text, (path) => {
+    maxLength(path, 65536);
+  });
 
-  // The @if in the template guards on `control()`, a computed() that always returns a fresh
-  // FormControl (never falsy), so the textarea - and this directive - is always present once the
-  // view has initialized.
   private readonly autosize = viewChild.required(CdkTextareaAutosize);
 
   ngAfterViewInit(): void {
     this.autosize().resizeToFitContent(true);
-  }
-
-  protected onChange(value: string) {
-    this.text.set(value);
   }
 }

@@ -23,30 +23,26 @@
   </div>
 
   @if (form$ | async; as form) {
-    <form method="post" class="form-horizontal" [formGroup]="form" (ngSubmit)="doSubmit(form, picture)">
+    <form method="post" class="form-horizontal" (submit)="doSubmit(form, picture); $event.preventDefault()">
       <div class="mb-3 row">
         <label class="col-md-2 col-form-label" for="lat" i18n>Point</label>
         <div class="col-md-10 coords mb-3">
           <input
             type="text"
             id="lat"
-            name="lat"
-            maxlength="20"
             size="20"
             placeholder="Latitude"
             i18n-placeholder
             class="form-control"
-            [formControl]="form.controls.lat"
+            [formField]="form.lat"
           />
           <input
             type="text"
-            name="lng"
-            maxlength="20"
             size="20"
             placeholder="Longitude"
             i18n-placeholder
             class="form-control"
-            [formControl]="form.controls.lng"
+            [formField]="form.lng"
           />
         </div>
       </div>
@@ -63,7 +59,14 @@
       }
       <div class="mb-3 row">
         <div class="col-md-10 offset-md-2">
-          <button type="submit" name="submit" class="btn btn-primary" i18n>Submit</button>
+          <button
+            type="submit"
+            name="submit"
+            class="btn btn-primary"
+            [disabled]="form().invalid() || form().submitting()"
+          >
+            <ng-container i18n>Submit</ng-container>
+          </button>
         </div>
       </div>
     </form>

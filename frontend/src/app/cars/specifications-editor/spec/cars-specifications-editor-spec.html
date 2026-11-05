@@ -1,154 +1,168 @@
 @if (item(); as item) {
-  @if (form$ | async; as form) {
-    <form class="spec-editor-form" (submit)="saveSpecs(item, form)">
-      <table class="table table-condensed">
-        <caption i18n>
-          Attributes
-        </caption>
-        <thead>
-          <tr>
-            <th i18n scope="col">Parameter</th>
-            <th i18n scope="col">Your value</th>
-            <th i18n scope="col">Current value</th>
-            <th i18n scope="col">All values</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (control of form.controls; track control) {
-            <tr [class.subform-header]="!!control.attr.childs.length">
-              @if (control.attr.childs.length > 0) {
-                <td colspan="4" [style.padding-left]="control.attr.deep * 20 + 'px'">
-                  <h4>{{ control.attr.name }}</h4>
-                </td>
-              } @else {
-                <td>
-                  <div [style.padding-left]="control.attr.deep * 20 + 'px'">{{ control.attr.name }}</div>
-                </td>
-                <td>
-                  <div class="input-group input-group-sm">
-                    <div class="input-group-prepend">
-                      <button
-                        type="button"
-                        class="btn btn-secondary btn-sm"
-                        ngbTooltip="not applicable"
-                        i18n-ngbTooltip
-                        (click)="control.disabled ? control.enable() : control.disable()"
-                      >
-                        <span class="bi bi-trash" aria-hidden="true"></span>
-                      </button>
-                    </div>
-                    @if (
-                      control.attr.typeId === AttrAttributeTypeId.LIST ||
-                      control.attr.typeId === AttrAttributeTypeId.TREE
-                    ) {
-                      <select
-                        class="form-select form-select-sm"
-                        [formControl]="control"
-                        [multiple]="control.attr.isMultiple"
-                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
-                      >
-                        @for (option of control.attr.options$ | async; track option.id) {
-                          <option [ngValue]="option.id">{{ option.name }}</option>
-                        }
-                      </select>
-                    } @else if (control.attr.typeId === AttrAttributeTypeId.BOOLEAN) {
-                      <select
-                        class="form-select form-select-sm"
-                        [formControl]="control"
-                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
-                      >
-                        @for (option of control.attr.options$ | async; track option.id) {
-                          <option [ngValue]="option.id">{{ option.name }}</option>
-                        }
-                      </select>
-                    } @else if (control.attr.typeId === AttrAttributeTypeId.INTEGER) {
-                      <input
-                        type="number"
-                        class="form-control form-control-sm"
-                        min="-2147483649"
-                        max="2147483648"
-                        [formControl]="control"
-                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
-                      />
-                    } @else if (control.attr.typeId === AttrAttributeTypeId.FLOAT) {
-                      <input
-                        type="number"
-                        class="form-control form-control-sm"
-                        min="-2147483649"
-                        max="2147483648"
-                        [formControl]="control"
-                        [step]="control.attr.step"
-                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
-                      />
-                    } @else if (control.attr.typeId === AttrAttributeTypeId.STRING) {
-                      <input
-                        type="text"
-                        class="form-control form-control-sm"
-                        [formControl]="control"
-                        [class.is-invalid]="control.invalid && (control.dirty || !control.untouched)"
-                      />
-                    }
-                    @if (control.attr.unitId !== '0') {
-                      <span class="unit input-group-text" [title]="control.attr.unitName">{{
-                        control.attr.unitAbbr
-                      }}</span>
-                    }
-                  </div>
-                  @if (control.attr.description) {
-                    <small>{{ control.attr.description }}</small>
-                  }
-                </td>
-                <td class="actual">
-                  @if (values$ | async; as values) {
-                    @if (values.get(control.attr.id); as value) {
-                      <div>
-                        @if (value.value?.isEmpty) {
-                          <em i18n>none</em>
-                        } @else {
-                          <span>
-                            {{ value.valueText }}
-                            @if (control.attr.unitId !== '0') {
-                              <span class="unit" [title]="control.attr.unitName">{{ control.attr.unitAbbr }}</span>
-                            }
-                          </span>
-                        }
-                      </div>
-                    }
-                  }
-                </td>
-                <td>
-                  @if (userValues$ | async; as userValues) {
-                    @for (value of userValues.get(control.attr.id); track value) {
-                      <div>
-                        @if (value.userValue.value?.isEmpty) {
-                          <em i18n>none</em>
-                        } @else {
-                          <span>{{ value.userValue.valueText }}</span>
-                        }
-                        &ngsp;
-                        @if (value.user$ | async; as user) {
-                          <app-user [user]="user" />
-                        }
-                        @if (value.userValue.updateTime?.toDate(); as date) {
-                          <span class="date"
-                            >[<span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span
-                            >]</span
-                          >
-                        }
-                      </div>
-                    }
-                  }
-                </td>
-              }
+  @if (form$ | async; as editor) {
+    @if (editor.form().value().itemId === item.id) {
+      @let form = editor.form;
+      <form class="spec-editor-form" (submit)="saveSpecs(form); $event.preventDefault()">
+        <table class="table table-condensed">
+          <caption>
+            <ng-container i18n>Attributes</ng-container>
+          </caption>
+          <thead>
+            <tr>
+              <th i18n scope="col">Parameter</th>
+              <th i18n scope="col">Your value</th>
+              <th i18n scope="col">Current value</th>
+              <th i18n scope="col">All values</th>
             </tr>
-          }
-          <tr>
-            <td>
-              <button type="submit" class="btn btn-success" i18n>Save</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </form>
+          </thead>
+          <tbody>
+            @for (control of form.rows; track control) {
+              @let attr = editor.attributes[$index];
+              <tr [class.subform-header]="!!attr.childs.length">
+                @if (attr.childs.length > 0) {
+                  <td colspan="4" [style.padding-left]="attr.deep * 20 + 'px'">
+                    <h4>{{ attr.name }}</h4>
+                  </td>
+                } @else {
+                  <td>
+                    <div [style.padding-left]="attr.deep * 20 + 'px'">{{ attr.name }}</div>
+                  </td>
+                  <td>
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-prepend">
+                        <button
+                          type="button"
+                          class="btn btn-secondary btn-sm"
+                          ngbTooltip="not applicable"
+                          i18n-ngbTooltip
+                          [disabled]="form().submitting()"
+                          [class.active]="control.notApplicable().value()"
+                          (click)="control.notApplicable().value.set(!control.notApplicable().value())"
+                        >
+                          <span class="bi bi-trash" aria-hidden="true"></span>
+                        </button>
+                      </div>
+                      @if (attr.typeId === AttrAttributeTypeId.LIST || attr.typeId === AttrAttributeTypeId.TREE) {
+                        @if (attr.isMultiple) {
+                          <app-select-multiple
+                            [formField]="control.list"
+                            [options]="(attr.options$ | async) ?? []"
+                            [label]="attr.name"
+                          />
+                        } @else {
+                          <select class="form-select form-select-sm" [formField]="control.value">
+                            @for (option of attr.options$ | async; track option.id) {
+                              <option [value]="option.id">{{ option.name }}</option>
+                            }
+                          </select>
+                        }
+                      } @else if (attr.typeId === AttrAttributeTypeId.BOOLEAN) {
+                        <select
+                          class="form-select form-select-sm"
+                          [formField]="control.value"
+                          [class.is-invalid]="
+                            control.value().invalid() && (control.value().dirty() || control.value().touched())
+                          "
+                        >
+                          @for (option of attr.options$ | async; track option.id) {
+                            <option [value]="option.id">{{ option.name }}</option>
+                          }
+                        </select>
+                      } @else if (attr.typeId === AttrAttributeTypeId.INTEGER) {
+                        <input
+                          type="text"
+                          inputmode="decimal"
+                          class="form-control form-control-sm"
+                          [formField]="control.value"
+                          [class.is-invalid]="
+                            control.value().invalid() && (control.value().dirty() || control.value().touched())
+                          "
+                        />
+                      } @else if (attr.typeId === AttrAttributeTypeId.FLOAT) {
+                        <input
+                          type="text"
+                          inputmode="decimal"
+                          class="form-control form-control-sm"
+                          [formField]="control.value"
+                          [class.is-invalid]="
+                            control.value().invalid() && (control.value().dirty() || control.value().touched())
+                          "
+                        />
+                      } @else if (attr.typeId === AttrAttributeTypeId.STRING) {
+                        <input
+                          type="text"
+                          class="form-control form-control-sm"
+                          [formField]="control.value"
+                          [class.is-invalid]="
+                            control.value().invalid() && (control.value().dirty() || control.value().touched())
+                          "
+                        />
+                      }
+                      @if (attr.typeId === AttrAttributeTypeId.TEXT) {
+                        <textarea class="form-control form-control-sm" [formField]="control.value"></textarea>
+                      }
+                      @if (attr.unitId !== '0') {
+                        <span class="unit input-group-text" [title]="attr.unitName">{{ attr.unitAbbr }}</span>
+                      }
+                    </div>
+                    @if (attr.description) {
+                      <small>{{ attr.description }}</small>
+                    }
+                  </td>
+                  <td class="actual">
+                    @if (values$ | async; as values) {
+                      @if (values.get(attr.id); as value) {
+                        <div>
+                          @if (value.value?.isEmpty) {
+                            <em i18n>none</em>
+                          } @else {
+                            <span>
+                              {{ value.valueText }}
+                              @if (attr.unitId !== '0') {
+                                <span class="unit" [title]="attr.unitName">{{ attr.unitAbbr }}</span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      }
+                    }
+                  </td>
+                  <td>
+                    @if (userValues$ | async; as userValues) {
+                      @for (value of userValues.get(attr.id); track value) {
+                        <div>
+                          @if (value.userValue.value?.isEmpty) {
+                            <em i18n>none</em>
+                          } @else {
+                            <span>{{ value.userValue.valueText }}</span>
+                          }
+                          &ngsp;
+                          @if (value.user$ | async; as user) {
+                            <app-user [user]="user" />
+                          }
+                          @if (value.userValue.updateTime?.toDate(); as date) {
+                            <span class="date"
+                              >[<span [ngbTooltip]="date | date: 'medium'">{{ date | timeAgo }}</span
+                              >]</span
+                            >
+                          }
+                        </div>
+                      }
+                    }
+                  </td>
+                }
+              </tr>
+            }
+            <tr>
+              <td>
+                <button type="submit" class="btn btn-success" [disabled]="form().submitting() || form().invalid()">
+                  <ng-container i18n>Save</ng-container>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    }
   }
 }

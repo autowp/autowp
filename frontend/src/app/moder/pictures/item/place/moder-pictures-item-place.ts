@@ -1,10 +1,12 @@
 import type {OnInit} from '@angular/core';
+import type {FieldTree} from '@angular/forms/signals';
 import type {LatLng, LeafletMouseEvent, Map, Marker, TileLayer} from 'leaflet';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {toObservable} from '@angular/core/rxjs-interop';
+import {disabled, form, FormField, maxLength, submit, validate} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {LatLng as grpcLatLng} from '@grpc/google/type/latlng.pb';
@@ -15,7 +17,7 @@ import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
-import {catchError, distinctUntilChanged, EMPTY, map, shareReplay, startWith, switchMap} from 'rxjs';
+import {catchError, distinctUntilChanged, EMPTY, firstValueFrom, map, shareReplay, switchMap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
@@ -26,8 +28,8 @@ interface MapOptions {
 }
 
 interface PointForm {
-  lat: FormControl<null | string>;
-  lng: FormControl<null | string>;
+  lat: string;
+  lng: string;
 }
 
 function createMarker(lat: number, lng: number): Marker {
@@ -42,7 +44,7 @@ function createMarker(lat: number, lng: number): Marker {
 }
 
 function normalizeLat(lat: number) {
-  return Math.max(lat, Math.min(lat, 90), -90);
+  return Math.max(-90, Math.min(lat, 90));
 }
 
 function normalizeLng(lng: number) {
@@ -52,7 +54,7 @@ function normalizeLng(lng: number) {
 
 @Component({
   selector: 'app-moder-pictures-place',
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, LeafletModule, AsyncPipe],
+  imports: [RouterLink, FormField, LeafletModule, AsyncPipe],
   templateUrl: './moder-pictures-item-place.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -64,10 +66,17 @@ export class ModerPicturesItemPlace implements OnInit {
   readonly #picturesClient = inject(PicturesClient);
   readonly #toastService = inject(ToastsService);
 
-  readonly #form = new FormGroup<PointForm>({
-    lat: new FormControl<string>(''),
-    lng: new FormControl<string>(''),
+  readonly #pointModel = signal({lat: '', lng: ''});
+  readonly #form = form(this.#pointModel, (path) => {
+    disabled(path, {when: ({state}) => state.submitting()});
+    for (const coordinate of [path.lat, path.lng]) {
+      maxLength(coordinate, 20);
+      validate(coordinate, ({value}) =>
+        value().trim() !== '' && !Number.isFinite(Number(value())) ? {kind: 'coordinate'} : undefined,
+      );
+    }
   });
+  readonly #pointValues$ = toObservable(this.#pointModel);
 
   protected readonly picture$: Observable<Picture> = this.#route.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
@@ -88,14 +97,14 @@ export class ModerPicturesItemPlace implements OnInit {
 
   protected readonly form$ = this.picture$.pipe(
     map((picture) => {
-      let lat = null,
-        lng = null;
-      if (picture.point?.latitude && picture.point.longitude) {
+      let lat = '',
+        lng = '';
+      if (picture.point) {
         lat = picture.point.latitude + '';
         lng = picture.point.longitude + '';
       }
 
-      this.#form.setValue({lat, lng});
+      this.#pointModel.set({lat, lng});
 
       return this.#form;
     }),
@@ -103,7 +112,7 @@ export class ModerPicturesItemPlace implements OnInit {
   );
 
   protected readonly map$ = this.form$.pipe(
-    switchMap((form) => form.valueChanges.pipe(startWith(form.value))),
+    switchMap(() => this.#pointValues$),
     map((formValues) => {
       let center = latLng(55.7423627, 37.6786422);
 
@@ -117,13 +126,13 @@ export class ModerPicturesItemPlace implements OnInit {
         zoom: 8,
       };
 
-      let lat = formValues.lat ? parseFloat(formValues.lat) : NaN;
-      let lng = formValues.lng ? parseFloat(formValues.lng) : NaN;
+      let lat = formValues.lat.trim() ? Number(formValues.lat) : NaN;
+      let lng = formValues.lng.trim() ? Number(formValues.lng) : NaN;
 
       const markers: Marker[] = [];
 
       let ll = null;
-      if (!isNaN(lat) && !isNaN(lng)) {
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
         lat = normalizeLat(lat);
         lng = normalizeLng(lng);
         ll = latLng([lat, lng]);
@@ -145,43 +154,42 @@ export class ModerPicturesItemPlace implements OnInit {
     });
   }
 
-  protected onMapReady(mapOptions: MapOptions, lmap: Map, form: FormGroup<PointForm>) {
+  protected onMapReady(mapOptions: MapOptions, lmap: Map, form: FieldTree<PointForm>) {
     lmap.on('click', (event: LeafletMouseEvent) => {
+      if (form().submitting()) return;
       const ll: LatLng = event.latlng;
       const lat = normalizeLat(ll.lat);
       const lng = normalizeLng(ll.lng);
       mapOptions.markers = [createMarker(lat, lng)];
-      // setValue re-emits through form.valueChanges -> map$ -> the `map$ | async` binding, which
-      // is what re-renders the marker and re-centres the map (no NgZone re-entry needed).
-      form.setValue({
+      form().value.set({
         lat: lat + '',
         lng: lng + '',
       });
     });
   }
 
-  protected doSubmit(form: FormGroup<PointForm>, picture: Picture) {
-    this.#picturesClient
-      .updatePicture(
-        new UpdatePictureRequest({
-          picture: new Picture({
-            id: picture.id,
-            point: new grpcLatLng({
-              latitude: form.controls.lat.value ? parseFloat(form.controls.lat.value) : 0,
-              longitude: form.controls.lng.value ? parseFloat(form.controls.lng.value) : 0,
+  protected doSubmit(field: FieldTree<PointForm>, picture: Picture): void {
+    void submit(field, async () => {
+      const value = field().value();
+      try {
+        await firstValueFrom(
+          this.#picturesClient.updatePicture(
+            new UpdatePictureRequest({
+              picture: new Picture({
+                id: picture.id,
+                point: new grpcLatLng({
+                  latitude: normalizeLat(Number(value.lat)),
+                  longitude: normalizeLng(Number(value.lng)),
+                }),
+              }),
+              updateMask: new FieldMask({paths: ['point']}),
             }),
-          }),
-          updateMask: new FieldMask({paths: ['point']}),
-        }),
-      )
-      .pipe(
-        catchError((response: unknown) => {
-          this.#toastService.handleError(response);
-          return EMPTY;
-        }),
-      )
-      .subscribe(() => {
+          ),
+        );
         void this.#router.navigate(['/moder/pictures', picture.id]);
-      });
+      } catch (response: unknown) {
+        this.#toastService.handleError(response);
+      }
+    });
   }
 }

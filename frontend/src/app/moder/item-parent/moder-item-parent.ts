@@ -1,10 +1,11 @@
-import type {Empty} from '@ngx-grpc/well-known-types';
+import type {WritableSignal} from '@angular/core';
+import type {FieldTree} from '@angular/forms/signals';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, UpperCasePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, inject, Injector, signal} from '@angular/core';
+import {applyEach, disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   GetItemParentLanguagesRequest,
@@ -23,14 +24,13 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {getItemTypeTranslation} from '@utils/translations';
 import {
   BehaviorSubject,
-  catchError,
   combineLatest,
   distinctUntilChanged,
-  EMPTY,
-  forkJoin,
+  firstValueFrom,
   map,
   shareReplay,
   switchMap,
@@ -40,19 +40,27 @@ import {
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
 
-interface LanguageItem {
-  invalidParams: InvalidParams;
-  language: string;
-  name: null | string;
+interface ParentFormValue {
+  catname: string;
+  itemId: string;
+  languages: {language: string; name: string}[];
+  parentId: string;
+  type: string;
+}
+
+interface ParentEditor {
+  errors: WritableSignal<Record<string, InvalidParams>>;
+  form: FieldTree<ParentFormValue>;
 }
 
 @Component({
   selector: 'app-moder-item-parent',
-  imports: [RouterLink, FormsModule, InvalidParamsPipe, AsyncPipe, UpperCasePipe],
+  imports: [RouterLink, FormField, InvalidParamsPipe, AsyncPipe, UpperCasePipe],
   templateUrl: './moder-item-parent.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerItemParent {
+  readonly #injector = inject(Injector);
   readonly #contentLanguage = inject(ContentLanguageService);
   readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
@@ -90,19 +98,6 @@ export class ModerItemParent {
   );
 
   readonly #reload$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly itemParent$ = combineLatest([this.#itemID$, this.#parentID$, this.#reload$]).pipe(
-    switchMap(([itemID, parentID]) =>
-      this.#itemsClient.getItemParent(
-        new ItemParentsRequest({
-          options: new ItemParentListOptions({
-            itemId: '' + itemID,
-            parentId: '' + parentID,
-          }),
-        }),
-      ),
-    ),
-  );
 
   protected readonly item$ = this.#itemID$.pipe(
     switchMap((itemID) =>
@@ -142,81 +137,108 @@ export class ModerItemParent {
     ),
   );
 
-  protected readonly languages$: Observable<LanguageItem[]> = combineLatest([this.#itemID$, this.#parentID$]).pipe(
-    switchMap(([itemID, parentID]) =>
-      combineLatest([
+  protected readonly editor$: Observable<ParentEditor> = combineLatest([this.#route.paramMap, this.#reload$]).pipe(
+    switchMap(([params]) => {
+      const itemId = params.get('item_id') ?? '0';
+      const parentId = params.get('parent_id') ?? '0';
+      return combineLatest([
         this.#contentLanguage.languages$,
-        this.#itemsClient.getItemParentLanguages(
-          new GetItemParentLanguagesRequest({
-            itemId: '' + itemID,
-            parentId: '' + parentID,
-          }),
+        this.#itemsClient.getItemParent(
+          new ItemParentsRequest({options: new ItemParentListOptions({itemId, parentId})}),
         ),
-      ]),
-    ),
-    map(([languages, itemParentLanguage]) => {
-      const resLanguages = languages.map((language): LanguageItem => ({
-        invalidParams: {},
-        language,
-        name: null,
-      }));
-
-      for (const languageData of itemParentLanguage.items ?? []) {
-        for (const i of resLanguages) {
-          if (i.language === languageData.language) {
-            i.name = languageData.name;
-          }
-        }
-      }
-
-      return resLanguages;
+        this.#itemsClient.getItemParentLanguages(new GetItemParentLanguagesRequest({itemId, parentId})),
+      ]).pipe(
+        map(
+          ([languages, parent, translations]) =>
+            [
+              parent,
+              languages.map((language) => ({
+                language,
+                name: translations.items?.find((row) => row.language === language)?.name ?? '',
+              })),
+            ] as const,
+        ),
+      );
     }),
+    map(([parent, languages]) => ({
+      errors: signal<Record<string, InvalidParams>>({}),
+      form: form(
+        signal<ParentFormValue>({
+          catname: parent.catname,
+          itemId: parent.itemId,
+          parentId: parent.parentId,
+          type: `${parent.type}`,
+          languages,
+        }),
+        (path) => {
+          maxLength(path.catname, 150);
+          applyEach(path.languages, (language) => {
+            maxLength(language.name, 255);
+          });
+          disabled(path, {when: ({state}) => state.submitting()});
+        },
+        {injector: this.#injector},
+      ),
+    })),
   );
 
   protected reloadItemParent() {
     this.#reload$.next();
   }
 
-  protected save(itemParent: ItemParent, languages: LanguageItem[]) {
-    const promises: Observable<Empty>[] = [
-      this.#itemsClient.updateItemParent(
-        new ItemParent({
-          catname: itemParent.catname,
-          itemId: itemParent.itemId,
-          parentId: itemParent.parentId,
-          type: itemParent.type,
-        }),
-      ),
-    ];
-
-    for (const language of languages) {
-      language.invalidParams = {};
-      promises.push(
-        this.#itemsClient
-          .setItemParentLanguage(
-            new ItemParentLanguage({
-              itemId: itemParent.itemId,
-              language: language.language,
-              name: language.name ?? undefined,
-              parentId: itemParent.parentId,
-            }),
-          )
-          .pipe(
-            catchError((response: unknown) => {
-              if (response instanceof GrpcStatusEvent) {
-                const fieldViolations = extractFieldViolations(response);
-                language.invalidParams = fieldViolations2InvalidParams(fieldViolations);
-              } else {
-                this.#toastService.handleError(response);
-              }
-              return EMPTY;
-            }),
-          ),
+  protected save(editor: ParentEditor): void {
+    void submit(editor.form, async () => {
+      const value = editor.form().value();
+      editor.errors.set({});
+      const operations = value.languages.map(async (language) => {
+        try {
+          await firstValueFrom(
+            this.#itemsClient.setItemParentLanguage(
+              new ItemParentLanguage({
+                itemId: value.itemId,
+                parentId: value.parentId,
+                language: language.language,
+                name: language.name,
+              }),
+            ),
+          );
+          return true;
+        } catch (response: unknown) {
+          if (response instanceof GrpcStatusEvent) {
+            editor.errors.update((errors) => ({
+              ...errors,
+              [language.language]: fieldViolations2InvalidParams(extractFieldViolations(response)),
+            }));
+          } else {
+            this.#toastService.handleError(response);
+          }
+          return false;
+        }
+      });
+      operations.push(
+        (async () => {
+          try {
+            await firstValueFrom(
+              this.#itemsClient.updateItemParent(
+                new ItemParent({
+                  catname: value.catname,
+                  itemId: value.itemId,
+                  parentId: value.parentId,
+                  type: numericEnumValue(ItemParentType, Number(value.type), ItemParentType.ITEM_TYPE_DEFAULT),
+                }),
+              ),
+            );
+            return true;
+          } catch (response: unknown) {
+            this.#toastService.handleError(response);
+            return false;
+          }
+        })(),
       );
-    }
-
-    forkJoin(promises).subscribe(() => {
-      this.reloadItemParent();
+      const results = await Promise.all(operations);
+      if (results.every(Boolean)) {
+        this.reloadItemParent();
+      }
     });
   }
 }

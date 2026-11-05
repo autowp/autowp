@@ -1,4 +1,4 @@
-@for (row of rows(); track row) {
+@for (row of rows(); track row.message.id) {
   <div
     class="message"
     [class.moderator-attention]="row.message.moderatorAttention"
@@ -31,18 +31,23 @@
       }
     </div>
     <div class="content">
-      @if (row.message.showEdit) {
-        <form class="comment-edit mb-2" (submit)="saveEdit(row.message)">
-          <textarea
-            name="editText"
-            rows="4"
-            maxlength="16000"
-            class="form-control"
-            [(ngModel)]="row.message.editText"
-          ></textarea>
+      @if (row.editForm; as editForm) {
+        <form class="comment-edit mb-2" novalidate (submit)="$event.preventDefault(); saveEdit(row.message)">
+          <textarea rows="4" class="form-control" [formField]="editForm"></textarea>
           <div class="mt-1">
-            <button type="submit" class="btn btn-sm btn-primary" i18n>Save</button>
-            <button type="button" class="btn btn-sm btn-secondary ms-1" (click)="cancelEdit(row.message)">
+            <button
+              type="submit"
+              class="btn btn-sm btn-primary"
+              [disabled]="editForm().submitting() || editForm().invalid()"
+            >
+              <ng-container i18n>Save</ng-container>
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-secondary ms-1"
+              [disabled]="editForm().submitting()"
+              (click)="cancelEdit(row.message)"
+            >
               <ng-container i18n>Cancel</ng-container>
             </button>
           </div>
@@ -111,7 +116,7 @@
             [entityId]="row.message.id"
           />
         }
-        @if (row.canManageOwn && !row.message.showEdit) {
+        @if (row.canManageOwn && !row.editForm) {
           <button type="button" class="btn btn-sm btn-outline-secondary me-1" (click)="startEdit(row.message)">
             <i class="bi bi-pencil me-1" aria-hidden="true"></i>
             <span class="d-none d-md-inline" i18n>Edit</span>

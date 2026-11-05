@@ -1,9 +1,9 @@
 import type {Voting, VotingVariant} from '@grpc/spec.pb';
 
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, linkedSignal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormsModule} from '@angular/forms';
+import {disabled, form, FormField, submit} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {CommentsType, CreateVoteRequest, VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
@@ -15,7 +15,7 @@ import {PageId} from '@services/page-id';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {timestampToDate} from '@utils/timestamp';
 import {errorMessage, isNotFoundError} from 'app/grpc';
-import {map} from 'rxjs';
+import {firstValueFrom, map} from 'rxjs';
 
 import {Comments} from '../comments/comments/comments';
 import {ToastsService} from '../toasts/toasts.service';
@@ -23,7 +23,7 @@ import {VotingVotes} from './votes/voting-votes';
 
 @Component({
   selector: 'app-voting',
-  imports: [RouterLink, FormsModule, NgbProgressbar, Comments, DatePipe],
+  imports: [RouterLink, FormField, NgbProgressbar, Comments, DatePipe],
   templateUrl: './voting-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,8 +47,17 @@ export class VotingPage {
     stream: ({params: id}) => this.#votingClient.getVoting(new VotingRequest({id})),
   });
 
-  protected selected = 0;
-  protected readonly selectedMulti: Record<number, number> = {};
+  readonly #voteModel = linkedSignal(() => ({
+    id: this.#votingID(),
+    selected: '',
+    variants: (this.votingResource.hasValue() ? (this.votingResource.value().variants ?? []) : []).map((variant) => ({
+      id: variant.id,
+      selected: false,
+    })),
+  }));
+  protected readonly voteForm = form(this.#voteModel, (path) => {
+    disabled(path, {when: ({state}) => state.submitting()});
+  });
 
   protected readonly CommentsType = CommentsType;
 
@@ -76,41 +85,22 @@ export class VotingPage {
     });
   }
 
-  protected vote(voting: Voting) {
-    const ids: number[] = [];
-
-    if (!voting.multivariant) {
-      if (this.selected) {
-        ids.push(this.selected);
+  protected vote(voting: Voting): void {
+    if (!this.isVariantSelected(voting)) return;
+    void submit(this.voteForm, async () => {
+      const model = this.#voteModel();
+      const ids = voting.multivariant
+        ? model.variants.filter((variant) => variant.selected).map((variant) => variant.id)
+        : [Number(model.selected)];
+      try {
+        await firstValueFrom(
+          this.#votingClient.vote(new CreateVoteRequest({vote: {id: voting.id, votingVariantVoteIds: ids}})),
+        );
+        this.votingResource.reload();
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
       }
-    } else {
-      for (const key in this.selectedMulti) {
-        const value = this.selectedMulti[key];
-        if (value) {
-          ids.push(parseInt(key, 10));
-        }
-      }
-    }
-
-    this.#votingClient
-      .vote(
-        new CreateVoteRequest({
-          vote: {
-            id: voting.id,
-            votingVariantVoteIds: ids,
-          },
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          this.#toastService.handleError(response);
-        },
-        next: () => {
-          this.votingResource.reload();
-        },
-      });
-
-    return false;
+    });
   }
 
   // Use timestampToDate() rather than voting.beginDate/endDate.toDate() directly in the template:
@@ -127,18 +117,8 @@ export class VotingPage {
   }
 
   protected isVariantSelected(voting: Voting): boolean {
-    if (!voting.multivariant) {
-      return this.selected > 0;
-    }
-
-    let count = 0;
-    for (const key in this.selectedMulti) {
-      const value = this.selectedMulti[key];
-      if (value) {
-        count++;
-      }
-    }
-    return count > 0;
+    const model = this.#voteModel();
+    return voting.multivariant ? model.variants.some((variant) => variant.selected) : Number(model.selected) > 0;
   }
 
   protected showWhoVoted(voting: Voting, variant: VotingVariant) {

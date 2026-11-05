@@ -163,12 +163,11 @@
       </ng-template>
       <div class="input-group mb-3">
         <input
-          name="item"
           placeholder="Item"
           i18n-placeholder
           class="form-control"
           [ngbTypeahead]="itemsDataSource"
-          [formControl]="itemQuery"
+          [formField]="itemQuery"
           [inputFormatter]="itemFormatter"
           [resultTemplate]="itemTemplate"
           [class.border-primary]="itemID()"
@@ -181,12 +180,11 @@
 
       <div class="input-group mb-3">
         <input
-          name="exclude_item"
           placeholder="Exclude item"
           i18n-placeholder
           class="form-control"
           [ngbTypeahead]="itemsDataSource"
-          [formControl]="excludeItemQuery"
+          [formField]="excludeItemQuery"
           [inputFormatter]="itemFormatter"
           [resultTemplate]="itemTemplate"
           [class.border-primary]="excludeItemID()"
@@ -236,12 +234,11 @@
       </ng-template>
       <div class="input-group mb-3">
         <input
-          name="owner"
           placeholder="Uploaded by"
           i18n-placeholder
           class="form-control"
           [ngbTypeahead]="ownersDataSource"
-          [formControl]="ownerQuery"
+          [formField]="ownerQuery"
           [inputFormatter]="ownerFormatter"
           [resultTemplate]="ownerTemplate"
           [class.border-primary]="ownerID()"
@@ -371,11 +368,11 @@
         <label i18n for="added_from">Added from (date)</label>
         <input
           type="text"
-          name="added_from"
           id="added_from"
           class="form-control"
           placeholder="2010-01-28"
-          [formControl]="addedFrom"
+          [formField]="addedFrom"
+          (change)="onAddedFromChanged()"
         />
       </div>
 

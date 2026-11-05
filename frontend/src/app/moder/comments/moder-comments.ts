@@ -6,7 +6,7 @@ import type {Observable} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, DestroyRef, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentMessageFields,
@@ -34,7 +34,7 @@ import {UserLink} from '../../user/user/user-link';
 
 @Component({
   selector: 'app-moder-comments',
-  imports: [RouterLink, FormsModule, NgbTypeahead, UserLink, Paginator, AsyncPipe, ReactiveFormsModule],
+  imports: [RouterLink, NgbTypeahead, UserLink, Paginator, AsyncPipe, FormField],
   templateUrl: './moder-comments.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,12 +50,10 @@ export class ModerComments implements OnInit {
   readonly #languageService = inject(LanguageService);
   readonly #usersClient = inject(UsersClient);
 
-  protected readonly moderatorAttention = new FormControl<ModeratorAttention>(ModeratorAttention.NONE, {
-    nonNullable: true,
-  });
+  protected readonly moderatorAttention = form(signal(String(ModeratorAttention.NONE)));
 
   protected readonly itemID = signal<null | string>(null);
-  protected readonly itemQuery = new FormControl<string>('', {nonNullable: true});
+  protected readonly itemQuery = form(signal(''));
   protected readonly itemsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
@@ -88,7 +86,7 @@ export class ModerComments implements OnInit {
       }),
     );
 
-  protected readonly userQuery = new FormControl<string>('', {nonNullable: true});
+  protected readonly userQuery = form(signal(''));
   protected readonly usersDataSource: (text$: Observable<string>) => Observable<User[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
@@ -148,7 +146,7 @@ export class ModerComments implements OnInit {
     paginator?: Pages;
   }> = combineLatest([this.userID$, this.#moderatorAttention$, this.#picturesOfItemID$, this.#page$]).pipe(
     switchMap(([userID, moderatorAttention, picturesOfItemID, page]) => {
-      this.moderatorAttention.setValue(moderatorAttention);
+      this.moderatorAttention().value.set(String(moderatorAttention));
       this.itemID.set(picturesOfItemID);
 
       return this.#commentsClient.getMessages(
@@ -160,7 +158,7 @@ export class ModerComments implements OnInit {
             status: true,
           }),
           limit: 30,
-          moderatorAttention: this.moderatorAttention.value,
+          moderatorAttention,
           order: GetMessagesRequest.Order.DATE_DESC,
           page,
           picturesOfItemId: this.itemID() ?? undefined,
@@ -204,7 +202,7 @@ export class ModerComments implements OnInit {
         takeUntilDestroyed(this.#destroyRef),
       )
       .subscribe((user) => {
-        this.userQuery.setValue(user ? this.userFormatter(user) : '', {emitEvent: false});
+        this.userQuery().value.set(user ? this.userFormatter(user) : '');
       });
 
     this.#picturesOfItemID$
@@ -225,14 +223,14 @@ export class ModerComments implements OnInit {
         takeUntilDestroyed(this.#destroyRef),
       )
       .subscribe((item) => {
-        this.itemQuery.setValue(item ? this.itemFormatter(item) : '', {emitEvent: false});
+        this.itemQuery().value.set(item ? this.itemFormatter(item) : '');
       });
   }
 
   protected setModeratorAttention() {
     void this.#router.navigate([], {
       queryParams: {
-        moderator_attention: this.moderatorAttention.value,
+        moderator_attention: this.moderatorAttention().value(),
         page: null,
       },
       queryParamsHandling: 'merge',
@@ -249,6 +247,8 @@ export class ModerComments implements OnInit {
     // e.item is typed `any` by ng-bootstrap - itemsDataSource above is the only source feeding
     // this typeahead, and it resolves Item[].
     const selected = e.item as Item;
+    e.preventDefault();
+    this.itemQuery().value.set(selected.nameText);
     void this.#router.navigate([], {
       queryParams: {
         pictures_of_item_id: selected.id,
@@ -258,7 +258,7 @@ export class ModerComments implements OnInit {
   }
 
   protected clearItem(): void {
-    this.itemQuery.setValue('');
+    this.itemQuery().value.set('');
     void this.#router.navigate([], {
       queryParams: {
         pictures_of_item_id: null,
@@ -275,6 +275,8 @@ export class ModerComments implements OnInit {
     // e.item is typed `any` by ng-bootstrap - usersDataSource above is the only source feeding
     // this typeahead, and it resolves User[].
     const selected = e.item as User;
+    e.preventDefault();
+    this.userQuery().value.set(selected.name);
     void this.#router.navigate([], {
       queryParams: {
         user_id: selected.id,
@@ -284,7 +286,7 @@ export class ModerComments implements OnInit {
   }
 
   protected clearUser(): void {
-    this.userQuery.setValue('');
+    this.userQuery().value.set('');
     void this.#router.navigate([], {
       queryParams: {
         user_id: null,

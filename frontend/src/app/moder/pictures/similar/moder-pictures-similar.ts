@@ -5,7 +5,7 @@ import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   DeleteSimilarRequest,
@@ -50,7 +50,7 @@ const unresolvedSimilarPictureListOptions = () =>
 
 @Component({
   selector: 'app-moder-pictures-similar',
-  imports: [Paginator, RouterLink, Thumbnail, NgbTypeahead, FormsModule, ReactiveFormsModule],
+  imports: [Paginator, RouterLink, Thumbnail, NgbTypeahead, FormField],
   templateUrl: './moder-pictures-similar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -70,7 +70,7 @@ export class ModerPicturesSimilar implements OnInit {
     requireSync: true,
   });
 
-  protected readonly brandQuery = new FormControl<string>('', {nonNullable: true});
+  protected readonly brandQuery = form(signal(''));
 
   protected readonly hideLoadingKey = signal<null | string>(null);
 
@@ -160,16 +160,18 @@ export class ModerPicturesSimilar implements OnInit {
       title: $localize`Similar pictures`,
     });
 
-    if (this.brandID() && !this.brandQuery.value) {
-      this.brandQuery.setValue('#' + this.brandID());
+    if (this.brandID() && !this.brandQuery().value()) {
+      this.brandQuery().value.set('#' + this.brandID());
     }
   }
 
-  protected brandFormatter(x: Item) {
-    return x.nameText;
+  protected brandFormatter(x: Item | string) {
+    return typeof x === 'string' ? x : x.nameText;
   }
 
   protected brandOnSelect(e: NgbTypeaheadSelectItemEvent<Item>): void {
+    e.preventDefault();
+    this.brandQuery().value.set(e.item.nameText);
     void this.#router.navigate([], {
       queryParams: {brand_id: e.item.id},
       queryParamsHandling: 'merge',
@@ -177,7 +179,7 @@ export class ModerPicturesSimilar implements OnInit {
   }
 
   protected clearBrand(): void {
-    this.brandQuery.setValue('');
+    this.brandQuery().value.set('');
     void this.#router.navigate([], {
       queryParams: {brand_id: null},
       queryParamsHandling: 'merge',

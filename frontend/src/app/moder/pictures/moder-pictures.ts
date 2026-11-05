@@ -1,11 +1,11 @@
-import type {OnDestroy, OnInit} from '@angular/core';
+import type {OnInit} from '@angular/core';
 import type {Item, Pages, User, VehicleType} from '@grpc/spec.pb';
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
-import type {Observable, Subscription} from 'rxjs';
+import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentTopicListOptions,
@@ -130,16 +130,15 @@ function toPlainVehicleTypes(options: VehicleType[], deep: number): VehicleTypeI
     NgbDropdownToggle,
     NgbDropdownMenu,
     NgbTypeahead,
-    FormsModule,
     Paginator,
     AsyncPipe,
     Thumbnail,
-    ReactiveFormsModule,
+    FormField,
   ],
   templateUrl: './moder-pictures.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ModerPictures implements OnDestroy, OnInit {
+export class ModerPictures implements OnInit {
   readonly #perspectiveService = inject(APIPerspectiveService);
   readonly #moderVoteService = inject(PictureModerVoteService);
   readonly #vehicleTypeService = inject(VehicleTypeService);
@@ -365,7 +364,7 @@ export class ModerPictures implements OnDestroy, OnInit {
   protected readonly specialName = signal(false);
 
   protected readonly ownerID = signal('');
-  protected readonly ownerQuery = new FormControl<string>('', {nonNullable: true});
+  protected readonly ownerQuery = form(signal(''));
   protected readonly ownersDataSource: (text$: Observable<string>) => Observable<User[]> = (
     text$: Observable<string>,
   ) =>
@@ -397,7 +396,7 @@ export class ModerPictures implements OnDestroy, OnInit {
     );
 
   protected readonly itemID = signal('');
-  protected readonly itemQuery = new FormControl<string>('', {nonNullable: true});
+  protected readonly itemQuery = form(signal(''));
   protected readonly itemsDataSource: (text$: Observable<string>) => Observable<Item[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
@@ -443,12 +442,10 @@ export class ModerPictures implements OnDestroy, OnInit {
 
   readonly #change$ = new BehaviorSubject<void>(void 0);
 
-  protected readonly addedFrom = new FormControl<string>('', {nonNullable: true});
-
-  #addedFromSub?: Subscription = undefined;
+  protected readonly addedFrom = form(signal(''));
 
   protected readonly excludeItemID = signal('');
-  protected readonly excludeItemQuery = new FormControl<string>('', {nonNullable: true});
+  protected readonly excludeItemQuery = form(signal(''));
 
   protected readonly data$: Observable<{
     chunks: Picture[][];
@@ -458,18 +455,18 @@ export class ModerPictures implements OnDestroy, OnInit {
     distinctUntilChanged(),
     // eslint-disable-next-line sonarjs/cognitive-complexity
     switchMap((params) => {
-      this.addedFrom.setValue(params.get('added_from') ?? '');
+      this.addedFrom().value.set(params.get('added_from') ?? '');
       this.status.set(params.get('status') ? params.get('status') : null);
       this.vehicleTypeID.set(params.get('vehicle_type_id') ? (params.get('vehicle_type_id') ?? '') : null);
       const perspectiveID = params.get('perspective_id');
       this.perspectiveID.set(perspectiveID === 'null' ? 'null' : parseInt(perspectiveID ?? '', 10) || null);
       this.itemID.set(params.get('item_id') ? (params.get('item_id') ?? '') : '');
-      if (this.itemID() && !this.itemQuery.value) {
-        this.itemQuery.setValue('#' + this.itemID());
+      if (this.itemID() && !this.itemQuery().value()) {
+        this.itemQuery().value.set('#' + this.itemID());
       }
       this.excludeItemID.set(params.get('exclude_item_id') ? (params.get('exclude_item_id') ?? '') : '');
-      if (this.excludeItemID() && !this.excludeItemQuery.value) {
-        this.excludeItemQuery.setValue('#' + this.excludeItemID());
+      if (this.excludeItemID() && !this.excludeItemQuery().value()) {
+        this.excludeItemQuery().value.set('#' + this.excludeItemID());
       }
       switch (params.get('comments')) {
         case 'false':
@@ -483,8 +480,8 @@ export class ModerPictures implements OnDestroy, OnInit {
           break;
       }
       this.ownerID.set(params.get('owner_id') ?? '');
-      if (this.ownerID() && !this.ownerQuery.value) {
-        this.ownerQuery.setValue('#' + this.ownerID());
+      if (this.ownerID() && !this.ownerQuery().value()) {
+        this.ownerQuery().value.set('#' + this.ownerID());
       }
       switch (params.get('replace')) {
         case 'false':
@@ -534,7 +531,7 @@ export class ModerPictures implements OnDestroy, OnInit {
           PicturesRequest.Order.ORDER_CREATED_AT_DESC,
         ),
       );
-      this.addedFrom.setValue(params.get('added_from') ?? '');
+      this.addedFrom().value.set(params.get('added_from') ?? '');
 
       this.#selected = [];
       this.hasSelectedItem.set(false);
@@ -570,7 +567,7 @@ export class ModerPictures implements OnDestroy, OnInit {
         language: this.#languageService.language,
         limit: 18,
         options: new PictureListOptions({
-          addedFrom: this.addedFrom.value ? parseStringToGrpcDate(this.addedFrom.value) : undefined,
+          addedFrom: this.addedFrom().value() ? parseStringToGrpcDate(this.addedFrom().value()) : undefined,
           commentTopic: this.comments() === true ? new CommentTopicListOptions({messagesGtZero: true}) : undefined,
           dfDistance: this.similar()
             ? new DfDistanceListOptions({
@@ -654,23 +651,11 @@ export class ModerPictures implements OnDestroy, OnInit {
       layout: {isAdminPage: true},
       pageId: PageId.MODER_PICTURES,
     });
-
-    this.#addedFromSub = this.addedFrom.valueChanges
-      .pipe(distinctUntilChanged(), debounceTime(30))
-      .subscribe((value) => {
-        void this.#router.navigate([], {
-          queryParams: {
-            added_from: value ? value : null,
-          },
-          queryParamsHandling: 'merge',
-        });
-      });
   }
 
-  ngOnDestroy(): void {
-    if (this.#addedFromSub) {
-      this.#addedFromSub.unsubscribe();
-    }
+  protected onAddedFromChanged(): void {
+    const value = this.addedFrom().value();
+    void this.#router.navigate([], {queryParams: {added_from: value || null}, queryParamsHandling: 'merge'});
   }
 
   private convertStatuses(status: null | string): PictureStatus[] | undefined {
@@ -714,6 +699,8 @@ export class ModerPictures implements OnDestroy, OnInit {
     // e.item is typed `any` by ng-bootstrap (a generic typeahead event) - itemsDataSource above
     // is the only source feeding this typeahead, and it resolves Item[].
     const selected = e.item as Item;
+    e.preventDefault();
+    this.itemQuery().value.set(selected.nameText);
     void this.#router.navigate([], {
       queryParams: {
         item_id: selected.id,
@@ -724,6 +711,8 @@ export class ModerPictures implements OnDestroy, OnInit {
 
   protected excludeItemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
     const selected = e.item as Item;
+    e.preventDefault();
+    this.excludeItemQuery().value.set(selected.nameText);
     void this.#router.navigate([], {
       queryParams: {
         exclude_item_id: selected.id,
@@ -733,7 +722,7 @@ export class ModerPictures implements OnDestroy, OnInit {
   }
 
   protected clearItem(): void {
-    this.itemQuery.setValue('');
+    this.itemQuery().value.set('');
     void this.#router.navigate([], {
       queryParams: {
         item_id: null,
@@ -743,7 +732,7 @@ export class ModerPictures implements OnDestroy, OnInit {
   }
 
   protected clearExcludeItem(): void {
-    this.excludeItemQuery.setValue('');
+    this.excludeItemQuery().value.set('');
     void this.#router.navigate([], {
       queryParams: {
         exclude_item_id: null,
@@ -756,6 +745,8 @@ export class ModerPictures implements OnDestroy, OnInit {
     // e.item is typed `any` by ng-bootstrap - ownersDataSource above is the only source feeding
     // this typeahead, and it resolves User[].
     const selected = e.item as User;
+    e.preventDefault();
+    this.ownerQuery().value.set(selected.name);
     void this.#router.navigate([], {
       queryParams: {
         owner_id: selected.id,
@@ -765,7 +756,7 @@ export class ModerPictures implements OnDestroy, OnInit {
   }
 
   protected clearOwner(): void {
-    this.ownerQuery.setValue('');
+    this.ownerQuery().value.set('');
     void this.#router.navigate([], {
       queryParams: {
         owner_id: null,

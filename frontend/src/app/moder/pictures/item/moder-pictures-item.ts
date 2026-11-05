@@ -1,10 +1,9 @@
-import type {DfDistance, IP, Item, PictureLicense, User} from '@grpc/spec.pb';
+import type {DfDistance, IP, Item, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
+import {disabled, form, FormField, maxLength, required, submit, validate} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CreatePictureItemRequest,
@@ -29,6 +28,7 @@ import {
   PictureItemFields,
   PictureItemsRequest,
   PictureItemType,
+  PictureLicense,
   PictureListOptions,
   PictureModerVoteRequest,
   PicturesRequest,
@@ -56,6 +56,7 @@ import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
 import {pictureLicenseOptions} from '@utils/license-badge/license-badge';
 import {LicenseHelpModal} from '@utils/license-help-modal/license-help-modal';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
@@ -100,7 +101,6 @@ interface LastItemInfo {
     NgbDropdownToggle,
     NgbDropdownMenu,
     NgbProgressbar,
-    FormsModule,
     MarkdownEdit,
     UserLink,
     AsyncPipe,
@@ -150,6 +150,26 @@ export class ModerPicturesItem {
       });
     }),
     shareReplay({bufferSize: 1, refCount: false}),
+  );
+
+  readonly #settingsModel = signal({year: '', month: '0', day: '0', specialName: ''});
+  protected readonly settingsForm = form(this.#settingsModel, (path) => {
+    maxLength(path.specialName, 255);
+    maxLength(path.year, 4);
+    validate(path.year, ({value}) =>
+      value() !== '' && (!/^\d{4}$/.test(value()) || Number(value()) < 1800 || Number(value()) > 2030)
+        ? {kind: 'year'}
+        : undefined,
+    );
+    disabled(path, {when: () => this.specialNameLoading()});
+  });
+  readonly #licenseModel = signal({license: '0', sourceUrl: ''});
+  protected readonly licenseForm = form(this.#licenseModel, (path) => {
+    maxLength(path.sourceUrl, 500);
+    disabled(path, {when: () => this.licenseLoading()});
+  });
+  protected readonly selectedLicense = computed(() =>
+    numericEnumValue(PictureLicense, Number(this.#licenseModel().license), PictureLicense.PICTURE_LICENSE_UNKNOWN),
   );
 
   protected readonly picture$ = combineLatest([this.id$, this.#change$]).pipe(
@@ -208,6 +228,15 @@ export class ModerPicturesItem {
     catchError(() => {
       this.#notFound.report();
       return EMPTY;
+    }),
+    tap((picture) => {
+      this.#settingsModel.set({
+        year: picture.takenDate?.year ? String(picture.takenDate.year) : '',
+        month: String(picture.takenDate?.month ?? 0),
+        day: String(picture.takenDate?.day ?? 0),
+        specialName: picture.specialName,
+      });
+      this.#licenseModel.set({license: String(picture.license), sourceUrl: picture.sourceUrl});
     }),
     shareReplay({bufferSize: 1, refCount: false}),
   );
@@ -429,15 +458,15 @@ export class ModerPicturesItem {
   }
 
   protected saveSpecialName(picture: Picture) {
+    if (this.specialNameLoading() || this.settingsForm().invalid()) return;
+    const model = this.#settingsModel();
+    const takenDate = {year: Number(model.year), month: Number(model.month), day: Number(model.day)};
+    const patch = new Picture({id: picture.id, specialName: model.specialName, takenDate});
     this.specialNameLoading.set(true);
     this.#picturesClient
       .updatePicture(
         new UpdatePictureRequest({
-          picture: new Picture({
-            id: picture.id,
-            specialName: picture.specialName,
-            takenDate: picture.takenDate,
-          }),
+          picture: patch,
           updateMask: new FieldMask({paths: ['special_name', 'taken_date']}),
         }),
       )
@@ -450,6 +479,8 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
+          picture.specialName = patch.specialName;
+          picture.takenDate = patch.takenDate;
           this.specialNameLoading.set(false);
         },
       });
@@ -488,16 +519,22 @@ export class ModerPicturesItem {
   }
 
   protected saveLicense(picture: Picture) {
-    if (this.licenseNeedsSource(picture.license, picture.sourceUrl)) {
+    if (
+      this.licenseLoading() ||
+      this.licenseForm().invalid() ||
+      this.licenseNeedsSource(this.selectedLicense(), this.#licenseModel().sourceUrl)
+    ) {
       return;
     }
 
+    const license = this.selectedLicense();
+    const sourceUrl = this.#licenseModel().sourceUrl;
     this.licenseLoading.set(true);
 
     this.#picturesClient
       .updatePicture(
         new UpdatePictureRequest({
-          picture: new Picture({id: picture.id, license: picture.license, sourceUrl: picture.sourceUrl}),
+          picture: new Picture({id: picture.id, license, sourceUrl}),
           updateMask: new FieldMask({paths: ['license', 'source_url']}),
         }),
       )
@@ -510,6 +547,8 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
+          picture.license = license;
+          picture.sourceUrl = sourceUrl;
           this.licenseLoading.set(false);
         },
       });

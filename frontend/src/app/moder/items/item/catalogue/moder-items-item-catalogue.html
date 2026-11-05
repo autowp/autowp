@@ -32,20 +32,19 @@
           @if (canHaveParents() || !canMove) {
             <tr>
               <td colspan="4">
-                <form class="car-add-parent" method="post">
+                <form class="car-add-parent" method="post" (submit)="$event.preventDefault()">
                   <div class="input-group" style="max-width: 400px">
                     <ng-template #itemTemplate let-model="result">
                       <span [innerHTML]="model.nameHtml"></span>
                     </ng-template>
                     <input
                       type="text"
-                      name="parent"
                       class="form-control item-autocomplete"
                       placeholder="Add parent …"
                       i18n-placeholder
                       autocomplete="off"
                       [ngbTypeahead]="itemsDataSource"
-                      [formControl]="itemQuery"
+                      [formField]="itemQuery"
                       [inputFormatter]="itemFormatter"
                       [resultTemplate]="itemTemplate"
                       (selectItem)="itemOnSelect(item, $event)"

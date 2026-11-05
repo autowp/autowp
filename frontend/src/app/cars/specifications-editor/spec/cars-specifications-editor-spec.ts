@@ -1,10 +1,11 @@
+import type {FieldTree} from '@angular/forms/signals';
 import type {AttrListOption, AttrValue, Item, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {FormArray, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {applyEach, disabled, form, FormField, submit, validate} from '@angular/forms/signals';
 import {
   AttrAttributeType,
   AttrSetUserValuesRequest,
@@ -19,6 +20,7 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
+import {SelectMultiple} from '@utils/select-multiple/select-multiple';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {
   getAttrDescriptionTranslation,
@@ -31,8 +33,8 @@ import {
   BehaviorSubject,
   catchError,
   combineLatest,
-  distinctUntilChanged,
   EMPTY,
+  firstValueFrom,
   map,
   of,
   shareReplay,
@@ -50,6 +52,7 @@ export interface APIAttrAttributeInSpecEditor extends AttrAttributeTreeItem {
   deep: number;
   options$: Observable<ListOption[]>;
   step: number;
+  typeId: AttrAttributeType.Id;
   unitAbbr: string;
   unitName: string;
 }
@@ -60,55 +63,51 @@ interface AttrUserValueWithUser {
 }
 
 interface ListOption {
-  id: boolean | null | string;
+  id: string;
   name: string;
 }
 
 const booleanOptions: ListOption[] = [
   {
-    id: null,
+    id: '',
     name: '—',
   },
   {
-    id: false,
+    id: 'false',
     name: $localize`no`,
   },
   {
-    id: true,
+    id: 'true',
     name: $localize`yes`,
   },
 ];
 
-type AttrFormControls =
-  | AttrFormControl<boolean | null>
-  | AttrFormControl<null | number>
-  | AttrFormControl<string>
-  | AttrFormControl<string[]>;
+interface SpecFormValue {
+  itemId: string;
+  rows: {
+    id: string;
+    list: string[];
+    multiple: boolean;
+    notApplicable: boolean;
+    type: AttrAttributeType.Id;
+    value: string;
+  }[];
+}
 
-export class AttrFormControl<TValue> extends FormControl {
-  public attr: APIAttrAttributeInSpecEditor;
-  // Declared, not inherited from FormControl<TValue>: extending the generic FormControl<TValue>
-  // here hits a real TS limitation (TS2510, "base constructors must all have the same return
-  // type") once TValue ranges over a union of unrelated types (boolean | null, string, string[],
-  // ...) - the constructor overload resolution becomes ambiguous. This narrows the same `.value`
-  // getter's return type without touching construction.
-  declare value: TValue;
-
-  constructor(attr: APIAttrAttributeInSpecEditor, value: TValue, disabled: boolean) {
-    super({disabled, value});
-
-    this.attr = attr;
-  }
+interface SpecEditor {
+  attributes: APIAttrAttributeInSpecEditor[];
+  form: FieldTree<SpecFormValue>;
 }
 
 @Component({
   selector: 'app-cars-specifications-editor-spec',
-  imports: [FormsModule, ReactiveFormsModule, UserLink, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [FormField, SelectMultiple, UserLink, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './cars-specifications-editor-spec.html',
   styleUrl: './cars-specifications-editor-spec.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsSpecificationsEditorSpec {
+  readonly #injector = inject(Injector);
   readonly #attrsService = inject(APIAttrsService);
   readonly #auth = inject(AuthService);
   readonly #toastService = inject(ToastsService);
@@ -121,35 +120,17 @@ export class CarsSpecificationsEditorSpec {
 
   readonly #change$ = new BehaviorSubject<void>(void 0);
 
-  // fields: 'options,childs.options',
-  readonly #attributes$: Observable<APIAttrAttributeInSpecEditor[]> = this.item$.pipe(
-    distinctUntilChanged(),
-    switchMap((item) =>
-      // item is a required input(), always defined here.
-      item.attrZoneId
-        ? this.#attrsService.getAttributes$(item.attrZoneId, null)
-        : throwError(() => new Error('Failed to detect attr_zone_id')),
-    ),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((attributes) => this.toPlain(attributes, 0)),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
   protected readonly AttrAttributeTypeId = AttrAttributeType.Id;
 
-  readonly #currentUserValues$: Observable<Record<string, AttrUserValue>> = combineLatest([
-    this.item$,
-    this.#auth.user$,
-    this.#attributes$,
-    this.#change$,
-  ]).pipe(
-    switchMap(([item, user, attributes]) =>
-      // item is a required input(), always defined here.
-      user
-        ? this.#attrsClient
+  readonly #currentUserValues$ = combineLatest([this.item$, this.#auth.user$, this.#change$]).pipe(
+    switchMap(([item, user]) => {
+      if (!user) return EMPTY;
+      if (!item.attrZoneId || item.attrZoneId === '0')
+        return throwError(() => new Error('Failed to detect attr_zone_id'));
+      return this.#attrsService.getAttributes$(item.attrZoneId, null).pipe(
+        map((attributes) => this.toPlain(attributes, 0)),
+        switchMap((attributes) =>
+          this.#attrsClient
             .getUserValues(
               new AttrUserValuesRequest({
                 itemId: item.id,
@@ -158,65 +139,78 @@ export class CarsSpecificationsEditorSpec {
                 zoneId: item.attrZoneId,
               }),
             )
-            .pipe(map((response) => ({attributes, response})))
-        : EMPTY,
-    ),
-    map(({attributes, response}) => {
-      const currentUserValues: Record<string, AttrUserValue> = {};
-      for (const value of response.items ?? []) {
-        currentUserValues[value.attributeId] = value;
-      }
-
-      for (const attr of attributes) {
-        // Object.hasOwn(), not `!currentUserValues[attr.id]`: without noUncheckedIndexedAccess,
-        // TS types a Record's index access as always-present, so the truthiness check reads as
-        // "always false" to the type checker even though the key can genuinely be absent here -
-        // Object.hasOwn() reflects the real runtime check instead of the unsound static type.
-        if (!Object.hasOwn(currentUserValues, attr.id)) {
-          currentUserValues[attr.id] = new AttrUserValue({
-            value: new AttrValueValue(),
-          });
-        }
-      }
-
-      return currentUserValues;
+            .pipe(map((response) => ({attributes, itemId: item.id, response}))),
+        ),
+        catchError((response: unknown) => {
+          this.#toastService.handleError(response);
+          return EMPTY;
+        }),
+      );
+    }),
+    map(({attributes, itemId, response}) => {
+      const currentUserValues = new Map((response.items ?? []).map((value) => [value.attributeId, value]));
+      return {attributes, itemId, currentUserValues};
     }),
   );
 
-  protected readonly form$: Observable<FormArray<AttrFormControls>> = combineLatest([
-    this.#attributes$,
-    this.#currentUserValues$,
-  ]).pipe(
-    map(([attributes, currentUserValues]) => {
-      const controls: AttrFormControls[] = attributes.map((attr) => {
-        const currentUserValue = currentUserValues[attr.id].value;
-        const disabled = !!currentUserValue?.isEmpty;
-        const valid = currentUserValue?.valid && !disabled;
-
-        // currentUserValue is narrowed non-nullish inside every `valid ? ... : ...` true branch
-        // below: valid is `currentUserValue?.valid && !disabled`, so valid can only be truthy if
-        // that optional chain already found currentUserValue defined.
-        // The `?? fallback : null/'' /[]` shapes below aren't redundant null-guards on top of the
-        // narrowing above - boolValue/floatValue/intValue/stringValue/listValue are proto3 scalar
-        // fields (one active per attribute type, per its `type` discriminant) that are never
-        // null/undefined themselves; the actual fallback happens on `valid` alone.
-        switch (attr.typeId) {
-          case AttrAttributeType.Id.BOOLEAN:
-            return new AttrFormControl<boolean | null>(attr, valid ? currentUserValue.boolValue : null, disabled);
-          case AttrAttributeType.Id.FLOAT:
-            return new AttrFormControl<null | number>(attr, valid ? currentUserValue.floatValue : null, disabled);
-          case AttrAttributeType.Id.INTEGER:
-            return new AttrFormControl<null | number>(attr, valid ? currentUserValue.intValue : null, disabled);
-          case AttrAttributeType.Id.LIST:
-          case AttrAttributeType.Id.TREE:
-            return new AttrFormControl<string[]>(attr, valid ? currentUserValue.listValue : [], disabled);
-          case AttrAttributeType.Id.STRING:
-          case AttrAttributeType.Id.TEXT:
-            return new AttrFormControl<string>(attr, valid ? currentUserValue.stringValue : '', disabled);
+  protected readonly form$: Observable<SpecEditor> = this.#currentUserValues$.pipe(
+    map(({attributes, currentUserValues, itemId}) => {
+      const rows: SpecFormValue['rows'] = attributes.map((attr) => {
+        const current = currentUserValues.get(attr.id)?.value;
+        const notApplicable = !!current?.isEmpty;
+        const valid = !!current?.valid && !notApplicable;
+        let value = '';
+        let list: string[] = [];
+        if (current && valid) {
+          switch (attr.typeId) {
+            case AttrAttributeType.Id.BOOLEAN:
+              value = String(current.boolValue);
+              break;
+            case AttrAttributeType.Id.FLOAT:
+              value = String(current.floatValue);
+              break;
+            case AttrAttributeType.Id.INTEGER:
+              value = String(current.intValue);
+              break;
+            case AttrAttributeType.Id.LIST:
+            case AttrAttributeType.Id.TREE:
+              list = [...current.listValue];
+              value = list[0] ?? '';
+              break;
+            case AttrAttributeType.Id.STRING:
+            case AttrAttributeType.Id.TEXT:
+              value = current.stringValue;
+              break;
+          }
         }
-        return new AttrFormControl<null>(attr, null, disabled);
+        return {id: attr.id, type: attr.typeId, multiple: attr.isMultiple, value, list, notApplicable};
       });
-      return new FormArray<AttrFormControls>(controls);
+      const field = form(
+        signal({itemId, rows}),
+        (path) => {
+          disabled(path, {when: ({state}) => state.submitting()});
+          applyEach(path.rows, (row) => {
+            disabled(row.value, {when: ({valueOf}) => valueOf(row.notApplicable)});
+            disabled(row.list, {when: ({valueOf}) => valueOf(row.notApplicable)});
+            validate(row.value, ({value, valueOf}) => {
+              const type = valueOf(row.type);
+              if (
+                value().trim() === '' ||
+                (type !== AttrAttributeType.Id.INTEGER && type !== AttrAttributeType.Id.FLOAT)
+              )
+                return undefined;
+              const number = Number(value());
+              return !Number.isFinite(number) ||
+                (type === AttrAttributeType.Id.INTEGER &&
+                  (!Number.isInteger(number) || number < -2147483648 || number > 2147483647))
+                ? {kind: 'number'}
+                : undefined;
+            });
+          });
+        },
+        {injector: this.#injector},
+      );
+      return {attributes, form: field};
     }),
   );
 
@@ -288,86 +282,48 @@ export class CarsSpecificationsEditorSpec {
     }
   }
 
-  protected saveSpecs(item: Item, form: FormArray<AttrFormControls>) {
-    const items = form.controls.map((control) => {
-      // typescript-eslint's type-checked linting reports this specific assignment as "error
-      // typed" (effectively `any`), but ts.getPreEmitDiagnostics() on this file directly (via the
-      // TypeScript compiler API, matching `npx tsc --noEmit`) returns zero diagnostics - a false
-      // positive from eslint's own type resolution, not a real type hole. The explicit annotation
-      // keeps it from also poisoning every downstream use of typeId.
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const typeId: AttrAttributeType.Id = control.attr.typeId;
-      let valid;
-      let stringValue;
-      let listValue: string[] = [];
-      let boolValue;
-      let floatValue;
-      let intValue;
-      // control is typed as the AttrFormControls union (one AttrFormControl<T> per attribute
-      // type), but that union isn't discriminated on typeId the way TS can narrow automatically -
-      // form$ above is the only place controls are constructed, and it pairs each case here with
-      // the exact same typeId, so the cast in each branch reflects a real invariant rather than
-      // papering over an unknown one.
-      switch (typeId) {
-        case AttrAttributeType.Id.BOOLEAN: {
-          const value = (control as AttrFormControl<boolean | null>).value;
-          valid = value !== null;
-          boolValue = value ?? undefined;
-          break;
+  protected saveSpecs(field: FieldTree<SpecFormValue>): void {
+    if (field().value().itemId !== this.item().id) return;
+    void submit(field, async () => {
+      const model = field().value();
+      const items = model.rows.map((row) => {
+        const value = new AttrValueValue({type: row.type, isEmpty: row.notApplicable});
+        if (row.notApplicable) {
+          value.valid = true;
+          return new AttrUserValue({attributeId: row.id, itemId: model.itemId, value});
         }
-        case AttrAttributeType.Id.FLOAT: {
-          const value = (control as AttrFormControl<null | number>).value;
-          valid = value !== null;
-          floatValue = value ?? undefined;
-          break;
+        switch (row.type) {
+          case AttrAttributeType.Id.BOOLEAN:
+            value.valid = row.value !== '';
+            value.boolValue = row.value === 'true';
+            break;
+          case AttrAttributeType.Id.FLOAT:
+            value.valid = row.value.trim() !== '';
+            value.floatValue = Number(row.value);
+            break;
+          case AttrAttributeType.Id.INTEGER:
+            value.valid = row.value.trim() !== '';
+            value.intValue = Number(row.value);
+            break;
+          case AttrAttributeType.Id.LIST:
+          case AttrAttributeType.Id.TREE:
+            value.listValue = (row.multiple ? row.list : [row.value]).filter((id) => id !== '');
+            value.valid = value.listValue.length > 0;
+            break;
+          case AttrAttributeType.Id.STRING:
+          case AttrAttributeType.Id.TEXT:
+            value.stringValue = row.value;
+            value.valid = row.value !== '';
+            break;
         }
-        case AttrAttributeType.Id.INTEGER: {
-          const value = (control as AttrFormControl<null | number>).value;
-          valid = value !== null;
-          intValue = value !== null ? value | 0 : undefined;
-          break;
-        }
-        case AttrAttributeType.Id.LIST:
-        case AttrAttributeType.Id.TREE: {
-          const value = (control as AttrFormControl<string[]>).value;
-          valid = value.length > 0;
-          listValue = value.filter((v) => !!v);
-          break;
-        }
-        case AttrAttributeType.Id.STRING:
-        case AttrAttributeType.Id.TEXT: {
-          const value = (control as AttrFormControl<string>).value;
-          valid = value.length > 0;
-          stringValue = value;
-          break;
-        }
-        default:
-          valid = control.value !== null;
-          break;
-      }
-      return new AttrUserValue({
-        attributeId: control.attr.id,
-        itemId: item.id,
-        value: new AttrValueValue({
-          boolValue,
-          floatValue,
-          intValue,
-          isEmpty: control.disabled,
-          listValue,
-          stringValue,
-          type: typeId,
-          valid: valid || control.disabled,
-        }),
+        return new AttrUserValue({attributeId: row.id, itemId: model.itemId, value});
       });
-    });
-
-    this.#attrsClient.setUserValues(new AttrSetUserValuesRequest({items})).subscribe({
-      error: (response: unknown) => {
+      try {
+        await firstValueFrom(this.#attrsClient.setUserValues(new AttrSetUserValuesRequest({items})));
+        if (this.item().id === model.itemId) this.#change$.next();
+      } catch (response: unknown) {
         this.#toastService.handleError(response);
-      },
-      next: () => {
-        this.#change$.next();
-      },
+      }
     });
   }
 
@@ -402,9 +358,9 @@ export class CarsSpecificationsEditorSpec {
             );
             return [
               {
-                id: null,
+                id: '',
                 name: '—',
-              } as ListOption,
+              },
             ].concat(opts);
           }),
         );

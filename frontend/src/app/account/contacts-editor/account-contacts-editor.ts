@@ -1,27 +1,24 @@
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {ChangeDetectionStrategy, Component, effect, inject, input, output, signal} from '@angular/core';
-import {FormArray, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {disabled, form, FormField, submit} from '@angular/forms/signals';
 import {UpdateUserRequest, User, UserContact, UserContactPlatform} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {detectContact, parseContact, SOCIAL_PLATFORMS} from '@services/user-contact';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {numericEnumValue} from '@utils/numeric-enum-value';
+import {firstValueFrom} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
-
-interface RowControls {
-  platform: FormControl<UserContactPlatform>;
-  value: FormControl<string>;
-}
 
 type ContactError = 'bad-format' | 'not-a-profile' | 'wrong-platform';
 
 @Component({
   selector: 'app-account-contacts-editor',
-  imports: [ReactiveFormsModule, InvalidParamsPipe],
+  imports: [FormField, InvalidParamsPipe],
   templateUrl: './account-contacts-editor.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -38,38 +35,46 @@ export class AccountContactsEditor {
   protected readonly invalidParams = signal<InvalidParams>({});
   protected readonly rowErrors = signal<Record<number, string>>({});
 
-  protected readonly rows = new FormArray<FormGroup<RowControls>>([]);
-  protected readonly contactsPublic = new FormControl<boolean>(false, {nonNullable: true});
+  readonly #model = signal({rows: [] as {platform: string; value: string}[], contactsPublic: false});
+  protected readonly contactsForm = form(this.#model, (path) => {
+    disabled(path, {when: ({state}) => state.submitting()});
+  });
 
   constructor() {
     effect(() => {
       const user = this.user();
-      this.rows.clear();
-      for (const contact of user.contacts ?? []) {
-        this.rows.push(this.makeRow(contact.platform, contact.username));
-      }
-      this.contactsPublic.setValue(user.contactsPublic);
+      this.#model.set({
+        rows: (user.contacts ?? []).map((contact) => ({platform: String(contact.platform), value: contact.username})),
+        contactsPublic: user.contactsPublic,
+      });
       this.rowErrors.set({});
+      this.invalidParams.set({});
     });
   }
 
   protected addRow(): void {
-    this.rows.push(this.makeRow(this.UNSPECIFIED, ''));
+    if (this.contactsForm().submitting()) return;
+    this.#model.update((model) => ({...model, rows: [...model.rows, {platform: String(this.UNSPECIFIED), value: ''}]}));
   }
 
   protected removeRow(index: number): void {
-    this.rows.removeAt(index);
-    this.clearRowError(index);
+    if (this.contactsForm().submitting()) return;
+    this.#model.update((model) => ({...model, rows: model.rows.filter((_, i) => i !== index)}));
+    this.rowErrors.set({});
+    this.invalidParams.set({});
+    this.#model().rows.forEach((_, i) => {
+      this.validateRow(i);
+    });
   }
 
   /** On input: detect the platform from a pasted URL, then validate against the chosen platform. */
   protected onValueInput(index: number): void {
-    const row = this.rows.at(index);
-    const detected = detectContact(row.controls.value.value);
+    const row = this.contactsForm.rows[index];
+    const detected = detectContact(row.value().value());
 
     if (detected) {
-      row.controls.platform.setValue(detected.platform);
-      row.controls.value.setValue(detected.username, {emitEvent: false});
+      row.platform().value.set(String(detected.platform));
+      row.value().value.set(detected.username);
       this.clearRowError(index);
 
       return;
@@ -79,9 +84,9 @@ export class AccountContactsEditor {
   }
 
   protected validateRow(index: number): void {
-    const row = this.rows.at(index);
-    const platform = row.controls.platform.value;
-    const raw = row.controls.value.value.trim();
+    const row = this.contactsForm.rows[index];
+    const platform = numericEnumValue(UserContactPlatform, Number(row.platform().value()), this.UNSPECIFIED);
+    const raw = row.value().value().trim();
 
     if (!raw) {
       this.clearRowError(index);
@@ -109,7 +114,7 @@ export class AccountContactsEditor {
     this.invalidParams.set({});
     this.rowErrors.set({});
 
-    for (let index = 0; index < this.rows.length; index++) {
+    for (let index = 0; index < this.#model().rows.length; index++) {
       this.validateRow(index);
     }
     if (Object.keys(this.rowErrors()).length > 0) {
@@ -117,44 +122,33 @@ export class AccountContactsEditor {
     }
 
     const contacts: UserContact[] = [];
-    for (const row of this.rows.controls) {
-      const platform = row.controls.platform.value;
-      const value = row.controls.value.value.trim();
+    for (const row of this.contactsForm.rows) {
+      const platform = numericEnumValue(UserContactPlatform, Number(row.platform().value()), this.UNSPECIFIED);
+      const value = row.value().value().trim();
       if (value && platform !== this.UNSPECIFIED) {
         contacts.push(new UserContact({platform, username: value}));
       }
     }
 
-    this.#usersClient
-      .updateUser(
-        new UpdateUserRequest({
-          updateMask: new FieldMask({paths: ['contacts', 'contacts_public']}),
-          user: new User({
-            id: this.user().id,
-            contacts,
-            contactsPublic: this.contactsPublic.value,
-          }),
-        }),
-      )
-      .subscribe({
-        error: (response: unknown) => {
-          if (response instanceof GrpcStatusEvent) {
-            this.invalidParams.set(fieldViolations2InvalidParams(extractFieldViolations(response)));
-          } else {
-            this.#toastService.handleError(response);
-          }
-        },
-        next: () => {
-          this.#toastService.success($localize`Data saved`);
-          this.saved.emit();
-        },
-      });
-  }
-
-  private makeRow(platform: UserContactPlatform, value: string): FormGroup<RowControls> {
-    return new FormGroup<RowControls>({
-      platform: new FormControl<UserContactPlatform>(platform, {nonNullable: true}),
-      value: new FormControl<string>(value, {nonNullable: true}),
+    void submit(this.contactsForm, async () => {
+      try {
+        await firstValueFrom(
+          this.#usersClient.updateUser(
+            new UpdateUserRequest({
+              updateMask: new FieldMask({paths: ['contacts', 'contacts_public']}),
+              user: new User({id: this.user().id, contacts, contactsPublic: this.#model().contactsPublic}),
+            }),
+          ),
+        );
+        this.#toastService.success($localize`Data saved`);
+        this.saved.emit();
+      } catch (response: unknown) {
+        if (response instanceof GrpcStatusEvent) {
+          this.invalidParams.set(fieldViolations2InvalidParams(extractFieldViolations(response)));
+        } else {
+          this.#toastService.handleError(response);
+        }
+      }
     });
   }
 

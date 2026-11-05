@@ -1,8 +1,9 @@
 import type {ControlValueAccessor} from '@angular/forms';
 import type {LatLng, Layer, LeafletMouseEvent, Map, MapOptions} from 'leaflet';
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
-import {FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
+import {NG_VALUE_ACCESSOR} from '@angular/forms';
+import {disabled, form, FormField} from '@angular/forms/signals';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {icon, latLng, marker, tileLayer} from 'leaflet';
 
@@ -40,7 +41,7 @@ const center = (lat: null | number | string, lng: null | number | string): LatLn
 
 @Component({
   selector: 'app-map-point',
-  imports: [FormsModule, LeafletModule],
+  imports: [FormField, LeafletModule],
   templateUrl: './map-point.html',
   styleUrl: './map-point.scss',
   providers: [
@@ -55,33 +56,17 @@ const center = (lat: null | number | string, lng: null | number | string): LatLn
 export class MapPoint implements ControlValueAccessor {
   readonly #cdr = inject(ChangeDetectorRef);
 
-  /*protected readonly center$ = this.point$.pipe(
-    map(point => point ? point : latLng(54.5260, 15.2551))
-  );*/
-
-  /*protected readonly markers$: Observable<Layer[]> = this.point$.pipe(
-    map(ll => ll ? [
-      marker(ll, {
-        icon: icon({
-          iconSize: [25, 41],
-          iconAnchor: [13, 41],
-          iconUrl: 'assets/marker-icon.png',
-          shadowUrl: 'assets/marker-shadow.png'
-        })
-      })
-    ] : []),
-  );*/
-
   protected markers: Layer[] = [];
+  readonly #disabled = signal(false);
+  readonly #coordinates = signal({lat: '', lng: ''});
+  protected readonly coordinatesForm = form(this.#coordinates, (path) => {
+    disabled(path, {when: () => this.#disabled()});
+  });
 
-  protected lat: null | number = null;
-  protected lng: null | number = null;
-  //protected  latLng: LatLng = latLng(54.5260, 15.2551);
-
-  protected center = center(this.lat, this.lng);
+  protected center = center(null, null);
 
   protected readonly mapOptions: MapOptions = {
-    center: center(this.lat, this.lng),
+    center: center(null, null),
     dragging: true,
     layers: [
       tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -95,16 +80,13 @@ export class MapPoint implements ControlValueAccessor {
 
   private onTouched?: () => void;
 
-  protected disabled = false;
-
   private touched = false;
 
-  writeValue(point: Point): void {
-    const lat = normalizeValue(point.lat);
-    const lng = normalizeValue(point.lng);
+  writeValue(point: null | Point): void {
+    const lat = normalizeValue(point?.lat);
+    const lng = normalizeValue(point?.lng);
 
-    this.lat = lat;
-    this.lng = lng;
+    this.#coordinates.set({lat: lat === null ? '' : String(lat), lng: lng === null ? '' : String(lng)});
 
     let ll: LatLng | null = null;
     if (lat !== null && lng !== null) {
@@ -126,18 +108,18 @@ export class MapPoint implements ControlValueAccessor {
   }
 
   setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.#disabled.set(isDisabled);
     this.#cdr.markForCheck();
   }
 
   protected onMapReady(lmap: Map) {
     lmap.on('click', (event: LeafletMouseEvent) => {
+      if (this.#disabled()) return;
       this.center = event.latlng;
       this.mapOptions.center = event.latlng;
       this.setMarker(event.latlng);
 
-      this.lat = event.latlng.lat;
-      this.lng = event.latlng.lng;
+      this.#coordinates.set({lat: String(event.latlng.lat), lng: String(event.latlng.lng)});
 
       this.markAsTouched();
       if (this.onChange) {
@@ -149,8 +131,8 @@ export class MapPoint implements ControlValueAccessor {
   }
 
   protected coordsChanged() {
-    const lat = normalizeValue(this.lat);
-    const lng = normalizeValue(this.lng);
+    const lat = normalizeValue(this.#coordinates().lat);
+    const lng = normalizeValue(this.#coordinates().lng);
 
     let ll: LatLng | null = null;
     if (lat !== null && lng !== null) {
@@ -162,7 +144,7 @@ export class MapPoint implements ControlValueAccessor {
     this.setMarker(ll);
 
     this.markAsTouched();
-    if (lat && lng) {
+    if (lat !== null && lng !== null) {
       if (this.onChange) {
         this.onChange({lat, lng});
       }

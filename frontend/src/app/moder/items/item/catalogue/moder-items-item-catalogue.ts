@@ -3,9 +3,9 @@ import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input, signal} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {form, FormField} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {
   DeleteItemParentRequest,
@@ -37,16 +37,7 @@ import {
 
 @Component({
   selector: 'app-moder-items-item-catalogue',
-  imports: [
-    RouterLink,
-    FormsModule,
-    NgbTypeahead,
-    NgbDropdown,
-    NgbDropdownToggle,
-    NgbDropdownMenu,
-    AsyncPipe,
-    ReactiveFormsModule,
-  ],
+  imports: [RouterLink, NgbTypeahead, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, AsyncPipe, FormField],
   templateUrl: './moder-items-item-catalogue.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -65,7 +56,7 @@ export class ModerItemsItemCatalogue {
   readonly #reloadParents$ = new BehaviorSubject<void>(void 0);
   readonly #reloadSuggestions$ = new BehaviorSubject<void>(void 0);
 
-  protected readonly itemQuery = new FormControl<string>('', {nonNullable: true});
+  protected readonly itemQuery = form(signal(''));
 
   protected readonly canMove$ = this.#auth
     .hasRole$(Role.CARS_MODER)
@@ -172,8 +163,8 @@ export class ModerItemsItemCatalogue {
 
   protected readonly ItemParentType = ItemParentType;
 
-  protected itemFormatter(x: Item) {
-    return x.nameText;
+  protected itemFormatter(x: Item | string) {
+    return typeof x === 'string' ? x : x.nameText;
   }
 
   protected itemOnSelect(item: Item, e: NgbTypeaheadSelectItemEvent): void {
@@ -183,7 +174,7 @@ export class ModerItemsItemCatalogue {
     // always really an Item at runtime.
     const selected = e.item as Item;
     this.addParent(item, selected.id);
-    this.itemQuery.setValue('');
+    this.itemQuery().value.set('');
   }
 
   protected addParent(item: Item, parentId: string) {

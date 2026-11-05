@@ -2,13 +2,13 @@
   Paste a link to your profile or a username. Links to your external profiles are shown on your public profile page.
 </p>
 
-@for (row of rows.controls; track row; let i = $index) {
-  <div class="row g-2 mb-2 align-items-start" [formGroup]="row">
+@for (row of contactsForm.rows; track row; let i = $index) {
+  <div class="row g-2 mb-2 align-items-start">
     <div class="col-sm-4">
-      <select class="form-select" formControlName="platform" (change)="validateRow(i)">
-        <option i18n [ngValue]="UNSPECIFIED">— social network —</option>
+      <select class="form-select" [formField]="row.platform" (change)="validateRow(i)">
+        <option i18n [value]="UNSPECIFIED">— social network —</option>
         @for (platform of platforms; track platform.id) {
-          <option [ngValue]="platform.id">{{ platform.name }}</option>
+          <option [value]="platform.id">{{ platform.name }}</option>
         }
       </select>
     </div>
@@ -16,9 +16,9 @@
       <input
         type="text"
         class="form-control"
-        formControlName="value"
         i18n-placeholder
         placeholder="link or username"
+        [formField]="row.value"
         [class.is-invalid]="rowErrors()[i] || invalidParams()['contacts[' + i + ']']"
         (input)="onValueInput(i)"
         (blur)="validateRow(i)"
@@ -32,20 +32,34 @@
       }
     </div>
     <div class="col-sm-1">
-      <button type="button" class="btn btn-outline-danger" i18n-aria-label aria-label="Remove" (click)="removeRow(i)">
+      <button
+        type="button"
+        class="btn btn-outline-danger"
+        i18n-aria-label
+        aria-label="Remove"
+        [disabled]="contactsForm().submitting()"
+        (click)="removeRow(i)"
+      >
         <i class="bi bi-x" aria-hidden="true"></i>
       </button>
     </div>
   </div>
 }
 
-<button type="button" class="btn btn-outline-secondary btn-sm mb-3" (click)="addRow()">
+<button
+  type="button"
+  class="btn btn-outline-secondary btn-sm mb-3"
+  [disabled]="contactsForm().submitting()"
+  (click)="addRow()"
+>
   <i class="bi bi-plus" aria-hidden="true"></i>&ngsp;<ng-container i18n>Add profile</ng-container>
 </button>
 
 <div class="form-check mb-3">
-  <input class="form-check-input" type="checkbox" id="contacts-public" [formControl]="contactsPublic" />
+  <input class="form-check-input" type="checkbox" id="contacts-public" [formField]="contactsForm.contactsPublic" />
   <label class="form-check-label" for="contacts-public" i18n> Show my links to visitors who are not signed in </label>
 </div>
 
-<button type="button" class="btn btn-primary" i18n (click)="save()">send</button>
+<button type="button" class="btn btn-primary" [disabled]="contactsForm().submitting()" (click)="save()">
+  <ng-container i18n>send</ng-container>
+</button>

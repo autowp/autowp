@@ -193,9 +193,9 @@
         @if (!picture.license) {
           <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
             <span class="text-muted" i18n>Missing licence? Add one:</span>
-            <select class="form-select form-select-sm w-auto" [(ngModel)]="fillLicense">
+            <select class="form-select form-select-sm w-auto" [formField]="fillForm.license">
               @for (option of licenseOptions; track option.value) {
-                <option [ngValue]="option.value">{{ option.label }}</option>
+                <option [value]="option.value">{{ option.label }}</option>
               }
             </select>
             <button
@@ -212,14 +212,15 @@
               class="form-control form-control-sm w-auto"
               placeholder="Source URL"
               i18n-placeholder
-              maxlength="500"
-              [(ngModel)]="fillSourceUrl"
+              [formField]="fillForm.sourceUrl"
             />
             <button
               type="button"
               class="btn btn-sm btn-outline-primary"
               i18n
-              [disabled]="licenseNeedsSource(fillLicense(), fillSourceUrl())"
+              [disabled]="
+                fillForm().submitting() || fillForm().invalid() || licenseNeedsSource(fillLicense(), fillSourceUrl())
+              "
               (click)="saveFillLicense(picture)"
             >
               Save
@@ -233,10 +234,15 @@
               class="form-control form-control-sm w-auto"
               placeholder="Source URL"
               i18n-placeholder
-              maxlength="500"
-              [(ngModel)]="fillSourceUrl"
+              [formField]="fillForm.sourceUrl"
             />
-            <button type="button" class="btn btn-sm btn-outline-primary" i18n (click)="saveFillSourceUrl(picture)">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              i18n
+              [disabled]="fillForm().submitting() || fillForm().invalid()"
+              (click)="saveFillSourceUrl(picture)"
+            >
               Save
             </button>
           </div>

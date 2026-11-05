@@ -3,21 +3,17 @@
   placeholder="Latitude"
   i18n-placeholder
   class="form-control"
-  [disabled]="disabled"
-  [(ngModel)]="lat"
+  [formField]="coordinatesForm.lat"
   (input)="coordsChanged()"
 />
-<!--[class.is-invalid]="lat.invalid && (lat.dirty || lat.touched) || invalidParams && invalidParams.lat"-->
 <input
   type="text"
   placeholder="Longitude"
   i18n-placeholder
   class="form-control"
-  [disabled]="disabled"
-  [(ngModel)]="lng"
+  [formField]="coordinatesForm.lng"
   (input)="coordsChanged()"
 />
-<!--[class.is-invalid]="lng.invalid && (lng.dirty || lng.touched) || invalidParams && invalidParams.lng" -->
 <div
   style="width: 100%; height: 300px"
   class="mb-4"

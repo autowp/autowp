@@ -1,11 +1,11 @@
-import type {OnInit, WritableSignal} from '@angular/core';
+import type {OnInit} from '@angular/core';
+import type {FieldTree} from '@angular/forms/signals';
 import type {ContentReport, Pages, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {form, FormField} from '@angular/forms/signals';
+import {ChangeDetectionStrategy, Component, inject, Injector, signal} from '@angular/core';
+import {disabled, form, FormField, submit} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CommentMessageFields,
@@ -28,6 +28,7 @@ import {
   combineLatest,
   distinctUntilChanged,
   EMPTY,
+  firstValueFrom,
   map,
   of,
   shareReplay,
@@ -41,9 +42,8 @@ import {UserLink} from '../../user/user/user-link';
 interface ContentReportInList {
   readonly report: ContentReport;
   readonly reporter$: Observable<null | User>;
-  readonly resolution: FormControl<string>;
+  readonly resolution: FieldTree<string>;
   readonly resolvedBy$: Observable<null | User>;
-  readonly submitting: WritableSignal<boolean>;
 }
 
 interface CommentLink {
@@ -53,11 +53,12 @@ interface CommentLink {
 
 @Component({
   selector: 'app-moder-content-reports',
-  imports: [FormField, RouterLink, FormsModule, ReactiveFormsModule, UserLink, Paginator, AsyncPipe, DatePipe],
+  imports: [FormField, RouterLink, UserLink, Paginator, AsyncPipe, DatePipe],
   templateUrl: './moder-content-reports.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerContentReports implements OnInit {
+  readonly #injector = inject(Injector);
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
@@ -102,6 +103,8 @@ export class ModerContentReports implements OnInit {
 
   readonly #reload$ = new BehaviorSubject<void>(undefined);
 
+  readonly #rowForms = new Map<string, FieldTree<string>>();
+
   protected readonly data$: Observable<{paginator?: Pages; reports: ContentReportInList[]}> = combineLatest([
     this.#status$,
     this.#entityType$,
@@ -118,16 +121,31 @@ export class ModerContentReports implements OnInit {
 
       return EMPTY;
     }),
-    map((response) => ({
-      paginator: response.paginator,
-      reports: (response.items ?? []).map((report): ContentReportInList => ({
-        report,
-        reporter$: this.#userService.getUser$(report.reporterId, {authenticated: true}),
-        resolution: new FormControl<string>('', {nonNullable: true}),
-        resolvedBy$: this.#userService.getUser$(report.resolvedBy, {authenticated: true}),
-        submitting: signal(false),
-      })),
-    })),
+    map((response) => {
+      const previousForms = new Map(this.#rowForms);
+      this.#rowForms.clear();
+      return {
+        paginator: response.paginator,
+        reports: (response.items ?? []).map((report): ContentReportInList => {
+          const resolution =
+            previousForms.get(report.id) ??
+            form(
+              signal(''),
+              (path) => {
+                disabled(path, {when: ({state}) => state.submitting()});
+              },
+              {injector: this.#injector},
+            );
+          this.#rowForms.set(report.id, resolution);
+          return {
+            report,
+            reporter$: this.#userService.getUser$(report.reporterId, {authenticated: true}),
+            resolution,
+            resolvedBy$: this.#userService.getUser$(report.resolvedBy, {authenticated: true}),
+          };
+        }),
+      };
+    }),
   );
 
   readonly #commentLinkCache = new Map<string, Observable<CommentLink | null>>();
@@ -183,24 +201,21 @@ export class ModerContentReports implements OnInit {
   }
 
   protected resolve(row: ContentReportInList, accepted: boolean): void {
-    if (row.submitting()) {
-      return;
-    }
-
-    row.submitting.set(true);
-
-    this.#autowpClient
-      .resolveContentReport(
-        new ResolveContentReportRequest({accepted, id: row.report.id, resolution: row.resolution.value.trim()}),
-      )
-      .subscribe({
-        error: (error: unknown) => {
-          row.submitting.set(false);
-          this.#toasts.handleError(error);
-        },
-        next: () => {
-          this.#reload$.next();
-        },
-      });
+    void submit(row.resolution, async () => {
+      try {
+        await firstValueFrom(
+          this.#autowpClient.resolveContentReport(
+            new ResolveContentReportRequest({
+              accepted,
+              id: row.report.id,
+              resolution: row.resolution().value().trim(),
+            }),
+          ),
+        );
+        this.#reload$.next();
+      } catch (error: unknown) {
+        this.#toasts.handleError(error);
+      }
+    });
   }
 }

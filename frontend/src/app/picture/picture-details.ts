@@ -12,11 +12,12 @@ import {
   inject,
   Injector,
   input,
+  linkedSignal,
   output,
   signal,
 } from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {FormsModule} from '@angular/forms';
+import {disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {Router, RouterLink} from '@angular/router';
 import {
   CommentsSubscribeRequest,
@@ -60,12 +61,13 @@ import {UserService} from '@services/user';
 import {browserWindow} from '@utils/browser-window';
 import {LicenseBadge, pictureLicenseOptions} from '@utils/license-badge/license-badge';
 import {LicenseHelpModal} from '@utils/license-help-modal/license-help-modal';
+import {numericEnumValue} from '@utils/numeric-enum-value';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {timestampToDate} from '@utils/timestamp';
 import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
-import {catchError, EMPTY, finalize, map, of} from 'rxjs';
+import {catchError, EMPTY, finalize, firstValueFrom, map, of} from 'rxjs';
 
 import {ModerPicturesPerspectivePicker} from '../moder/pictures/perspective-picker/moder-pictures-perspective-picker';
 import {PictureModerVote} from '../picture-moder-vote/picture-moder-vote/picture-moder-vote';
@@ -97,7 +99,7 @@ import {PicturePaginator} from './picture-paginator';
     ReportButton,
     RemarkModule,
     LicenseBadge,
-    FormsModule,
+    FormField,
   ],
   templateUrl: './picture-details.html',
   styleUrl: './picture-details.scss',
@@ -203,8 +205,18 @@ export class PictureDetails implements OnInit {
     label: getPictureLicenseTranslation(value.toString()),
     value,
   }));
-  protected readonly fillLicense = signal<PictureLicense>(PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED);
-  protected readonly fillSourceUrl = signal('');
+  readonly #fillModel = linkedSignal({
+    source: () => this.picture().id,
+    computation: () => ({license: String(PictureLicense.PICTURE_LICENSE_ALL_RIGHTS_RESERVED), sourceUrl: ''}),
+  });
+  protected readonly fillForm = form(this.#fillModel, (path) => {
+    maxLength(path.sourceUrl, 500);
+    disabled(path, {when: ({state}) => state.submitting()});
+  });
+  protected readonly fillLicense = computed(() =>
+    numericEnumValue(PictureLicense, Number(this.#fillModel().license), PictureLicense.PICTURE_LICENSE_UNKNOWN),
+  );
+  protected readonly fillSourceUrl = computed(() => this.#fillModel().sourceUrl);
 
   protected factoriesResource!: ResourceRef<Item[] | undefined>;
   protected categoriesResource!: ResourceRef<Item[] | undefined>;
@@ -607,50 +619,44 @@ export class PictureDetails implements OnInit {
   protected saveFillLicense(picture: Picture): void {
     const license = this.fillLicense();
     const sourceUrl = this.fillSourceUrl();
-
-    if (this.licenseNeedsSource(license, sourceUrl)) {
-      return;
-    }
-
-    this.#picturesClient
-      .updatePicture(
-        new UpdatePictureRequest({
-          picture: new Picture({id: picture.id, license, sourceUrl}),
-          updateMask: new FieldMask({paths: ['license', 'source_url']}),
-        }),
-      )
-      .pipe(
-        catchError((error: unknown) => {
-          this.#toastService.handleError(error);
-          return EMPTY;
-        }),
-      )
-      .subscribe(() => {
+    if (this.licenseNeedsSource(license, sourceUrl)) return;
+    void submit(this.fillForm, async () => {
+      try {
+        await firstValueFrom(
+          this.#picturesClient.updatePicture(
+            new UpdatePictureRequest({
+              picture: new Picture({id: picture.id, license, sourceUrl}),
+              updateMask: new FieldMask({paths: ['license', 'source_url']}),
+            }),
+          ),
+        );
         picture.license = license;
         picture.sourceUrl = sourceUrl;
         this.#cdr.markForCheck();
-      });
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
+      }
+    });
   }
 
   protected saveFillSourceUrl(picture: Picture): void {
     const sourceUrl = this.fillSourceUrl();
 
-    this.#picturesClient
-      .updatePicture(
-        new UpdatePictureRequest({
-          picture: new Picture({id: picture.id, sourceUrl}),
-          updateMask: new FieldMask({paths: ['source_url']}),
-        }),
-      )
-      .pipe(
-        catchError((error: unknown) => {
-          this.#toastService.handleError(error);
-          return EMPTY;
-        }),
-      )
-      .subscribe(() => {
+    void submit(this.fillForm, async () => {
+      try {
+        await firstValueFrom(
+          this.#picturesClient.updatePicture(
+            new UpdatePictureRequest({
+              picture: new Picture({id: picture.id, sourceUrl}),
+              updateMask: new FieldMask({paths: ['source_url']}),
+            }),
+          ),
+        );
         picture.sourceUrl = sourceUrl;
         this.#cdr.markForCheck();
-      });
+      } catch (error: unknown) {
+        this.#toastService.handleError(error);
+      }
+    });
   }
 }

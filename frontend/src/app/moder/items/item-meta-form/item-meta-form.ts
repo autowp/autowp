@@ -1,5 +1,5 @@
-import type {AbstractControl} from '@angular/forms';
-import type {Picture, PictureItem, Spec} from '@grpc/spec.pb';
+import type {FieldTree} from '@angular/forms/signals';
+import type {PictureItem, Spec} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
@@ -11,10 +11,10 @@ import {
   computed,
   inject,
   input,
+  linkedSignal,
   output,
-  untracked,
 } from '@angular/core';
-import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {disabled, form, FormField, hidden, maxLength, required, validate} from '@angular/forms/signals';
 import {LatLng} from '@grpc/google/type/latlng.pb';
 import {Item, ItemType, PictureFields, PictureListOptions, PicturesRequest, VehicleType} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
@@ -53,7 +53,7 @@ export interface ItemMetaFormResult {
   full_name: string;
   is_concept: isConceptValue;
   is_group: boolean;
-  items: number[];
+  items: string[];
   model_years: null | {
     begin_year: null | number;
     begin_year_fraction: string;
@@ -78,52 +78,30 @@ export interface ParentIsConcept {
   isConcept: boolean;
 }
 
-interface Form {
-  begin?: FormGroup<{
-    month: FormControl<null | number>;
-    year: FormControl<null | number>;
-  }>;
-  body?: FormControl<null | string>;
-  catname?: FormControl<null | string>;
-  end?: FormGroup<{
-    month: FormControl<null | number>;
-    today: FormControl<boolean | null>;
-    year: FormControl<null | number>;
-  }>;
-  full_name?: FormControl<null | string>;
-  is_concept?: FormControl<isConceptValue>;
-  is_group?: FormControl<boolean | null>;
-  items?: FormArray<FormControl<string>>;
-  model_years?: FormGroup<{
-    begin_year: FormControl<null | number>;
-    begin_year_fraction: FormControl<string>;
-    end_year: FormControl<null | number>;
-    end_year_fraction: FormControl<string>;
-  }>;
-  name: FormControl<null | string>;
-  pictures?: FormArray<FormControl<string>>;
-  point?: FormControl<null | {
-    lat: number;
-    lng: number;
-  }>;
-  produced?: FormGroup<{
-    count: FormControl<null | number>;
-    exactly: FormControl<boolean>;
-  }>;
-  spec_id?: FormControl<specValue>;
-  vehicle_type_id?: FormControl<string[]>;
+interface ItemMetaModel {
+  begin: {month: string; year: string};
+  body: string;
+  catname: string;
+  end: {month: string; today: string; year: string};
+  full_name: string;
+  is_concept: string;
+  is_group: boolean;
+  items: {id: string; selected: boolean}[];
+  model_years: {begin_year: string; begin_year_fraction: string; end_year: string; end_year_fraction: string};
+  name: string;
+  pictures: {id: string; selected: boolean}[];
+  point: {lat: number; lng: number};
+  produced: {count: string; exactly: string};
+  spec_id: string;
+  vehicle_type_id: string[];
 }
+
+const optionalNumber = (value: string): null | number => (value === '' ? null : Number(value));
 
 interface ItemMetaFormAPISpec {
   deep?: number;
-  id: 'inherited' | number;
+  id: 'inherited' | null | number;
   short_name: string;
-}
-
-interface PicturesListItem {
-  picture$: Observable<Picture>;
-  pictureItem: PictureItem;
-  selected: boolean;
 }
 
 export function itemMetaFormResultsToAPIItem(result: ItemMetaFormResult): Item {
@@ -146,7 +124,10 @@ export function itemMetaFormResultsToAPIItem(result: ItemMetaFormResult): Item {
       ? new LatLng({latitude: result.point.lat ?? undefined, longitude: result.point.lng ?? undefined})
       : undefined,
     name: result.name,
-    produced: result.produced?.count ? new Int32Value({value: result.produced.count}) : undefined,
+    produced:
+      result.produced?.count !== null && result.produced?.count !== undefined
+        ? new Int32Value({value: result.produced.count})
+        : undefined,
     producedExactly: result.produced?.exactly ?? false,
     specId: result.spec_id === 'inherited' ? undefined : (result.spec_id ?? undefined),
     specInherit: result.spec_id === 'inherited',
@@ -178,7 +159,7 @@ function specsToPlain(options: Spec[], deep: number): ItemMetaFormAPISpec[] {
 
 @Component({
   selector: 'app-item-meta-form',
-  imports: [FormsModule, ReactiveFormsModule, MapPoint, AsyncPipe, InvalidParamsPipe],
+  imports: [FormField, MapPoint, AsyncPipe, InvalidParamsPipe],
   templateUrl: './item-meta-form.html',
   styleUrl: './item-meta-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -224,7 +205,6 @@ export class ItemMetaForm {
             }),
           ),
           pictureItem: p,
-          selected: false,
         }))
       : null;
   });
@@ -283,7 +263,6 @@ export class ItemMetaForm {
   readonly #nameMaxlength = 150; // schema.ItemNameMaxLength (goautowp)
   readonly #fullnameMaxlength = 255; // BrandModel::MAX_FULLNAME
   readonly #bodyMaxlength = 20;
-  readonly #modelYearMax: number = new Date().getFullYear() + 10;
   readonly #yearMax: number = new Date().getFullYear() + 10;
 
   protected readonly monthOptions: {
@@ -330,106 +309,82 @@ export class ItemMetaForm {
     ),
   );
 
-  // All form configuration comes from inputs; rebuild once when those inputs change.
-
-  protected readonly form = computed<FormGroup<Form>>(() => {
+  readonly #vehicle = computed(() =>
+    [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(this.item().itemTypeId),
+  );
+  readonly #model = linkedSignal<ItemMetaModel>(() => {
     const item = this.item();
-    const vehicleTypeIDs = this.vehicleTypeIDs();
-    const disableIsGroup = this.disableIsGroup();
-    const items = this.itemsData();
-    const pictures = this.picturesData();
-    // Form controls use signals internally. Do not make user edits dependencies of this computed.
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-    return untracked(() => {
-      const elements: Form = {
-        name: new FormControl(item.name, {
-          nonNullable: true,
-          validators: [Validators.required, Validators.maxLength(this.#nameMaxlength)],
-        }),
-      };
-      if (item.itemTypeId === ItemType.ITEM_TYPE_BRAND) {
-        elements.full_name = new FormControl(item.fullName, {
-          nonNullable: true,
-          validators: Validators.maxLength(this.#fullnameMaxlength),
-        });
-      }
-      if (item.itemTypeId === ItemType.ITEM_TYPE_BRAND || item.itemTypeId === ItemType.ITEM_TYPE_CATEGORY) {
-        elements.catname = new FormControl(item.catname, {nonNullable: true});
-      }
-      if (item.itemTypeId === ItemType.ITEM_TYPE_VEHICLE || item.itemTypeId === ItemType.ITEM_TYPE_ENGINE) {
-        elements.body = new FormControl(item.body, {
-          nonNullable: true,
-          validators: Validators.maxLength(this.#bodyMaxlength),
-        });
-
-        let spec: specValue = specInherited;
-        if (!item.specInherit) {
-          spec = item.specId ? item.specId : null;
-        }
-        elements.spec_id = new FormControl<null | specValue>(spec);
-        elements.model_years = new FormGroup({
-          begin_year: new FormControl(item.beginModelYear > 0 ? item.beginModelYear : null, [
-            Validators.min(1700),
-            Validators.max(this.#modelYearMax),
-          ]),
-          begin_year_fraction: new FormControl(item.beginModelYearFraction, {nonNullable: true}),
-          end_year: new FormControl(item.endModelYear > 0 ? item.endModelYear : null, [
-            Validators.min(1700),
-            Validators.max(this.#modelYearMax),
-          ]),
-          end_year_fraction: new FormControl(item.endModelYearFraction, {nonNullable: true}),
-        });
-        elements.produced = new FormGroup({
-          count: new FormControl(item.produced ? item.produced.value : null),
-          exactly: new FormControl(item.producedExactly, {nonNullable: true}),
-        });
-        elements.is_concept = new FormControl<isConceptValue>(
-          item.isConceptInherit ? isConceptInherited : item.isConcept,
-          {nonNullable: true},
-        );
-        elements.is_group = new FormControl(
-          {
-            disabled: item.childsCount > 0 || disableIsGroup,
-            value: item.isGroup,
-          },
-          {nonNullable: true},
-        );
-      }
-      if ([ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(item.itemTypeId)) {
-        elements.vehicle_type_id = new FormControl([...vehicleTypeIDs], {nonNullable: true});
-      }
-      if (item.itemTypeId !== ItemType.ITEM_TYPE_COPYRIGHT) {
-        elements.begin = new FormGroup({
-          month: new FormControl(item.beginMonth > 0 ? item.beginMonth : null),
-          year: new FormControl(item.beginYear > 0 ? item.beginYear : null, [
-            Validators.min(1700),
-            Validators.max(this.#yearMax),
-          ]),
-        });
-        elements.end = new FormGroup({
-          month: new FormControl(item.endMonth > 0 ? item.endMonth : null),
-          today: new FormControl(item.today ? item.today.value : null),
-          year: new FormControl(item.endYear > 0 ? item.endYear : null, [
-            Validators.min(1700),
-            Validators.max(this.#yearMax),
-          ]),
-        });
-      }
-      if ([ItemType.ITEM_TYPE_FACTORY, ItemType.ITEM_TYPE_MUSEUM].includes(item.itemTypeId)) {
-        const lat = item.location?.latitude ?? 0;
-        const lng = item.location?.longitude ?? 0;
-        elements.point = new FormControl({disabled: false, value: {lat, lng}}, {nonNullable: true});
-      }
-      if (items) {
-        elements.items = new FormArray<FormControl<string>>([], {validators: Validators.required});
-      }
-      if (pictures) {
-        elements.pictures = new FormArray<FormControl<string>>([], {
-          validators: Validators.required,
-        });
-      }
-      return new FormGroup<Form>(elements);
+    const spec = item.specId ? String(item.specId) : '';
+    return {
+      name: item.name,
+      full_name: item.fullName,
+      catname: item.catname,
+      body: item.body,
+      spec_id: item.specInherit ? specInherited : spec,
+      model_years: {
+        begin_year: item.beginModelYear ? String(item.beginModelYear) : '',
+        begin_year_fraction: item.beginModelYearFraction,
+        end_year: item.endModelYear ? String(item.endModelYear) : '',
+        end_year_fraction: item.endModelYearFraction,
+      },
+      produced: {count: item.produced ? String(item.produced.value) : '', exactly: String(item.producedExactly)},
+      is_concept: item.isConceptInherit ? isConceptInherited : String(item.isConcept),
+      is_group: item.isGroup,
+      vehicle_type_id: [...this.vehicleTypeIDs()],
+      begin: {
+        month: item.beginMonth ? String(item.beginMonth) : '',
+        year: item.beginYear ? String(item.beginYear) : '',
+      },
+      end: {
+        month: item.endMonth ? String(item.endMonth) : '',
+        year: item.endYear ? String(item.endYear) : '',
+        today: item.today ? String(item.today.value) : '',
+      },
+      point: {lat: item.location?.latitude ?? 0, lng: item.location?.longitude ?? 0},
+      items: this.items().map((child) => ({id: child.id, selected: false})),
+      pictures: this.pictures().map((picture) => ({id: picture.pictureId, selected: false})),
+    };
+  });
+  protected readonly editForm = form(this.#model, (path) => {
+    disabled(path, {when: () => this.sending()});
+    required(path.name);
+    maxLength(path.name, this.#nameMaxlength);
+    maxLength(path.full_name, this.#fullnameMaxlength);
+    maxLength(path.body, this.#bodyMaxlength);
+    hidden(path.full_name, {when: () => this.item().itemTypeId !== ItemType.ITEM_TYPE_BRAND});
+    hidden(path.catname, {
+      when: () => ![ItemType.ITEM_TYPE_BRAND, ItemType.ITEM_TYPE_CATEGORY].includes(this.item().itemTypeId),
     });
+    hidden(path.body, {when: () => !this.#vehicle()});
+    hidden(path.spec_id, {when: () => !this.#vehicle()});
+    hidden(path.model_years, {when: () => !this.#vehicle()});
+    hidden(path.produced, {when: () => !this.#vehicle()});
+    hidden(path.is_concept, {when: () => !this.#vehicle()});
+    hidden(path.is_group, {when: () => !this.#vehicle()});
+    hidden(path.vehicle_type_id, {
+      when: () => ![ItemType.ITEM_TYPE_TWINS, ItemType.ITEM_TYPE_VEHICLE].includes(this.item().itemTypeId),
+    });
+    hidden(path.begin, {when: () => this.item().itemTypeId === ItemType.ITEM_TYPE_COPYRIGHT});
+    hidden(path.end, {when: () => this.item().itemTypeId === ItemType.ITEM_TYPE_COPYRIGHT});
+    hidden(path.point, {
+      when: () => ![ItemType.ITEM_TYPE_FACTORY, ItemType.ITEM_TYPE_MUSEUM].includes(this.item().itemTypeId),
+    });
+    disabled(path.is_group, {when: () => this.item().childsCount > 0 || this.disableIsGroup()});
+    for (const year of [path.begin.year, path.end.year, path.model_years.begin_year, path.model_years.end_year]) {
+      maxLength(year, 4);
+      validate(year, ({value}) =>
+        value() !== '' && (!/^\d{4}$/.test(value()) || Number(value()) < 1700 || Number(value()) > this.#yearMax)
+          ? {kind: 'year'}
+          : undefined,
+      );
+    }
+    validate(path.produced.count, ({value}) =>
+      value() !== '' && (!/^\d+$/.test(value()) || Number(value()) > 100000000) ? {kind: 'count'} : undefined,
+    );
+    hidden(path.items, {when: () => this.items().length === 0});
+    hidden(path.pictures, {when: () => this.pictures().length === 0});
+    validate(path.items, ({value}) => (value().some((row) => row.selected) ? undefined : {kind: 'required'}));
+    validate(path.pictures, ({value}) => (value().some((row) => row.selected) ? undefined : {kind: 'required'}));
   });
 
   constructor() {
@@ -447,25 +402,58 @@ export class ItemMetaForm {
     }
   }
 
-  protected doSubmit(form: FormGroup<Form>) {
-    // FormGroup<Form>.value is inferred as a structurally-loose Partial<...> (every optional
-    // control's value type is itself partial), which doesn't restate cleanly as
-    // ItemMetaFormResult even though the two describe the same actual form shape built above.
-    this.submitted.emit(form.value as unknown as ItemMetaFormResult);
-    return false;
+  protected doSubmit(field: FieldTree<ItemMetaModel>): void {
+    field().markAsTouched();
+    if (this.sending() || field().invalid()) return;
+    const value = this.#model();
+    this.submitted.emit({
+      name: value.name,
+      full_name: value.full_name,
+      catname: value.catname,
+      body: value.body,
+      spec_id: value.spec_id === specInherited ? specInherited : optionalNumber(value.spec_id),
+      model_years: field.model_years().hidden()
+        ? null
+        : {
+            ...value.model_years,
+            begin_year: optionalNumber(value.model_years.begin_year),
+            end_year: optionalNumber(value.model_years.end_year),
+          },
+      produced: field.produced().hidden()
+        ? null
+        : {count: optionalNumber(value.produced.count), exactly: value.produced.exactly === 'true'},
+      is_concept: value.is_concept === isConceptInherited ? isConceptInherited : value.is_concept === 'true',
+      is_group: value.is_group,
+      vehicle_type_id: [...value.vehicle_type_id],
+      begin: field.begin().hidden()
+        ? null
+        : {year: optionalNumber(value.begin.year), month: optionalNumber(value.begin.month)},
+      end: field.end().hidden()
+        ? null
+        : {
+            year: optionalNumber(value.end.year),
+            month: optionalNumber(value.end.month),
+            today: value.end.today === '' ? null : value.end.today === 'true',
+          },
+      point: field.point().hidden() ? null : {...value.point},
+      items: value.items.filter((row) => row.selected).map((row) => row.id),
+      pictures: value.pictures.filter((row) => row.selected).map((row) => row.id),
+    });
   }
 
-  protected showVehicleTypesModal(vehicleTypeIDs: AbstractControl) {
+  protected showVehicleTypesModal(vehicleTypeIDs: FieldTree<string[]>) {
+    if (this.sending()) return;
     const modalRef = this.#modalService.open(VehicleTypesModal, {
       centered: true,
       size: 'lg',
     });
 
     const componentRef = getModalComponentRef<VehicleTypesModal>(modalRef);
-    componentRef.setInput('ids', vehicleTypeIDs.value);
+    componentRef.setInput('ids', vehicleTypeIDs().value());
 
     componentRef.instance.changed.subscribe((value: string[]) => {
-      vehicleTypeIDs.setValue(value);
+      if (this.sending()) return;
+      vehicleTypeIDs().value.set([...value]);
       this.#cdr.markForCheck();
     });
   }
@@ -479,37 +467,8 @@ export class ItemMetaForm {
     );
   }
 
-  protected onCheckboxChange(e: Event, ctrl: FormArray<FormControl<string>>) {
-    const target = e.target as HTMLInputElement;
-    if (target.checked) {
-      ctrl.push(new FormControl<string>(target.value, {nonNullable: true}));
-    } else {
-      let i = 0;
-      ctrl.controls.forEach((item) => {
-        if (item.value == target.value) {
-          ctrl.removeAt(i);
-          return;
-        }
-        i++;
-      });
-    }
-    this.#cdr.markForCheck();
-  }
-
-  protected onPictureClick(e: PicturesListItem, ctrl: FormArray<FormControl<string>>) {
-    e.selected = !e.selected;
-    if (e.selected) {
-      ctrl.push(new FormControl<string>({disabled: false, value: e.pictureItem.pictureId}, {nonNullable: true}));
-    } else {
-      let i = 0;
-      ctrl.controls.forEach((item) => {
-        if (item.value == e.pictureItem.pictureId) {
-          ctrl.removeAt(i);
-          return;
-        }
-        i++;
-      });
-    }
-    this.#cdr.markForCheck();
+  protected onPictureClick(selected: FieldTree<boolean>): void {
+    if (this.sending()) return;
+    selected().value.update((value) => !value);
   }
 }

@@ -1,10 +1,12 @@
 import type {OnInit} from '@angular/core';
+import type {FieldTree} from '@angular/forms/signals';
 import type {Item, ItemParent, Pages} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {toObservable} from '@angular/core/rxjs-interop';
+import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   CreatePictureItemRequest,
@@ -36,7 +38,6 @@ import {
   map,
   of,
   shareReplay,
-  startWith,
   switchMap,
 } from 'rxjs';
 
@@ -69,7 +70,7 @@ interface SrcSelection {
 
 @Component({
   selector: 'app-moder-pictures-item-move',
-  imports: [RouterLink, Paginator, FormsModule, ReactiveFormsModule, ModerPictureMoveItem, AsyncPipe],
+  imports: [RouterLink, Paginator, FormField, ModerPictureMoveItem, AsyncPipe],
   templateUrl: './moder-pictures-item-move.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -165,9 +166,9 @@ export class ModerPicturesItemMove implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  protected readonly searchBrandControl = new FormControl('');
-  protected readonly searchPersonControl = new FormControl('');
-  protected readonly searchAuthorControl = new FormControl('');
+  protected readonly searchBrandControl = form(signal(''));
+  protected readonly searchPersonControl = form(signal(''));
+  protected readonly searchAuthorControl = form(signal(''));
 
   readonly #page$ = this.#route.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '', 10)),
@@ -325,10 +326,10 @@ export class ModerPicturesItemMove implements OnInit {
 
   protected readonly brands$: Observable<{items: Item[][]; paginator?: Pages}> = combineLatest([
     this.#page$,
-    this.searchBrandControl.valueChanges.pipe(startWith(''), distinctUntilChanged(), debounceTime(30)),
+    toObservable(this.searchBrandControl().value).pipe(distinctUntilChanged(), debounceTime(30)),
   ]).pipe(
     switchMap(([page, search]) => {
-      const trimmed = search?.trim() ?? '';
+      const trimmed = search.trim();
 
       return this.#itemsClient.list(
         new ItemsRequest({
@@ -395,15 +396,15 @@ export class ModerPicturesItemMove implements OnInit {
   }
 
   private authorsAndPersons$(
-    searchControl: FormControl<null | string>,
+    searchControl: FieldTree<string>,
     selectionType: PictureItemType,
   ): Observable<{items: HtmlAndSelectItemParams[]; paginator?: Pages}> {
     return combineLatest([
       this.#page$,
-      searchControl.valueChanges.pipe(startWith(''), distinctUntilChanged(), debounceTime(30)),
+      toObservable(searchControl().value).pipe(distinctUntilChanged(), debounceTime(30)),
     ]).pipe(
       switchMap(([page, search]) => {
-        const trimmed = search?.trim() ?? '';
+        const trimmed = search.trim();
 
         return this.getItems$(
           new ItemsRequest({
