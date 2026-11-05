@@ -3,10 +3,10 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, ErrorHandler, inject, input} from '@angular/core';
-import {toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
-import {catchError, of, switchMap} from 'rxjs';
+import {tap} from 'rxjs';
 
 import {UserLink} from '../../user/user/user-link';
 
@@ -20,18 +20,18 @@ import {UserLink} from '../../user/user/user-link';
 export class ItemOfDayCard {
   readonly #errorHandler = inject(ErrorHandler);
   readonly item$ = input.required<Observable<Item>>();
-  protected readonly item = toSignal(
-    toObservable(this.item$).pipe(
-      switchMap((item$) =>
-        item$.pipe(
-          catchError((error: unknown) => {
+  protected readonly itemResource = rxResource({
+    params: () => this.item$(),
+    stream: ({params}) =>
+      params.pipe(
+        tap({
+          error: (error: unknown) => {
             this.#errorHandler.handleError(error);
-            return of(undefined);
-          }),
-        ),
+          },
+        }),
       ),
-    ),
-  );
+  });
+  protected readonly item = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
 
   protected readonly itemOfDayPictures = computed(() => {
     const item = this.item();

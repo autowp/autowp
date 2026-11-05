@@ -1,5 +1,5 @@
 @if (itemParent(); as itemParent) {
-  @if (item$ | async; as item) {
+  @if (itemResource.hasValue() ? itemResource.value() : undefined; as item) {
     <app-moder-items-item-select-parent-tree-item
       [item]="item"
       [typeID]="itemParent.type"

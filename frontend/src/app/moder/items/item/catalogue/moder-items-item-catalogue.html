@@ -1,6 +1,6 @@
 @if (item(); as item) {
   <div class="card card-body">
-    @if (canMove$ | async; as canMove) {
+    @if (canMove(); as canMove) {
       <div class="mb-3">
         @if (item && item.isGroup && canMove && item.childsCount > 0) {
           <a
@@ -13,7 +13,7 @@
         }
       </div>
     }
-    @if (canMove$ | async; as canMove) {
+    @if (canMove(); as canMove) {
       <table class="table">
         <caption i18n>
           Catalogue
@@ -65,7 +65,10 @@
                               <i class="bi bi-plus me-1" aria-hidden="true"></i>
                               <ng-container i18n>Brand …</ng-container>
                             </a>
-                            @for (brand of suggestions$ | async; track brand.id) {
+                            @for (
+                              brand of suggestionsResource.hasValue() ? suggestionsResource.value() : [];
+                              track brand.id
+                            ) {
                               <a class="dropdown-item" href="#" (click)="addParent(item, brand.id)">
                                 <i class="bi bi-plus me-1" aria-hidden="true"></i>
                                 <span i18n>Brand {{ brand.nameText }}</span>
@@ -80,7 +83,7 @@
               </td>
             </tr>
           }
-          @for (parentsItem of parents$ | async; track parentsItem) {
+          @for (parentsItem of parentsResource.hasValue() ? parentsResource.value() : []; track parentsItem) {
             <tr>
               <td>
                 <i class="bi bi-arrow-up me-1" aria-hidden="true"></i>
@@ -142,7 +145,7 @@
               <td></td>
             }
           </tr>
-          @for (childsItem of childs$ | async; track childsItem) {
+          @for (childsItem of childsResource.hasValue() ? childsResource.value() : []; track childsItem) {
             <tr>
               <td>
                 <i class="bi bi-arrow-down me-1" aria-hidden="true"></i>

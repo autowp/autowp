@@ -1,1 +1,1 @@
-<div [innerHTML]="html$ | async"></div>
+<div [innerHTML]="htmlResource.hasValue() ? htmlResource.value() : undefined"></div>

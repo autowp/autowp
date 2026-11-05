@@ -1,5 +1,5 @@
 @if (item(); as item) {
-  @if (form$ | async; as editor) {
+  @if (formResource.hasValue() ? formResource.value() : undefined; as editor) {
     @if (editor.form().value().itemId === item.id) {
       @let form = editor.form;
       <form class="spec-editor-form" (submit)="saveSpecs(form); $event.preventDefault()">
@@ -110,7 +110,7 @@
                     }
                   </td>
                   <td class="actual">
-                    @if (values$ | async; as values) {
+                    @if (valuesResource.hasValue() ? valuesResource.value() : undefined; as values) {
                       @if (values.get(attr.id); as value) {
                         <div>
                           @if (value.value?.isEmpty) {
@@ -128,7 +128,7 @@
                     }
                   </td>
                   <td>
-                    @if (userValues$ | async; as userValues) {
+                    @if (userValuesResource.hasValue() ? userValuesResource.value() : undefined; as userValues) {
                       @for (value of userValues.get(attr.id); track value) {
                         <div>
                           @if (value.userValue.value?.isEmpty) {

@@ -1,18 +1,14 @@
-import type {Item} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
-
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {EMPTY, map, switchMap} from 'rxjs';
+import {map, of} from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-vehicles',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink],
   templateUrl: './moder-items-item-vehicles.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,21 +18,22 @@ export class ModerItemsItemVehicles {
 
   readonly itemId = input.required<string>();
 
-  protected readonly engineVehicles$: Observable<Item[]> = toObservable(this.itemId).pipe(
-    switchMap((itemId) =>
-      itemId
-        ? this.#itemsClient.list(
-            new ItemsRequest({
-              fields: new ItemFields({nameHtml: true}),
-              language: this.#languageService.language,
-              limit: 100,
-              options: new ItemListOptions({
-                engineId: itemId,
+  protected readonly engineVehiclesResource = rxResource({
+    params: () => (this.itemId() && this.itemId() !== '0' ? this.itemId() : null),
+    stream: ({params: itemId}) =>
+      itemId === null
+        ? of(undefined)
+        : this.#itemsClient
+            .list(
+              new ItemsRequest({
+                fields: new ItemFields({nameHtml: true}),
+                language: this.#languageService.language,
+                limit: 100,
+                options: new ItemListOptions({
+                  engineId: itemId,
+                }),
               }),
-            }),
-          )
-        : EMPTY,
-    ),
-    map((response) => response.items ?? []),
-  );
+            )
+            .pipe(map((response) => response.items ?? [])),
+  });
 }

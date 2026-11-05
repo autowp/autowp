@@ -2,9 +2,8 @@ import type {Item} from '@grpc/spec.pb';
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, input, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {form, FormField} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {
@@ -24,20 +23,11 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbTypeahead} from '@ng
 import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {
-  BehaviorSubject,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-} from 'rxjs';
+import {debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-catalogue',
-  imports: [RouterLink, NgbTypeahead, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, AsyncPipe, FormField],
+  imports: [RouterLink, NgbTypeahead, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, FormField],
   templateUrl: './moder-items-item-catalogue.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -52,15 +42,9 @@ export class ModerItemsItemCatalogue {
 
   protected readonly ItemType: typeof ItemType = ItemType;
 
-  readonly #reloadChilds$ = new BehaviorSubject<void>(void 0);
-  readonly #reloadParents$ = new BehaviorSubject<void>(void 0);
-  readonly #reloadSuggestions$ = new BehaviorSubject<void>(void 0);
-
   protected readonly itemQuery = form(signal(''));
 
-  protected readonly canMove$ = this.#auth
-    .hasRole$(Role.CARS_MODER)
-    .pipe(shareReplay({bufferSize: 1, refCount: false}));
+  protected readonly canMove = toSignal(this.#auth.hasRole$(Role.CARS_MODER), {initialValue: false});
 
   protected readonly organizeTypeId = computed(() => {
     const type = this.item().itemTypeId;
@@ -107,59 +91,70 @@ export class ModerItemsItemCatalogue {
       ),
     );
 
-  protected readonly childs$: Observable<ItemParent[]> = combineLatest([this.item$, this.#reloadChilds$]).pipe(
-    switchMap(([item]) =>
-      this.#itemsClient.getItemParents(
-        new ItemParentsRequest({
-          fields: new ItemParentFields({
-            duplicateChild: new ItemFields({nameHtml: true}),
-            item: new ItemFields({nameHtml: true, publicRoutes: true}),
-          }),
-          limit: 10,
-          options: new ItemParentListOptions({
-            parentId: item.id,
-          }),
-          order: ItemParentsRequest.Order.AUTO,
-        }),
-      ),
-    ),
-    map((response) => response.items ?? []),
-  );
+  protected readonly childsResource = rxResource({
+    params: () => (this.canMove() ? this.item() : null),
+    stream: ({params: item}) =>
+      item === null
+        ? of(undefined)
+        : this.#itemsClient
+            .getItemParents(
+              new ItemParentsRequest({
+                language: this.#languageService.language,
+                fields: new ItemParentFields({
+                  duplicateChild: new ItemFields({nameHtml: true}),
+                  item: new ItemFields({nameHtml: true, publicRoutes: true}),
+                }),
+                limit: 10,
+                options: new ItemParentListOptions({
+                  parentId: item.id,
+                }),
+                order: ItemParentsRequest.Order.AUTO,
+              }),
+            )
+            .pipe(map((response) => response.items ?? [])),
+  });
 
-  protected readonly parents$: Observable<ItemParent[]> = combineLatest([this.item$, this.#reloadParents$]).pipe(
-    switchMap(([item]) =>
-      this.#itemsClient.getItemParents(
-        new ItemParentsRequest({
-          fields: new ItemParentFields({
-            duplicateParent: new ItemFields({nameHtml: true}),
-            parent: new ItemFields({nameHtml: true, publicRoutes: true}),
-          }),
-          limit: 10,
-          options: new ItemParentListOptions({
-            itemId: item.id,
-          }),
-          order: ItemParentsRequest.Order.AUTO,
-        }),
-      ),
-    ),
-    map((response) => response.items ?? []),
-  );
+  protected readonly parentsResource = rxResource({
+    params: () => (this.canMove() ? this.item() : null),
+    stream: ({params: item}) =>
+      item === null
+        ? of(undefined)
+        : this.#itemsClient
+            .getItemParents(
+              new ItemParentsRequest({
+                language: this.#languageService.language,
+                fields: new ItemParentFields({
+                  duplicateParent: new ItemFields({nameHtml: true}),
+                  parent: new ItemFields({nameHtml: true, publicRoutes: true}),
+                }),
+                limit: 10,
+                options: new ItemParentListOptions({
+                  itemId: item.id,
+                }),
+                order: ItemParentsRequest.Order.AUTO,
+              }),
+            )
+            .pipe(map((response) => response.items ?? [])),
+  });
 
-  protected readonly suggestions$: Observable<Item[]> = combineLatest([this.item$, this.#reloadSuggestions$]).pipe(
-    switchMap(([item]) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({nameText: true}),
-          language: this.#languageService.language,
-          limit: 3,
-          options: new ItemListOptions({
-            suggestionsTo: item.id,
-          }),
-        }),
-      ),
-    ),
-    map((response) => response.items ?? []),
-  );
+  protected readonly suggestionsResource = rxResource({
+    params: () => (this.canMove() && this.canHaveParents() && this.canHaveParentBrand() ? this.item() : null),
+    stream: ({params: item}) =>
+      item === null
+        ? of(undefined)
+        : this.#itemsClient
+            .list(
+              new ItemsRequest({
+                fields: new ItemFields({nameText: true}),
+                language: this.#languageService.language,
+                limit: 3,
+                options: new ItemListOptions({
+                  suggestionsTo: item.id,
+                }),
+              }),
+            )
+            .pipe(map((response) => response.items ?? [])),
+  });
 
   protected readonly ItemParentType = ItemParentType;
 
@@ -190,8 +185,8 @@ export class ModerItemsItemCatalogue {
           this.#toastService.handleError(error);
         },
         next: () => {
-          this.#reloadParents$.next();
-          this.#reloadSuggestions$.next();
+          this.parentsResource.reload();
+          this.suggestionsResource.reload();
         },
       });
 
@@ -211,9 +206,9 @@ export class ModerItemsItemCatalogue {
           this.#toastService.handleError(error);
         },
         next: () => {
-          this.#reloadChilds$.next();
-          this.#reloadParents$.next();
-          this.#reloadSuggestions$.next();
+          this.childsResource.reload();
+          this.parentsResource.reload();
+          this.suggestionsResource.reload();
         },
       });
   }

@@ -12,7 +12,7 @@ import {
   signal,
   ViewContainerRef,
 } from '@angular/core';
-import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {LeafletModule} from '@bluehalo/ngx-leaflet';
 import {MapGetPicturePointsRequest, MapGetPointsRequest} from '@grpc/spec.pb';
@@ -20,7 +20,16 @@ import {MapClient} from '@grpc/spec.pbsc';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {divIcon, icon, latLng, marker, Popup, tileLayer} from 'leaflet';
-import {BehaviorSubject, catchError, combineLatest, debounceTime, EMPTY, map, switchMap} from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  map,
+  switchMap,
+} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {MapPopup} from './popup/map-popup';
@@ -133,14 +142,12 @@ export class MapPage implements OnDestroy, OnInit {
   protected markers: Marker[] = [];
   protected readonly isFullscreen = signal(false);
 
-  protected readonly mode = toSignal(
-    this.#route.queryParamMap.pipe(
-      map((params): MapMode => (params.get('mode') === 'pictures' ? 'pictures' : 'objects')),
-    ),
-    {requireSync: true},
+  readonly #mode$ = this.#route.queryParamMap.pipe(
+    map((params): MapMode => (params.get('mode') === 'pictures' ? 'pictures' : 'objects')),
+    distinctUntilChanged(),
   );
+  protected readonly mode = toSignal(this.#mode$, {requireSync: true});
 
-  readonly #mode$ = toObservable(this.mode);
   readonly #bounds$ = new BehaviorSubject<LatLngBounds | null>(null);
 
   protected readonly options: MapOptions = {

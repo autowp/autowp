@@ -6,6 +6,8 @@
       [class.has-popover]="!!popover()"
       [ngbPopover]="popover()"
       [popoverTitle]="popoverTitle()"
+      (shown)="popoverShown.emit()"
+      (hidden)="popoverHidden.emit()"
       >+{{ newCount() }}</span
     >})</span
 >

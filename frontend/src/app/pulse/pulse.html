@@ -22,7 +22,7 @@
   } @else if (dataResource.isLoading()) {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   } @else {
-    @if (gridData$ | async; as gridData) {
+    @if (gridResource.hasValue() ? gridResource.value() : undefined; as gridData) {
       <canvas
         baseChart
         width="400"

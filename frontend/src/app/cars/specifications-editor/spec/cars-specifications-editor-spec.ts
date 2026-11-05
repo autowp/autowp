@@ -4,7 +4,7 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {applyEach, disabled, form, FormField, submit, validate} from '@angular/forms/signals';
 import {
   AttrAttributeType,
@@ -29,18 +29,7 @@ import {
   getUnitAbbrTranslation,
   getUnitNameTranslation,
 } from '@utils/translations';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  EMPTY,
-  firstValueFrom,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-  throwError,
-} from 'rxjs';
+import {firstValueFrom, map, of, shareReplay, switchMap, tap, throwError} from 'rxjs';
 
 import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
 
@@ -116,147 +105,155 @@ export class CarsSpecificationsEditorSpec {
   readonly #languageService = inject(LanguageService);
 
   readonly item = input.required<Item>();
-  readonly item$ = toObservable(this.item);
-
-  readonly #change$ = new BehaviorSubject<void>(void 0);
+  readonly #user = toSignal(this.#auth.user$, {initialValue: null});
 
   protected readonly AttrAttributeTypeId = AttrAttributeType.Id;
 
-  readonly #currentUserValues$ = combineLatest([this.item$, this.#auth.user$, this.#change$]).pipe(
-    switchMap(([item, user]) => {
-      if (!user) return EMPTY;
+  protected readonly formResource = rxResource({
+    params: () => {
+      const user = this.#user();
+      return user ? {item: this.item(), user} : null;
+    },
+    stream: ({params}) => {
+      if (params === null) return of(undefined);
+      const {item, user} = params;
       if (!item.attrZoneId || item.attrZoneId === '0')
         return throwError(() => new Error('Failed to detect attr_zone_id'));
-      return this.#attrsService.getAttributes$(item.attrZoneId, null).pipe(
-        map((attributes) => this.toPlain(attributes, 0)),
-        switchMap((attributes) =>
-          this.#attrsClient
-            .getUserValues(
-              new AttrUserValuesRequest({
+      return this.#attrsService
+        .getAttributes$(item.attrZoneId, null)
+        .pipe(
+          map((attributes) => this.toPlain(attributes, 0)),
+          switchMap((attributes) =>
+            this.#attrsClient
+              .getUserValues(
+                new AttrUserValuesRequest({
+                  itemId: item.id,
+                  language: this.#languageService.language,
+                  userId: user.id,
+                  zoneId: item.attrZoneId,
+                }),
+              )
+              .pipe(map((response) => ({attributes, itemId: item.id, response}))),
+          ),
+          tap({
+            error: (error: unknown) => {
+              this.#toastService.handleError(error);
+            },
+          }),
+        )
+        .pipe(
+          map(({attributes, itemId, response}) => {
+            const currentUserValues = new Map((response.items ?? []).map((value) => [value.attributeId, value]));
+            return {attributes, itemId, currentUserValues};
+          }),
+          map(({attributes, currentUserValues, itemId}): SpecEditor => {
+            const rows: SpecFormValue['rows'] = attributes.map((attr) => {
+              const current = currentUserValues.get(attr.id)?.value;
+              const notApplicable = !!current?.isEmpty;
+              const valid = !!current?.valid && !notApplicable;
+              let value = '';
+              let list: string[] = [];
+              if (current && valid) {
+                switch (attr.typeId) {
+                  case AttrAttributeType.Id.BOOLEAN:
+                    value = String(current.boolValue);
+                    break;
+                  case AttrAttributeType.Id.FLOAT:
+                    value = String(current.floatValue);
+                    break;
+                  case AttrAttributeType.Id.INTEGER:
+                    value = String(current.intValue);
+                    break;
+                  case AttrAttributeType.Id.LIST:
+                  case AttrAttributeType.Id.TREE:
+                    list = [...current.listValue];
+                    value = list[0] ?? '';
+                    break;
+                  case AttrAttributeType.Id.STRING:
+                  case AttrAttributeType.Id.TEXT:
+                    value = current.stringValue;
+                    break;
+                }
+              }
+              return {id: attr.id, type: attr.typeId, multiple: attr.isMultiple, value, list, notApplicable};
+            });
+            const field = form(
+              signal({itemId, rows}),
+              (path) => {
+                disabled(path, {when: ({state}) => state.submitting()});
+                applyEach(path.rows, (row) => {
+                  disabled(row.value, {when: ({valueOf}) => valueOf(row.notApplicable)});
+                  disabled(row.list, {when: ({valueOf}) => valueOf(row.notApplicable)});
+                  validate(row.value, ({value, valueOf}) => {
+                    const type = valueOf(row.type);
+                    if (
+                      value().trim() === '' ||
+                      (type !== AttrAttributeType.Id.INTEGER && type !== AttrAttributeType.Id.FLOAT)
+                    )
+                      return undefined;
+                    const number = Number(value());
+                    return !Number.isFinite(number) ||
+                      (type === AttrAttributeType.Id.INTEGER &&
+                        (!Number.isInteger(number) || number < -2147483648 || number > 2147483647))
+                      ? {kind: 'number'}
+                      : undefined;
+                  });
+                });
+              },
+              {injector: this.#injector},
+            );
+            return {attributes, form: field};
+          }),
+        );
+    },
+  });
+
+  protected readonly valuesResource = rxResource({
+    params: () => (this.formResource.hasValue() && this.formResource.value().attributes.length ? this.item() : null),
+    stream: ({params: item}) =>
+      item === null
+        ? of(undefined)
+        : this.#attrsClient
+            .getValues(
+              new AttrValuesRequest({
                 itemId: item.id,
                 language: this.#languageService.language,
-                userId: user.id,
                 zoneId: item.attrZoneId,
               }),
             )
-            .pipe(map((response) => ({attributes, itemId: item.id, response}))),
-        ),
-        catchError((response: unknown) => {
-          this.#toastService.handleError(response);
-          return EMPTY;
-        }),
-      );
-    }),
-    map(({attributes, itemId, response}) => {
-      const currentUserValues = new Map((response.items ?? []).map((value) => [value.attributeId, value]));
-      return {attributes, itemId, currentUserValues};
-    }),
-  );
+            .pipe(
+              map((response) => {
+                const values = new Map<string, AttrValue>();
+                for (const value of response.items ?? []) {
+                  values.set(value.attributeId, value);
+                }
+                return values;
+              }),
+            ),
+  });
 
-  protected readonly form$: Observable<SpecEditor> = this.#currentUserValues$.pipe(
-    map(({attributes, currentUserValues, itemId}) => {
-      const rows: SpecFormValue['rows'] = attributes.map((attr) => {
-        const current = currentUserValues.get(attr.id)?.value;
-        const notApplicable = !!current?.isEmpty;
-        const valid = !!current?.valid && !notApplicable;
-        let value = '';
-        let list: string[] = [];
-        if (current && valid) {
-          switch (attr.typeId) {
-            case AttrAttributeType.Id.BOOLEAN:
-              value = String(current.boolValue);
-              break;
-            case AttrAttributeType.Id.FLOAT:
-              value = String(current.floatValue);
-              break;
-            case AttrAttributeType.Id.INTEGER:
-              value = String(current.intValue);
-              break;
-            case AttrAttributeType.Id.LIST:
-            case AttrAttributeType.Id.TREE:
-              list = [...current.listValue];
-              value = list[0] ?? '';
-              break;
-            case AttrAttributeType.Id.STRING:
-            case AttrAttributeType.Id.TEXT:
-              value = current.stringValue;
-              break;
-          }
-        }
-        return {id: attr.id, type: attr.typeId, multiple: attr.isMultiple, value, list, notApplicable};
-      });
-      const field = form(
-        signal({itemId, rows}),
-        (path) => {
-          disabled(path, {when: ({state}) => state.submitting()});
-          applyEach(path.rows, (row) => {
-            disabled(row.value, {when: ({valueOf}) => valueOf(row.notApplicable)});
-            disabled(row.list, {when: ({valueOf}) => valueOf(row.notApplicable)});
-            validate(row.value, ({value, valueOf}) => {
-              const type = valueOf(row.type);
-              if (
-                value().trim() === '' ||
-                (type !== AttrAttributeType.Id.INTEGER && type !== AttrAttributeType.Id.FLOAT)
-              )
-                return undefined;
-              const number = Number(value());
-              return !Number.isFinite(number) ||
-                (type === AttrAttributeType.Id.INTEGER &&
-                  (!Number.isInteger(number) || number < -2147483648 || number > 2147483647))
-                ? {kind: 'number'}
-                : undefined;
-            });
-          });
-        },
-        {injector: this.#injector},
-      );
-      return {attributes, form: field};
-    }),
-  );
-
-  protected readonly values$ = combineLatest([this.item$, this.#change$]).pipe(
-    // item is a required input(), always defined here.
-    switchMap(([item]) =>
-      this.#attrsClient.getValues(
-        new AttrValuesRequest({
-          itemId: item.id,
-          language: this.#languageService.language,
-          zoneId: item.attrZoneId,
-        }),
-      ),
-    ),
-    map((response) => {
-      const values = new Map<string, AttrValue>();
-      for (const value of response.items ?? []) {
-        values.set(value.attributeId, value);
-      }
-      return values;
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly userValues$: Observable<Map<string, AttrUserValueWithUser[]>> = combineLatest([
-    this.item$,
-    this.#change$,
-  ]).pipe(
-    // item is a required input(), always defined here.
-    switchMap(([item]) =>
-      this.#attrsClient.getUserValues(
-        new AttrUserValuesRequest({
-          fields: new AttrUserValuesFields({valueText: true}),
-          itemId: item.id,
-          language: this.#languageService.language,
-          zoneId: item.attrZoneId,
-        }),
-      ),
-    ),
-    map((response) => {
-      const uv = new Map<string, AttrUserValueWithUser[]>();
-      this.applyUserValues(uv, response.items ?? []);
-      return uv;
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly userValuesResource = rxResource({
+    params: () => (this.formResource.hasValue() && this.formResource.value().attributes.length ? this.item() : null),
+    stream: ({params: item}) =>
+      item === null
+        ? of(undefined)
+        : this.#attrsClient
+            .getUserValues(
+              new AttrUserValuesRequest({
+                fields: new AttrUserValuesFields({valueText: true}),
+                itemId: item.id,
+                language: this.#languageService.language,
+                zoneId: item.attrZoneId,
+              }),
+            )
+            .pipe(
+              map((response) => {
+                const uv = new Map<string, AttrUserValueWithUser[]>();
+                this.applyUserValues(uv, response.items ?? []);
+                return uv;
+              }),
+            ),
+  });
 
   readonly #listOptions$: Observable<{attributeId: string; id: string; name: string; parentId: string}[]> =
     this.#attrsService.getListOptions$(undefined).pipe(
@@ -320,7 +317,11 @@ export class CarsSpecificationsEditorSpec {
       });
       try {
         await firstValueFrom(this.#attrsClient.setUserValues(new AttrSetUserValuesRequest({items})));
-        if (this.item().id === model.itemId) this.#change$.next();
+        if (this.item().id === model.itemId) {
+          this.formResource.reload();
+          this.valuesResource.reload();
+          this.userValuesResource.reload();
+        }
       } catch (response: unknown) {
         this.#toastService.handleError(response);
       }

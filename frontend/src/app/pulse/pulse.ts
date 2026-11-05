@@ -3,7 +3,7 @@ import type {ChartConfiguration} from 'chart.js';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
-import {rxResource, toObservable} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {PulseRequest} from '@grpc/spec.pb';
 import {StatisticsClient} from '@grpc/spec.pbsc';
@@ -12,7 +12,7 @@ import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {errorMessage} from 'app/grpc';
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
-import {combineLatest, EMPTY, map, of, switchMap} from 'rxjs';
+import {map} from 'rxjs';
 
 import {UserLink} from '../user/user/user-link';
 
@@ -61,11 +61,7 @@ export class Pulse implements OnInit {
     stream: ({params: period}) => this.#statisticsClient.getPulse(new PulseRequest({period})),
   });
 
-  // resource.value() throws while its resource is in an error state - hasValue() is the reactive
-  // guard against that. toObservable() below runs its computed()'s effect regardless of what the
-  // template is currently showing (unlike a template-only `resource.value()` read, which the
-  // `@else` branch below only evaluates once dataResource.error() is already known falsy), so an
-  // unguarded read here would throw even while the error is already being shown inline.
+  // Guard reads of a resource that may be in an error state.
   protected readonly dataData = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
   protected readonly legend = computed(() =>
@@ -77,25 +73,18 @@ export class Pulse implements OnInit {
 
   protected readonly labels = computed(() => this.dataData()?.labels);
 
-  protected readonly gridData$ = toObservable(this.dataData).pipe(
-    switchMap((response) => {
-      if (!response) {
-        return EMPTY;
-      }
-      return combineLatest(
-        (response.grid ?? []).map((dataset) =>
-          combineLatest([this.#usersService.getUser$(dataset.userId), of(dataset)]),
-        ),
-      ).pipe(
-        map((rows) => ({
-          data: rows.map(([user, dataset]) => ({
+  protected readonly gridResource = rxResource({
+    params: () => this.dataData(),
+    stream: ({params}) =>
+      this.#usersService.getUserMap$((params.grid ?? []).map((dataset) => dataset.userId)).pipe(
+        map((users) => ({
+          data: (params.grid ?? []).map((dataset) => ({
             data: dataset.line,
-            label: user ? user.name : '',
+            label: users.get(dataset.userId)?.name ?? '',
           })),
         })),
-      );
-    }),
-  );
+      ),
+  });
 
   protected readonly errorMessage = errorMessage;
 

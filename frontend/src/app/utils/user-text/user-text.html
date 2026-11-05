@@ -1,4 +1,4 @@
-@if (textPrepared$ | async; as textPrepared) {
+@if (textResource.hasValue() ? textResource.value() : undefined; as textPrepared) {
   @for (line of textPrepared; track line) {
     <p>
       @for (element of line.elements; track element) {

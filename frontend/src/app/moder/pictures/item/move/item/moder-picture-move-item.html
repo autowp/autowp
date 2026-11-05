@@ -13,17 +13,17 @@
     ></button>
   } @else {
     <div>
-      <button class="btn btn-link d-block text-start" type="button" (click)="toggleItem(item)">
+      <button class="btn btn-link d-block text-start" type="button" (click)="toggleItem()">
         <i class="bi me-1" [class.bi-plus-circle]="!item.expanded" [class.bi-dash-circle]="item.expanded"></i>
         <span [innerHTML]="item.row.item?.nameHtml"></span>
       </button>
       @if (item.expanded) {
         <div class="mb-1 ms-4">
-          @if (childs$ | async; as childs) {
+          @if (childsResource.hasValue() ? childsResource.value() : undefined; as childs) {
             @for (child of childs; track child) {
               <app-moder-picture-move-item [item]="child" (selected)="selectItem($event)" />
             }
-          } @else {
+          } @else if (childsResource.isLoading()) {
             <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
           }
           <button

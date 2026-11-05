@@ -1,15 +1,14 @@
 import type {Picture, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {PictureFields, PictureListOptions, PicturesRequest} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
-import {catchError, combineLatest, distinctUntilChanged, map, of, switchMap} from 'rxjs';
+import {catchError, combineLatest, map, of, switchMap} from 'rxjs';
 import URLParse from 'url-parse';
 
 import {UserLink} from '../../user/user/user-link';
@@ -28,7 +27,7 @@ interface CommentTextLine {
 
 @Component({
   selector: 'app-user-text',
-  imports: [UserLink, RouterLink, AsyncPipe],
+  imports: [UserLink, RouterLink],
   templateUrl: './user-text.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -54,16 +53,10 @@ export class UserText {
     'wheelsage.org',
   ];
 
-  // No debounceTime() before prepareText$(): `text` is a comment/message body that changes only
-  // when the message itself does, so there was nothing to coalesce (distinctUntilChanged already
-  // drops repeats), and a macrotask delay ahead of the first HTTP call is exactly the shape that
-  // stops registering as pending for SSR's whenStable() once the app drops zone-based change
-  // detection - see the note on Comments.dataResource. Every comment body on the site is
-  // rendered through here, so it must be in the SSR output.
-  protected readonly textPrepared$ = toObservable(this.text).pipe(
-    distinctUntilChanged(),
-    switchMap((text) => this.prepareText$(text ? text : '')),
-  );
+  protected readonly textResource = rxResource({
+    params: () => this.text() || '',
+    stream: ({params}) => this.prepareText$(params),
+  });
 
   private prepareText$(text: string): Observable<CommentTextLine[]> {
     const lines = text.split(/\r?\n/);

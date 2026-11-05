@@ -1,9 +1,9 @@
 <h2 i18n>Engine from catalogue</h2>
 
 @if (item(); as item) {
-  @if (isAllowedEditEngine$ | async) {
+  @if (isAllowedEditEngine()) {
     <div>
-      @if (engine$ | async; as engine) {
+      @if (engineResource.hasValue() ? engineResource.value() : undefined; as engine) {
         <div>
           <p>
             <a [routerLink]="['/moder/items/item', engine.id]" [innerHTML]="engine.nameHtml"></a>
@@ -51,8 +51,8 @@
       }
     </div>
   }
-  @if (engine$ | async; as engine) {
-    @if (engine && (isAllowedEditEngine$ | async) === false) {
+  @if (engineResource.hasValue() ? engineResource.value() : undefined; as engine) {
+    @if (engine && isAllowedEditEngine() === false) {
       <div>
         <p [innerHTML]="engine.nameHtml"></p>
         @if (item.engineInherit) {

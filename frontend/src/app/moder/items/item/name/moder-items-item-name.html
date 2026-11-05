@@ -1,4 +1,4 @@
-@if (editForm$ | async; as editForm) {
+@if (editFormResource.hasValue() ? editFormResource.value() : undefined; as editForm) {
   <div class="card card-body">
     <ul #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="editForm().value().languages[0]?.language">
       @for (language of editForm.languages; track language().value().language) {

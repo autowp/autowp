@@ -7,7 +7,7 @@
     i18n-placeholder
     (input)="doSearch(catalogueSearch.value)"
   />
-  @if (catalogueBrands$ | async; as response) {
+  @if (catalogueBrandsResource.hasValue() ? catalogueBrandsResource.value() : undefined; as response) {
     <div class="row">
       @for (chunk of response.brands; track chunk) {
         <div class="col-2">
@@ -27,7 +27,7 @@
       <app-paginator [data]="response.paginator" />
     }
   }
-  @if (catalogueItems$ | async; as response) {
+  @if (catalogueItemsResource.hasValue() ? catalogueItemsResource.value() : undefined; as response) {
     <ul>
       @for (item of response.items; track item) {
         <li class="car-node">

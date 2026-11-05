@@ -1,17 +1,16 @@
 import type {FieldTree} from '@angular/forms/signals';
 import type {Item} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
 
-import {AsyncPipe, UpperCasePipe} from '@angular/common';
+import {UpperCasePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {applyEach, disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {GetItemLanguagesRequest, ItemLanguage} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
 import {ContentLanguageService} from '@services/content-language';
-import {combineLatest, firstValueFrom, map, of, switchMap} from 'rxjs';
+import {combineLatest, firstValueFrom, map, of} from 'rxjs';
 
 import {MarkdownEdit} from '../../../../markdown-edit/markdown-edit/markdown-edit';
 import {ToastsService} from '../../../../toasts/toasts.service';
@@ -32,7 +31,6 @@ interface LanguagesFormValue {
     MarkdownEdit,
     RouterLink,
     NgbNavOutlet,
-    AsyncPipe,
     UpperCasePipe,
   ],
   templateUrl: './moder-items-item-name.html',
@@ -45,7 +43,6 @@ export class ModerItemsItemName {
   readonly #itemsClient = inject(ItemsClient);
 
   readonly item = input.required<Item>();
-  protected readonly item$ = toObservable(this.item);
 
   protected readonly languages$ = this.#contentLanguage.languages$.pipe(
     map((contentLanguages) => {
@@ -69,47 +66,48 @@ export class ModerItemsItemName {
     }),
   );
 
-  protected readonly editForm$: Observable<FieldTree<LanguagesFormValue>> = this.item$.pipe(
-    switchMap((item) =>
+  protected readonly editFormResource = rxResource({
+    params: () => this.item(),
+    stream: ({params: item}) =>
       combineLatest([
         of(item.id),
         this.#itemsClient.getItemLanguages(new GetItemLanguagesRequest({itemId: item.id})),
         this.languages$,
-      ]),
-    ),
-    map(([itemId, {items}, languages]) => {
-      languages.forEach((language) => {
-        language.itemId = itemId;
-      });
-
-      for (const value of items ?? []) {
-        languages.set(value.language, value);
-      }
-
-      return form(
-        signal<LanguagesFormValue>({
-          languages: Array.from(languages.values()).map(
-            ({itemId, language, name, text, textId, fullText, fullTextId}) => ({
-              itemId,
-              language,
-              name,
-              text,
-              textId,
-              fullText,
-              fullTextId,
-            }),
-          ),
-        }),
-        (path) => {
-          applyEach(path.languages, (language) => {
-            maxLength(language.name, 255);
+      ]).pipe(
+        map(([itemId, {items}, languages]) => {
+          languages.forEach((language) => {
+            language.itemId = itemId;
           });
-          disabled(path, {when: ({state}) => state.submitting()});
-        },
-        {injector: this.#injector},
-      );
-    }),
-  );
+
+          for (const value of items ?? []) {
+            languages.set(value.language, value);
+          }
+
+          return form(
+            signal<LanguagesFormValue>({
+              languages: Array.from(languages.values()).map(
+                ({itemId, language, name, text, textId, fullText, fullTextId}) => ({
+                  itemId,
+                  language,
+                  name,
+                  text,
+                  textId,
+                  fullText,
+                  fullTextId,
+                }),
+              ),
+            }),
+            (path) => {
+              applyEach(path.languages, (language) => {
+                maxLength(language.name, 255);
+              });
+              disabled(path, {when: ({state}) => state.submitting()});
+            },
+            {injector: this.#injector},
+          );
+        }),
+      ),
+  });
 
   protected saveLanguages(editForm: FieldTree<LanguagesFormValue>): void {
     void submit(editForm, async () => {

@@ -5,7 +5,7 @@
     } @else if (itemParent.type === ItemParentType.ITEM_TYPE_SPORT) {
       <span class="text-muted" i18n>Sport</span>
     }
-    @if (item$ | async; as item) {
+    @if (itemResource.hasValue() ? itemResource.value() : undefined; as item) {
       @if (!item.childsCount) {
         @if (item.isCompilesItemOfDay) {
           <a
@@ -39,7 +39,7 @@
         }
         @if (expanded()) {
           <div class="mb-1 ms-4">
-            @if (childs$ | async; as childs) {
+            @if (childsResource.hasValue() ? childsResource.value() : undefined; as childs) {
               @for (child of childs; track child) {
                 <app-donate-vod-select-item [itemParent]="child" />
               }

@@ -1,5 +1,5 @@
 <ng-template #popover>
-  @if (response$ | async; as response) {
+  @if (responseResource.hasValue() ? responseResource.value() : undefined; as response) {
     <div>
       @if ((response.items || []).length > 0) {
         @if (response.brand?.brandicon?.src) {
@@ -14,7 +14,7 @@
         <br style="clear: both" />
       }
     </div>
-  } @else {
+  } @else if (responseResource.isLoading()) {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 </ng-template>
@@ -25,5 +25,7 @@
     [count]="factory.count - factory.newCount"
     [newCount]="factory.newCount"
     [popover]="popover"
+    (popoverShown)="popoverOpen.set(true)"
+    (popoverHidden)="popoverOpen.set(false)"
   />
 }

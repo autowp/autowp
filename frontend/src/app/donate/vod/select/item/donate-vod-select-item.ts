@@ -1,9 +1,7 @@
-import type {Item, ItemParent} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
+import type {ItemParent} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -16,13 +14,13 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {catchError, EMPTY, map, shareReplay, switchMap} from 'rxjs';
+import {map, of, tap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
 
 @Component({
   selector: 'app-donate-vod-select-item',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink],
   templateUrl: './donate-vod-select-item.html',
   styleUrl: './donate-vod-select-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,11 +31,11 @@ export class DonateVodSelectItem {
   readonly #languageService = inject(LanguageService);
 
   readonly itemParent = input.required<ItemParent>();
-  protected readonly itemParent$ = toObservable(this.itemParent);
   protected readonly expanded = signal(false);
 
-  protected readonly item$: Observable<Item> = this.itemParent$.pipe(
-    switchMap((itemParent) =>
+  protected readonly itemResource = rxResource({
+    params: () => this.itemParent(),
+    stream: ({params: itemParent}) =>
       this.#itemsClient.item(
         new ItemRequest({
           fields: new ItemFields({
@@ -49,31 +47,35 @@ export class DonateVodSelectItem {
           language: this.#languageService.language,
         }),
       ),
-    ),
-  );
+  });
 
-  protected readonly childs$: Observable<ItemParent[]> = this.itemParent$.pipe(
-    switchMap((itemParent) =>
-      this.#itemsClient.getItemParents(
-        new ItemParentsRequest({
-          language: this.#languageService.language,
-          options: new ItemParentListOptions({
-            item: new ItemListOptions({
-              typeId: ItemType.ITEM_TYPE_VEHICLE,
-            }),
-            parentId: itemParent.itemId,
-          }),
-          order: ItemParentsRequest.Order.AUTO,
-        }),
-      ),
-    ),
-    catchError((e: unknown) => {
-      this.#toastService.handleError(e);
-      return EMPTY;
-    }),
-    map((items) => items.items ?? []),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  protected readonly childsResource = rxResource({
+    params: () => (this.expanded() ? this.itemParent() : null),
+    stream: ({params: itemParent}) =>
+      itemParent === null
+        ? of(undefined)
+        : this.#itemsClient
+            .getItemParents(
+              new ItemParentsRequest({
+                language: this.#languageService.language,
+                options: new ItemParentListOptions({
+                  item: new ItemListOptions({
+                    typeId: ItemType.ITEM_TYPE_VEHICLE,
+                  }),
+                  parentId: itemParent.itemId,
+                }),
+                order: ItemParentsRequest.Order.AUTO,
+              }),
+            )
+            .pipe(
+              tap({
+                error: (error: unknown) => {
+                  this.#toastService.handleError(error);
+                },
+              }),
+              map((response) => response.items ?? []),
+            ),
+  });
 
   protected readonly ItemParentType = ItemParentType;
 

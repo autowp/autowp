@@ -1,9 +1,7 @@
 import type {ItemParent} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, inject, input, linkedSignal, output} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {
   ItemFields,
   ItemParentFields,
@@ -14,7 +12,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
-import {map, switchMap} from 'rxjs';
+import {map, of} from 'rxjs';
 
 import type {PictureItemMoveSelection} from '../moder-pictures-item-move';
 
@@ -25,7 +23,7 @@ interface ListItem {
 
 @Component({
   selector: 'app-moder-picture-move-item',
-  imports: [AsyncPipe],
+  imports: [],
   templateUrl: './moder-picture-move-item.html',
   styles: `
     :host {
@@ -39,37 +37,40 @@ export class ModerPictureMoveItem {
   readonly #languageService = inject(LanguageService);
 
   readonly item = input.required<ItemParent>();
-  protected readonly row = computed<ListItem>(() => ({expanded: false, row: this.item()}));
+  protected readonly row = linkedSignal<ListItem>(() => ({expanded: false, row: this.item()}));
 
   readonly selected = output<PictureItemMoveSelection>();
 
-  protected readonly childs$: Observable<ItemParent[]> = toObservable(this.item).pipe(
-    switchMap((item) =>
-      this.#itemsClient.getItemParents(
-        new ItemParentsRequest({
-          fields: new ItemParentFields({
-            item: new ItemFields({
-              childsCount: true,
-              nameHtml: true,
-            }),
-          }),
-          language: this.#languageService.language,
-          limit: 500,
-          options: new ItemParentListOptions({
-            parentId: item.itemId,
-          }),
-          order: ItemParentsRequest.Order.AUTO,
-        }),
-      ),
-    ),
-    map((response) => response.items ?? []),
-  );
+  protected readonly childsResource = rxResource({
+    params: () => (this.row().expanded ? this.row().row : null),
+    stream: ({params: item}) =>
+      item === null
+        ? of(undefined)
+        : this.#itemsClient
+            .getItemParents(
+              new ItemParentsRequest({
+                fields: new ItemParentFields({
+                  item: new ItemFields({
+                    childsCount: true,
+                    nameHtml: true,
+                  }),
+                }),
+                language: this.#languageService.language,
+                limit: 500,
+                options: new ItemParentListOptions({
+                  parentId: item.itemId,
+                }),
+                order: ItemParentsRequest.Order.AUTO,
+              }),
+            )
+            .pipe(map((response) => response.items ?? [])),
+  });
 
   protected readonly PictureItemType = PictureItemType;
   protected readonly ItemParentType = ItemParentType;
 
-  protected toggleItem(item: ListItem) {
-    item.expanded = !item.expanded;
+  protected toggleItem() {
+    this.row.update((item) => ({...item, expanded: !item.expanded}));
     return false;
   }
 

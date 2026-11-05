@@ -1,17 +1,16 @@
 import type {TopFactoriesListItem} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {NameCount} from '@utils/name-count/name-count';
-import {switchMap} from 'rxjs';
+import {of} from 'rxjs';
 
 @Component({
   selector: 'app-index-factories-factory',
-  imports: [AsyncPipe, NameCount],
+  imports: [NameCount],
   templateUrl: './index-factories-factory.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,16 +19,17 @@ export class IndexFactoriesFactory {
   readonly #languageService = inject(LanguageService);
 
   readonly factory = input.required<TopFactoriesListItem>();
-  protected readonly factory$ = toObservable(this.factory);
+  protected readonly popoverOpen = signal(false);
 
-  protected readonly response$ = this.factory$.pipe(
-    switchMap((factory) =>
-      this.#itemsClient.getNewItems(
-        new NewItemsRequest({
-          itemId: factory.id,
-          language: this.#languageService.language,
-        }),
-      ),
-    ),
-  );
+  // A null request emits an empty result, cancelling any in-flight request on close.
+  // Angular 22 leaves the previous request running when params becomes undefined.
+  protected readonly responseResource = rxResource({
+    params: () => (this.popoverOpen() ? this.factory().id : null),
+    stream: ({params}) =>
+      params === null
+        ? of(undefined)
+        : this.#itemsClient.getNewItems(
+            new NewItemsRequest({itemId: params, language: this.#languageService.language}),
+          ),
+  });
 }
