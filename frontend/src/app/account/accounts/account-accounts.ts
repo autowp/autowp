@@ -1,22 +1,20 @@
 import type {OnInit} from '@angular/core';
 import type {AccountsAccount} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {DeleteUserAccountRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, catchError, combineLatest, EMPTY, map} from 'rxjs';
+import {map, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
-
 @Component({
   selector: 'app-account-accounts',
-  imports: [AsyncPipe, RemarkModule],
+  imports: [RemarkModule],
   templateUrl: './account-accounts.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -25,16 +23,19 @@ export class AccountAccounts implements OnInit {
   readonly #toastService = inject(ToastsService);
   readonly #usersClient = inject(UsersClient);
 
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
-  protected readonly accounts$: Observable<AccountsAccount[]> = combineLatest([
-    this.#usersClient.getAccounts(new Empty()),
-    this.#reload$,
-  ]).pipe(
-    catchError((error: unknown) => {
-      this.#toastService.handleError(error);
-      return EMPTY;
-    }),
-    map(([response]) => response.items ?? []),
+  protected readonly accountsResource = rxResource({
+    stream: () =>
+      this.#usersClient.getAccounts(new Empty()).pipe(
+        tap({
+          error: (error: unknown) => {
+            this.#toastService.handleError(error);
+          },
+        }),
+        map((response) => response.items ?? []),
+      ),
+  });
+  protected readonly accounts = computed(() =>
+    this.accountsResource.hasValue() ? this.accountsResource.value() : undefined,
   );
 
   protected readonly disconnectFailed = signal(false);
@@ -52,7 +53,7 @@ export class AccountAccounts implements OnInit {
       next: () => {
         this.#toastService.success($localize`Account removed`);
 
-        this.#reload$.next();
+        this.accountsResource.reload();
       },
     });
   }

@@ -3,7 +3,7 @@
 </div>
 
 <h2 i18n>Personal info</h2>
-@if (user$ | async; as user) {
+@if (user(); as user) {
   <div class="card card-body mb-4">
     <p>{{ user.name }} (<a i18n [href]="changeProfileUrl">Change</a>)</p>
   </div>
@@ -11,7 +11,7 @@
   <h2 i18n>Photo</h2>
   <div class="card card-body mb-4">
     <remark i18n-markdown markdown="You can upload photo or use [Gravatar](https://gravatar.com/)" />
-    @if (photo$ | async; as photo) {
+    @if (photo(); as photo) {
       <div>
         <img alt="" class="mb-4" [src]="photo.src" />
       </div>
@@ -24,7 +24,7 @@
         }
       </div>
       <div class="col-6">
-        @if (photo$ | async) {
+        @if (photo()) {
           <button type="submit" class="btn btn-danger" (click)="resetPhoto(user.id)">
             <i class="bi bi-x" aria-hidden="true"></i>
             &ngsp;<ng-container i18n>Delete photo</ng-container>
@@ -41,9 +41,9 @@
 
   <h2 i18n>Other</h2>
   <div class="card card-body mb-4">
-    @if (votesLeft$ | async) {
-      <p><ng-container i18n>Votes per day</ng-container>: {{ votesPerDay$ | async }}</p>
-      <p><ng-container i18n>Votes left</ng-container>: {{ votesLeft$ | async }}</p>
+    @if (votesLeft()) {
+      <p><ng-container i18n>Votes per day</ng-container>: {{ votesPerDay() }}</p>
+      <p><ng-container i18n>Votes left</ng-container>: {{ votesLeft() }}</p>
     }
 
     <form method="post" class="form-horizontal" novalidate (submit)="$event.preventDefault(); sendSettings(user.id)">

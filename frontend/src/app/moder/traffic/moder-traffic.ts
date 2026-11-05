@@ -3,7 +3,8 @@ import type {TrafficTopItem} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {
   CreateTrafficBlacklistItemRequest,
@@ -16,10 +17,9 @@ import {IpService} from '@services/ip';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {BehaviorSubject, map, switchMap} from 'rxjs';
+import {map} from 'rxjs';
 
 import {UserLink} from '../../user/user/user-link';
-
 interface ListItem {
   hostname$: Observable<string>;
   item: TrafficTopItem;
@@ -37,16 +37,13 @@ export class ModerTraffic implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
 
-  readonly #change$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly items$: Observable<ListItem[]> = this.#change$.pipe(
-    switchMap(() => this.#trafficClient.getTrafficTop(new Empty())),
-    map((response) =>
-      (response.items ?? []).map((item) => ({
-        hostname$: this.#ipService.getHostByAddr$(item.ipAddress),
-        item,
-      })),
-    ),
+  protected readonly itemsResource = rxResource({
+    stream: () => this.#trafficClient.getTrafficTop(new Empty()).pipe(map((response) => response.items ?? [])),
+  });
+  protected readonly items = computed<ListItem[] | undefined>(() =>
+    this.itemsResource.hasValue()
+      ? this.itemsResource.value().map((item) => ({item, hostname$: this.#ipService.getHostByAddr$(item.ipAddress)}))
+      : undefined,
   );
 
   ngOnInit(): void {
@@ -64,7 +61,7 @@ export class ModerTraffic implements OnInit {
           this.#toastService.handleError(error);
         },
         next: () => {
-          this.#change$.next();
+          this.itemsResource.reload();
         },
       });
   }
@@ -85,7 +82,7 @@ export class ModerTraffic implements OnInit {
           this.#toastService.handleError(error);
         },
         next: () => {
-          this.#change$.next();
+          this.itemsResource.reload();
         },
       });
   }
@@ -96,7 +93,7 @@ export class ModerTraffic implements OnInit {
         this.#toastService.handleError(error);
       },
       next: () => {
-        this.#change$.next();
+        this.itemsResource.reload();
       },
     });
   }

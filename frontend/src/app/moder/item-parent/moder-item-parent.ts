@@ -1,10 +1,10 @@
 import type {WritableSignal} from '@angular/core';
 import type {FieldTree} from '@angular/forms/signals';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
-import type {Observable} from 'rxjs';
 
-import {AsyncPipe, UpperCasePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, Injector, signal} from '@angular/core';
+import {UpperCasePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {applyEach, disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -26,20 +26,10 @@ import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {numericEnumValue} from '@utils/numeric-enum-value';
 import {getItemTypeTranslation} from '@utils/translations';
-import {
-  BehaviorSubject,
-  combineLatest,
-  distinctUntilChanged,
-  firstValueFrom,
-  map,
-  shareReplay,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {combineLatest, defer, distinctUntilChanged, firstValueFrom, map, tap} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
-
 interface ParentFormValue {
   catname: string;
   itemId: string;
@@ -55,7 +45,7 @@ interface ParentEditor {
 
 @Component({
   selector: 'app-moder-item-parent',
-  imports: [RouterLink, FormField, InvalidParamsPipe, AsyncPipe, UpperCasePipe],
+  imports: [RouterLink, FormField, InvalidParamsPipe, UpperCasePipe],
   templateUrl: './moder-item-parent.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -67,6 +57,8 @@ export class ModerItemParent {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
   readonly #toastService = inject(ToastsService);
+
+  readonly #routeParams = toSignal(this.#route.paramMap, {requireSync: true});
 
   protected readonly typeOptions: {name: string; value: ItemParentType}[] = [
     {
@@ -87,103 +79,121 @@ export class ModerItemParent {
     },
   ];
 
-  readonly #itemID$ = this.#route.paramMap.pipe(
-    map((params) => parseInt(params.get('item_id') ?? '', 10)),
-    distinctUntilChanged(),
-  );
-
-  readonly #parentID$ = this.#route.paramMap.pipe(
-    map((params) => parseInt(params.get('parent_id') ?? '', 10)),
-    distinctUntilChanged(),
-  );
-
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly item$ = this.#itemID$.pipe(
-    switchMap((itemID) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            nameHtml: true,
-            nameText: true,
-          }),
-          id: '' + itemID,
-          language: this.#languageService.language,
-        }),
-      ),
+  readonly #itemID = toSignal(
+    this.#route.paramMap.pipe(
+      map((params) => parseInt(params.get('item_id') ?? '', 10)),
+      distinctUntilChanged(),
     ),
-    tap((item) => {
-      this.#pageEnv.set({
-        layout: {isAdminPage: true},
-        pageId: PageId.MODER_ITEM,
-        title: getItemTypeTranslation(item.itemTypeId, 'name') + ': ' + item.nameText,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
+    {requireSync: true},
   );
 
-  protected readonly parent$ = this.#parentID$.pipe(
-    switchMap((parentID) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            nameHtml: true,
-            nameText: true,
-          }),
-          id: '' + parentID,
-          language: this.#languageService.language,
-        }),
-      ),
+  readonly #parentID = toSignal(
+    this.#route.paramMap.pipe(
+      map((params) => parseInt(params.get('parent_id') ?? '', 10)),
+      distinctUntilChanged(),
     ),
+    {requireSync: true},
   );
 
-  protected readonly editor$: Observable<ParentEditor> = combineLatest([this.#route.paramMap, this.#reload$]).pipe(
-    switchMap(([params]) => {
-      const itemId = params.get('item_id') ?? '0';
-      const parentId = params.get('parent_id') ?? '0';
-      return combineLatest([
-        this.#contentLanguage.languages$,
-        this.#itemsClient.getItemParent(
-          new ItemParentsRequest({options: new ItemParentListOptions({itemId, parentId})}),
+  protected readonly itemResource = rxResource({
+    params: () => this.#itemID(),
+    stream: ({params: itemID}) =>
+      defer(() =>
+        this.#itemsClient.item(
+          new ItemRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameText: true,
+            }),
+            id: '' + itemID,
+            language: this.#languageService.language,
+          }),
         ),
-        this.#itemsClient.getItemParentLanguages(new GetItemParentLanguagesRequest({itemId, parentId})),
-      ]).pipe(
-        map(
-          ([languages, parent, translations]) =>
-            [
-              parent,
-              languages.map((language) => ({
-                language,
-                name: translations.items?.find((row) => row.language === language)?.name ?? '',
-              })),
-            ] as const,
-        ),
-      );
-    }),
-    map(([parent, languages]) => ({
-      errors: signal<Record<string, InvalidParams>>({}),
-      form: form(
-        signal<ParentFormValue>({
-          catname: parent.catname,
-          itemId: parent.itemId,
-          parentId: parent.parentId,
-          type: `${parent.type}`,
-          languages,
-        }),
-        (path) => {
-          maxLength(path.catname, 150);
-          applyEach(path.languages, (language) => {
-            maxLength(language.name, 255);
+      ).pipe(
+        tap((item) => {
+          this.#pageEnv.set({
+            layout: {isAdminPage: true},
+            pageId: PageId.MODER_ITEM,
+            title: getItemTypeTranslation(item.itemTypeId, 'name') + ': ' + item.nameText,
           });
-          disabled(path, {when: ({state}) => state.submitting()});
-        },
-        {injector: this.#injector},
+        }),
       ),
-    })),
+  });
+  protected readonly item = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+
+  protected readonly parentResource = rxResource({
+    params: () => this.#parentID(),
+    stream: ({params: parentID}) =>
+      defer(() =>
+        this.#itemsClient.item(
+          new ItemRequest({
+            fields: new ItemFields({
+              nameHtml: true,
+              nameText: true,
+            }),
+            id: '' + parentID,
+            language: this.#languageService.language,
+          }),
+        ),
+      ),
+  });
+  protected readonly parent = computed(() =>
+    this.parentResource.hasValue() ? this.parentResource.value() : undefined,
+  );
+
+  protected readonly editorResource = rxResource({
+    params: () => this.#routeParams(),
+    stream: ({params}) =>
+      defer(() => {
+        const itemId = params.get('item_id') ?? '0';
+        const parentId = params.get('parent_id') ?? '0';
+        return combineLatest([
+          this.#contentLanguage.languages$,
+          this.#itemsClient.getItemParent(
+            new ItemParentsRequest({options: new ItemParentListOptions({itemId, parentId})}),
+          ),
+          this.#itemsClient.getItemParentLanguages(new GetItemParentLanguagesRequest({itemId, parentId})),
+        ]).pipe(
+          map(
+            ([languages, parent, translations]) =>
+              [
+                parent,
+                languages.map((language) => ({
+                  language,
+                  name: translations.items?.find((row) => row.language === language)?.name ?? '',
+                })),
+              ] as const,
+          ),
+        );
+      }).pipe(
+        map(([parent, languages]) => ({
+          errors: signal<Record<string, InvalidParams>>({}),
+          form: form(
+            signal<ParentFormValue>({
+              catname: parent.catname,
+              itemId: parent.itemId,
+              parentId: parent.parentId,
+              type: `${parent.type}`,
+              languages,
+            }),
+            (path) => {
+              maxLength(path.catname, 150);
+              applyEach(path.languages, (language) => {
+                maxLength(language.name, 255);
+              });
+              disabled(path, {when: ({state}) => state.submitting()});
+            },
+            {injector: this.#injector},
+          ),
+        })),
+      ),
+  });
+  protected readonly editor = computed(() =>
+    this.editorResource.hasValue() ? this.editorResource.value() : undefined,
   );
 
   protected reloadItemParent() {
-    this.#reload$.next();
+    this.editorResource.reload();
   }
 
   protected save(editor: ParentEditor): void {

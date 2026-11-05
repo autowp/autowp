@@ -9,7 +9,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/moder/items" i18n>Items</a>
     </li>
-    @if (item$ | async; as item) {
+    @if (item(); as item) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
       </li>
@@ -22,20 +22,20 @@
 </div>
 
 <p>
-  @if (parent$ | async; as parent) {
+  @if (parent(); as parent) {
     <a
       [routerLink]="['/moder/items/item', parent.id]"
       [queryParams]="{tab: 'catalogue'}"
       [innerHTML]="parent.nameHtml"
     ></a>
   }
-  @if (item$ | async; as item) {
+  @if (item(); as item) {
     &rarr;
     <a [routerLink]="['/moder/items/item', item.id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="item.nameHtml"></a>
   }
 </p>
 
-@if (editor$ | async; as editor) {
+@if (editor(); as editor) {
   @let editForm = editor.form;
   <form method="post" class="form-horizontal" novalidate (submit)="$event.preventDefault(); save(editor)">
     <div class="mb-3 row">

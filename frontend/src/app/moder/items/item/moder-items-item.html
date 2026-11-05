@@ -12,14 +12,14 @@
   </ol>
 </nav>
 
-@if (item$ | async; as item) {
+@if (item(); as item) {
   <div class="page-header">
     <h1>{{ getItemTypeTranslation(item.itemTypeId, 'name') }}: <span [innerHTML]="item.nameHtml"></span></h1>
   </div>
 
   <div class="row mb-4">
     <div class="col-md-2">
-      @if (randomPicture$ | async; as randomPicture) {
+      @if (randomPicture(); as randomPicture) {
         @if (randomPicture.thumbMedium) {
           <img alt="" class="mb-4 w-100 rounded border border-light" [src]="randomPicture.thumbMedium.src" />
         }
@@ -71,7 +71,7 @@
     </div>
   </div>
 
-  @if (activeTab$ | async; as activeTab) {
+  @if (activeTab(); as activeTab) {
     <div class="nav nav-pills" style="margin-bottom: 10px">
       <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'meta'" [queryParams]="{tab: 'meta'}">
         <span class="glyphicon glyphicon-pencil me-1"></span>
@@ -174,7 +174,7 @@
       <app-moder-items-item-name [item]="item" />
     }
     @if (logoTab.visible && activeTab === 'logo') {
-      <app-moder-items-item-logo [item]="item" (itemUpdated)="reloadItem$.next()" />
+      <app-moder-items-item-logo [item]="item" (itemUpdated)="itemResource.reload()" />
     }
     @if (catalogueTab.visible && activeTab === 'catalogue') {
       <app-moder-items-item-catalogue [item]="item" />
@@ -185,7 +185,7 @@
 
     @if (treeTab.visible && activeTab === 'tree') {
       <div class="tree card card-body">
-        @if (tree$ | async; as tree) {
+        @if (tree(); as tree) {
           <app-moder-items-item-tree [item]="tree" />
         }
       </div>
@@ -198,7 +198,7 @@
       <app-moder-items-item-links [item]="item" />
     }
     @if (gdprTab.visible && activeTab === 'gdpr') {
-      <app-moder-items-item-gdpr [item]="item" (suppressed)="reloadItem$.next()" />
+      <app-moder-items-item-gdpr [item]="item" (suppressed)="itemResource.reload()" />
     }
   }
 }

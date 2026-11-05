@@ -1,9 +1,8 @@
 import type {OnInit} from '@angular/core';
-import type {User} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
 
-import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {DatePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {UserPreferencesRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
@@ -16,14 +15,13 @@ import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import Keycloak from 'keycloak-js';
-import {BehaviorSubject, catchError, EMPTY, map, of, switchMap} from 'rxjs';
+import {map, of, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserLink} from '../../user/user/user-link';
-
 @Component({
   selector: 'app-account-blacklist',
-  imports: [RouterLink, UserLink, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [RouterLink, UserLink, NgbTooltip, DatePipe, TimeAgoPipe],
   templateUrl: './account-blacklist.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -36,29 +34,29 @@ export class AccountBlacklist implements OnInit {
   readonly #keycloak = inject(Keycloak);
   readonly #window = browserWindow();
 
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly items$: Observable<User[]> = this.#auth.authenticated$.pipe(
-    switchMap((authenticated) => {
-      if (!authenticated) {
-        if (this.#window) {
-          void this.#keycloak.login({
-            locale: this.#languageService.language,
-            redirectUri: this.#window.location.href,
-          });
-        }
-        return EMPTY;
-      }
-      return of(authenticated);
-    }),
-    switchMap(() => this.#reload$),
-    switchMap(() => this.#usersClient.getBlacklistedUsers(new Empty())),
-    catchError((error: unknown) => {
-      this.#toastService.handleError(error);
-      return EMPTY;
-    }),
-    map((response) => response.items ?? []),
+  readonly #authenticated = toSignal(
+    this.#auth.authenticated$.pipe(
+      tap((authenticated) => {
+        if (!authenticated && this.#window)
+          void this.#keycloak.login({locale: this.#languageService.language, redirectUri: this.#window.location.href});
+      }),
+    ),
   );
+  protected readonly itemsResource = rxResource({
+    params: () => this.#authenticated(),
+    stream: ({params}) =>
+      params
+        ? this.#usersClient.getBlacklistedUsers(new Empty()).pipe(
+            tap({
+              error: (error: unknown) => {
+                this.#toastService.handleError(error);
+              },
+            }),
+            map((response) => response.items ?? []),
+          )
+        : of(undefined),
+  });
+  protected readonly items = computed(() => (this.itemsResource.hasValue() ? this.itemsResource.value() : undefined));
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ACCOUNT_BLACKLIST, title: $localize`Blacklist`});
@@ -70,7 +68,7 @@ export class AccountBlacklist implements OnInit {
         this.#toastService.handleError(response);
       },
       next: () => {
-        this.#reload$.next(void 0);
+        this.itemsResource.reload();
       },
     });
     return false;

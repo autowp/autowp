@@ -1,10 +1,11 @@
 import type {OnInit, WritableSignal} from '@angular/core';
 import type {FieldTree} from '@angular/forms/signals';
-import type {GdprObjection, GdprObjectionCleanupCandidate, Pages} from '@grpc/spec.pb';
+import type {GdprObjection, GdprObjectionCleanupCandidate} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, Injector, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, maxLength, pattern, required, submit} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -27,22 +28,10 @@ import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {timestampToDate} from '@utils/timestamp';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  distinctUntilChanged,
-  EMPTY,
-  firstValueFrom,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-} from 'rxjs';
+import {catchError, defer, distinctUntilChanged, EMPTY, firstValueFrom, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {Paginator} from '../../paginator/paginator/paginator';
 import {ToastsService} from '../../toasts/toasts.service';
-
 interface CommentLink {
   readonly preview: string;
   readonly route: string[];
@@ -91,66 +80,70 @@ export class ModerGdprObjections implements OnInit {
   readonly #hitsOnly = signal(false);
   protected readonly hitsOnly = form(this.#hitsOnly);
 
-  readonly #hitsOnly$ = this.#route.queryParamMap.pipe(
-    map((params) => params.get('hits_only') === '1'),
-    distinctUntilChanged(),
+  readonly #hitsFilter = toSignal(
+    this.#route.queryParamMap.pipe(
+      map((params) => params.get('hits_only') === '1'),
+      distinctUntilChanged(),
+    ),
+    {requireSync: true},
   );
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    map((page) => (page ? page : 0)),
-    distinctUntilChanged(),
+  readonly #page = toSignal(
+    this.#route.queryParamMap.pipe(
+      map((params) => parseInt(params.get('page') ?? '', 10)),
+      map((page) => (page ? page : 0)),
+      distinctUntilChanged(),
+    ),
+    {requireSync: true},
   );
-
-  readonly #reload$ = new BehaviorSubject<void>(undefined);
 
   readonly #rowForms = new Map<string, FieldTree<string>>();
 
-  protected readonly data$: Observable<{objections: ObjectionInList[]; paginator?: Pages}> = combineLatest([
-    this.#hitsOnly$,
-    this.#page$,
-    this.#reload$,
-  ]).pipe(
-    switchMap(([hitsOnly, page]) => {
-      this.#hitsOnly.set(hitsOnly);
+  protected readonly dataResource = rxResource({
+    params: () => [this.#hitsFilter(), this.#page()] as const,
+    stream: ({params: [hitsOnly, page]}) =>
+      defer(() => {
+        this.#hitsOnly.set(hitsOnly);
 
-      return this.#autowpClient.getGdprObjections(new GetGdprObjectionsRequest({hitsOnly, page}));
-    }),
-    map((response) => {
-      const previousForms = new Map(this.#rowForms);
-      this.#rowForms.clear();
-      return {
-        objections: (response.items ?? []).map((objection): ObjectionInList => {
-          const addCandidatePictureId =
-            previousForms.get(objection.id) ??
-            form(
-              signal(''),
-              (path) => {
-                required(path);
-                pattern(path, /^\s*\d+\s*$/);
-                disabled(path, {when: ({state}) => state.submitting()});
-              },
-              {injector: this.#injector},
-            );
-          this.#rowForms.set(objection.id, addCandidatePictureId);
+        return this.#autowpClient.getGdprObjections(new GetGdprObjectionsRequest({hitsOnly, page}));
+      }).pipe(
+        map((response) => {
+          const previousForms = new Map(this.#rowForms);
+          this.#rowForms.clear();
           return {
-            acknowledging: signal(false),
-            addCandidatePictureId,
-            affectedPictureIdentities: signal(null),
-            affectedPictureIds: signal(null),
-            affectedPicturesLoading: signal(false),
-            cleanupCandidates: signal(null),
-            cleanupCandidatesLoading: signal(false),
-            deleting: signal(false),
-            objection,
-            sourceText: signal(null),
-            sourceTextLoading: signal(false),
+            objections: (response.items ?? []).map((objection): ObjectionInList => {
+              const addCandidatePictureId =
+                previousForms.get(objection.id) ??
+                form(
+                  signal(''),
+                  (path) => {
+                    required(path);
+                    pattern(path, /^\s*\d+\s*$/);
+                    disabled(path, {when: ({state}) => state.submitting()});
+                  },
+                  {injector: this.#injector},
+                );
+              this.#rowForms.set(objection.id, addCandidatePictureId);
+              return {
+                acknowledging: signal(false),
+                addCandidatePictureId,
+                affectedPictureIdentities: signal(null),
+                affectedPictureIds: signal(null),
+                affectedPicturesLoading: signal(false),
+                cleanupCandidates: signal(null),
+                cleanupCandidatesLoading: signal(false),
+                deleting: signal(false),
+                objection,
+                sourceText: signal(null),
+                sourceTextLoading: signal(false),
+              };
+            }),
+            paginator: response.paginator,
           };
         }),
-        paginator: response.paginator,
-      };
-    }),
-  );
+      ),
+  });
+  protected readonly data = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
   readonly #model = signal({contactEmail: '', names: '', note: '', reference: '', sourceText: ''});
   protected readonly createForm = form(this.#model, (path) => {
@@ -204,7 +197,7 @@ export class ModerGdprObjections implements OnInit {
         );
 
         this.createForm().reset({contactEmail: '', names: '', note: '', reference: '', sourceText: ''});
-        this.#reload$.next();
+        this.dataResource.reload();
       } catch (error: unknown) {
         this.#toasts.handleError(error);
       }
@@ -222,7 +215,7 @@ export class ModerGdprObjections implements OnInit {
       .acknowledgeGdprObjectionHit(new AcknowledgeGdprObjectionHitRequest({id: row.objection.id}))
       .pipe(
         switchMap(() => {
-          this.#reload$.next();
+          this.dataResource.reload();
           return EMPTY;
         }),
       )
@@ -247,7 +240,7 @@ export class ModerGdprObjections implements OnInit {
         this.#toasts.handleError(error);
       },
       next: () => {
-        this.#reload$.next();
+        this.dataResource.reload();
       },
     });
   }

@@ -3,8 +3,8 @@ import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, inject, linkedSignal, signal, viewChild} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, inject, linkedSignal, signal, viewChild} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {form, FormField, submit} from '@angular/forms/signals';
 import {environment} from '@environment/environment';
 import {DeleteUserPhotoRequest, MeRequest, UpdateUserRequest, User, UserFields} from '@grpc/spec.pb';
@@ -20,23 +20,11 @@ import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  EMPTY,
-  firstValueFrom,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {catchError, EMPTY, firstValueFrom, of, switchMap, tap} from 'rxjs';
 
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../grpc';
 import {ToastsService} from '../../toasts/toasts.service';
 import {AccountContactsEditor} from '../contacts-editor/account-contacts-editor';
-
 @Component({
   selector: 'app-account-profile',
   imports: [FormField, AsyncPipe, InvalidParamsPipe, RemarkModule, AccountContactsEditor],
@@ -69,51 +57,49 @@ export class AccountProfile implements OnInit {
     value: language.code,
   }));
 
-  readonly #reload$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly user$ = combineLatest([this.#auth.user$, this.#reload$]).pipe(
-    switchMap(([user]) => {
-      if (!user) {
-        if (this.#window) {
-          void this.#keycloak.login({
-            locale: this.#languageService.language,
-            redirectUri: this.#window.location.href,
-          });
-        }
-        return EMPTY;
-      }
-
-      return of(user);
-    }),
-    switchMap(() =>
-      this.#usersClient.me(
-        new MeRequest({
-          fields: new UserFields({
-            contacts: true,
-            img: true,
-            language: true,
-            timezone: true,
-            votesLeft: true,
-            votesPerDay: true,
-          }),
-        }),
-      ),
+  readonly #authUser = toSignal(
+    this.#auth.user$.pipe(
+      tap((user) => {
+        if (!user && this.#window)
+          void this.#keycloak.login({locale: this.#languageService.language, redirectUri: this.#window.location.href});
+      }),
     ),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
   );
+  protected readonly userResource = rxResource({
+    params: () => this.#authUser(),
+    stream: ({params}) =>
+      params
+        ? this.#usersClient
+            .me(
+              new MeRequest({
+                fields: new UserFields({
+                  contacts: true,
+                  img: true,
+                  language: true,
+                  timezone: true,
+                  votesLeft: true,
+                  votesPerDay: true,
+                }),
+              }),
+            )
+            .pipe(
+              tap({
+                error: (error: unknown) => {
+                  this.#toastService.handleError(error);
+                },
+              }),
+            )
+        : of(undefined),
+  });
+  protected readonly user = computed(() => (this.userResource.hasValue() ? this.userResource.value() : undefined));
 
-  protected readonly votesPerDay$ = this.user$.pipe(map((user) => +user.votesPerDay || 0));
-  protected readonly votesLeft$ = this.user$.pipe(map((user) => +user.votesLeft || 0));
-  protected readonly photo$ = this.user$.pipe(map((user) => user.img));
+  protected readonly votesPerDay = computed(() => +(this.user()?.votesPerDay ?? 0) || 0);
+  protected readonly votesLeft = computed(() => +(this.user()?.votesLeft ?? 0) || 0);
+  protected readonly photo = computed(() => this.user()?.img);
 
-  readonly #settingsUser = toSignal(this.user$);
   readonly #model = linkedSignal(() => ({
-    language: this.#settingsUser()?.language ?? '',
-    timezone: this.#settingsUser()?.timezone ?? '',
+    language: this.user()?.language ?? '',
+    timezone: this.user()?.timezone ?? '',
   }));
   protected readonly form = form(this.#model);
 
@@ -122,7 +108,7 @@ export class AccountProfile implements OnInit {
   }
 
   protected reload(): void {
-    this.#reload$.next(void 0);
+    this.userResource.reload();
   }
 
   private showSavedMessage() {
@@ -164,7 +150,7 @@ export class AccountProfile implements OnInit {
         this.#toastService.handleError(response);
       },
       next: () => {
-        this.#reload$.next(void 0);
+        this.userResource.reload();
       },
     });
   }
@@ -211,7 +197,7 @@ export class AccountProfile implements OnInit {
           return EMPTY;
         }),
         tap(() => {
-          this.#reload$.next();
+          this.userResource.reload();
         }),
       )
       .subscribe();

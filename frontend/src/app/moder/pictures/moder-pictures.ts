@@ -1,10 +1,11 @@
 import type {OnInit} from '@angular/core';
-import type {Item, Pages, User, VehicleType} from '@grpc/spec.pb';
+import type {Item, User, VehicleType} from '@grpc/spec.pb';
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -45,11 +46,9 @@ import {getModalComponentRef} from '@utils/modal-component-ref';
 import {numericEnumValue} from '@utils/numeric-enum-value';
 import {getPerspectiveTranslation, getVehicleTypeTranslation} from '@utils/translations';
 import {
-  BehaviorSubject,
   catchError,
   debounceTime,
   defer,
-  distinctUntilChanged,
   EMPTY,
   finalize,
   from,
@@ -58,6 +57,7 @@ import {
   of,
   shareReplay,
   switchMap,
+  tap,
   toArray,
 } from 'rxjs';
 
@@ -68,7 +68,6 @@ import {Paginator} from '../../paginator/paginator/paginator';
 import {Thumbnail} from '../../thumbnail/thumbnail/thumbnail';
 import {ToastsService} from '../../toasts/toasts.service';
 import {ModerPicturesBulkEditModal} from './bulk-edit-modal/moder-pictures-bulk-edit-modal';
-
 const BULK_MODERATION_CONCURRENCY = 4;
 
 type LicenseFilter = 'all-rights-reserved' | 'cc' | 'pd' | null;
@@ -440,205 +439,203 @@ export class ModerPictures implements OnInit {
     shareReplay({bufferSize: 1, refCount: false}),
   );
 
-  readonly #change$ = new BehaviorSubject<void>(void 0);
-
   protected readonly addedFrom = form(signal(''));
 
   protected readonly excludeItemID = signal('');
   protected readonly excludeItemQuery = form(signal(''));
 
-  protected readonly data$: Observable<{
-    chunks: Picture[][];
-    paginator: Pages | undefined;
-    pictures: Picture[];
-  }> = this.#route.queryParamMap.pipe(
-    distinctUntilChanged(),
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-    switchMap((params) => {
-      this.addedFrom().value.set(params.get('added_from') ?? '');
-      this.status.set(params.get('status') ? params.get('status') : null);
-      this.vehicleTypeID.set(params.get('vehicle_type_id') ? (params.get('vehicle_type_id') ?? '') : null);
-      const perspectiveID = params.get('perspective_id');
-      this.perspectiveID.set(perspectiveID === 'null' ? 'null' : parseInt(perspectiveID ?? '', 10) || null);
-      this.itemID.set(params.get('item_id') ? (params.get('item_id') ?? '') : '');
-      if (this.itemID() && !this.itemQuery().value()) {
-        this.itemQuery().value.set('#' + this.itemID());
-      }
-      this.excludeItemID.set(params.get('exclude_item_id') ? (params.get('exclude_item_id') ?? '') : '');
-      if (this.excludeItemID() && !this.excludeItemQuery().value()) {
-        this.excludeItemQuery().value.set('#' + this.excludeItemID());
-      }
-      switch (params.get('comments')) {
-        case 'false':
-          this.comments.set(false);
-          break;
-        case 'true':
-          this.comments.set(true);
-          break;
-        default:
-          this.comments.set(null);
-          break;
-      }
-      this.ownerID.set(params.get('owner_id') ?? '');
-      if (this.ownerID() && !this.ownerQuery().value()) {
-        this.ownerQuery().value.set('#' + this.ownerID());
-      }
-      switch (params.get('replace')) {
-        case 'false':
-          this.replace.set(false);
-          break;
-        case 'true':
-          this.replace.set(true);
-          break;
-        default:
-          this.replace.set(null);
-          break;
-      }
-      switch (params.get('copyrights')) {
-        case 'false':
-          this.copyrights.set(false);
-          break;
-        case 'true':
-          this.copyrights.set(true);
-          break;
-        default:
-          this.copyrights.set(null);
-          break;
-      }
-      switch (params.get('license')) {
-        case 'all-rights-reserved':
-          this.licenseFilter.set('all-rights-reserved');
-          break;
-        case 'cc':
-          this.licenseFilter.set('cc');
-          break;
-        case 'pd':
-          this.licenseFilter.set('pd');
-          break;
-        default:
-          this.licenseFilter.set(null);
-          break;
-      }
-      this.requests.set(params.get('requests') ? parseInt(params.get('requests') ?? '', 10) : null);
-      this.specialName.set(!!params.get('special_name'));
-      this.lost.set(!!params.get('lost'));
-      this.gps.set(params.get('gps') ? true : null);
-      this.similar.set(!!params.get('similar'));
-      this.order.set(
-        numericEnumValue(
-          PicturesRequest.Order,
-          parseInt(params.get('order') ?? '', 10),
-          PicturesRequest.Order.ORDER_CREATED_AT_DESC,
-        ),
-      );
-      this.addedFrom().value.set(params.get('added_from') ?? '');
-
-      this.#selected = [];
-      this.hasSelectedItem.set(false);
-
-      const statuses = this.convertStatuses(this.status());
-      const vehicleTypeID = this.vehicleTypeID();
-      const perspectiveIDVal = this.perspectiveID();
-
-      const qParams = new PicturesRequest({
-        fields: new PictureFields({
-          commentsCount: true,
-          dfDistance: this.similar() ? new DfDistanceRequest({limit: 1}) : undefined,
-          moderVote: true,
-          nameHtml: true,
-          nameText: true,
-          pictureItem: new PictureItemsRequest({
-            fields: new PictureItemFields({
-              item: new ItemsRequest({
-                fields: new ItemFields({nameHtml: true}),
-              }),
-            }),
-            options: new PictureItemListOptions({
-              item: new ItemListOptions({
-                typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_BRAND, ItemType.ITEM_TYPE_PERSON],
-              }),
-              typeId: PictureItemType.PICTURE_ITEM_CONTENT,
-            }),
-          }),
-          thumbMedium: true,
-          views: true,
-          votes: true,
-        }),
-        language: this.#languageService.language,
-        limit: 18,
-        options: new PictureListOptions({
-          addedFrom: this.addedFrom().value() ? parseStringToGrpcDate(this.addedFrom().value()) : undefined,
-          commentTopic: this.comments() === true ? new CommentTopicListOptions({messagesGtZero: true}) : undefined,
-          dfDistance: this.similar()
-            ? new DfDistanceListOptions({
-                dstPicture: statuses ? new PictureListOptions({statuses}) : undefined,
-              })
-            : undefined,
-          hasCopyrights: this.copyrights() === true,
-          hasNoComments: this.comments() === false,
-          hasNoCopyrights: this.copyrights() === false,
-          hasNoPictureItem: this.lost(),
-          hasNoPictureModerVote: this.requests() === 0,
-          hasNoReplacePicture: this.replace() === false,
-          hasPoint: this.gps() === true,
-          hasSpecialName: this.specialName(),
-          licenses: licenseFilterToLicenses(this.licenseFilter()),
-          ownerId: this.ownerID(),
-          pictureItem:
-            vehicleTypeID || this.excludeItemID() || this.itemID() || perspectiveIDVal
-              ? new PictureItemListOptions({
-                  excludeAncestorOrSelfId: this.excludeItemID(),
-                  hasNoPerspectiveId: perspectiveIDVal === 'null',
-                  itemParentCacheAncestor: this.itemID()
-                    ? new ItemParentCacheListOptions({parentId: this.itemID()})
-                    : undefined,
-                  itemVehicleType: vehicleTypeID
-                    ? new ItemVehicleTypeListOptions({vehicleTypeId: vehicleTypeID})
-                    : undefined,
-                  perspectiveId: perspectiveIDVal && perspectiveIDVal !== 'null' ? perspectiveIDVal : undefined,
-                })
-              : undefined,
-          pictureModerVote:
-            this.requests() === 1 ||
-            this.requests() === 2 ||
-            this.requests() === 3 ||
-            this.order() === PicturesRequest.Order.ORDER_MODER_VOTES
-              ? new PictureModerVoteListOptions({
-                  voteGtZero: this.requests() === 1,
-                  voteLteZero: this.requests() === 2,
-                })
-              : undefined,
-          replacePicture: this.replace() === true ? new PictureListOptions({}) : undefined,
-          statuses: statuses,
-        }),
-        order: this.similar() ? PicturesRequest.Order.ORDER_DF_DISTANCE_SIMILARITY : this.order(),
-        page: parseInt(params.get('page') ?? '', 10),
-        paginator: true,
-      });
-
-      return this.#change$.pipe(
-        switchMap(() =>
-          this.#picturesClient.getPictures(qParams).pipe(
-            catchError((response: unknown) => {
-              this.#toastService.handleError(response);
-              return EMPTY;
-            }),
+  readonly #request = toSignal(
+    this.#route.queryParamMap.pipe(
+      // eslint-disable-next-line sonarjs/cognitive-complexity
+      map((params) => {
+        this.addedFrom().value.set(params.get('added_from') ?? '');
+        this.status.set(params.get('status') ? params.get('status') : null);
+        this.vehicleTypeID.set(params.get('vehicle_type_id') ? (params.get('vehicle_type_id') ?? '') : null);
+        const perspectiveID = params.get('perspective_id');
+        this.perspectiveID.set(perspectiveID === 'null' ? 'null' : parseInt(perspectiveID ?? '', 10) || null);
+        this.itemID.set(params.get('item_id') ? (params.get('item_id') ?? '') : '');
+        if (this.itemID() && !this.itemQuery().value()) {
+          this.itemQuery().value.set('#' + this.itemID());
+        }
+        this.excludeItemID.set(params.get('exclude_item_id') ? (params.get('exclude_item_id') ?? '') : '');
+        if (this.excludeItemID() && !this.excludeItemQuery().value()) {
+          this.excludeItemQuery().value.set('#' + this.excludeItemID());
+        }
+        switch (params.get('comments')) {
+          case 'false':
+            this.comments.set(false);
+            break;
+          case 'true':
+            this.comments.set(true);
+            break;
+          default:
+            this.comments.set(null);
+            break;
+        }
+        this.ownerID.set(params.get('owner_id') ?? '');
+        if (this.ownerID() && !this.ownerQuery().value()) {
+          this.ownerQuery().value.set('#' + this.ownerID());
+        }
+        switch (params.get('replace')) {
+          case 'false':
+            this.replace.set(false);
+            break;
+          case 'true':
+            this.replace.set(true);
+            break;
+          default:
+            this.replace.set(null);
+            break;
+        }
+        switch (params.get('copyrights')) {
+          case 'false':
+            this.copyrights.set(false);
+            break;
+          case 'true':
+            this.copyrights.set(true);
+            break;
+          default:
+            this.copyrights.set(null);
+            break;
+        }
+        switch (params.get('license')) {
+          case 'all-rights-reserved':
+            this.licenseFilter.set('all-rights-reserved');
+            break;
+          case 'cc':
+            this.licenseFilter.set('cc');
+            break;
+          case 'pd':
+            this.licenseFilter.set('pd');
+            break;
+          default:
+            this.licenseFilter.set(null);
+            break;
+        }
+        this.requests.set(params.get('requests') ? parseInt(params.get('requests') ?? '', 10) : null);
+        this.specialName.set(!!params.get('special_name'));
+        this.lost.set(!!params.get('lost'));
+        this.gps.set(params.get('gps') ? true : null);
+        this.similar.set(!!params.get('similar'));
+        this.order.set(
+          numericEnumValue(
+            PicturesRequest.Order,
+            parseInt(params.get('order') ?? '', 10),
+            PicturesRequest.Order.ORDER_CREATED_AT_DESC,
           ),
-        ),
-      );
-    }),
-    map((response) => {
-      const pictures = (response.items ?? []).map((picture) =>
-        Object.assign(picture, {selected: this.#selected.includes(picture.id)}),
-      );
-      return {
-        chunks: chunkBy<Picture>(pictures, 3),
-        paginator: response.paginator,
-        pictures,
-      };
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
+        );
+        this.addedFrom().value.set(params.get('added_from') ?? '');
+
+        this.#selected = [];
+        this.hasSelectedItem.set(false);
+
+        const statuses = this.convertStatuses(this.status());
+        const vehicleTypeID = this.vehicleTypeID();
+        const perspectiveIDVal = this.perspectiveID();
+
+        const qParams = new PicturesRequest({
+          fields: new PictureFields({
+            commentsCount: true,
+            dfDistance: this.similar() ? new DfDistanceRequest({limit: 1}) : undefined,
+            moderVote: true,
+            nameHtml: true,
+            nameText: true,
+            pictureItem: new PictureItemsRequest({
+              fields: new PictureItemFields({
+                item: new ItemsRequest({
+                  fields: new ItemFields({nameHtml: true}),
+                }),
+              }),
+              options: new PictureItemListOptions({
+                item: new ItemListOptions({
+                  typeIds: [ItemType.ITEM_TYPE_VEHICLE, ItemType.ITEM_TYPE_BRAND, ItemType.ITEM_TYPE_PERSON],
+                }),
+                typeId: PictureItemType.PICTURE_ITEM_CONTENT,
+              }),
+            }),
+            thumbMedium: true,
+            views: true,
+            votes: true,
+          }),
+          language: this.#languageService.language,
+          limit: 18,
+          options: new PictureListOptions({
+            addedFrom: this.addedFrom().value() ? parseStringToGrpcDate(this.addedFrom().value()) : undefined,
+            commentTopic: this.comments() === true ? new CommentTopicListOptions({messagesGtZero: true}) : undefined,
+            dfDistance: this.similar()
+              ? new DfDistanceListOptions({
+                  dstPicture: statuses ? new PictureListOptions({statuses}) : undefined,
+                })
+              : undefined,
+            hasCopyrights: this.copyrights() === true,
+            hasNoComments: this.comments() === false,
+            hasNoCopyrights: this.copyrights() === false,
+            hasNoPictureItem: this.lost(),
+            hasNoPictureModerVote: this.requests() === 0,
+            hasNoReplacePicture: this.replace() === false,
+            hasPoint: this.gps() === true,
+            hasSpecialName: this.specialName(),
+            licenses: licenseFilterToLicenses(this.licenseFilter()),
+            ownerId: this.ownerID(),
+            pictureItem:
+              vehicleTypeID || this.excludeItemID() || this.itemID() || perspectiveIDVal
+                ? new PictureItemListOptions({
+                    excludeAncestorOrSelfId: this.excludeItemID(),
+                    hasNoPerspectiveId: perspectiveIDVal === 'null',
+                    itemParentCacheAncestor: this.itemID()
+                      ? new ItemParentCacheListOptions({parentId: this.itemID()})
+                      : undefined,
+                    itemVehicleType: vehicleTypeID
+                      ? new ItemVehicleTypeListOptions({vehicleTypeId: vehicleTypeID})
+                      : undefined,
+                    perspectiveId: perspectiveIDVal && perspectiveIDVal !== 'null' ? perspectiveIDVal : undefined,
+                  })
+                : undefined,
+            pictureModerVote:
+              this.requests() === 1 ||
+              this.requests() === 2 ||
+              this.requests() === 3 ||
+              this.order() === PicturesRequest.Order.ORDER_MODER_VOTES
+                ? new PictureModerVoteListOptions({
+                    voteGtZero: this.requests() === 1,
+                    voteLteZero: this.requests() === 2,
+                  })
+                : undefined,
+            replacePicture: this.replace() === true ? new PictureListOptions({}) : undefined,
+            statuses: statuses,
+          }),
+          order: this.similar() ? PicturesRequest.Order.ORDER_DF_DISTANCE_SIMILARITY : this.order(),
+          page: parseInt(params.get('page') ?? '', 10),
+          paginator: true,
+        });
+
+        return qParams;
+      }),
+    ),
+    {requireSync: true},
   );
+  protected readonly dataResource = rxResource({
+    params: () => this.#request(),
+    stream: ({params}) =>
+      this.#picturesClient.getPictures(params).pipe(
+        tap({
+          error: (error: unknown) => {
+            this.#toastService.handleError(error);
+          },
+        }),
+        map((response) => {
+          const pictures = (response.items ?? []).map((picture) =>
+            Object.assign(picture, {selected: this.#selected.includes(picture.id)}),
+          );
+          return {
+            chunks: chunkBy<Picture>(pictures, 3),
+            paginator: response.paginator,
+            pictures,
+          };
+        }),
+      ),
+  });
+  protected readonly data = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
   protected readonly moderVoteTemplateOptions$ = this.#moderVoteTemplateService
     .getTemplates$()
@@ -815,7 +812,7 @@ export class ModerPictures implements OnInit {
         const completed = new Set(completedIds);
         this.#selected = this.#selected.filter((id) => !completed.has(id));
         this.hasSelectedItem.set(this.#selected.length > 0);
-        this.#change$.next();
+        this.dataResource.reload();
       });
   }
 
@@ -831,7 +828,7 @@ export class ModerPictures implements OnInit {
     componentRef.instance.applied.subscribe(() => {
       this.#selected = [];
       this.hasSelectedItem.set(false);
-      this.#change$.next();
+      this.dataResource.reload();
     });
   }
 }

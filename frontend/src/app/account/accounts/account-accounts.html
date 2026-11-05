@@ -1,7 +1,7 @@
 <div class="page-header">
   <h1 i18n>My accounts</h1>
 </div>
-@if (accounts$ | async; as accounts) {
+@if (accounts(); as accounts) {
   @if (accounts.length > 0 && !disconnectFailed()) {
     <div class="card card-body mb-4">
       @for (account of accounts; track account.id) {

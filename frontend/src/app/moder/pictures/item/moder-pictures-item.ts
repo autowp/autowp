@@ -1,8 +1,9 @@
-import type {DfDistance, IP, Item, User} from '@grpc/spec.pb';
+import type {DfDistance, Item, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, maxLength, required, submit, validate} from '@angular/forms/signals';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -67,9 +68,8 @@ import {UserLink} from 'app/user/user/user-link';
 import {NgDatePipesModule, NgMathPipesModule} from 'ngx-pipes';
 import {RemarkModule} from 'ngx-remark';
 import {
-  BehaviorSubject,
   catchError,
-  combineLatest,
+  defer,
   distinctUntilChanged,
   EMPTY,
   finalize,
@@ -77,19 +77,12 @@ import {
   map,
   of,
   shareReplay,
-  switchMap,
   tap,
   throwError,
 } from 'rxjs';
 import {sprintf} from 'sprintf-js';
 
 import {ModerPicturesPerspectivePicker} from '../perspective-picker/moder-pictures-perspective-picker';
-
-interface LastItemInfo {
-  hasItem: boolean;
-  item: Item | null;
-}
-
 @Component({
   selector: 'app-moder-pictures-item',
   imports: [
@@ -137,19 +130,20 @@ export class ModerPicturesItem {
   protected readonly specialNameLoading = signal(false);
   protected readonly licenseLoading = signal(false);
 
-  readonly #change$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly id$ = this.#route.paramMap.pipe(
-    map((params) => params.get('id') ?? ''),
-    distinctUntilChanged(),
-    tap((id) => {
-      this.#pageEnv.set({
-        layout: {isAdminPage: true},
-        pageId: PageId.MODER_PICTURE,
-        title: $localize`Picture №${id}`,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
+  protected readonly id = toSignal(
+    this.#route.paramMap.pipe(
+      map((params) => params.get('id') ?? ''),
+      distinctUntilChanged(),
+      tap((id) => {
+        this.#pageEnv.set({
+          layout: {isAdminPage: true},
+          pageId: PageId.MODER_PICTURE,
+          title: $localize`Picture №${id}`,
+        });
+      }),
+      shareReplay({bufferSize: 1, refCount: false}),
+    ),
+    {requireSync: true},
   );
 
   readonly #settingsModel = signal({year: '', month: '0', day: '0', specialName: ''});
@@ -178,128 +172,171 @@ export class ModerPicturesItem {
     disabled(path, {when: () => this.copyrightsLoading()});
   });
 
-  protected readonly picture$ = combineLatest([this.id$, this.#change$]).pipe(
-    switchMap(([id]) =>
-      this.#picturesClient.getPicture(
-        new PicturesRequest({
-          fields: new PictureFields({
-            acceptedCount: true,
-            copyrights: true,
-            dfDistance: new DfDistanceRequest({
-              fields: new DfDistanceFields({
-                dstPicture: new PicturesRequest({
-                  fields: new PictureFields({thumbMedium: true}),
-                }),
-              }),
-              limit: 1,
-            }),
-            exif: true,
-            image: true,
-            isLast: true,
-            moderVoted: true,
-            pictureItem: new PictureItemsRequest({
-              fields: new PictureItemFields({
-                item: new ItemsRequest({
-                  fields: new ItemFields({
-                    nameHtml: true,
+  protected readonly pictureResource = rxResource({
+    params: () => this.id(),
+    stream: ({params: id}) =>
+      defer(() =>
+        this.#picturesClient.getPicture(
+          new PicturesRequest({
+            fields: new PictureFields({
+              acceptedCount: true,
+              copyrights: true,
+              dfDistance: new DfDistanceRequest({
+                fields: new DfDistanceFields({
+                  dstPicture: new PicturesRequest({
+                    fields: new PictureFields({thumbMedium: true}),
                   }),
                 }),
-                itemParentCacheAncestor: new ItemParentCacheRequest({
-                  fields: new ItemParentCacheFields({
-                    parentItem: new ItemsRequest({
-                      fields: new ItemFields({nameHtml: true}),
+                limit: 1,
+              }),
+              exif: true,
+              image: true,
+              isLast: true,
+              moderVoted: true,
+              pictureItem: new PictureItemsRequest({
+                fields: new PictureItemFields({
+                  item: new ItemsRequest({
+                    fields: new ItemFields({
+                      nameHtml: true,
                     }),
                   }),
-                  options: new ItemParentCacheListOptions({
-                    itemsByParentId: new ItemListOptions({
-                      typeId: ItemType.ITEM_TYPE_BRAND,
+                  itemParentCacheAncestor: new ItemParentCacheRequest({
+                    fields: new ItemParentCacheFields({
+                      parentItem: new ItemsRequest({
+                        fields: new ItemFields({nameHtml: true}),
+                      }),
+                    }),
+                    options: new ItemParentCacheListOptions({
+                      itemsByParentId: new ItemListOptions({
+                        typeId: ItemType.ITEM_TYPE_BRAND,
+                      }),
                     }),
                   }),
                 }),
               }),
+              pictureModerVotes: new PictureModerVoteRequest(),
+              replaceable: new PicturesRequest(),
+              rights: true,
+              siblings: new PicturesRequest({fields: new PictureFields({nameText: true})}),
+              specialName: true,
+              thumbMedium: true,
+              views: true,
             }),
-            pictureModerVotes: new PictureModerVoteRequest(),
-            replaceable: new PicturesRequest(),
-            rights: true,
-            siblings: new PicturesRequest({fields: new PictureFields({nameText: true})}),
-            specialName: true,
-            thumbMedium: true,
-            views: true,
+            language: this.#languageService.language,
+            options: new PictureListOptions({id}),
           }),
-          language: this.#languageService.language,
-          options: new PictureListOptions({id}),
+        ),
+      ).pipe(
+        catchError((error: unknown) => {
+          if (isNotFoundError(error)) this.#notFound.report();
+          else this.#toastService.handleError(error);
+          return throwError(() => error);
+        }),
+        tap((picture) => {
+          this.#copyrightsModel.set(picture.copyrights);
+          this.#settingsModel.set({
+            year: picture.takenDate?.year ? String(picture.takenDate.year) : '',
+            month: String(picture.takenDate?.month ?? 0),
+            day: String(picture.takenDate?.day ?? 0),
+            specialName: picture.specialName,
+          });
+          this.#licenseModel.set({license: String(picture.license), sourceUrl: picture.sourceUrl});
         }),
       ),
-    ),
-    catchError(() => {
-      this.#notFound.report();
-      return EMPTY;
-    }),
-    tap((picture) => {
-      this.#copyrightsModel.set(picture.copyrights);
-      this.#settingsModel.set({
-        year: picture.takenDate?.year ? String(picture.takenDate.year) : '',
-        month: String(picture.takenDate?.month ?? 0),
-        day: String(picture.takenDate?.day ?? 0),
-        specialName: picture.specialName,
-      });
-      this.#licenseModel.set({license: String(picture.license), sourceUrl: picture.sourceUrl});
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
+  });
+  protected readonly picture = computed(() =>
+    this.pictureResource.hasValue() ? this.pictureResource.value() : undefined,
   );
 
-  protected readonly changeStatusUser$: Observable<null | User> = this.picture$.pipe(
-    // Authenticated lookups on this screen (and for the owner below): it is a moderation tool,
-    // where an admin is meant to see a deleted account's name rather than the stub the cacheable
-    // anonymous lookup returns.
-    switchMap((picture) => this.#userService.getUser$(picture.changeStatusUserId, {authenticated: true})),
-  );
-
-  protected readonly owner$: Observable<null | User> = this.picture$.pipe(
-    switchMap((picture) => this.#userService.getUser$(picture.ownerId, {authenticated: true})),
-  );
-
-  protected readonly ip$: Observable<IP | null> = this.picture$.pipe(
-    switchMap((picture) => {
-      if (!picture.ipAddress) {
-        return of(null);
-      }
-      return this.#ipService.getIp$(picture.ipAddress, ['blacklist', 'rights']).pipe(catchError(() => of(null)));
-    }),
-  );
-
-  protected readonly lastItem$: Observable<LastItemInfo> = this.picture$.pipe(
-    switchMap((picture) => {
-      const localStorage = this.#window?.localStorage;
-      if (!localStorage) {
-        return of({hasItem: false, item: null});
-      }
-
-      const lastItemId = localStorage.getItem('last_item');
-      if (!lastItemId) {
-        return of({hasItem: false, item: null});
-      }
-
-      return this.#itemsClient
-        .item(
-          new ItemRequest({
-            fields: new ItemFields({nameHtml: true}),
-            id: lastItemId,
-            language: this.#languageService.language,
+  protected readonly changeStatusUserResource = rxResource({
+    params: () => this.picture() ?? null,
+    stream: ({params}) =>
+      params === null
+        ? of(undefined)
+        : defer(() => {
+            const picture = params;
+            return defer(() => this.#userService.getUser$(picture.changeStatusUserId, {authenticated: true}));
           }),
-        )
-        .pipe(
-          catchError((error: unknown) => {
-            if (isNotFoundError(error)) {
-              return of(null);
-            }
-            console.error(error);
-            return throwError(() => error);
+  });
+  protected readonly changeStatusUser = computed(() =>
+    this.changeStatusUserResource.hasValue() ? this.changeStatusUserResource.value() : undefined,
+  );
+
+  protected readonly ownerResource = rxResource({
+    params: () => this.picture() ?? null,
+    stream: ({params}) =>
+      params === null
+        ? of(undefined)
+        : defer(() => {
+            const picture = params;
+            return defer(() => this.#userService.getUser$(picture.ownerId, {authenticated: true}));
           }),
-          map((item) => ({hasItem: item ? this.hasItem(picture.pictureItems?.items ?? [], item.id) : false, item})),
-        );
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
+  });
+  protected readonly owner = computed(() => (this.ownerResource.hasValue() ? this.ownerResource.value() : undefined));
+
+  protected readonly ipResource = rxResource({
+    params: () => this.picture() ?? null,
+    stream: ({params}) =>
+      params === null
+        ? of(undefined)
+        : defer(() => {
+            const picture = params;
+            return defer(() => {
+              if (!picture.ipAddress) {
+                return of(null);
+              }
+              return this.#ipService
+                .getIp$(picture.ipAddress, ['blacklist', 'rights'])
+                .pipe(catchError(() => of(null)));
+            });
+          }),
+  });
+  protected readonly ip = computed(() => (this.ipResource.hasValue() ? this.ipResource.value() : undefined));
+
+  protected readonly lastItemResource = rxResource({
+    params: () => (this.picture()?.rights?.move ? (this.picture() ?? null) : null),
+    stream: ({params}) =>
+      params === null
+        ? of(undefined)
+        : defer(() => {
+            const picture = params;
+            return defer(() => {
+              const localStorage = this.#window?.localStorage;
+              if (!localStorage) {
+                return of({hasItem: false, item: null});
+              }
+
+              const lastItemId = localStorage.getItem('last_item');
+              if (!lastItemId) {
+                return of({hasItem: false, item: null});
+              }
+
+              return this.#itemsClient
+                .item(
+                  new ItemRequest({
+                    fields: new ItemFields({nameHtml: true}),
+                    id: lastItemId,
+                    language: this.#languageService.language,
+                  }),
+                )
+                .pipe(
+                  catchError((error: unknown) => {
+                    if (isNotFoundError(error)) {
+                      return of(null);
+                    }
+                    console.error(error);
+                    return throwError(() => error);
+                  }),
+                  map((item) => ({
+                    hasItem: item ? this.hasItem(picture.pictureItems?.items ?? [], item.id) : false,
+                    item,
+                  })),
+                );
+            });
+          }),
+  });
+  protected readonly lastItem = computed(() =>
+    this.lastItemResource.hasValue() ? this.lastItemResource.value() : undefined,
   );
 
   protected readonly banPeriods = [
@@ -397,7 +434,7 @@ export class ModerPicturesItem {
   }
 
   protected pictureVoted() {
-    this.#change$.next();
+    this.pictureResource.reload();
   }
 
   private hasItem(items: PictureItem[], itemId: string): boolean {
@@ -431,7 +468,7 @@ export class ModerPicturesItem {
       .subscribe({
         next: () => {
           localStorage.setItem('last_item', item.id);
-          this.#change$.next();
+          this.pictureResource.reload();
           this.pictureItemLoading.set(false);
         },
       });
@@ -458,7 +495,7 @@ export class ModerPicturesItem {
       .subscribe({
         next: () => {
           localStorage.setItem('last_item', dstItemId);
-          this.#change$.next();
+          this.pictureResource.reload();
           this.pictureItemLoading.set(false);
         },
       });
@@ -582,7 +619,7 @@ export class ModerPicturesItem {
         }),
       )
       .subscribe(() => {
-        this.#change$.next();
+        this.pictureResource.reload();
       });
   }
 
@@ -615,7 +652,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
           this.repairLoading.set(false);
         },
       });
@@ -634,7 +671,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
           this.repairLoading.set(false);
         },
       });
@@ -653,7 +690,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
           this.repairLoading.set(false);
         },
       });
@@ -672,7 +709,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
           this.repairLoading.set(false);
         },
       });
@@ -691,7 +728,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
           this.similarLoading.set(false);
         },
       });
@@ -716,7 +753,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
           this.pictureItemLoading.set(false);
         },
       });
@@ -737,7 +774,7 @@ export class ModerPicturesItem {
       .subscribe({
         next: () => {
           this.replaceLoading.set(false);
-          this.#change$.next();
+          this.pictureResource.reload();
         },
       });
   }
@@ -755,7 +792,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
           this.replaceLoading.set(false);
         },
       });
@@ -772,7 +809,7 @@ export class ModerPicturesItem {
       )
       .subscribe({
         next: () => {
-          this.#change$.next();
+          this.pictureResource.reload();
         },
       });
   }
@@ -791,7 +828,7 @@ export class ModerPicturesItem {
             }),
           ),
         );
-        this.#change$.next();
+        this.pictureResource.reload();
       } catch (error: unknown) {
         this.#toastService.handleError(error);
       }

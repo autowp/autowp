@@ -18,7 +18,7 @@
   <a class="nav-link" routerLink="/moder/traffic/whitelist">Whitelist</a>
 </div>
 
-@if (items$ | async; as items) {
+@if (items(); as items) {
   @for (item of items; track item) {
     <div class="row">
       <div class="col-sm-2">

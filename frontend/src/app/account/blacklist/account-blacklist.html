@@ -8,7 +8,7 @@
   >
 </p>
 <div class="row gy-5">
-  @for (user of items$ | async; track user.id) {
+  @for (user of items(); track user.id) {
     <div class="col-md-6">
       <div class="d-flex justify-content-start">
         <div class="align-self-start me-3">

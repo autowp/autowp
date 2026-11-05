@@ -12,13 +12,13 @@
   </ol>
 </nav>
 
-@if (id$ | async; as id) {
+@if (id(); as id) {
   <div class="page-header">
     <h1 i18n>Picture №{{ id }}</h1>
   </div>
 }
 
-@if (picture$ | async; as picture) {
+@if (picture(); as picture) {
   @if (picture.siblings) {
     <div class="row mb-4">
       <div class="col-md-3">
@@ -193,7 +193,7 @@
                       <i class="bi bi-arrow-right me-1" aria-hidden="true"></i>
                       <ng-container i18n>move to</ng-container> …
                     </a>
-                    @if (lastItem$ | async; as lastItem) {
+                    @if (lastItem(); as lastItem) {
                       @if (
                         item.type === PictureItemType.PICTURE_ITEM_CONTENT &&
                         ((lastItem.item && !lastItem.hasItem) || (item.itemParentCacheAncestors?.items || []).length)
@@ -258,7 +258,7 @@
     }
     @if (picture.rights?.move) {
       <div>
-        @if (lastItem$ | async; as lastItem) {
+        @if (lastItem(); as lastItem) {
           @if (lastItem.item && !lastItem.hasItem) {
             @if (lastItem.item.itemTypeId !== ItemType.ITEM_TYPE_COPYRIGHT) {
               <div>
@@ -483,7 +483,7 @@
         }
         <h3 i18n>Status/Delete/Accept</h3>
         <div class="card card-body mb-4">
-          @if (changeStatusUser$ | async; as user) {
+          @if (changeStatusUser(); as user) {
             <app-user [user]="user" />
           }
           @if (picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
@@ -629,12 +629,12 @@
         }
         <h3 i18n>Uploader</h3>
         <div class="card card-body mb-4">
-          @if (owner$ | async; as owner) {
+          @if (owner(); as owner) {
             <app-user [user]="owner" />
           } @else {
             <span i18n>Unknown</span>
           }
-          @if (ip$ | async; as ip) {
+          @if (ip(); as ip) {
             @if (ip.address) {
               <div>
                 <ng-container i18n>IP-address of uploader:</ng-container>&ngsp;

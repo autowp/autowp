@@ -1,10 +1,11 @@
 import type {OnInit} from '@angular/core';
 import type {FieldTree} from '@angular/forms/signals';
-import type {ContentReport, Pages, User} from '@grpc/spec.pb';
+import type {ContentReport, User} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, Injector, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, submit} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -23,27 +24,25 @@ import {UserService} from '@services/user';
 import {numericEnumValue} from '@utils/numeric-enum-value';
 import {timestampToDate} from '@utils/timestamp';
 import {
-  BehaviorSubject,
   catchError,
-  combineLatest,
+  defer,
   distinctUntilChanged,
-  EMPTY,
   firstValueFrom,
   map,
   of,
   shareReplay,
   switchMap,
+  throwError,
 } from 'rxjs';
 
 import {Paginator} from '../../paginator/paginator/paginator';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserLink} from '../../user/user/user-link';
-
 interface ContentReportInList {
   readonly report: ContentReport;
-  readonly reporter$: Observable<null | User>;
+  readonly reporter: null | User;
   readonly resolution: FieldTree<string>;
-  readonly resolvedBy$: Observable<null | User>;
+  readonly resolvedBy: null | User;
 }
 
 interface CommentLink {
@@ -73,80 +72,94 @@ export class ModerContentReports implements OnInit {
   });
   protected readonly filterForm = form(this.#filterModel);
 
-  readonly #status$ = this.#route.queryParamMap.pipe(
-    map((params) =>
-      numericEnumValue(
-        ContentReportStatus,
-        parseInt(params.get('status') ?? '', 10) || ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
-        ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
+  readonly #status = toSignal(
+    this.#route.queryParamMap.pipe(
+      map((params) =>
+        numericEnumValue(
+          ContentReportStatus,
+          parseInt(params.get('status') ?? '', 10) || ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
+          ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
+        ),
       ),
+      distinctUntilChanged(),
     ),
-    distinctUntilChanged(),
+    {requireSync: true},
   );
 
-  readonly #entityType$ = this.#route.queryParamMap.pipe(
-    map((params) =>
-      numericEnumValue(
-        ContentReportEntityType,
-        parseInt(params.get('entity_type') ?? '', 10),
-        ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED,
+  readonly #entityType = toSignal(
+    this.#route.queryParamMap.pipe(
+      map((params) =>
+        numericEnumValue(
+          ContentReportEntityType,
+          parseInt(params.get('entity_type') ?? '', 10),
+          ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED,
+        ),
       ),
+      distinctUntilChanged(),
     ),
-    distinctUntilChanged(),
+    {requireSync: true},
   );
 
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    map((page) => (page ? page : 0)),
-    distinctUntilChanged(),
+  readonly #page = toSignal(
+    this.#route.queryParamMap.pipe(
+      map((params) => parseInt(params.get('page') ?? '', 10)),
+      map((page) => (page ? page : 0)),
+      distinctUntilChanged(),
+    ),
+    {requireSync: true},
   );
-
-  readonly #reload$ = new BehaviorSubject<void>(undefined);
 
   readonly #rowForms = new Map<string, FieldTree<string>>();
 
-  protected readonly data$: Observable<{paginator?: Pages; reports: ContentReportInList[]}> = combineLatest([
-    this.#status$,
-    this.#entityType$,
-    this.#page$,
-    this.#reload$,
-  ]).pipe(
-    switchMap(([status, entityType, page]) => {
-      this.#filterModel.set({status: `${status}`, entityType: `${entityType}`});
+  protected readonly dataResource = rxResource({
+    params: () => [this.#status(), this.#entityType(), this.#page()] as const,
+    stream: ({params: [status, entityType, page]}) =>
+      defer(() => {
+        this.#filterModel.set({status: `${status}`, entityType: `${entityType}`});
 
-      return this.#autowpClient.getContentReports(new ContentReportsRequest({entityType, page, status}));
-    }),
-    catchError((error: unknown) => {
-      this.#toasts.handleError(error);
+        return this.#autowpClient.getContentReports(new ContentReportsRequest({entityType, page, status}));
+      }).pipe(
+        catchError((error: unknown) => {
+          this.#toasts.handleError(error);
 
-      return EMPTY;
-    }),
-    map((response) => {
-      const previousForms = new Map(this.#rowForms);
-      this.#rowForms.clear();
-      return {
-        paginator: response.paginator,
-        reports: (response.items ?? []).map((report): ContentReportInList => {
-          const resolution =
-            previousForms.get(report.id) ??
-            form(
-              signal(''),
-              (path) => {
-                disabled(path, {when: ({state}) => state.submitting()});
-              },
-              {injector: this.#injector},
-            );
-          this.#rowForms.set(report.id, resolution);
+          return throwError(() => error);
+        }),
+        switchMap((response) =>
+          this.#userService
+            .getUserMap$(
+              (response.items ?? []).flatMap((report) => [report.reporterId, report.resolvedBy]),
+              {authenticated: true},
+            )
+            .pipe(map((users) => ({response, users}))),
+        ),
+        map(({response, users}) => {
+          const previousForms = new Map(this.#rowForms);
+          this.#rowForms.clear();
           return {
-            report,
-            reporter$: this.#userService.getUser$(report.reporterId, {authenticated: true}),
-            resolution,
-            resolvedBy$: this.#userService.getUser$(report.resolvedBy, {authenticated: true}),
+            paginator: response.paginator,
+            reports: (response.items ?? []).map((report): ContentReportInList => {
+              const resolution =
+                previousForms.get(report.id) ??
+                form(
+                  signal(''),
+                  (path) => {
+                    disabled(path, {when: ({state}) => state.submitting()});
+                  },
+                  {injector: this.#injector},
+                );
+              this.#rowForms.set(report.id, resolution);
+              return {
+                report,
+                reporter: users.get(report.reporterId) ?? null,
+                resolution,
+                resolvedBy: users.get(report.resolvedBy) ?? null,
+              };
+            }),
           };
         }),
-      };
-    }),
-  );
+      ),
+  });
+  protected readonly data = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
   readonly #commentLinkCache = new Map<string, Observable<CommentLink | null>>();
 
@@ -212,7 +225,7 @@ export class ModerContentReports implements OnInit {
             }),
           ),
         );
-        this.#reload$.next();
+        this.dataResource.reload();
       } catch (error: unknown) {
         this.#toasts.handleError(error);
       }

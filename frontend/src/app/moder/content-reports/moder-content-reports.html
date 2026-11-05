@@ -39,7 +39,7 @@
   </div>
 </form>
 
-@if (data$ | async; as data) {
+@if (data(); as data) {
   <ul class="list-group mb-3">
     @for (row of data.reports; track row.report.id) {
       <li class="list-group-item">
@@ -81,7 +81,7 @@
 
         <p class="mb-2 small text-muted">
           <ng-container i18n>Reported by:</ng-container>&ngsp;
-          @if (row.reporter$ | async; as reporter) {
+          @if (row.reporter; as reporter) {
             <app-user [user]="reporter" />
           } @else {
             <ng-container i18n>anonymous</ng-container>
@@ -119,7 +119,7 @@
         } @else {
           <p class="mb-0 small text-muted">
             <ng-container i18n="@@moder-content-report-resolved-by">Resolved by</ng-container>&ngsp;
-            @if (row.resolvedBy$ | async; as resolvedBy) {
+            @if (row.resolvedBy; as resolvedBy) {
               <app-user [user]="resolvedBy" />
             }
             @if (timestampToDate(row.report.resolveTime); as resolveTime) {

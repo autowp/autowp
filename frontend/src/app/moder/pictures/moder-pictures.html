@@ -448,7 +448,7 @@
     <h2>
       <ng-container i18n>Pictures</ng-container>&ngsp;
 
-      @if (data$ | async; as data) {
+      @if (data(); as data) {
         @if (data.paginator; as paginator) {
           @if (paginator.totalItemCount) {
             <small i18n="@@n-pictures">{paginator.totalItemCount, plural,
@@ -464,7 +464,7 @@
 
     <div style="margin-bottom: 20px">
       <div class="btn-group">
-        @if (data$ | async; as data) {
+        @if (data(); as data) {
           <button
             type="button"
             class="btn btn-success"
@@ -485,7 +485,7 @@
             <ng-container i18n>Want accept</ng-container>
             <span class="caret" aria-hidden="true"></span>
           </button>
-          @if (data$ | async; as data) {
+          @if (data(); as data) {
             <div ngbDropdownMenu>
               @for (template of moderVoteTemplateOptions$ | async; track template) {
                 <div role="menuitem">
@@ -513,7 +513,7 @@
             <ng-container i18n>Want delete</ng-container>
             <span class="caret" aria-hidden="true"></span>
           </button>
-          @if (data$ | async; as data) {
+          @if (data(); as data) {
             <div ngbDropdownMenu>
               @for (template of moderVoteTemplateOptions$ | async; track template) {
                 <div role="menuitem">
@@ -543,7 +543,7 @@
       </div>
     </div>
 
-    @if (data$ | async; as data) {
+    @if (data(); as data) {
       @if (data.paginator) {
         <app-paginator [data]="data.paginator" />
       }

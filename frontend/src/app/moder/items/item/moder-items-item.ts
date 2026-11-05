@@ -1,8 +1,8 @@
-import type {Item, TreeItem} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
+import type {Item} from '@grpc/spec.pb';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   GetTreeRequest,
@@ -25,19 +25,7 @@ import {PageId} from '@services/page-id';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-  tap,
-  throwError,
-} from 'rxjs';
+import {catchError, defer, distinctUntilChanged, map, of, tap, throwError} from 'rxjs';
 
 import {ModerItemsItemCatalogue} from './catalogue/moder-items-item-catalogue';
 import {ModerItemsItemGdpr} from './gdpr/moder-items-item-gdpr';
@@ -48,7 +36,6 @@ import {ModerItemsItemName} from './name/moder-items-item-name';
 import {ModerItemsItemPictures} from './pictures/moder-items-item-pictures';
 import {ModerItemsItemTree} from './tree/moder-items-item-tree';
 import {ModerItemsItemVehicles} from './vehicles/moder-items-item-vehicles';
-
 interface Tab {
   count: number;
   visible: boolean;
@@ -82,8 +69,6 @@ export class ModerItemsItem {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
   readonly #cdr = inject(ChangeDetectorRef);
-
-  protected readonly reloadItem$ = new BehaviorSubject<void>(void 0);
 
   protected readonly specsAllowed = signal(false);
   protected readonly canEditSpecifications$ = this.#auth.authenticated$;
@@ -125,124 +110,157 @@ export class ModerItemsItem {
     visible: true,
   };
 
-  protected readonly activeTab$ = this.#route.queryParamMap.pipe(
-    map((params) => params.get('tab')),
-    distinctUntilChanged(),
-    // A `?tab=` query param (present, empty value) yields '' from params.get(), not null - ??
-    // would treat that as a real tab value instead of falling back to 'meta' like the ternary
-    // does.
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    map((tab) => (tab ? tab : 'meta')),
-  );
-
-  readonly #itemID: Observable<string> = this.#route.paramMap.pipe(
-    map((params) => params.get('id') ?? ''),
-    distinctUntilChanged(),
-  );
-
-  protected readonly item$: Observable<Item> = combineLatest([this.#itemID, this.reloadItem$]).pipe(
-    switchMap(([id]) =>
-      this.#itemsClient.item(
-        new ItemRequest({
-          fields: new ItemFields({
-            childsCount: true,
-            engineVehiclesCount: true,
-            exactPicturesCount: true,
-            fullName: true,
-            itemLanguageCount: true,
-            linksCount: true,
-            location: true,
-            logo: true,
-            meta: true,
-            nameDefault: true,
-            nameHtml: true,
-            nameText: true,
-            parentsCount: true,
-            specificationsCount: true,
-            subscription: true,
-          }),
-          id,
-          language: this.#languageService.language,
-        }),
-      ),
+  readonly activeTab = toSignal(
+    this.#route.queryParamMap.pipe(
+      map((params) => params.get('tab')),
+      distinctUntilChanged(),
+      // A `?tab=` query param (present, empty value) yields '' from params.get(), not null - ??
+      // would treat that as a real tab value instead of falling back to 'meta' like the ternary
+      // does.
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      map((tab) => (tab ? tab : 'meta')),
     ),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      this.#notFound.report();
-      return EMPTY;
-    }),
-    tap((item) => {
-      this.#pageEnv.set({
-        layout: {isAdminPage: true},
-        pageId: PageId.MODER_ITEM,
-        title: item.nameText,
-      });
-
-      const typeID = item.itemTypeId;
-
-      this.specsAllowed.set([ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(typeID));
-
-      this.nameTab.count = item.itemLanguageCount;
-      this.logoTab.count = item.logo ? 1 : 0;
-      this.catalogueTab.count = item.parentsCount + item.childsCount;
-      this.vehiclesTab.count = item.engineVehiclesCount;
-      this.picturesTab.count = item.exactPicturesCount;
-      this.linksTab.count = item.linksCount;
-
-      this.metaTab.visible = true;
-      this.nameTab.visible = true;
-      this.catalogueTab.visible = ![ItemType.ITEM_TYPE_COPYRIGHT, ItemType.ITEM_TYPE_MUSEUM].includes(typeID);
-      this.treeTab.visible = ![ItemType.ITEM_TYPE_COPYRIGHT, ItemType.ITEM_TYPE_MUSEUM].includes(typeID);
-      this.linksTab.visible = [ItemType.ITEM_TYPE_BRAND, ItemType.ITEM_TYPE_MUSEUM, ItemType.ITEM_TYPE_PERSON].includes(
-        typeID,
-      );
-      this.logoTab.visible = typeID === ItemType.ITEM_TYPE_BRAND;
-      this.gdprTab.visible = typeID === ItemType.ITEM_TYPE_PERSON;
-      this.vehiclesTab.visible = typeID === ItemType.ITEM_TYPE_ENGINE;
-      this.picturesTab.visible = [
-        ItemType.ITEM_TYPE_BRAND,
-        ItemType.ITEM_TYPE_COPYRIGHT,
-        ItemType.ITEM_TYPE_ENGINE,
-        ItemType.ITEM_TYPE_FACTORY,
-        ItemType.ITEM_TYPE_MUSEUM,
-        ItemType.ITEM_TYPE_PERSON,
-        ItemType.ITEM_TYPE_VEHICLE,
-      ].includes(typeID);
-      this.#cdr.markForCheck();
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
+    {requireSync: true},
   );
 
-  protected readonly tree$: Observable<TreeItem> = this.item$.pipe(
-    switchMap((item) =>
-      this.#itemsClient.getTree(new GetTreeRequest({id: item.id, language: this.#languageService.language})),
+  readonly #itemID = toSignal(
+    this.#route.paramMap.pipe(
+      map((params) => params.get('id') ?? ''),
+      distinctUntilChanged(),
     ),
+    {requireSync: true},
   );
 
-  protected readonly randomPicture$ = this.item$.pipe(
-    switchMap((item) =>
-      this.#picturesClient.getPicture(
-        new PicturesRequest({
-          fields: new PictureFields({thumbMedium: true}),
-          limit: 1,
-          options: new PictureListOptions({
-            pictureItem: new PictureItemListOptions({
-              itemParentCacheAncestor: new ItemParentCacheListOptions({
-                parentId: item.id,
-              }),
+  protected readonly itemResource = rxResource({
+    params: () => this.#itemID(),
+    stream: ({params: id}) =>
+      defer(() =>
+        this.#itemsClient.item(
+          new ItemRequest({
+            fields: new ItemFields({
+              childsCount: true,
+              engineVehiclesCount: true,
+              exactPicturesCount: true,
+              fullName: true,
+              itemLanguageCount: true,
+              linksCount: true,
+              location: true,
+              logo: true,
+              meta: true,
+              nameDefault: true,
+              nameHtml: true,
+              nameText: true,
+              parentsCount: true,
+              specificationsCount: true,
+              subscription: true,
             }),
+            id,
+            language: this.#languageService.language,
           }),
-          order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
+        ),
+      ).pipe(
+        catchError((err: unknown) => {
+          this.#toastService.handleError(err);
+          if (isNotFoundError(err)) this.#notFound.report();
+          return throwError(() => err);
+        }),
+        tap((item) => {
+          this.#pageEnv.set({
+            layout: {isAdminPage: true},
+            pageId: PageId.MODER_ITEM,
+            title: item.nameText,
+          });
+
+          const typeID = item.itemTypeId;
+
+          this.specsAllowed.set([ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(typeID));
+
+          this.nameTab.count = item.itemLanguageCount;
+          this.logoTab.count = item.logo ? 1 : 0;
+          this.catalogueTab.count = item.parentsCount + item.childsCount;
+          this.vehiclesTab.count = item.engineVehiclesCount;
+          this.picturesTab.count = item.exactPicturesCount;
+          this.linksTab.count = item.linksCount;
+
+          this.metaTab.visible = true;
+          this.nameTab.visible = true;
+          this.catalogueTab.visible = ![ItemType.ITEM_TYPE_COPYRIGHT, ItemType.ITEM_TYPE_MUSEUM].includes(typeID);
+          this.treeTab.visible = ![ItemType.ITEM_TYPE_COPYRIGHT, ItemType.ITEM_TYPE_MUSEUM].includes(typeID);
+          this.linksTab.visible = [
+            ItemType.ITEM_TYPE_BRAND,
+            ItemType.ITEM_TYPE_MUSEUM,
+            ItemType.ITEM_TYPE_PERSON,
+          ].includes(typeID);
+          this.logoTab.visible = typeID === ItemType.ITEM_TYPE_BRAND;
+          this.gdprTab.visible = typeID === ItemType.ITEM_TYPE_PERSON;
+          this.vehiclesTab.visible = typeID === ItemType.ITEM_TYPE_ENGINE;
+          this.picturesTab.visible = [
+            ItemType.ITEM_TYPE_BRAND,
+            ItemType.ITEM_TYPE_COPYRIGHT,
+            ItemType.ITEM_TYPE_ENGINE,
+            ItemType.ITEM_TYPE_FACTORY,
+            ItemType.ITEM_TYPE_MUSEUM,
+            ItemType.ITEM_TYPE_PERSON,
+            ItemType.ITEM_TYPE_VEHICLE,
+          ].includes(typeID);
+          this.#cdr.markForCheck();
         }),
       ),
-    ),
-    catchError((error: unknown) => {
-      if (isNotFoundError(error)) {
-        return of(undefined);
-      }
-      console.error(error);
-      return throwError(() => error);
-    }),
+  });
+  protected readonly item = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
+
+  protected readonly treeResource = rxResource({
+    params: () => {
+      const item = this.item();
+      return this.activeTab() === 'tree' && this.treeTab.visible ? (item ?? null) : null;
+    },
+    stream: ({params}) =>
+      params === null
+        ? of(undefined)
+        : defer(() => {
+            const item = params;
+            return defer(() =>
+              this.#itemsClient.getTree(new GetTreeRequest({id: item.id, language: this.#languageService.language})),
+            );
+          }),
+  });
+  protected readonly tree = computed(() => (this.treeResource.hasValue() ? this.treeResource.value() : undefined));
+
+  protected readonly randomPictureResource = rxResource({
+    params: () => this.item() ?? null,
+    stream: ({params}) =>
+      params === null
+        ? of(undefined)
+        : defer(() => {
+            const item = params;
+            return defer(() =>
+              this.#picturesClient.getPicture(
+                new PicturesRequest({
+                  fields: new PictureFields({thumbMedium: true}),
+                  limit: 1,
+                  options: new PictureListOptions({
+                    pictureItem: new PictureItemListOptions({
+                      itemParentCacheAncestor: new ItemParentCacheListOptions({
+                        parentId: item.id,
+                      }),
+                    }),
+                  }),
+                  order: PicturesRequest.Order.ORDER_CREATED_AT_DESC,
+                }),
+              ),
+            ).pipe(
+              catchError((error: unknown) => {
+                if (isNotFoundError(error)) {
+                  return of(undefined);
+                }
+                console.error(error);
+                return throwError(() => error);
+              }),
+            );
+          }),
+  });
+  protected readonly randomPicture = computed(() =>
+    this.randomPictureResource.hasValue() ? this.randomPictureResource.value() : undefined,
   );
 
   protected toggleSubscription(item: Item) {
