@@ -6,11 +6,12 @@ import {NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {NameCount} from '@utils/name-count/name-count';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {of} from 'rxjs';
 
 @Component({
   selector: 'app-index-categories-category',
-  imports: [NameCount],
+  imports: [ResourceStatus, NameCount],
   templateUrl: './index-categories-category.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,3 +1,4 @@
+<app-resource-status [resource]="itemResource" />
 @if (itemParent(); as itemParent) {
   <div>
     @if (itemParent.type === ItemParentType.ITEM_TYPE_TUNING) {
@@ -39,12 +40,11 @@
         }
         @if (expanded()) {
           <div class="mb-1 ms-4">
+            <app-resource-status [resource]="childsResource" />
             @if (childsResource.hasValue() ? childsResource.value() : undefined; as childs) {
               @for (child of childs; track child) {
                 <app-donate-vod-select-item [itemParent]="child" />
               }
-            } @else {
-              <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
             }
           </div>
         }

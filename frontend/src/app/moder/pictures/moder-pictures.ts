@@ -44,6 +44,7 @@ import {parseStringToGrpcDate} from '@services/utils';
 import {VehicleTypeService} from '@services/vehicle-type';
 import {getModalComponentRef} from '@utils/modal-component-ref';
 import {numericEnumValue} from '@utils/numeric-enum-value';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {getPerspectiveTranslation, getVehicleTypeTranslation} from '@utils/translations';
 import {
   catchError,
@@ -124,6 +125,7 @@ function toPlainVehicleTypes(options: VehicleType[], deep: number): VehicleTypeI
 @Component({
   selector: 'app-moder-pictures',
   imports: [
+    ResourceStatus,
     RouterLink,
     NgbDropdown,
     NgbDropdownToggle,
@@ -637,9 +639,10 @@ export class ModerPictures implements OnInit {
   });
   protected readonly data = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
-  protected readonly moderVoteTemplateOptions$ = this.#moderVoteTemplateService
-    .getTemplates$()
-    .pipe(shareReplay({bufferSize: 1, refCount: false}));
+  protected readonly moderVoteTemplatesResource = this.#moderVoteTemplateService.getTemplatesResource();
+  protected readonly moderVoteTemplateOptions = computed(() =>
+    this.moderVoteTemplatesResource.hasValue() ? this.moderVoteTemplatesResource.value() : [],
+  );
 
   protected readonly PicturesRequest = PicturesRequest;
 

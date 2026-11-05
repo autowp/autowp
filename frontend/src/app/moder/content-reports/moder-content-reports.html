@@ -39,6 +39,7 @@
   </div>
 </form>
 
+<app-resource-status [resource]="dataResource" />
 @if (data(); as data) {
   <ul class="list-group mb-3">
     @for (row of data.reports; track row.report.id) {

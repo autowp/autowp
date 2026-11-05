@@ -6,13 +6,13 @@ import {ItemsClient} from '@grpc/spec.pbsc';
 import {FieldMask} from '@ngx-grpc/well-known-types';
 import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {of} from 'rxjs';
 
 import {ToastsService} from '../../../toasts/toasts.service';
-
 @Component({
   selector: 'app-cars-specifications-editor-engine',
-  imports: [RouterLink],
+  imports: [ResourceStatus, RouterLink],
   templateUrl: './cars-specifications-editor-engine.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

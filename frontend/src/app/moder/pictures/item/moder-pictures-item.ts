@@ -58,6 +58,7 @@ import {browserWindow} from '@utils/browser-window';
 import {pictureLicenseOptions} from '@utils/license-badge/license-badge';
 import {LicenseHelpModal} from '@utils/license-help-modal/license-help-modal';
 import {numericEnumValue} from '@utils/numeric-enum-value';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {getPictureLicenseTranslation, pictureLicenseRequiresSourceUrl} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
@@ -86,6 +87,7 @@ import {ModerPicturesPerspectivePicker} from '../perspective-picker/moder-pictur
 @Component({
   selector: 'app-moder-pictures-item',
   imports: [
+    ResourceStatus,
     FormField,
     RouterLink,
     NgbTooltip,

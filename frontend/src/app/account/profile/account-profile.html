@@ -3,6 +3,7 @@
 </div>
 
 <h2 i18n>Personal info</h2>
+<app-resource-status [resource]="userResource" />
 @if (user(); as user) {
   <div class="card card-body mb-4">
     <p>{{ user.name }} (<a i18n [href]="changeProfileUrl">Change</a>)</p>

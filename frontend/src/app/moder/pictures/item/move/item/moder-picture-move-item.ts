@@ -12,10 +12,10 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map, of} from 'rxjs';
 
 import type {PictureItemMoveSelection} from '../moder-pictures-item-move';
-
 interface ListItem {
   expanded: boolean;
   row: ItemParent;
@@ -23,7 +23,7 @@ interface ListItem {
 
 @Component({
   selector: 'app-moder-picture-move-item',
-  imports: [],
+  imports: [ResourceStatus],
   templateUrl: './moder-picture-move-item.html',
   styles: `
     :host {

@@ -1,3 +1,4 @@
+<app-resource-status [resource]="engineResource" />
 <h2 i18n>Engine from catalogue</h2>
 
 @if (item(); as item) {
@@ -32,7 +33,7 @@
             }
           </div>
         </div>
-      } @else {
+      } @else if (!engineResource.isLoading() && !engineResource.error()) {
         <p i18n>[not selected]</p>
         <div class="d-flex flex-wrap gap-2">
           <a routerLink="/cars/select-engine" class="btn btn-primary" i18n [queryParams]="{item_id: item.id}"

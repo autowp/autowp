@@ -3,6 +3,7 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {CommentVote, GetCommentVotesRequest} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
@@ -10,7 +11,7 @@ import {UserLink} from '../../user/user/user-link';
 
 @Component({
   selector: 'app-comments-votes',
-  imports: [UserLink],
+  imports: [ResourceStatus, UserLink],
   templateUrl: './comments-votes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

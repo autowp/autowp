@@ -4,6 +4,7 @@ import {VotingRequest} from '@grpc/spec.pb';
 import {VotingsClient} from '@grpc/spec.pbsc';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from '@services/user';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map, of, switchMap, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
@@ -11,7 +12,7 @@ import {UserLink} from '../../user/user/user-link';
 
 @Component({
   selector: 'app-voting-votes',
-  imports: [UserLink],
+  imports: [ResourceStatus, UserLink],
   templateUrl: './voting-votes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

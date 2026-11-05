@@ -25,6 +25,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {numericEnumValue} from '@utils/numeric-enum-value';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {getItemTypeTranslation} from '@utils/translations';
 import {combineLatest, defer, distinctUntilChanged, firstValueFrom, map, tap} from 'rxjs';
 
@@ -45,7 +46,7 @@ interface ParentEditor {
 
 @Component({
   selector: 'app-moder-item-parent',
-  imports: [RouterLink, FormField, InvalidParamsPipe, UpperCasePipe],
+  imports: [ResourceStatus, RouterLink, FormField, InvalidParamsPipe, UpperCasePipe],
   templateUrl: './moder-item-parent.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,3 +1,4 @@
+<app-resource-status [resource]="itemsResource" />
 <div class="page-header">
   <h1 i18n>Blacklist</h1>
 </div>
@@ -42,6 +43,8 @@
       </div>
     </div>
   } @empty {
-    <p i18n>Your blacklist is empty</p>
+    @if (itemsResource.hasValue() && !itemsResource.isLoading()) {
+      <p i18n>Your blacklist is empty</p>
+    }
   }
 </div>

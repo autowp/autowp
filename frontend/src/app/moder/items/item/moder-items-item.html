@@ -12,6 +12,7 @@
   </ol>
 </nav>
 
+<app-resource-status [resource]="itemResource" />
 @if (item(); as item) {
   <div class="page-header">
     <h1>{{ getItemTypeTranslation(item.itemTypeId, 'name') }}: <span [innerHTML]="item.nameHtml"></span></h1>
@@ -185,6 +186,7 @@
 
     @if (treeTab.visible && activeTab === 'tree') {
       <div class="tree card card-body">
+        <app-resource-status [resource]="treeResource" />
         @if (tree(); as tree) {
           <app-moder-items-item-tree [item]="tree" />
         }

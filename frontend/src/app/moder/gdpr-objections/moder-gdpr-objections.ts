@@ -27,6 +27,7 @@ import {AuthService, Role} from '@services/auth-service';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {timestampToDate} from '@utils/timestamp';
 import {catchError, defer, distinctUntilChanged, EMPTY, firstValueFrom, map, of, shareReplay, switchMap} from 'rxjs';
 
@@ -58,7 +59,7 @@ interface ObjectionInList {
 
 @Component({
   selector: 'app-moder-gdpr-objections',
-  imports: [FormField, RouterLink, Paginator, AsyncPipe, DatePipe],
+  imports: [ResourceStatus, FormField, RouterLink, Paginator, AsyncPipe, DatePipe],
   templateUrl: './moder-gdpr-objections.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

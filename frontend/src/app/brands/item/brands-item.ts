@@ -7,11 +7,12 @@ import {NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {of} from 'rxjs';
 
 @Component({
   selector: 'app-brands-item',
-  imports: [RouterLink, NgbPopover],
+  imports: [ResourceStatus, RouterLink, NgbPopover],
   templateUrl: './brands-item.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

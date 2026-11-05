@@ -32,6 +32,7 @@
   <label class="form-check-label" for="gdpr-objections-hits-only" i18n>Only show entries hit again</label>
 </form>
 
+<app-resource-status [resource]="dataResource" />
 @if (data(); as data) {
   <div class="table-responsive mb-4">
     <table class="table table-sm align-middle">

@@ -2,13 +2,12 @@
   <h3 class="modal-title" i18n>Who voted?</h3>
   <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
 </div>
+<app-resource-status [resource]="votesResource" />
 <div class="modal-body">
   @if (votesResource.hasValue() ? votesResource.value() : undefined; as votes) {
     @for (user of votes; track user.id) {
       <app-user [user]="user" />
     }
-  } @else if (votesResource.isLoading()) {
-    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
 </div>
 <div class="modal-footer">

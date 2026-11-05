@@ -22,6 +22,7 @@ import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
@@ -44,6 +45,7 @@ interface Tab {
 @Component({
   selector: 'app-moder-items-item',
   imports: [
+    ResourceStatus,
     RouterLink,
     ModerItemsItemMeta,
     ModerItemsItemName,

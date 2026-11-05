@@ -1,3 +1,4 @@
+<app-resource-status [resource]="itemResource" />
 @if (itemParent(); as itemParent) {
   @if (itemResource.hasValue() ? itemResource.value() : undefined; as item) {
     <app-moder-items-item-select-parent-tree-item

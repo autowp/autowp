@@ -10,11 +10,11 @@ import {GetItemLanguagesRequest, ItemLanguage} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {NgbNav, NgbNavContent, NgbNavItem, NgbNavLink, NgbNavLinkBase, NgbNavOutlet} from '@ng-bootstrap/ng-bootstrap';
 import {ContentLanguageService} from '@services/content-language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {combineLatest, firstValueFrom, map, of} from 'rxjs';
 
 import {MarkdownEdit} from '../../../../markdown-edit/markdown-edit/markdown-edit';
 import {ToastsService} from '../../../../toasts/toasts.service';
-
 interface LanguagesFormValue {
   languages: Pick<ItemLanguage, 'fullText' | 'fullTextId' | 'itemId' | 'language' | 'name' | 'text' | 'textId'>[];
 }
@@ -22,6 +22,7 @@ interface LanguagesFormValue {
 @Component({
   selector: 'app-moder-items-item-name',
   imports: [
+    ResourceStatus,
     NgbNav,
     NgbNavItem,
     NgbNavLink,

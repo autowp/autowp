@@ -1,3 +1,4 @@
+<app-resource-status [resource]="childsResource" />
 @if (item(); as item) {
   @if (item.childsCount > 0) {
     <div>
@@ -32,10 +33,6 @@
                 />
               </li>
             }
-          } @else if (childsResource.isLoading()) {
-            <li>
-              <span class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></span>
-            </li>
           }
         </ul>
       }

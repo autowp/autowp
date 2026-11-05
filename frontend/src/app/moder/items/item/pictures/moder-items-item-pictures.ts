@@ -15,14 +15,14 @@ import {
 } from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map} from 'rxjs';
 
 import {chunkBy} from '../../../../chunk';
 import {Thumbnail} from '../../../../thumbnail/thumbnail/thumbnail';
-
 @Component({
   selector: 'app-moder-items-item-pictures',
-  imports: [RouterLink, Thumbnail],
+  imports: [ResourceStatus, RouterLink, Thumbnail],
   templateUrl: './moder-items-item-pictures.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -6,11 +6,11 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {GetSpecificationsRequest} from '@grpc/spec.pb';
 import {AttrsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map} from 'rxjs';
-
 @Component({
   selector: 'app-cars-specifications-editor-result',
-  imports: [],
+  imports: [ResourceStatus],
   templateUrl: './cars-specifications-editor-result.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

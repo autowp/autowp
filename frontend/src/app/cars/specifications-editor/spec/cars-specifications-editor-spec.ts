@@ -20,6 +20,7 @@ import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {UserService} from '@services/user';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {SelectMultiple} from '@utils/select-multiple/select-multiple';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import {
@@ -36,7 +37,6 @@ import type {AttrAttributeTreeItem} from '../../../api/attrs/attrs.service';
 import {APIAttrsService} from '../../../api/attrs/attrs.service';
 import {ToastsService} from '../../../toasts/toasts.service';
 import {UserLink} from '../../../user/user/user-link';
-
 export interface APIAttrAttributeInSpecEditor extends AttrAttributeTreeItem {
   deep: number;
   options$: Observable<ListOption[]>;
@@ -90,7 +90,7 @@ interface SpecEditor {
 
 @Component({
   selector: 'app-cars-specifications-editor-spec',
-  imports: [FormField, SelectMultiple, UserLink, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
+  imports: [ResourceStatus, FormField, SelectMultiple, UserLink, NgbTooltip, AsyncPipe, DatePipe, TimeAgoPipe],
   templateUrl: './cars-specifications-editor-spec.html',
   styleUrl: './cars-specifications-editor-spec.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

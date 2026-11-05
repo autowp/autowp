@@ -2,6 +2,7 @@
   <h3 class="modal-title" i18n>Votes</h3>
   <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
 </div>
+<app-resource-status [resource]="votesResource" />
 @if (votesResource.hasValue() ? votesResource.value() : undefined; as votes) {
   <div class="modal-body">
     @if (votes) {

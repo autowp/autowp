@@ -14,6 +14,7 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map, of, tap} from 'rxjs';
 
 import {chunk} from '../../../../../chunk';
@@ -23,7 +24,7 @@ import {ModerItemsItemSelectParentTree} from '../tree/moder-items-item-select-pa
 
 @Component({
   selector: 'app-moder-items-item-select-parent-catalogue',
-  imports: [RouterLink, Paginator, ModerItemsItemSelectParentTree],
+  imports: [ResourceStatus, RouterLink, Paginator, ModerItemsItemSelectParentTree],
   templateUrl: './moder-items-item-select-parent-catalogue.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

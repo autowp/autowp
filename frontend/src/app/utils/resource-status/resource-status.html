@@ -1,0 +1,12 @@
+@if (resource().error(); as error) {
+  <div class="alert alert-danger" role="alert">
+    <div>{{ errorMessage(error) }}</div>
+    <button type="button" class="btn btn-outline-danger mt-2" (click)="resource().reload()">
+      <ng-container i18n>Refresh</ng-container>
+    </button>
+  </div>
+} @else if (resource().isLoading()) {
+  <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+} @else if (empty()) {
+  <p><ng-container i18n>Nothing found</ng-container></p>
+}

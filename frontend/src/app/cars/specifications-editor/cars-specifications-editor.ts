@@ -1,8 +1,8 @@
 import type {Item} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
 
 import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ItemFields, ItemRequest, ItemType, RefreshInheritanceRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -11,18 +11,19 @@ import {LanguageService} from '@services/language';
 import {NotFoundService} from '@services/not-found';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {BehaviorSubject, catchError, distinctUntilChanged, EMPTY, map, switchMap} from 'rxjs';
+import {map, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CarsSpecificationsEditorEngine} from './engine/cars-specifications-editor-engine';
 import {CarsSpecificationsEditorResult} from './result/cars-specifications-editor-result';
 import {CarsSpecificationsEditorSpec} from './spec/cars-specifications-editor-spec';
-
 @Component({
   selector: 'app-cars-specifications-editor',
   imports: [
+    ResourceStatus,
     RouterLink,
     CarsSpecificationsEditorEngine,
     CarsSpecificationsEditorSpec,
@@ -43,53 +44,45 @@ export class CarsSpecificationsEditor {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #change$ = new BehaviorSubject<void>(void 0);
   protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
   protected readonly isSpecsAdmin$ = this.#auth.hasRole$(Role.ADMIN);
   protected readonly tab$ = this.#route.queryParamMap.pipe(map((params) => params.get('tab') ?? 'info'));
   protected readonly user$ = this.#auth.user$;
 
-  protected readonly data$: Observable<Item> = this.#route.queryParamMap.pipe(
-    map((params) => params.get('item_id') ?? ''),
-    distinctUntilChanged(),
-    switchMap((itemID) =>
-      this.#change$.pipe(
-        switchMap(() =>
-          this.#itemsClient.item(
-            new ItemRequest({
-              fields: new ItemFields({
-                attrZoneId: true,
-                nameHtml: true,
-                nameText: true,
-              }),
-              id: itemID,
-              language: this.#languageService.language,
-            }),
-          ),
+  readonly #itemID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('item_id') ?? '')), {
+    requireSync: true,
+  });
+  protected readonly dataResource = rxResource({
+    params: () => this.#itemID(),
+    stream: ({params: id}) =>
+      this.#itemsClient
+        .item(
+          new ItemRequest({
+            fields: new ItemFields({attrZoneId: true, nameHtml: true, nameText: true}),
+            id,
+            language: this.#languageService.language,
+          }),
+        )
+        .pipe(
+          tap({
+            next: (item) => {
+              this.#pageEnv.set({
+                pageId: PageId.SPECIFICATIONS_EDITOR,
+                title: $localize`Specs editor of ${item.nameText}`,
+              });
+            },
+            error: (error: unknown) => {
+              if (isNotFoundError(error)) this.#notFound.report();
+            },
+          }),
         ),
-      ),
-    ),
-    catchError((response: unknown) => {
-      if (isNotFoundError(response)) {
-        this.#notFound.report();
-      } else {
-        this.#toastService.handleError(response);
-      }
-      return EMPTY;
-    }),
-    map((item) => {
-      this.#pageEnv.set({
-        pageId: PageId.SPECIFICATIONS_EDITOR,
-        title: $localize`Specs editor of ${item.nameText}`,
-      });
-      return item;
-    }),
-  );
+  });
+  protected readonly data = computed(() => (this.dataResource.hasValue() ? this.dataResource.value() : undefined));
 
   protected readonly ItemType = ItemType;
 
   protected onEngineChanged() {
-    this.#change$.next();
+    this.dataResource.reload();
   }
 
   protected refreshInheritance(item: Item) {

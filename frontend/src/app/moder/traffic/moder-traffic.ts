@@ -16,6 +16,7 @@ import {Empty} from '@ngx-grpc/well-known-types';
 import {IpService} from '@services/ip';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {map} from 'rxjs';
 
@@ -27,7 +28,7 @@ interface ListItem {
 
 @Component({
   selector: 'app-moder-traffic',
-  imports: [RouterLink, UserLink, AsyncPipe, DatePipe],
+  imports: [ResourceStatus, RouterLink, UserLink, AsyncPipe, DatePipe],
   templateUrl: './moder-traffic.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

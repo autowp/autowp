@@ -5,12 +5,12 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {ItemFields, ItemParentsRequest, ItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 
 import {ModerItemsItemSelectParentTreeItem} from '../tree-item/moder-items-item-select-parent-tree-item';
-
 @Component({
   selector: 'app-moder-items-item-select-parent-tree',
-  imports: [ModerItemsItemSelectParentTreeItem],
+  imports: [ResourceStatus, ModerItemsItemSelectParentTreeItem],
   templateUrl: './moder-items-item-select-parent-tree.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

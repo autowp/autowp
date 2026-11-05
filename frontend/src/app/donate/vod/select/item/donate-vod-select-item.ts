@@ -14,13 +14,13 @@ import {
 } from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map, of, tap} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
-
 @Component({
   selector: 'app-donate-vod-select-item',
-  imports: [RouterLink],
+  imports: [ResourceStatus, RouterLink],
   templateUrl: './donate-vod-select-item.html',
   styleUrl: './donate-vod-select-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

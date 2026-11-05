@@ -4,11 +4,11 @@ import {RouterLink} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map, of} from 'rxjs';
-
 @Component({
   selector: 'app-moder-items-item-vehicles',
-  imports: [RouterLink],
+  imports: [ResourceStatus, RouterLink],
   templateUrl: './moder-items-item-vehicles.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

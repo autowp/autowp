@@ -1,3 +1,6 @@
+<app-resource-status [resource]="formResource" />
+<app-resource-status [resource]="valuesResource" />
+<app-resource-status [resource]="userValuesResource" />
 @if (item(); as item) {
   @if (formResource.hasValue() ? formResource.value() : undefined; as editor) {
     @if (editor.form().value().itemId === item.id) {

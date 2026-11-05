@@ -1,12 +1,13 @@
+import type {ResourceRef} from '@angular/core';
 import type {Observable} from 'rxjs';
 
-import {inject, Service} from '@angular/core';
+import {inject, Injector, Service, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {DeleteModerVoteTemplateRequest, ModerVoteTemplate} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {AuthService} from '@services/auth-service';
-import {BehaviorSubject, combineLatest, map, shareReplay, switchMap, tap} from 'rxjs';
-
+import {map, tap} from 'rxjs';
 export interface APIPictureModerVoteTemplatePostData {
   name: string;
   vote: number;
@@ -17,20 +18,30 @@ export class APIPictureModerVoteTemplateService {
   readonly #auth = inject(AuthService);
   readonly #pictures = inject(PicturesClient);
 
-  readonly #change$ = new BehaviorSubject<void>(void 0);
+  readonly #injector = inject(Injector);
+  readonly #authenticated = toSignal(this.#auth.authenticated$);
+  readonly #revision = signal(0);
+  #templatesResource: ResourceRef<ModerVoteTemplate[] | undefined> | undefined;
 
-  public getTemplates$(): Observable<ModerVoteTemplate[]> {
-    return combineLatest([this.#change$, this.#auth.authenticated$]).pipe(
-      switchMap(() => this.#pictures.getModerVoteTemplates(new Empty({}))),
-      map((response) => response.items ?? []),
-      shareReplay({bufferSize: 1, refCount: false}),
-    );
+  public getTemplatesResource(): ResourceRef<ModerVoteTemplate[] | undefined> {
+    // Creating a template without reading the list must not trigger a background read.
+    this.#templatesResource ??= rxResource({
+      injector: this.#injector,
+      id: 'picture-moder-vote-templates',
+      params: () => {
+        const authenticated = this.#authenticated();
+        return authenticated === undefined ? undefined : `${Number(authenticated)}:${this.#revision()}`;
+      },
+      stream: () => this.#pictures.getModerVoteTemplates(new Empty()).pipe(map((response) => response.items ?? [])),
+    });
+    return this.#templatesResource;
   }
 
   public deleteTemplate$(id: string): Observable<Empty> {
     return this.#pictures.deleteModerVoteTemplate(new DeleteModerVoteTemplateRequest({id})).pipe(
       tap(() => {
-        this.#change$.next();
+        // Changing params also cancels a stale read already in flight during the mutation.
+        this.#revision.update((revision) => revision + 1);
       }),
     );
   }
@@ -45,7 +56,8 @@ export class APIPictureModerVoteTemplateService {
       )
       .pipe(
         tap(() => {
-          this.#change$.next();
+          // Changing params also cancels a stale read already in flight during the mutation.
+          this.#revision.update((revision) => revision + 1);
         }),
       );
   }

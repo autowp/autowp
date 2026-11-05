@@ -8,16 +8,16 @@ import {NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbModal} from '@ng-boo
 import {PictureModerVoteService} from '@services/picture-moder-vote';
 import {UserService} from '@services/user';
 import {getModalComponentRef} from '@utils/modal-component-ref';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {catchError, map, of} from 'rxjs';
 
 import {APIPictureModerVoteTemplateService} from '../../api/picture-moder-vote-template/picture-moder-vote-template.service';
 import {UserLink} from '../../user/user/user-link';
 import {PictureModerVoteModal} from './modal/picture-moder-vote-modal';
-
 @Component({
   selector: 'app-picture-moder-vote',
-  imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserLink],
+  imports: [ResourceStatus, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, UserLink],
   templateUrl: './picture-moder-vote.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -58,10 +58,7 @@ export class PictureModerVote implements OnInit {
     }));
   });
 
-  protected readonly moderVoteTemplatesResource = rxResource({
-    id: 'picture-moder-vote-templates',
-    stream: () => this.#moderVoteTemplateService.getTemplates$(),
-  });
+  protected readonly moderVoteTemplatesResource = this.#moderVoteTemplateService.getTemplatesResource();
 
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
   // guard against that, so a transient error here (this dropdown has no inline slot for an error

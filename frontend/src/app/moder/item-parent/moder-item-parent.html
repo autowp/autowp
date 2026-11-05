@@ -21,6 +21,8 @@
   <h1>Item parent</h1>
 </div>
 
+<app-resource-status [resource]="itemResource" />
+<app-resource-status [resource]="parentResource" />
 <p>
   @if (parent(); as parent) {
     <a
@@ -35,6 +37,7 @@
   }
 </p>
 
+<app-resource-status [resource]="editorResource" />
 @if (editor(); as editor) {
   @let editForm = editor.form;
   <form method="post" class="form-horizontal" novalidate (submit)="$event.preventDefault(); save(editor)">

@@ -22,6 +22,7 @@ import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {numericEnumValue} from '@utils/numeric-enum-value';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {timestampToDate} from '@utils/timestamp';
 import {
   catchError,
@@ -52,7 +53,7 @@ interface CommentLink {
 
 @Component({
   selector: 'app-moder-content-reports',
-  imports: [FormField, RouterLink, UserLink, Paginator, AsyncPipe, DatePipe],
+  imports: [ResourceStatus, FormField, RouterLink, UserLink, Paginator, AsyncPipe, DatePipe],
   templateUrl: './moder-content-reports.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

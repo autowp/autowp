@@ -5,15 +5,15 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {ItemListOptions, ItemParentListOptions, ItemParentsRequest, ItemParentType} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {map, of, tap} from 'rxjs';
 
 import {ToastsService} from '../../../../../toasts/toasts.service';
 import {ModerItemsItemSelectParentTree} from '../tree/moder-items-item-select-parent-tree';
-
 @Component({
   selector: 'app-moder-items-item-select-parent-tree-item',
   // eslint-disable-next-line @angular-eslint/no-forward-ref
-  imports: [forwardRef(() => ModerItemsItemSelectParentTree)],
+  imports: [ResourceStatus, forwardRef(() => ModerItemsItemSelectParentTree)],
   templateUrl: './moder-items-item-select-parent-tree-item.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

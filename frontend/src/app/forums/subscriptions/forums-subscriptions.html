@@ -1,4 +1,5 @@
-@if (data$ | async; as data) {
+<app-resource-status [resource]="dataResource" [empty]="data()?.items?.length === 0" />
+@if (data(); as data) {
   <app-forums-topic-list [topics]="data.items || []" [showSubscribe]="true" (reload)="reload()" />
   @if (data.paginator) {
     <app-paginator [data]="data.paginator" />

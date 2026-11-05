@@ -8,13 +8,14 @@ import {UsersClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {RemarkModule} from 'ngx-remark';
 import {map, tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 @Component({
   selector: 'app-account-accounts',
-  imports: [RemarkModule],
+  imports: [ResourceStatus, RemarkModule],
   templateUrl: './account-accounts.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -6,11 +6,12 @@ import {NewItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {LanguageService} from '@services/language';
 import {NameCount} from '@utils/name-count/name-count';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {of} from 'rxjs';
 
 @Component({
   selector: 'app-index-brands-brand',
-  imports: [NameCount],
+  imports: [ResourceStatus, NameCount],
   templateUrl: './index-brands-brand.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

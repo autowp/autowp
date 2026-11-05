@@ -18,6 +18,7 @@
   <a class="nav-link" routerLink="/moder/traffic/whitelist">Whitelist</a>
 </div>
 
+<app-resource-status [resource]="itemsResource" [empty]="items()?.length === 0" />
 @if (items(); as items) {
   @for (item of items; track item) {
     <div class="row">

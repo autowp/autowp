@@ -18,6 +18,7 @@ import {PageId} from '@services/page-id';
 import {TimezoneService} from '@services/timezone';
 import {browserWindow} from '@utils/browser-window';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import Keycloak from 'keycloak-js';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, firstValueFrom, of, switchMap, tap} from 'rxjs';
@@ -27,7 +28,7 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {AccountContactsEditor} from '../contacts-editor/account-contacts-editor';
 @Component({
   selector: 'app-account-profile',
-  imports: [FormField, AsyncPipe, InvalidParamsPipe, RemarkModule, AccountContactsEditor],
+  imports: [ResourceStatus, FormField, AsyncPipe, InvalidParamsPipe, RemarkModule, AccountContactsEditor],
   templateUrl: './account-profile.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -13,6 +13,7 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {TimeAgoPipe} from '@utils/time-ago.pipe';
 import Keycloak from 'keycloak-js';
 import {map, of, tap} from 'rxjs';
@@ -21,7 +22,7 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserLink} from '../../user/user/user-link';
 @Component({
   selector: 'app-account-blacklist',
-  imports: [RouterLink, UserLink, NgbTooltip, DatePipe, TimeAgoPipe],
+  imports: [ResourceStatus, RouterLink, UserLink, NgbTooltip, DatePipe, TimeAgoPipe],
   templateUrl: './account-blacklist.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
