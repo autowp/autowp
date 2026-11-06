@@ -1,3 +1,5 @@
 # TODO
 
+- [ ] Revisit Angular's [`debounced()`](https://angular.dev/guide/signals/debounced) once it becomes stable. Evaluate whether it simplifies existing signal-driven search and filtering delays; preserve request cancellation and avoid duplicate requests. Keep the current implementation while the API is experimental.
 - [ ] Enable `reportUploadProgress` for picture uploads on `/upload` when Angular's Fetch backend supports upload progress (`src/app/upload/index/upload-index.ts`).
+- [ ] Finish migrating route parameters to signal inputs where parameters are needed during resource construction (for example, the article-specific SSR cache key in `src/app/articles/article/articles-article.ts`) once Angular provides a suitable stable API. Revisit [route resources](https://angular.dev/guide/routing/data-fetching-with-resources) when they leave developer preview; keep the current `ActivatedRoute` implementation until then. Preserve per-page TransferState cache isolation, avoid duplicate initial/hydration requests, and verify parameter changes, cancellation and SSR 404 handling.
