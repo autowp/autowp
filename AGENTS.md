@@ -32,8 +32,10 @@ server stubs and the Angular client:
 This runs `protoc` with `--go_out`/`--go-grpc_out` into `goautowp/api/pb/` and `--ng_out` into
 `frontend/src/grpc/`. It requires `protoc-gen-go`, `protoc-gen-go-grpc`, and the local
 `protoc-gen-ng` (from `frontend/node_modules/.bin`, selected explicitly by the script). The Go
-plugins must be on `PATH`. CI runs this before building
-either side, so a proto change without regenerating output will build stale code locally.
+plugins must be on `PATH`. Install frontend dependencies first with
+`npm ci --prefix frontend --include=dev`. Backend-only CI jobs use `./protoc.sh --go-only`,
+which generates only Go stubs and does not require frontend dependencies. CI runs generation
+before building either side, so a proto change without regenerating output will build stale code locally.
 
 ### API conventions
 

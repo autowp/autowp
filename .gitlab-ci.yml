@@ -74,11 +74,11 @@ test-frontend:
         - cache/sonar/
       when: always
   script:
+    - npm ci --prefix frontend --include=dev
     - ./protoc.sh
     - cd frontend/
     - sonar-scanner -Dsonar.login=$SONAR_TOKEN
     - hadolint Dockerfile
-    - npm ci || npm cache clear --force && npm ci
     - npx ng lint
     - npx stylelint "src/**/*.scss"
     - ./node_modules/.bin/ng build --configuration production --no-progress --base-href=/
@@ -93,7 +93,7 @@ test-goautowp-lint:
       - cache/go/build/
       - cache/golangci-lint/
   script:
-    - ./protoc.sh
+    - ./protoc.sh --go-only
     - cd goautowp/
     - hadolint ./build/package/Dockerfile
     - dclint .
@@ -119,7 +119,7 @@ test-goautowp:
         - cache/sonar/
       when: always
   script:
-    - ./protoc.sh
+    - ./protoc.sh --go-only
     - cd goautowp/
     - go mod download
     - go mod verify
@@ -184,9 +184,9 @@ publish-frontend:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
     - echo "$DOCKER_PASSWORD" | buildah login -u="$DOCKER_USERNAME" --password-stdin docker.io
   script:
+    - npm ci --prefix frontend --include=dev
     - ./protoc.sh
     - cd frontend
-    - npm ci || npm cache clear --force && npm ci
     - "jq -n --arg release \"$CI_COMMIT_TAG\" '{release: $release}' > src/version.json"
     - NG_BUILD_OPTIMIZE_CHUNKS=1 ./node_modules/.bin/ng build --configuration production --no-progress --base-href=/
 
@@ -216,7 +216,7 @@ publish-goautowp:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login "$CI_REGISTRY" -u="$CI_REGISTRY_USER" --password-stdin
     - echo "$DOCKER_PASSWORD" | buildah login -u="$DOCKER_USERNAME" --password-stdin docker.io
   script:
-    - ./protoc.sh
+    - ./protoc.sh --go-only
     - cd goautowp
     - go mod download
     - go mod verify

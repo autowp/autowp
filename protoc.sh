@@ -2,6 +2,25 @@
 
 set -e
 
+frontend_options=()
+case "$*" in
+  "")
+    if [[ ! -x frontend/node_modules/.bin/protoc-gen-ng ]]; then
+      echo "Missing frontend generator. Run: npm ci --prefix frontend --include=dev" >&2
+      exit 1
+    fi
+    frontend_options=(
+      --plugin=protoc-gen-ng=frontend/node_modules/.bin/protoc-gen-ng
+      --ng_out=frontend/src/grpc
+    )
+    ;;
+  --go-only) ;;
+  *)
+    echo "Usage: $0 [--go-only]" >&2
+    exit 2
+    ;;
+esac
+
 # go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 # go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 # go get -u github.com/googleapis/googleapis@latest
@@ -19,8 +38,7 @@ protoc --proto_path="/usr/local/include" \
        --go_opt=paths=source_relative \
        --go-grpc_out=goautowp/api/pb \
        --go-grpc_opt=paths=source_relative \
-       --plugin=protoc-gen-ng=frontend/node_modules/.bin/protoc-gen-ng \
-       --ng_out=frontend/src/grpc \
+       "${frontend_options[@]}" \
        spec.proto
 
 # Remove stubs generated at the old location to avoid duplicate descriptor registration.
