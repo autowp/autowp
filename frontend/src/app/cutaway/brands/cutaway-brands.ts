@@ -1,10 +1,11 @@
 import type {OnInit} from '@angular/core';
 import type {Image, Item} from '@grpc/spec.pb';
 import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/catalogue-item-card';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
 import {
   ItemFields,
   ItemListOptions,
@@ -35,19 +36,18 @@ import {Paginator} from '../../paginator/paginator/paginator';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CutawayBrands implements OnInit {
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly queryResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: 'cutaway-brands',
-    params: () => this.#page(),
+    params: () => this.page(),
     stream: ({params: page}) =>
       this.#itemsClient
         .list(

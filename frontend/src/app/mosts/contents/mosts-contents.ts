@@ -87,7 +87,7 @@ export class MostsContents implements OnInit {
 
   protected readonly defaultTypeCatname = computed(() => this.vehicleTypes()?.[0]?.catname);
 
-  // ratingCatname() is '' (not null) when the route has no rating_catname param - see
+  // ratingCatname() is '' (not null) when the route has no rating parameter - see
   // mosts.ts's `?? ''` at the source - so the empty-string case must fall through to
   // the first rating exactly like a real "unset" would. ?? wouldn't treat '' as unset.
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

@@ -13,7 +13,7 @@ export const routes: Routes = [
   },
   {
     loadComponent: () => import('./new-topic/forums-new-topic').then((m) => m.ForumsNewTopic),
-    path: 'new-topic/:theme_id',
+    path: 'new-topic/:themeId',
     title: $localize`New topic`,
   },
   {

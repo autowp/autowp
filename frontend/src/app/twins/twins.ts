@@ -1,6 +1,7 @@
 import type {Item, ItemParent} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -47,10 +48,9 @@ export class Twins {
 
   protected readonly canEdit = this.#auth.hasRole(Role.CARS_MODER);
 
-  protected readonly page = toSignal(
-    this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))),
-    {requireSync: true},
-  );
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
+  });
 
   protected readonly currentBrandCatname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,

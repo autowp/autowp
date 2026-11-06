@@ -1,7 +1,8 @@
 import type {Image} from '@grpc/spec.pb';
 import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/catalogue-item-card';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -53,8 +54,8 @@ export class FactoryItems {
     requireSync: true,
   });
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly factoryResource = rxResource({
@@ -91,7 +92,7 @@ export class FactoryItems {
       if (this.#authenticated() === undefined) return undefined;
       const factory = this.factoryData();
 
-      return factory ? {authenticated: this.#authenticated(), factoryID: factory.id, page: this.#page()} : undefined;
+      return factory ? {authenticated: this.#authenticated(), factoryID: factory.id, page: this.page()} : undefined;
     },
     stream: ({params: {factoryID, page}}) =>
       this.#itemsClient.list(

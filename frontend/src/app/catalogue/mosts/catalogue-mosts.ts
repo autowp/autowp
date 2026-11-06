@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import type {RouteParam} from '@utils/route-param';
+
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
@@ -24,15 +26,14 @@ export class CatalogueMosts {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly ratingCatname = toSignal(
-    this.#route.paramMap.pipe(map((params) => params.get('rating_catname'))),
-    {requireSync: true},
-  );
-  protected readonly typeCatname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('type_catname'))), {
-    requireSync: true,
+  readonly ratingCatname = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
-  protected readonly yearsCatname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('years_catname'))), {
-    requireSync: true,
+  readonly typeCatname = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
+  });
+  readonly yearsCatname = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
 
   readonly #brandCatname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {

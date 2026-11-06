@@ -1,9 +1,10 @@
 import type {OnInit} from '@angular/core';
 import type {DfDistance, Item, Picture} from '@grpc/spec.pb';
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -62,8 +63,8 @@ export class ModerPicturesSimilar implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #toastService = inject(ToastsService);
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly brandID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('brand_id') ?? '')), {
@@ -117,7 +118,7 @@ export class ModerPicturesSimilar implements OnInit {
     // `?brand_id=` before Angular's whenStable() ever resolves, match TransferState's
     // still-present entry from the first brand and seed itself with the wrong data.
     id: `moder-pictures-similar-${this.brandID()}`,
-    params: () => ({brandID: this.brandID(), page: this.#page()}),
+    params: () => ({brandID: this.brandID(), page: this.page()}),
     stream: ({params: {brandID, page}}) =>
       this.#picturesClient
         .getPictures(

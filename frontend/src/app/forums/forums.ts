@@ -1,6 +1,7 @@
 import type {Theme} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {GetThemeRequest, ListThemesRequest, ListTopicsRequest} from '@grpc/spec.pb';
@@ -27,8 +28,8 @@ export class Forums {
   readonly #pageEnv = inject(PageEnvService);
   readonly #grpc = inject(ForumsClient);
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   readonly #themeID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('theme_id'))), {
@@ -55,7 +56,7 @@ export class Forums {
 
   protected readonly topicsResource = rxResource({
     id: `forums-topics-${this.#themeID() ?? ''}`,
-    params: () => ({page: this.#page(), themeID: this.#themeID()}),
+    params: () => ({page: this.page(), themeID: this.#themeID()}),
     stream: ({params: {page, themeID}}) =>
       this.#grpc.listTopics(new ListTopicsRequest({page, themeId: themeID ?? undefined})),
   });

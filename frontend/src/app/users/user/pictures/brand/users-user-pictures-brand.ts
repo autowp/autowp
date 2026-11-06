@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import type {RouteParam} from '@utils/route-param';
+
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -48,8 +50,8 @@ export class UsersUserPicturesBrand {
     requireSync: true,
   });
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly userResource = rxResource({
@@ -105,7 +107,7 @@ export class UsersUserPicturesBrand {
       const user = this.userData();
       const brand = this.brandData();
 
-      return user && brand ? {brandId: brand.id, page: this.#page(), userId: user.id} : undefined;
+      return user && brand ? {brandId: brand.id, page: this.page(), userId: user.id} : undefined;
     },
     stream: ({params: {brandId, page, userId}}) =>
       this.#picturesClient.getPictures(

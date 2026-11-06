@@ -1,7 +1,8 @@
 import type {Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   ItemFields,
@@ -77,8 +78,8 @@ export class CategoriesCategoryItem {
 
   protected readonly current = computed(() => this.categoryData()?.current);
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly itemParentsResource = rxResource({
@@ -92,7 +93,7 @@ export class CategoriesCategoryItem {
             authenticated: this.#authenticated(),
             category: data.category,
             current: data.current,
-            page: this.#page(),
+            page: this.page(),
             pathCatnames: data.pathCatnames,
           }
         : undefined;

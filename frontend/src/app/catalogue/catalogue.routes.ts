@@ -124,15 +124,15 @@ export const routes: Routes = [
       },
       {
         loadComponent: () => import('./mosts/catalogue-mosts').then((m) => m.CatalogueMosts),
-        path: ':rating_catname',
+        path: ':ratingCatname',
       },
       {
         loadComponent: () => import('./mosts/catalogue-mosts').then((m) => m.CatalogueMosts),
-        path: ':rating_catname/:type_catname',
+        path: ':ratingCatname/:typeCatname',
       },
       {
         loadComponent: () => import('./mosts/catalogue-mosts').then((m) => m.CatalogueMosts),
-        path: ':rating_catname/:type_catname/:years_catname',
+        path: ':ratingCatname/:typeCatname/:yearsCatname',
       },
     ],
     path: 'mosts',

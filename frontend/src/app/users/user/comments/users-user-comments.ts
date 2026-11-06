@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import type {RouteParam} from '@utils/route-param';
+
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {CommentMessageFields, GetMessagesRequest} from '@grpc/spec.pb';
@@ -31,14 +33,13 @@ export class UsersUserComments {
   readonly #pageEnv = inject(PageEnvService);
   readonly #commentsClient = inject(CommentsClient);
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
-  protected readonly order = toSignal(
-    this.#route.queryParamMap.pipe(map((params) => params.get('order') ?? 'date_desc')),
-    {requireSync: true},
-  );
+  readonly order = input('date_desc', {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? 'date_desc',
+  });
 
   readonly #identity = toSignal(this.#route.paramMap.pipe(map((params) => params.get('identity') ?? '')), {
     requireSync: true,
@@ -66,7 +67,7 @@ export class UsersUserComments {
     params: () => {
       const user = this.userData();
 
-      return user ? {order: this.order(), page: this.#page(), userId: user.id} : undefined;
+      return user ? {order: this.order(), page: this.page(), userId: user.id} : undefined;
     },
     stream: ({params: {order, page, userId}}) =>
       this.#commentsClient.getMessages(
@@ -101,7 +102,7 @@ export class UsersUserComments {
       }
 
       this.order();
-      this.#page();
+      this.page();
       this.userData();
       this.#pageEnv.set({pageId: PageId.USER_COMMENTS});
     });

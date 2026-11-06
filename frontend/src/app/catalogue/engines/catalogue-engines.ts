@@ -1,8 +1,9 @@
 import type {Item, Pages} from '@grpc/spec.pb';
 import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/catalogue-item-card';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -43,8 +44,8 @@ export class CatalogueEngines {
     requireSync: true,
   });
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
@@ -98,7 +99,7 @@ export class CatalogueEngines {
 
   protected readonly dataResource = rxResource({
     id: `catalogue-engines-data-${this.#catname() ?? ''}`,
-    params: () => ({brand: this.brandData(), page: this.#page()}),
+    params: () => ({brand: this.brandData(), page: this.page()}),
     stream: ({
       params: {brand, page},
     }): Observable<undefined | {items: CatalogueListItem[]; paginator: Pages | undefined}> => {

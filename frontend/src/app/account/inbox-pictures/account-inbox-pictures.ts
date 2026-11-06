@@ -1,10 +1,10 @@
 import type {OnInit} from '@angular/core';
 import type {Pages} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {InboxPicture} from 'app/inbox-pictures-grid/inbox-pictures-grid';
 
-import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute} from '@angular/router';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {
   ItemFields,
   ItemsRequest,
@@ -41,13 +41,14 @@ interface InboxData {
 })
 export class AccountInboxPictures implements OnInit {
   readonly #auth = inject(AuthService);
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #query = toSignal(this.#route.queryParamMap, {requireSync: true});
-  readonly #page = computed(() => parseInt(this.#query().get('page') ?? '', 10) || 1);
+  readonly page = input(1, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10) || 1,
+  });
+
   readonly #userId = computed(() => this.#auth.user()?.id);
   protected readonly dataResource = rxResource({
     params: () => {
@@ -55,7 +56,7 @@ export class AccountInboxPictures implements OnInit {
       if (authenticated === undefined) return undefined;
       if (!authenticated) return null;
       const userId = this.#userId();
-      return userId && userId !== '0' ? {userId, page: this.#page()} : null;
+      return userId && userId !== '0' ? {userId, page: this.page()} : null;
     },
     stream: ({params}) => {
       if (!params) return of(undefined);

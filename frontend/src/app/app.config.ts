@@ -20,7 +20,7 @@ import {
   withHttpTransferCacheOptions,
   withI18nSupport,
 } from '@angular/platform-browser';
-import {provideRouter, withInMemoryScrolling} from '@angular/router';
+import {provideRouter, withComponentInputBinding, withInMemoryScrolling} from '@angular/router';
 import {environment} from '@environment/environment';
 import {
   NgbCollapseModule,
@@ -192,6 +192,7 @@ export const appConfig: ApplicationConfig = {
     IpService,
     provideRouter(
       routes,
+      withComponentInputBinding(),
       withInMemoryScrolling({
         scrollPositionRestoration: 'enabled',
       }),

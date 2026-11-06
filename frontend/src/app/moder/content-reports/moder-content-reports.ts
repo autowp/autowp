@@ -1,13 +1,14 @@
 import type {OnInit} from '@angular/core';
 import type {FieldTree} from '@angular/forms/signals';
 import type {ContentReport, User} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, Injector, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, submit} from '@angular/forms/signals';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {
   CommentMessageFields,
   ContentReportEntityType,
@@ -24,17 +25,7 @@ import {UserService} from '@services/user';
 import {numericEnumValue} from '@utils/numeric-enum-value';
 import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {timestampToDate} from '@utils/timestamp';
-import {
-  catchError,
-  defer,
-  distinctUntilChanged,
-  firstValueFrom,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-  throwError,
-} from 'rxjs';
+import {catchError, defer, firstValueFrom, map, of, shareReplay, switchMap, throwError} from 'rxjs';
 
 import {Paginator} from '../../paginator/paginator/paginator';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -59,7 +50,6 @@ interface CommentLink {
 })
 export class ModerContentReports implements OnInit {
   readonly #injector = inject(Injector);
-  readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
   readonly #autowpClient = inject(AutowpClient);
@@ -73,47 +63,34 @@ export class ModerContentReports implements OnInit {
   });
   protected readonly filterForm = form(this.#filterModel);
 
-  readonly #status = toSignal(
-    this.#route.queryParamMap.pipe(
-      map((params) =>
-        numericEnumValue(
-          ContentReportStatus,
-          parseInt(params.get('status') ?? '', 10) || ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
-          ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
-        ),
+  readonly status = input(ContentReportStatus.CONTENT_REPORT_STATUS_OPEN, {
+    transform: (value: RouteParam) =>
+      numericEnumValue(
+        ContentReportStatus,
+        parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10) || ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
+        ContentReportStatus.CONTENT_REPORT_STATUS_OPEN,
       ),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  });
 
-  readonly #entityType = toSignal(
-    this.#route.queryParamMap.pipe(
-      map((params) =>
-        numericEnumValue(
-          ContentReportEntityType,
-          parseInt(params.get('entity_type') ?? '', 10),
-          ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED,
-        ),
+  readonly entityType = input(ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED, {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'entity_type',
+    transform: (value: RouteParam) =>
+      numericEnumValue(
+        ContentReportEntityType,
+        parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
+        ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_UNSPECIFIED,
       ),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  });
 
-  readonly #page = toSignal(
-    this.#route.queryParamMap.pipe(
-      map((params) => parseInt(params.get('page') ?? '', 10)),
-      map((page) => (page ? page : 0)),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  readonly page = input(0, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10) || 0,
+  });
 
   readonly #rowForms = new Map<string, FieldTree<string>>();
 
   protected readonly dataResource = rxResource({
-    params: () => [this.#status(), this.#entityType(), this.#page()] as const,
+    params: () => [this.status(), this.entityType(), this.page()] as const,
     stream: ({params: [status, entityType, page]}) =>
       defer(() => {
         this.#filterModel.set({status: `${status}`, entityType: `${entityType}`});

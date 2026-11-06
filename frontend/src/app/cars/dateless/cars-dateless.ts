@@ -1,8 +1,9 @@
 import type {OnInit} from '@angular/core';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
 import {
   ItemFields,
   ItemListOptions,
@@ -19,7 +20,6 @@ import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage} from 'app/grpc';
-import {map} from 'rxjs';
 
 import {ItemCard} from '../../item/item/item-card';
 import {Paginator} from '../../paginator/paginator/paginator';
@@ -30,7 +30,6 @@ import {Paginator} from '../../paginator/paginator/paginator';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsDateless implements OnInit {
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
@@ -41,8 +40,8 @@ export class CarsDateless implements OnInit {
   // the id string alone and never refetches once auth resolves. See CatalogueIndex.
   readonly #authenticated = this.#auth.authenticated;
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly dataResource = rxResource({
@@ -50,7 +49,7 @@ export class CarsDateless implements OnInit {
     id: `cars-dateless-page${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
       if (this.#authenticated() === undefined) return undefined;
-      return {authenticated: this.#authenticated(), page: this.#page()};
+      return {authenticated: this.#authenticated(), page: this.page()};
     },
     stream: ({params: {page}}) =>
       this.#itemsClient.list(

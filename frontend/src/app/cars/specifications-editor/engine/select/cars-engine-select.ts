@@ -1,7 +1,9 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import type {RouteParam} from '@utils/route-param';
+
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {form, FormField} from '@angular/forms/signals';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {
   Item,
   ItemFields,
@@ -37,17 +39,25 @@ import {CarsSelectEngineTreeItem} from './tree-item/cars-select-engine-tree-item
 export class CarsEngineSelect {
   readonly #itemsClient = inject(ItemsClient);
   readonly #router = inject(Router);
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #languageService = inject(LanguageService);
 
   readonly #search = signal('');
   protected readonly search = form(this.#search);
-  readonly #query = toSignal(this.#route.queryParamMap, {requireSync: true});
-  protected readonly itemID = computed(() => this.#query().get('item_id') ?? '');
-  protected readonly brandID = computed(() => this.#query().get('brand_id') ?? '');
-  readonly #page = computed(() => parseInt(this.#query().get('page') ?? '', 10) || 1);
+  readonly itemID = input('', {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'item_id',
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? '',
+  });
+  readonly brandID = input('', {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'brand_id',
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? '',
+  });
+  readonly page = input(1, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10) || 1,
+  });
   readonly #searchTerm = computed(() => this.#search().trim());
 
   protected readonly itemResource = rxResource({
@@ -66,7 +76,7 @@ export class CarsEngineSelect {
   protected readonly item = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
 
   protected readonly itemsResource = rxResource({
-    params: () => (this.brandID() ? {brandID: this.brandID(), page: this.#page()} : null),
+    params: () => (this.brandID() ? {brandID: this.brandID(), page: this.page()} : null),
     stream: ({params}) => {
       if (!params) return of(undefined);
       const {brandID, page} = params;

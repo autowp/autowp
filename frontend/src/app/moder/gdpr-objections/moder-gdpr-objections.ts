@@ -1,13 +1,14 @@
 import type {OnInit, WritableSignal} from '@angular/core';
 import type {FieldTree} from '@angular/forms/signals';
 import type {GdprObjection, GdprObjectionCleanupCandidate} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject, Injector, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, maxLength, pattern, required, submit} from '@angular/forms/signals';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {
   AcknowledgeGdprObjectionHitRequest,
   AddGdprObjectionCleanupCandidateRequest,
@@ -29,7 +30,7 @@ import {PageId} from '@services/page-id';
 import {browserWindow} from '@utils/browser-window';
 import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {timestampToDate} from '@utils/timestamp';
-import {catchError, defer, distinctUntilChanged, EMPTY, firstValueFrom, map, of, shareReplay, switchMap} from 'rxjs';
+import {catchError, defer, EMPTY, firstValueFrom, map, of, shareReplay, switchMap} from 'rxjs';
 
 import {Paginator} from '../../paginator/paginator/paginator';
 import {ToastsService} from '../../toasts/toasts.service';
@@ -65,7 +66,6 @@ interface ObjectionInList {
 })
 export class ModerGdprObjections implements OnInit {
   readonly #injector = inject(Injector);
-  readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
   readonly #autowpClient = inject(AutowpClient);
@@ -81,27 +81,20 @@ export class ModerGdprObjections implements OnInit {
   readonly #hitsOnly = signal(false);
   protected readonly hitsOnly = form(this.#hitsOnly);
 
-  readonly #hitsFilter = toSignal(
-    this.#route.queryParamMap.pipe(
-      map((params) => params.get('hits_only') === '1'),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  readonly hitsFilter = input(false, {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'hits_only',
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) === '1',
+  });
 
-  readonly #page = toSignal(
-    this.#route.queryParamMap.pipe(
-      map((params) => parseInt(params.get('page') ?? '', 10)),
-      map((page) => (page ? page : 0)),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  readonly page = input(0, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10) || 0,
+  });
 
   readonly #rowForms = new Map<string, FieldTree<string>>();
 
   protected readonly dataResource = rxResource({
-    params: () => [this.#hitsFilter(), this.#page()] as const,
+    params: () => [this.hitsFilter(), this.page()] as const,
     stream: ({params: [hitsOnly, page]}) =>
       defer(() => {
         this.#hitsOnly.set(hitsOnly);

@@ -1,10 +1,11 @@
 import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {form, FormField} from '@angular/forms/signals';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {AttrUserValuesFields, AttrUserValuesRequest, User, UsersRequest} from '@grpc/spec.pb';
 import {AttrsClient, UsersClient} from '@grpc/spec.pbsc';
 import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
@@ -28,7 +29,6 @@ import {CarsAttrsChangeLogRow} from './row/cars-attrs-change-log-row';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarsAttrsChangeLog {
-  readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
@@ -37,18 +37,22 @@ export class CarsAttrsChangeLog {
   readonly #attrsClient = inject(AttrsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #userID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('user_id') ?? '')), {
-    requireSync: true,
+  readonly userId = input('', {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'user_id',
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? '',
   });
 
-  readonly #itemID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('item_id') ?? '')), {
-    requireSync: true,
+  readonly itemId = input('', {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'item_id',
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? '',
   });
 
   protected readonly itemsResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: 'cars-attrs-change-log-items',
-    params: () => ({itemID: this.#itemID(), userID: this.#userID()}),
+    params: () => ({itemID: this.itemId(), userID: this.userId()}),
     stream: ({params: {itemID, userID}}) =>
       this.#attrsClient
         .getUserValues(
@@ -95,7 +99,7 @@ export class CarsAttrsChangeLog {
     );
 
   protected readonly userQuery = this.#control;
-  protected readonly hasUserID = computed(() => !!this.#userID());
+  protected readonly hasUserID = computed(() => !!this.userId());
 
   protected readonly errorMessage = errorMessage;
 
@@ -106,7 +110,7 @@ export class CarsAttrsChangeLog {
     // way around) - clearUser()/userOnSelect() below both drive user_id through the router, and
     // this keeps the typeahead input reflecting whatever the URL currently says.
     effect(() => {
-      const userID = this.#userID();
+      const userID = this.userId();
       this.#control().value.set(userID ? '#' + userID : '');
     });
   }

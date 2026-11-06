@@ -1,8 +1,9 @@
 import type {OnInit} from '@angular/core';
 import type {Item} from '@grpc/spec.pb';
 import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/catalogue-item-card';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -41,12 +42,12 @@ export class Persons implements OnInit {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
-  protected readonly char = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('char'))), {
-    requireSync: true,
+  readonly char = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
 
   protected readonly authors = toSignal(this.#route.data.pipe(map((params) => !!params['authors'])), {
@@ -88,7 +89,7 @@ export class Persons implements OnInit {
   protected readonly dataResource = rxResource({
     // Suffixed with the authors flag for the same reason as charGroupsResource above.
     id: `persons-data-${this.authors() ? 'authors' : 'content'}`,
-    params: () => ({authors: this.authors(), char: this.char(), page: this.#page()}),
+    params: () => ({authors: this.authors(), char: this.char(), page: this.page()}),
     stream: ({params: {authors, char, page}}) => {
       const typeId = authors ? PictureItemType.PICTURE_ITEM_AUTHOR : PictureItemType.PICTURE_ITEM_CONTENT;
 

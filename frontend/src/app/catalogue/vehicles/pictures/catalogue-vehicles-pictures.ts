@@ -1,7 +1,8 @@
 import type {Item, Pages, Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -59,8 +60,8 @@ export class CatalogueVehiclesPictures {
     requireSync: true,
   });
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   readonly #exact = toSignal(this.#route.data.pipe(map((data) => !!data['exact'])), {requireSync: true});
@@ -118,7 +119,7 @@ export class CatalogueVehiclesPictures {
     id: `catalogue-vehicles-pictures-list-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}-${this.#exact() ? 'exact' : ''}`,
     params: () => {
       const item = this.item();
-      return item ? {exact: this.#exact(), item, page: this.#page()} : undefined;
+      return item ? {exact: this.#exact(), item, page: this.page()} : undefined;
     },
     stream: ({params: {exact, item, page}}): Observable<{paginator: Pages | undefined; pictures: Picture[][]}> =>
       this.#picturesClient

@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import type {RouteParam} from '@utils/route-param';
+
+import {ChangeDetectionStrategy, Component, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {
@@ -44,8 +46,8 @@ export class TwinsGroupPicturesList {
     },
   );
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly groupResource = rxResource({
@@ -69,7 +71,7 @@ export class TwinsGroupPicturesList {
 
   protected readonly picturesResource = rxResource({
     id: `twins-group-pictures-list-data-${this.#id()}`,
-    params: () => ({id: this.#id(), page: this.#page()}),
+    params: () => ({id: this.#id(), page: this.page()}),
     stream: ({params: {id, page}}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({

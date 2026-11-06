@@ -1,5 +1,7 @@
+import type {RouteParam} from '@utils/route-param';
+
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -40,12 +42,12 @@ export class NewItem {
     requireSync: true,
   });
 
-  protected readonly date = toSignal(this.#route.paramMap.pipe(map((params) => params.get('date'))), {
-    requireSync: true,
+  readonly date = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly itemResource = rxResource({
@@ -72,7 +74,7 @@ export class NewItem {
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: `new-item-detail-pictures-${this.#itemID()}`,
-    params: () => ({date: this.date(), itemID: this.#itemID(), page: this.#page()}),
+    params: () => ({date: this.date(), itemID: this.#itemID(), page: this.page()}),
     stream: ({params: {date, itemID, page}}) =>
       this.#picturesClient.getPictures(
         new PicturesRequest({

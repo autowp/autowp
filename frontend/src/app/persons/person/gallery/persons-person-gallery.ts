@@ -1,6 +1,7 @@
 import type {Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, input} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {PictureItemType} from '@grpc/spec.pb';
@@ -22,8 +23,8 @@ export class PersonsPersonGallery {
   readonly #route = inject(ActivatedRoute);
   readonly #notFound = inject(NotFoundService);
 
-  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
-    requireSync: true,
+  readonly identity = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
 
   protected readonly itemID = toSignal(

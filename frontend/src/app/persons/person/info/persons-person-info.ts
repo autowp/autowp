@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import type {RouteParam} from '@utils/route-param';
+
+import {ChangeDetectionStrategy, Component, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {
@@ -48,8 +50,8 @@ export class PersonsPersonInfo {
     requireSync: true,
   });
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   protected readonly itemResource = rxResource({
@@ -83,7 +85,7 @@ export class PersonsPersonInfo {
 
   protected readonly authorPicturesResource = rxResource({
     id: `persons-person-info-author-pictures-${this.#itemID()}`,
-    params: () => ({itemID: this.#itemID(), page: this.#page()}),
+    params: () => ({itemID: this.#itemID(), page: this.page()}),
     stream: ({params: {itemID, page}}) =>
       this.#picturesClient
         .getPictures(
@@ -116,7 +118,7 @@ export class PersonsPersonInfo {
 
   protected readonly contentPicturesResource = rxResource({
     id: `persons-person-info-content-pictures-${this.#itemID()}`,
-    params: () => ({itemID: this.#itemID(), page: this.#page()}),
+    params: () => ({itemID: this.#itemID(), page: this.page()}),
     stream: ({params: {itemID, page}}) =>
       this.#picturesClient
         .getPictures(

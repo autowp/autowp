@@ -1,6 +1,7 @@
 import type {Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {
@@ -42,8 +43,8 @@ export class CategoriesCategoryPictures {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   // Read once at construction time purely to scope the resources' TransferState ids below -
@@ -82,7 +83,7 @@ export class CategoriesCategoryPictures {
   protected readonly picturesResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: `categories-category-pictures-${this.#category() ?? ''}-${this.#path() ?? ''}`,
-    params: () => ({categoryData: this.categoryData(), page: this.#page()}),
+    params: () => ({categoryData: this.categoryData(), page: this.page()}),
     stream: ({params: {categoryData, page}}) => {
       if (!categoryData?.category || !categoryData.current) {
         return of(undefined);

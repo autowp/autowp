@@ -1,9 +1,9 @@
 import type {Item} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {Router, RouterLink} from '@angular/router';
 import {ItemFields, ItemRequest, ItemType, RefreshInheritanceRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth-service';
@@ -14,7 +14,7 @@ import {PageId} from '@services/page-id';
 import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {isNotFoundError} from 'app/grpc';
 import {RemarkModule} from 'ngx-remark';
-import {map, tap} from 'rxjs';
+import {tap} from 'rxjs';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CarsSpecificationsEditorEngine} from './engine/cars-specifications-editor-engine';
@@ -28,7 +28,6 @@ import {CarsSpecificationsEditorSpec} from './spec/cars-specifications-editor-sp
     CarsSpecificationsEditorEngine,
     CarsSpecificationsEditorSpec,
     CarsSpecificationsEditorResult,
-    AsyncPipe,
     RemarkModule,
   ],
   templateUrl: './cars-specifications-editor.html',
@@ -37,7 +36,6 @@ import {CarsSpecificationsEditorSpec} from './spec/cars-specifications-editor-sp
 export class CarsSpecificationsEditor {
   readonly #router = inject(Router);
   readonly #notFound = inject(NotFoundService);
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #auth = inject(AuthService);
@@ -46,14 +44,18 @@ export class CarsSpecificationsEditor {
 
   protected readonly isModer = this.#auth.hasRole(Role.MODER);
   protected readonly isSpecsAdmin = this.#auth.hasRole(Role.ADMIN);
-  protected readonly tab$ = this.#route.queryParamMap.pipe(map((params) => params.get('tab') ?? 'info'));
+  readonly tab = input('info', {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? 'info',
+  });
   protected readonly user = this.#auth.user;
 
-  readonly #itemID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('item_id') ?? '')), {
-    requireSync: true,
+  readonly itemId = input('', {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'item_id',
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? '',
   });
   protected readonly dataResource = rxResource({
-    params: () => this.#itemID(),
+    params: () => this.itemId(),
     stream: ({params: id}) =>
       this.#itemsClient
         .item(

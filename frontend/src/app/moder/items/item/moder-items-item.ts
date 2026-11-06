@@ -1,8 +1,9 @@
 import type {Item} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
 import {
   GetTreeRequest,
   ItemFields,
@@ -25,7 +26,7 @@ import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {getItemTypeTranslation} from '@utils/translations';
 import {isNotFoundError} from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
-import {catchError, defer, distinctUntilChanged, map, of, tap, throwError} from 'rxjs';
+import {catchError, defer, of, tap, throwError} from 'rxjs';
 
 import {ModerItemsItemCatalogue} from './catalogue/moder-items-item-catalogue';
 import {ModerItemsItemGdpr} from './gdpr/moder-items-item-gdpr';
@@ -61,7 +62,6 @@ interface Tab {
 })
 export class ModerItemsItem {
   readonly #auth = inject(AuthService);
-  readonly #route = inject(ActivatedRoute);
   readonly #notFound = inject(NotFoundService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
@@ -110,29 +110,17 @@ export class ModerItemsItem {
     visible: true,
   };
 
-  readonly activeTab = toSignal(
-    this.#route.queryParamMap.pipe(
-      map((params) => params.get('tab')),
-      distinctUntilChanged(),
-      // A `?tab=` query param (present, empty value) yields '' from params.get(), not null - ??
-      // would treat that as a real tab value instead of falling back to 'meta' like the ternary
-      // does.
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      map((tab) => (tab ? tab : 'meta')),
-    ),
-    {requireSync: true},
-  );
+  readonly tab = input('meta', {
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- Empty ?tab= also selects the default tab.
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) || 'meta',
+  });
 
-  readonly #itemID = toSignal(
-    this.#route.paramMap.pipe(
-      map((params) => params.get('id') ?? ''),
-      distinctUntilChanged(),
-    ),
-    {requireSync: true},
-  );
+  readonly id = input('', {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? '',
+  });
 
   protected readonly itemResource = rxResource({
-    params: () => this.#itemID(),
+    params: () => this.id(),
     stream: ({params: id}) =>
       defer(() =>
         this.#itemsClient.item(
@@ -212,7 +200,7 @@ export class ModerItemsItem {
   protected readonly treeResource = rxResource({
     params: () => {
       const item = this.item();
-      return this.activeTab() === 'tree' && this.treeTab.visible ? (item ?? null) : null;
+      return this.tab() === 'tree' && this.treeTab.visible ? (item ?? null) : null;
     },
     stream: ({params}) =>
       params === null

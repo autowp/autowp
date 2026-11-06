@@ -1,11 +1,12 @@
 import type {OnInit} from '@angular/core';
 import type {Theme} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {form, FormField, maxLength, submit} from '@angular/forms/signals';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {CreateTopicRequest, GetThemeRequest, Topic} from '@grpc/spec.pb';
 import {ForumsClient} from '@grpc/spec.pbsc';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
@@ -24,7 +25,7 @@ import {
 } from 'app/grpc';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {RemarkModule} from 'ngx-remark';
-import {firstValueFrom, map} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 @Component({
   selector: 'app-forums-new-topic',
   imports: [RouterLink, FormField, InvalidParamsPipe, RemarkModule],
@@ -34,7 +35,6 @@ import {firstValueFrom, map} from 'rxjs';
 export class ForumsNewTopic implements OnInit {
   readonly #router = inject(Router);
   readonly #notFound = inject(NotFoundService);
-  readonly #route = inject(ActivatedRoute);
   protected readonly auth = inject(AuthService);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
@@ -53,12 +53,12 @@ export class ForumsNewTopic implements OnInit {
   });
   protected readonly invalidParams = signal<InvalidParams>({});
 
-  readonly #themeID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('theme_id'))), {
-    requireSync: true,
+  readonly themeId = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
 
   protected readonly themeResource = rxResource({
-    params: () => this.#themeID(),
+    params: () => this.themeId(),
     stream: ({params: themeID}) => {
       if (!themeID) {
         return notFoundError();

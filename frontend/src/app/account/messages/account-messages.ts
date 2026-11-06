@@ -1,6 +1,8 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import type {RouteParam} from '@utils/route-param';
+
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
 import {MessagingGetMessagesRequest} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {AuthService} from '@services/auth-service';
@@ -26,18 +28,24 @@ import {map, of, switchMap, tap, timer} from 'rxjs';
 export class AccountMessages {
   readonly #messageService = inject(MessageService);
   readonly #messageDialogService = inject(MessageDialogService);
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
   readonly #messagingClient = inject(MessagingClient);
   readonly #userService = inject(UserService);
 
   readonly #auth = inject(AuthService);
-  readonly #query = toSignal(this.#route.queryParamMap, {requireSync: true});
   readonly #revision = signal(0);
-  protected readonly folder = computed(() => this.#query().get('folder') ?? 'inbox');
-  readonly #page = computed(() => parseInt(this.#query().get('page') ?? '', 10) || 1);
-  readonly #userId = computed(() => this.#query().get('user_id') ?? undefined);
+  readonly folder = input('inbox', {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? 'inbox',
+  });
+  readonly page = input(1, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10) || 1,
+  });
+  readonly userId = input<string | undefined, RouteParam>(undefined, {
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- Preserve the public query parameter name.
+    alias: 'user_id',
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value),
+  });
   readonly #pageInfo = computed(() => {
     switch (this.folder()) {
       case 'dialog':
@@ -59,8 +67,8 @@ export class AccountMessages {
       if (!authenticated) return null;
       return {
         folder: this.folder(),
-        page: this.#page(),
-        userId: this.#userId(),
+        page: this.page(),
+        userId: this.userId(),
         revision: this.#revision(),
         changed: this.#messageService.changed(),
       };

@@ -1,12 +1,10 @@
 import type {OnInit} from '@angular/core';
 import type {Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute} from '@angular/router';
+import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
-import {map} from 'rxjs';
 
 import {Gallery} from './gallery';
 
@@ -17,11 +15,10 @@ import {Gallery} from './gallery';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GalleryPage implements OnInit {
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
 
-  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
-    requireSync: true,
+  readonly identity = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
 
   ngOnInit(): void {

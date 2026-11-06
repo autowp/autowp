@@ -8,17 +8,17 @@ export const routes: Routes = [
   },
   {
     loadComponent: () => import('./mosts').then((m) => m.Mosts),
-    path: ':rating_catname',
+    path: ':ratingCatname',
     title: $localize`Mostly`,
   },
   {
     loadComponent: () => import('./mosts').then((m) => m.Mosts),
-    path: ':rating_catname/:type_catname',
+    path: ':ratingCatname/:typeCatname',
     title: $localize`Mostly`,
   },
   {
     loadComponent: () => import('./mosts').then((m) => m.Mosts),
-    path: ':rating_catname/:type_catname/:years_catname',
+    path: ':ratingCatname/:typeCatname/:yearsCatname',
     title: $localize`Mostly`,
   },
 ];

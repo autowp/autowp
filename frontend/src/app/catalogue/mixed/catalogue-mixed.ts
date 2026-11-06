@@ -1,7 +1,8 @@
 import type {Item, Pages, Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
@@ -49,8 +50,8 @@ export class CatalogueMixed {
   // that changes without a fresh component instance, so requireSync is safe here.
   protected readonly data = toSignal(this.#route.data as Observable<BrandPerspectivePageData>, {requireSync: true});
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
@@ -103,7 +104,7 @@ export class CatalogueMixed {
 
   protected readonly picturesResource = rxResource({
     id: `catalogue-mixed-pictures-${this.data().catname}-${this.#catname() ?? ''}`,
-    params: () => ({brand: this.brandData(), page: this.#page()}),
+    params: () => ({brand: this.brandData(), page: this.page()}),
     stream: ({
       params: {brand, page},
     }): Observable<undefined | {paginator: Pages | undefined; pictures: Picture[][]}> => {

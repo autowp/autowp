@@ -1,7 +1,8 @@
 import type {Item, Pages, Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject, RESPONSE_INIT} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, RESPONSE_INIT} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -61,8 +62,8 @@ export class CatalogueRecent {
     requireSync: true,
   });
 
-  readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
-    requireSync: true,
+  readonly page = input(NaN, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10),
   });
 
   // Missing catname / empty list response are both surfaced as a NOT_FOUND resource error rather
@@ -115,7 +116,7 @@ export class CatalogueRecent {
 
   protected readonly picturesResource = rxResource({
     id: `catalogue-recent-pictures-${this.#catname() ?? ''}`,
-    params: () => ({brand: this.brandData(), page: this.#page()}),
+    params: () => ({brand: this.brandData(), page: this.page()}),
     stream: ({
       params: {brand, page},
     }): Observable<undefined | {paginator: Pages | undefined; pictures: PictureRoute[][]}> => {
@@ -188,7 +189,7 @@ export class CatalogueRecent {
     // distinct resource - redirect callers straight to the one that does, rather than rendering an
     // empty page for every number above it.
     effect(() => {
-      const page = this.#page();
+      const page = this.page();
       const last = this.picturesResource.value()?.paginator?.pageCount;
 
       if (last === undefined || !Number.isFinite(page) || page <= last) {

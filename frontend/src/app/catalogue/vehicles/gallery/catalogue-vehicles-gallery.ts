@@ -1,7 +1,8 @@
 import type {Picture} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {NotFoundService} from '@services/not-found';
@@ -28,8 +29,8 @@ export class CatalogueVehiclesGallery {
   readonly #catalogueService = inject(CatalogueService);
   readonly #notFound = inject(NotFoundService);
 
-  protected readonly identity = toSignal(this.#route.paramMap.pipe(map((route) => route.get('identity'))), {
-    requireSync: true,
+  readonly identity = input<null | string, RouteParam>(null, {
+    transform: (value: RouteParam) => (Array.isArray(value) ? value[0] : value) ?? null,
   });
 
   readonly #exact = toSignal(this.#route.data.pipe(map((data) => !!data['exact'])), {requireSync: true});

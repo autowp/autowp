@@ -1,11 +1,12 @@
 import type {OnInit} from '@angular/core';
 import type {Article, User} from '@grpc/spec.pb';
+import type {RouteParam} from '@utils/route-param';
 import type {Observable} from 'rxjs';
 
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
 import {ArticlesRequest} from '@grpc/spec.pb';
 import {ArticlesClient} from '@grpc/spec.pbsc';
 import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
@@ -38,22 +39,20 @@ interface ArticleListItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleList implements OnInit {
-  readonly #route = inject(ActivatedRoute);
   readonly #pageEnv = inject(PageEnvService);
   readonly #articlesClient = inject(ArticlesClient);
   readonly #userService = inject(UserService);
 
-  readonly #page = toSignal(
-    this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10) || 1)),
-    {requireSync: true},
-  );
+  readonly page = input(1, {
+    transform: (value: RouteParam) => parseInt((Array.isArray(value) ? value[0] : value) ?? '', 10) || 1,
+  });
 
   protected readonly articlesResource = rxResource({
     // Lets the resource seed its status as already-resolved from TransferState on hydration
     // instead of restarting at 'loading' and flashing the spinner before the (already
     // transfer-cached) HTTP response resolves a tick later.
     id: 'articles-list',
-    params: () => this.#page(),
+    params: () => this.page(),
     stream: ({params: page}) =>
       this.#articlesClient.getList(new ArticlesRequest({limit: 10, page})).pipe(
         map((response) => ({

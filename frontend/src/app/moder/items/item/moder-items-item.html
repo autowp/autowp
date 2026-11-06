@@ -72,7 +72,7 @@
     </div>
   </div>
 
-  @if (activeTab(); as activeTab) {
+  @if (tab(); as activeTab) {
     <div class="nav nav-pills" style="margin-bottom: 10px">
       <a class="nav-link me-1" routerLink="." [class.active]="activeTab === 'meta'" [queryParams]="{tab: 'meta'}">
         <span class="glyphicon glyphicon-pencil me-1"></span>

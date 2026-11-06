@@ -36,7 +36,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
       />
     }
   }
-  @if (tab$ | async; as tab) {
+  @if (tab(); as tab) {
     <ul class="nav nav-tabs" id="myTab">
       <li class="nav-item">
         <a
