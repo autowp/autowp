@@ -77,7 +77,7 @@ export class ModerItemsNew {
     map(
       (itemTypeID) =>
         new Item({
-          isConceptInherit: true,
+          isConceptInherit: [ItemType.ITEM_TYPE_ENGINE, ItemType.ITEM_TYPE_VEHICLE].includes(itemTypeID),
           itemTypeId: itemTypeID,
         }),
     ),
@@ -139,6 +139,7 @@ export class ModerItemsNew {
     }
 
     this.sending.set(true);
+    this.invalidParams.set({});
 
     const newItem = itemMetaFormResultsToAPIItem(event);
     newItem.itemTypeId = itemTypeID;
@@ -150,6 +151,9 @@ export class ModerItemsNew {
           if (response instanceof GrpcStatusEvent) {
             const fieldViolations = extractFieldViolations(response);
             this.invalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+            if (fieldViolations.length === 0) {
+              this.#toastService.handleError(response);
+            }
           } else {
             this.#toastService.handleError(response);
           }

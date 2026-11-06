@@ -1,5 +1,14 @@
 @let form = editForm;
 <form method="post" class="form-horizontal" (submit)="doSubmit(form); $event.preventDefault()">
+  @if (serverErrors().length) {
+    <div class="alert alert-danger" role="alert">
+      <ul class="mb-0">
+        @for (message of serverErrors(); track message) {
+          <li>{{ message }}</li>
+        }
+      </ul>
+    </div>
+  }
   @if (!form.name().hidden()) {
     @let name = form.name;
     <div class="mb-3 row">

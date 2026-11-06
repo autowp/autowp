@@ -173,6 +173,9 @@ export class ItemMetaForm {
   readonly #cdr = inject(ChangeDetectorRef);
 
   readonly invalidParams = input.required<InvalidParams>();
+  protected readonly serverErrors = computed(() => [
+    ...new Set(Object.values(this.invalidParams()).flatMap((errors) => Object.values(errors))),
+  ]);
   readonly submitted = output<ItemMetaFormResult>();
 
   // Set by the parent while its own submit-handling observable is in flight - this component has
@@ -406,6 +409,7 @@ export class ItemMetaForm {
     field().markAsTouched();
     if (this.sending() || field().invalid()) return;
     const value = this.#model();
+    const isConcept = value.is_concept === isConceptInherited ? isConceptInherited : value.is_concept === 'true';
     this.submitted.emit({
       name: value.name,
       full_name: value.full_name,
@@ -422,7 +426,7 @@ export class ItemMetaForm {
       produced: field.produced().hidden()
         ? null
         : {count: optionalNumber(value.produced.count), exactly: value.produced.exactly === 'true'},
-      is_concept: value.is_concept === isConceptInherited ? isConceptInherited : value.is_concept === 'true',
+      is_concept: !field.is_concept().hidden() && isConcept,
       is_group: value.is_group,
       vehicle_type_id: [...value.vehicle_type_id],
       begin: field.begin().hidden()
