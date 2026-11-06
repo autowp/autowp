@@ -1,31 +1,37 @@
-import type {Observable} from 'rxjs';
+import type {ResourceRef} from '@angular/core';
 
-import {inject, Service} from '@angular/core';
+import {inject, Injector, Service} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {GetMessagesRequest, ModeratorAttention} from '@grpc/spec.pb';
 import {CommentsClient} from '@grpc/spec.pbsc';
 import {AuthService, Role} from '@services/auth-service';
-import {map, of, shareReplay, switchMap} from 'rxjs';
+import {map, of} from 'rxjs';
 
 @Service()
 export class APICommentsService {
   readonly #auth = inject(AuthService);
   readonly #commentsClient = inject(CommentsClient);
 
-  public readonly attentionCommentsCount$: Observable<null | number> = this.#auth.hasRole$(Role.MODER).pipe(
-    switchMap((isModer) => {
-      if (!isModer) {
-        return of(null);
-      }
+  readonly #injector = inject(Injector);
+  readonly #isModer = this.#auth.hasRole(Role.MODER);
+  #attentionCommentsCountResource: ResourceRef<null | number | undefined> | undefined;
 
-      return this.#commentsClient
-        .getMessages(
-          new GetMessagesRequest({
-            limit: 0,
-            moderatorAttention: ModeratorAttention.REQUIRED,
-          }),
-        )
-        .pipe(map((response) => (response.paginator ? response.paginator.totalItemCount : null)));
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  getAttentionCommentsCountResource(): ResourceRef<null | number | undefined> {
+    this.#attentionCommentsCountResource ??= rxResource({
+      injector: this.#injector,
+      params: () => this.#isModer(),
+      stream: ({params: isModer}) => {
+        if (!isModer) return of(null);
+        return this.#commentsClient
+          .getMessages(
+            new GetMessagesRequest({
+              limit: 0,
+              moderatorAttention: ModeratorAttention.REQUIRED,
+            }),
+          )
+          .pipe(map((response) => (response.paginator ? response.paginator.totalItemCount : null)));
+      },
+    });
+    return this.#attentionCommentsCountResource;
+  }
 }

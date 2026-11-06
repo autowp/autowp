@@ -1,11 +1,12 @@
+import type {ResourceRef} from '@angular/core';
 import type {PicturesUserSummary} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
 
-import {inject, Service} from '@angular/core';
+import {inject, Injector, Service} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {DfDistanceListOptions, PictureListOptions, PicturesRequest, PictureStatus} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {map, of, shareReplay, switchMap} from 'rxjs';
+import {map, of} from 'rxjs';
 
 import {AuthService, Role} from './auth-service';
 
@@ -17,55 +18,62 @@ export class PictureService {
   readonly #auth = inject(AuthService);
   readonly #picturesClient = inject(PicturesClient);
 
-  public readonly summary$: Observable<null | PicturesUserSummary> = this.#auth.authenticated$.pipe(
-    switchMap((authenticated) => {
-      if (!authenticated) {
-        return of(null);
-      }
-      return this.#picturesClient.getUserSummary(new Empty());
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  readonly #injector = inject(Injector);
+  readonly #isModer = this.#auth.hasRole(Role.MODER);
+  #summaryResource: ResourceRef<null | PicturesUserSummary | undefined> | undefined;
+  #inboxSizeResource: ResourceRef<null | number | undefined> | undefined;
+  #similarPicturesCountResource: ResourceRef<null | number | undefined> | undefined;
 
-  public readonly inboxSize$: Observable<null | number> = this.#auth.hasRole$(Role.MODER).pipe(
-    switchMap((isModer) => {
-      if (!isModer) {
-        return of(null);
-      }
+  getSummaryResource(): ResourceRef<null | PicturesUserSummary | undefined> {
+    this.#summaryResource ??= rxResource({
+      injector: this.#injector,
+      params: () => this.#auth.authenticated(),
+      stream: ({params}) => (params ? this.#picturesClient.getUserSummary(new Empty()) : of(null)),
+    });
+    return this.#summaryResource;
+  }
 
-      return this.#picturesClient
-        .getPicturesPaginator(
-          new PicturesRequest({
-            limit: 0,
-            options: new PictureListOptions({
-              status: PictureStatus.PICTURE_STATUS_INBOX,
+  getInboxSizeResource(): ResourceRef<null | number | undefined> {
+    this.#inboxSizeResource ??= rxResource({
+      injector: this.#injector,
+      params: () => this.#isModer(),
+      stream: ({params: isModer}) => {
+        if (!isModer) return of(null);
+        return this.#picturesClient
+          .getPicturesPaginator(
+            new PicturesRequest({
+              limit: 0,
+              options: new PictureListOptions({
+                status: PictureStatus.PICTURE_STATUS_INBOX,
+              }),
+              paginator: true,
             }),
-            paginator: true,
-          }),
-        )
-        .pipe(map((paginator) => paginator.totalItemCount || null));
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+          )
+          .pipe(map((paginator) => paginator.totalItemCount || null));
+      },
+    });
+    return this.#inboxSizeResource;
+  }
 
-  public readonly similarPicturesCount$: Observable<null | number> = this.#auth.hasRole$(Role.MODER).pipe(
-    switchMap((isModer) => {
-      if (!isModer) {
-        return of(null);
-      }
-
-      return this.#picturesClient
-        .getPicturesPaginator(
-          new PicturesRequest({
-            limit: 0,
-            options: new PictureListOptions({
-              dfDistance: new DfDistanceListOptions({}),
+  getSimilarPicturesCountResource(): ResourceRef<null | number | undefined> {
+    this.#similarPicturesCountResource ??= rxResource({
+      injector: this.#injector,
+      params: () => this.#isModer(),
+      stream: ({params: isModer}) => {
+        if (!isModer) return of(null);
+        return this.#picturesClient
+          .getPicturesPaginator(
+            new PicturesRequest({
+              limit: 0,
+              options: new PictureListOptions({
+                dfDistance: new DfDistanceListOptions({}),
+              }),
+              paginator: true,
             }),
-            paginator: true,
-          }),
-        )
-        .pipe(map((paginator) => paginator.totalItemCount || null));
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+          )
+          .pipe(map((paginator) => paginator.totalItemCount || null));
+      },
+    });
+    return this.#similarPicturesCountResource;
+  }
 }

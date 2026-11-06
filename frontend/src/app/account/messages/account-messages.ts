@@ -1,36 +1,25 @@
-import type {Message, Pages, User} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
-
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {MessagingGetMessagesRequest} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
+import {AuthService} from '@services/auth-service';
 import {MessageService} from '@services/message';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {UserService} from '@services/user';
 import {PastTimeIndicator} from '@utils/past-time-indicator/past-time-indicator';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
 import {UserText} from '@utils/user-text/user-text';
 import {MessageDialogService} from 'app/message-dialog/message-dialog.service';
 import {Paginator} from 'app/paginator/paginator/paginator';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserLink} from 'app/user/user/user-link';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {map, of, switchMap, tap, timer} from 'rxjs';
 
 @Component({
   selector: 'app-account-messages',
-  imports: [UserLink, RouterLink, UserText, PastTimeIndicator, Paginator, AsyncPipe],
+  imports: [UserLink, RouterLink, UserText, PastTimeIndicator, Paginator, ResourceStatus],
   templateUrl: './account-messages.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -43,78 +32,77 @@ export class AccountMessages {
   readonly #messagingClient = inject(MessagingClient);
   readonly #userService = inject(UserService);
 
-  readonly #change$ = new BehaviorSubject<void>(void 0);
-
-  protected readonly pageName = signal('');
-
-  protected readonly folder$: Observable<string> = this.#route.queryParamMap.pipe(
-    map((params) => params.get('folder') ?? 'inbox'),
-    distinctUntilChanged(),
+  readonly #auth = inject(AuthService);
+  readonly #query = toSignal(this.#route.queryParamMap, {requireSync: true});
+  readonly #revision = signal(0);
+  protected readonly folder = computed(() => this.#query().get('folder') ?? 'inbox');
+  readonly #page = computed(() => parseInt(this.#query().get('page') ?? '', 10) || 1);
+  readonly #userId = computed(() => this.#query().get('user_id') ?? undefined);
+  readonly #pageInfo = computed(() => {
+    switch (this.folder()) {
+      case 'dialog':
+        return {pageId: PageId.ACCOUNT_MESSAGES_DIALOG, title: $localize`Personal messages`};
+      case 'sent':
+        return {pageId: PageId.ACCOUNT_MESSAGES_SENT, title: $localize`Sent`};
+      case 'system':
+        return {pageId: PageId.ACCOUNT_MESSAGES_SYSTEM, title: $localize`System messages`};
+      default:
+        return {pageId: PageId.ACCOUNT_MESSAGES, title: $localize`Inbox`};
+    }
+  });
+  protected readonly pageName = computed(() => this.#pageInfo().title);
+  protected readonly messagesResource = rxResource({
+    params: () => {
+      const authenticated = this.#auth.authenticated();
+      if (authenticated === undefined) return undefined;
+      // A defined inactive param cancels an in-flight authenticated read on logout.
+      if (!authenticated) return null;
+      return {
+        folder: this.folder(),
+        page: this.#page(),
+        userId: this.#userId(),
+        revision: this.#revision(),
+        changed: this.#messageService.changed(),
+      };
+    },
+    stream: ({params}) => {
+      if (!params) return of(undefined);
+      // Preserve the existing coalescing window for route changes, mutations and WebSocket echoes.
+      // Resource cancellation also cancels the timer, before an obsolete RPC can start.
+      return timer(50).pipe(
+        switchMap(() =>
+          this.#messagingClient.getMessages(
+            new MessagingGetMessagesRequest({
+              userId: params.userId,
+              folder: params.folder,
+              page: params.page,
+            }),
+          ),
+        ),
+        tap((response) => {
+          this.#messageService.seen(response.items ?? []);
+        }),
+        switchMap((response) =>
+          this.#userService.getUserMap$((response.items ?? []).map((message) => message.authorId)).pipe(
+            map((authors) => ({
+              items: (response.items ?? []).map((message) => ({message, author: authors.get(message.authorId)})),
+              paginator: response.paginator,
+              sendingBlocked: response.sendingBlocked,
+            })),
+          ),
+        ),
+      );
+    },
+  });
+  protected readonly messages = computed(() =>
+    this.messagesResource.hasValue() ? this.messagesResource.value() : undefined,
   );
 
-  protected readonly page$: Observable<number> = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-  );
-
-  readonly #userId$: Observable<string | undefined> = this.#route.queryParamMap.pipe(
-    map((params) => params.get('user_id') ?? undefined),
-    distinctUntilChanged(),
-  );
-
-  protected readonly messages$: Observable<{
-    items: {author$: Observable<null | User>; message: Message}[];
-    paginator: Pages | undefined;
-    sendingBlocked: boolean;
-  }> = combineLatest([this.folder$, this.page$, this.#userId$, this.#change$, this.#messageService.changed$]).pipe(
-    debounceTime(50),
-    switchMap(([folder, page, userId]) => {
-      let pageId: PageId | undefined;
-
-      switch (folder) {
-        case 'dialog':
-          pageId = PageId.ACCOUNT_MESSAGES_DIALOG;
-          this.pageName.set($localize`Personal messages`);
-          break;
-        case 'inbox':
-          pageId = PageId.ACCOUNT_MESSAGES;
-          this.pageName.set($localize`Inbox`);
-          break;
-        case 'sent':
-          pageId = PageId.ACCOUNT_MESSAGES_SENT;
-          this.pageName.set($localize`Sent`);
-          break;
-        case 'system':
-          pageId = PageId.ACCOUNT_MESSAGES_SYSTEM;
-          this.pageName.set($localize`System messages`);
-          break;
-      }
-
-      this.#pageEnv.set({
-        pageId,
-        title: this.pageName(),
-      });
-
-      return this.#messagingClient.getMessages(new MessagingGetMessagesRequest({userId, folder, page: page || 1}));
-    }),
-    catchError((err: unknown) => {
-      this.#toastService.handleError(err);
-      return EMPTY;
-    }),
-    tap((response) => {
-      if (response.items) {
-        this.#messageService.seen(response.items);
-      }
-    }),
-    map((response) => ({
-      items: (response.items ?? []).map((msg) => ({
-        author$: this.#userService.getUser$(msg.authorId),
-        message: msg,
-      })),
-      paginator: response.paginator,
-      sendingBlocked: response.sendingBlocked,
-    })),
-  );
+  constructor() {
+    effect(() => {
+      this.#pageEnv.set(this.#pageInfo());
+    });
+  }
 
   protected deleteMessage(id: string) {
     this.#messageService.deleteMessage$(id).subscribe({
@@ -122,7 +110,7 @@ export class AccountMessages {
         this.#toastService.handleError(response);
       },
       next: () => {
-        this.#change$.next();
+        this.#revision.update((value) => value + 1);
       },
     });
 
@@ -135,7 +123,7 @@ export class AccountMessages {
         this.#toastService.handleError(response);
       },
       next: () => {
-        this.#change$.next();
+        this.#revision.update((value) => value + 1);
       },
     });
   }
@@ -145,7 +133,7 @@ export class AccountMessages {
       switch (folder) {
         case 'dialog':
         case 'sent':
-          this.#change$.next();
+          this.#revision.update((value) => value + 1);
           break;
       }
     });

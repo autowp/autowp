@@ -89,9 +89,10 @@ export class App {
 
   protected readonly languages: Language[] = environment.languages;
   protected readonly authenticated = this.#auth.authenticated;
-  protected readonly newPersonalMessages$ = this.#messageService
-    .getNew$()
-    .pipe(shareReplay({bufferSize: 1, refCount: false}));
+  protected readonly newPersonalMessagesResource = this.#messageService.getNewResource();
+  protected readonly newPersonalMessages = computed(() =>
+    this.newPersonalMessagesResource.hasValue() ? this.newPersonalMessagesResource.value() : null,
+  );
   protected readonly searchHostname: string;
   // Deterministic (not truly random) so the skeleton's widths match between the SSR pass and
   // client hydration - see IndexBrands.placeholderItems for the same reasoning.

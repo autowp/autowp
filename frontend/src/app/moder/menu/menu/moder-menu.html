@@ -1,4 +1,4 @@
-@if (items$ | async; as items) {
+@if (items(); as items) {
   <div class="moderator-menu-container">
     <div class="btn-group" ngbDropdown placement="top-right">
       <button type="button" ngbDropdownToggle class="btn btn-secondary">
@@ -12,10 +12,15 @@
               <i aria-hidden="true" [class]="item.icon"></i>
             }
             {{ item.label }}
-            @if (item.count$ | async; as count) {
+            @if (item.countResource?.hasValue() && item.countResource.value(); as count) {
               <span [class]="'badge rounded-pill ' + (item.badgeClass ?? 'text-bg-secondary')">{{ count }}</span>
             }
           </a>
+          @if (item.countResource; as resource) {
+            @if (resource.error()) {
+              <app-resource-status [resource]="resource" />
+            }
+          }
         }
         <div class="dropdown-divider"></div>
         <a routerLink="/moder" class="dropdown-item">

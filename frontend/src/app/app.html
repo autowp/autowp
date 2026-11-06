@@ -84,12 +84,18 @@
             <li class="nav-item">
               <a class="nav-link" routerLink="/account/messages" routerLinkActive="active">
                 <i class="bi bi-chat-fill me-1" aria-hidden="true"></i>
-                @if (newPersonalMessages$ | async; as newPersonalMessages) {
+                @if (newPersonalMessages(); as newPersonalMessages) {
                   @if (newPersonalMessages > 0) {
                     <span class="badge rounded-pill text-bg-secondary">{{ newPersonalMessages }}</span>
                   }
                 }
               </a>
+              @if (newPersonalMessagesResource.error()) {
+                <button type="button" class="btn btn-link nav-link" (click)="newPersonalMessagesResource.reload()">
+                  <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                  <span class="visually-hidden"><ng-container i18n>Refresh</ng-container></span>
+                </button>
+              }
             </li>
           } @else {
             <li class="nav-item">

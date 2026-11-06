@@ -1,87 +1,61 @@
+import type {ResourceRef} from '@angular/core';
 import type {MessageSummary} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {inject, Service} from '@angular/core';
+import {inject, Injector, Service, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {CreateMessageRequest, Message, MessagingClearFolder, MessagingDeleteMessage} from '@grpc/spec.pb';
 import {MessagingClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
-import {
-  asapScheduler,
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  debounceTime,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {map, of, scan, tap} from 'rxjs';
 
-import {ToastsService} from '../toasts/toasts.service';
 import {AuthService} from './auth-service';
 import {MessagingWebSocketService} from './messaging-ws.service';
 
 @Service()
 export class MessageService {
   readonly #auth = inject(AuthService);
-  readonly #toasts = inject(ToastsService);
   readonly #messagingClient = inject(MessagingClient);
   readonly #ws = inject(MessagingWebSocketService);
 
-  readonly #deleted$ = new BehaviorSubject<void>(void 0);
-  readonly #sent$ = new BehaviorSubject<void>(void 0);
-  readonly #seen$ = new BehaviorSubject<void>(void 0);
+  readonly #injector = inject(Injector);
+  // The WebSocket's initial emission becomes revision 0, so subscribing does not refetch.
+  readonly changed = toSignal(this.#ws.messagesChanged$.pipe(scan((revision) => revision + 1, -1)), {
+    requireSync: true,
+  });
+  readonly #newRevision = signal(0);
+  readonly #summaryRevision = signal(0);
+  #newResource: ResourceRef<null | number | undefined> | undefined;
+  #summaryResource: ResourceRef<MessageSummary | null | undefined> | undefined;
 
-  // Passthrough for consumers (e.g. the messages list screen) that want to react to any
-  // server-side change (send/delete/clear, from this session or another tab/device).
-  public readonly changed$: Observable<void> = this.#ws.messagesChanged$;
+  getNewResource(): ResourceRef<null | number | undefined> {
+    this.#newResource ??= rxResource({
+      injector: this.#injector,
+      params: () => {
+        const authenticated = this.#auth.authenticated();
+        if (authenticated === undefined) return undefined;
+        return {authenticated, revision: this.#newRevision(), changed: this.changed()};
+      },
+      stream: ({params}) =>
+        params.authenticated
+          ? this.#messagingClient.getMessagesNewCount(new Empty()).pipe(map((response) => response.count))
+          : of(null),
+    });
+    return this.#newResource;
+  }
 
-  readonly #new$: Observable<null | number> = combineLatest([
-    this.#auth.authenticated$,
-    this.#deleted$,
-    this.#seen$,
-    this.#ws.messagesChanged$,
-  ]).pipe(
-    // Coalesces the burst of synchronous emissions the sources above produce on subscribe into a
-    // single request, on a microtask rather than a timer: a timer is work SSR's whenStable() only
-    // waits for through the zone bridge, which goes away with zone-based change detection, and
-    // this runs in the app shell on every page.
-    debounceTime(0, asapScheduler),
-    switchMap(([authenticated]) => {
-      if (!authenticated) {
-        return of(null);
-      }
-
-      return this.#messagingClient.getMessagesNewCount(new Empty()).pipe(
-        catchError((response: unknown) => {
-          this.#toasts.handleError(response);
-          return of(null);
-        }),
-      );
-    }),
-    map((response) => (response ? response.count : null)),
-  );
-
-  readonly #summary$: Observable<MessageSummary | null> = combineLatest([
-    this.#deleted$,
-    this.#sent$,
-    this.#seen$,
-    this.#auth.authenticated$,
-    this.#ws.messagesChanged$,
-  ]).pipe(
-    map(([, , , authenticated]) => authenticated),
-    // Same coalescing as #new$ above, same reason.
-    debounceTime(0, asapScheduler),
-    switchMap((authenticated) => {
-      if (!authenticated) {
-        return of(null);
-      }
-
-      return this.#messagingClient.getMessagesSummary(new Empty());
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+  getSummaryResource(): ResourceRef<MessageSummary | null | undefined> {
+    this.#summaryResource ??= rxResource({
+      injector: this.#injector,
+      params: () => {
+        const authenticated = this.#auth.authenticated();
+        if (authenticated === undefined) return undefined;
+        return {authenticated, revision: this.#summaryRevision(), changed: this.changed()};
+      },
+      stream: ({params}) => (params.authenticated ? this.#messagingClient.getMessagesSummary(new Empty()) : of(null)),
+    });
+    return this.#summaryResource;
+  }
 
   public seen(messages: Message[]) {
     let newFound = false;
@@ -92,14 +66,16 @@ export class MessageService {
     }
 
     if (newFound) {
-      this.#seen$.next();
+      this.#newRevision.update((value) => value + 1);
+      this.#summaryRevision.update((value) => value + 1);
     }
   }
 
   public clearFolder$(folder: string): Observable<object> {
     return this.#messagingClient.clearFolder(new MessagingClearFolder({folder})).pipe(
       tap(() => {
-        this.#deleted$.next();
+        this.#newRevision.update((value) => value + 1);
+        this.#summaryRevision.update((value) => value + 1);
       }),
     );
   }
@@ -107,17 +83,10 @@ export class MessageService {
   public deleteMessage$(messageId: string): Observable<object> {
     return this.#messagingClient.deleteMessage(new MessagingDeleteMessage({messageId})).pipe(
       tap(() => {
-        this.#deleted$.next();
+        this.#newRevision.update((value) => value + 1);
+        this.#summaryRevision.update((value) => value + 1);
       }),
     );
-  }
-
-  public getSummary$(): Observable<MessageSummary | null> {
-    return this.#summary$;
-  }
-
-  public getNew$(): Observable<null | number> {
-    return this.#new$;
   }
 
   public send$(userId: string, text: string): Observable<object> {
@@ -132,7 +101,7 @@ export class MessageService {
       )
       .pipe(
         tap(() => {
-          this.#sent$.next();
+          this.#summaryRevision.update((value) => value + 1);
         }),
       );
   }

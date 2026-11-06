@@ -2,8 +2,8 @@
   <h1>{{ pageName() }}</h1>
 </div>
 
-@if (folder$ | async; as folder) {
-  @if (messages$ | async; as data) {
+@if (folder(); as folder) {
+  @if (messages(); as data) {
     @if (data.sendingBlocked) {
       <div class="alert alert-secondary" role="alert">
         <ng-container i18n
@@ -31,7 +31,7 @@
       @for (message of data.items; track message.message.id) {
         <div class="message">
           @if (message.message.authorId !== '0') {
-            @if (message.author$ | async; as author) {
+            @if (message.author; as author) {
               <div>
                 <app-user [user]="author" />
               </div>
@@ -49,9 +49,7 @@
               </div>
             } @else {
               <div></div>
-              <div class="photo">
-                <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
-              </div>
+              <div class="photo"></div>
             }
           } @else {
             <div>
@@ -107,6 +105,6 @@
       <app-paginator [data]="data.paginator" />
     }
   } @else {
-    <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
+    <app-resource-status [resource]="messagesResource" />
   }
 }

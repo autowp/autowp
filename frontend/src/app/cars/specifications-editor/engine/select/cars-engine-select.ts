@@ -1,8 +1,5 @@
-import type {ItemParent, Pages} from '@grpc/spec.pb';
-import type {Observable} from 'rxjs';
-
-import {AsyncPipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {form, FormField} from '@angular/forms/signals';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
@@ -23,18 +20,8 @@ import {FieldMask} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
 import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  shareReplay,
-  switchMap,
-  tap,
-} from 'rxjs';
+import {ResourceStatus} from '@utils/resource-status/resource-status';
+import {catchError, EMPTY, map, of, switchMap, timer} from 'rxjs';
 
 import {chunk} from '../../../../chunk';
 import {Paginator} from '../../../../paginator/paginator/paginator';
@@ -43,7 +30,7 @@ import {CarsSelectEngineTreeItem} from './tree-item/cars-select-engine-tree-item
 
 @Component({
   selector: 'app-cars-engine-select',
-  imports: [RouterLink, CarsSelectEngineTreeItem, FormField, Paginator, AsyncPipe],
+  imports: [RouterLink, CarsSelectEngineTreeItem, FormField, Paginator, ResourceStatus],
   templateUrl: './cars-engine-select.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -57,108 +44,97 @@ export class CarsEngineSelect {
 
   readonly #search = signal('');
   protected readonly search = form(this.#search);
-  readonly #search$ = new BehaviorSubject<string>('');
+  readonly #query = toSignal(this.#route.queryParamMap, {requireSync: true});
+  protected readonly itemID = computed(() => this.#query().get('item_id') ?? '');
+  protected readonly brandID = computed(() => this.#query().get('brand_id') ?? '');
+  readonly #page = computed(() => parseInt(this.#query().get('page') ?? '', 10) || 1);
+  readonly #searchTerm = computed(() => this.#search().trim());
 
-  protected readonly itemID$ = this.#route.queryParamMap.pipe(
-    map((params) => params.get('item_id') ?? ''),
-    distinctUntilChanged(),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
-
-  protected readonly brandID$ = this.#route.queryParamMap.pipe(
-    map((params) => params.get('brand_id') ?? ''),
-    distinctUntilChanged(),
-  );
-
-  readonly #page$ = this.#route.queryParamMap.pipe(
-    map((params) => parseInt(params.get('page') ?? '', 10)),
-    distinctUntilChanged(),
-  );
-
-  protected readonly item$ = this.itemID$.pipe(
-    switchMap((itemID) =>
-      this.#itemsClient.item(
+  protected readonly itemResource = rxResource({
+    params: () => this.itemID() || null,
+    stream: ({params: itemID}) => {
+      if (!itemID) return of(undefined);
+      return this.#itemsClient.item(
         new ItemRequest({
           fields: new ItemFields({nameText: true}),
           id: itemID,
           language: this.#languageService.language,
         }),
-      ),
-    ),
-    tap((item) => {
-      this.#pageEnv.set({
-        pageId: PageId.SPECIFICATIONS_EDITOR,
-        title: $localize`Specs editor of ${item.nameText}`,
-      });
-    }),
-    shareReplay({bufferSize: 1, refCount: false}),
-  );
+      );
+    },
+  });
+  protected readonly item = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
 
-  protected readonly items$: Observable<ItemParent[]> = combineLatest([this.brandID$, this.#page$]).pipe(
-    switchMap(([brandID, page]) =>
-      this.#itemsClient.getItemParents(
-        new ItemParentsRequest({
-          fields: new ItemParentFields({
-            item: new ItemFields({
-              childsCount: true,
-              nameHtml: true,
-            }),
-          }),
-          language: this.#languageService.language,
-          limit: 500,
-          options: new ItemParentListOptions({
-            item: new ItemListOptions({
-              typeId: ItemType.ITEM_TYPE_ENGINE,
-            }),
-            parentId: brandID,
-          }),
-          order: ItemParentsRequest.Order.AUTO,
-          page,
-        }),
-      ),
-    ),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((response) => response.items ?? []),
-  );
-
-  protected readonly brands$: Observable<{items: Item[][]; paginator?: Pages}> = this.#search$.pipe(
-    map((str) => str.trim()),
-    distinctUntilChanged(),
-    debounceTime(50),
-    switchMap((search) =>
-      this.#itemsClient.list(
-        new ItemsRequest({
-          fields: new ItemFields({nameOnly: true}),
-          language: this.#languageService.language,
-          limit: 500,
-          options: new ItemListOptions({
-            descendant: new ItemParentCacheListOptions({
-              itemsByItemId: new ItemListOptions({
-                typeId: ItemType.ITEM_TYPE_ENGINE,
+  protected readonly itemsResource = rxResource({
+    params: () => (this.brandID() ? {brandID: this.brandID(), page: this.#page()} : null),
+    stream: ({params}) => {
+      if (!params) return of(undefined);
+      const {brandID, page} = params;
+      return this.#itemsClient
+        .getItemParents(
+          new ItemParentsRequest({
+            fields: new ItemParentFields({
+              item: new ItemFields({
+                childsCount: true,
+                nameHtml: true,
               }),
             }),
-            name: search ? '%' + search + '%' : undefined,
-            typeId: ItemType.ITEM_TYPE_BRAND,
+            language: this.#languageService.language,
+            limit: 500,
+            options: new ItemParentListOptions({
+              item: new ItemListOptions({
+                typeId: ItemType.ITEM_TYPE_ENGINE,
+              }),
+              parentId: brandID,
+            }),
+            order: ItemParentsRequest.Order.AUTO,
+            page,
           }),
-          order: ItemsRequest.Order.NAME,
-        }),
-      ),
-    ),
-    catchError((response: unknown) => {
-      this.#toastService.handleError(response);
-      return EMPTY;
-    }),
-    map((response) => ({
-      items: chunk<Item>(response.items ?? [], 6),
-      paginator: response.paginator,
-    })),
+        )
+        .pipe(map((response) => response.items ?? []));
+    },
+  });
+  protected readonly items = computed(() => (this.itemsResource.hasValue() ? this.itemsResource.value() : undefined));
+
+  protected readonly brandsResource = rxResource({
+    params: () => (this.brandID() ? null : this.#searchTerm()),
+    stream: ({params: search}) => {
+      if (search === null) return of(undefined);
+      // A new search or selecting a brand cancels the timer before an obsolete request starts.
+      return timer(50).pipe(
+        switchMap(() =>
+          this.#itemsClient.list(
+            new ItemsRequest({
+              fields: new ItemFields({nameOnly: true}),
+              language: this.#languageService.language,
+              limit: 500,
+              options: new ItemListOptions({
+                descendant: new ItemParentCacheListOptions({
+                  itemsByItemId: new ItemListOptions({
+                    typeId: ItemType.ITEM_TYPE_ENGINE,
+                  }),
+                }),
+                name: search ? '%' + search + '%' : undefined,
+                typeId: ItemType.ITEM_TYPE_BRAND,
+              }),
+              order: ItemsRequest.Order.NAME,
+            }),
+          ),
+        ),
+        map((response) => ({items: chunk<Item>(response.items ?? [], 6), paginator: response.paginator})),
+      );
+    },
+  });
+  protected readonly brands = computed(() =>
+    this.brandsResource.hasValue() ? this.brandsResource.value() : undefined,
   );
 
-  protected onInput() {
-    this.#search$.next(this.#search());
+  constructor() {
+    effect(() => {
+      const item = this.item();
+      if (item)
+        this.#pageEnv.set({pageId: PageId.SPECIFICATIONS_EDITOR, title: $localize`Specs editor of ${item.nameText}`});
+    });
   }
 
   protected selectEngine(itemID: string, engineId: string) {
