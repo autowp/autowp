@@ -1,6 +1,5 @@
 import type {Item, ItemParent} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -27,7 +26,6 @@ import {map, of} from 'rxjs';
 
 import {chunkBy} from '../chunk';
 import {Paginator} from '../paginator/paginator/paginator';
-
 interface ChunkedGroup {
   childs: ItemParent[][];
   hasMoreImages: boolean;
@@ -36,7 +34,7 @@ interface ChunkedGroup {
 
 @Component({
   selector: 'app-twins',
-  imports: [RouterLink, Paginator, AsyncPipe],
+  imports: [RouterLink, Paginator],
   templateUrl: './twins.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,7 +45,7 @@ export class Twins {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly canEdit$ = this.#auth.hasRole$(Role.CARS_MODER);
+  protected readonly canEdit = this.#auth.hasRole(Role.CARS_MODER);
 
   protected readonly page = toSignal(
     this.#route.queryParamMap.pipe(map((query) => parseInt(query.get('page') ?? '', 10))),

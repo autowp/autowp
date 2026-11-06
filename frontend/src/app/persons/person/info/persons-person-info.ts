@@ -27,7 +27,6 @@ import {catchError, map, of, switchMap} from 'rxjs';
 
 import {Paginator} from '../../../paginator/paginator/paginator';
 import {Thumbnail} from '../../../thumbnail/thumbnail/thumbnail';
-
 @Component({
   selector: 'app-persons-person-info',
   imports: [Paginator, Thumbnail, RemarkModule],
@@ -43,7 +42,7 @@ export class PersonsPersonInfo {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   readonly #itemID = toSignal(requireRouteParent(this.#route).paramMap.pipe(map((params) => params.get('id') ?? '')), {
     requireSync: true,

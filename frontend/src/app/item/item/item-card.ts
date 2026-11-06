@@ -1,16 +1,14 @@
 import type {Item} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth-service';
 import {ItemHeading} from '@utils/item-header/item-heading';
 import {RemarkModule} from 'ngx-remark';
-
 @Component({
   selector: 'app-item',
-  imports: [ItemHeading, RouterLink, AsyncPipe, RemarkModule],
+  imports: [ItemHeading, RouterLink, RemarkModule],
   templateUrl: './item-card.html',
   styleUrl: './item-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +22,7 @@ export class ItemCard {
   readonly disableDescription = input(false);
   readonly disableDetailsLink = input(false);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   protected readonly ItemType = ItemType;
 

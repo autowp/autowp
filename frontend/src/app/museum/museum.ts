@@ -1,4 +1,3 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -28,10 +27,9 @@ import {map, of, switchMap} from 'rxjs';
 import {Comments} from '../comments/comments/comments';
 import {Thumbnail} from '../thumbnail/thumbnail/thumbnail';
 import {MuseumMap} from './map/museum-map';
-
 @Component({
   selector: 'app-museum',
-  imports: [RouterLink, Comments, Thumbnail, RemarkModule, MuseumMap, AsyncPipe],
+  imports: [RouterLink, Comments, Thumbnail, RemarkModule, MuseumMap],
   templateUrl: './museum.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -44,7 +42,7 @@ export class Museum {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly museumModer$ = this.#auth.hasRole$(Role.CARS_MODER);
+  protected readonly museumModer = this.#auth.hasRole(Role.CARS_MODER);
 
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
     requireSync: true,

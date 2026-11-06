@@ -15,7 +15,7 @@
   <div class="page-header">
     <h1 [innerHTML]="item.nameHtml"></h1>
   </div>
-  @if (museumModer$ | async) {
+  @if (museumModer()) {
     <p>
       <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
       <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
@@ -47,7 +47,6 @@
     }
   }
 }
-
 @if (picturesResource.error(); as error) {
   <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
 } @else if (picturesResource.value(); as data) {
@@ -64,7 +63,6 @@
     </div>
   }
 }
-
 @if (itemData(); as item) {
   <app-comments [itemID]="item.id" [typeID]="CommentsType.ITEM_TYPE_ID" />
 }

@@ -153,7 +153,7 @@
             >
           </li>
         }
-        @if (isModer$ | async) {
+        @if (isModer()) {
           <li class="list-inline-item">
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
             <a i18n [routerLink]="['/moder/items/item', item.id]">edit</a>

@@ -10,7 +10,7 @@
 </td>
 <td>
   @if (itemData(); as item) {
-    @if (isModer$ | async) {
+    @if (isModer()) {
       <a [routerLink]="['/moder/items/item', userValue().itemId]" [innerHTML]="item.nameHtml"></a>
     } @else {
       <span [innerHTML]="item.nameHtml"></span>

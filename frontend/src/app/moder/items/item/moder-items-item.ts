@@ -1,6 +1,5 @@
 import type {Item} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -56,7 +55,6 @@ interface Tab {
     ModerItemsItemPictures,
     ModerItemsItemLinks,
     ModerItemsItemGdpr,
-    AsyncPipe,
   ],
   templateUrl: './moder-items-item.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,7 +71,7 @@ export class ModerItemsItem {
   readonly #cdr = inject(ChangeDetectorRef);
 
   protected readonly specsAllowed = signal(false);
-  protected readonly canEditSpecifications$ = this.#auth.authenticated$;
+  protected readonly canEditSpecifications = this.#auth.authenticated;
 
   protected readonly metaTab: Tab = {
     count: 0,

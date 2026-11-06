@@ -92,7 +92,7 @@
             >
           </li>
         }
-        @if (canEdit$ | async) {
+        @if (canEdit()) {
           <li>
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
             <a i18n [routerLink]="['/moder/items/item', group.item.id]">edit</a>

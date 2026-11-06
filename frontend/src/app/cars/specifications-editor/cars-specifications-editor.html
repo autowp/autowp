@@ -13,7 +13,7 @@
   </div>
 
   <div class="nav nav-pills mb-3">
-    @if (isModer$ | async) {
+    @if (isModer()) {
       <a class="nav-link" [routerLink]="['/moder/items/item', item.id]">
         <i class="bi bi-gear-fill" aria-hidden="true"></i>
         &ngsp;<ng-container i18n>edit</ng-container> &ngsp;<span [innerHTML]="item.nameHtml"></span>
@@ -25,7 +25,7 @@
     </a>
   </div>
 
-  @if (user$ | async; as user) {
+  @if (user(); as user) {
     @if (user.specsWeight < 1) {
       <remark
         class="d-block alert alert-danger"
@@ -36,7 +36,6 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
       />
     }
   }
-
   @if (tab$ | async; as tab) {
     <ul class="nav nav-tabs" id="myTab">
       <li class="nav-item">
@@ -89,7 +88,7 @@ Some of them discovered by other visitors can be found [here](/account/specs-con
             &ngsp;<ng-container i18n>Result</ng-container>
           </a>
         </li>
-        @if (isSpecsAdmin$ | async) {
+        @if (isSpecsAdmin()) {
           <li class="nav-item">
             <a
               routerLink="/cars/specifications-editor"
@@ -136,7 +135,7 @@ All values entered here are displayed on the site, in the specifications, are us
         <div class="tab-pane active" id="result">
           <app-cars-specifications-editor-result [item]="item" />
         </div>
-      } @else if (tab === 'admin' && (isSpecsAdmin$ | async)) {
+      } @else if (tab === 'admin' && isSpecsAdmin()) {
         <div class="tab-pane active" id="admin">
           <p>
             <a routerLink="/cars/specs-admin" i18n [queryParams]="{item_id: item.id}">Admin</a>

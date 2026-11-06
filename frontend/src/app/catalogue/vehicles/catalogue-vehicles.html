@@ -40,11 +40,11 @@
         <p>{{ name }}</p>
       }
     }
-    @if (isModer$ | async) {
+    @if (isModer()) {
       <p>
         <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
         <a class="me-1" i18n [routerLink]="['/moder/items/item', item.id]">edit</a>
-        @if (canAddItem$ | async; as canAddItem) {
+        @if (canAddItem(); as canAddItem) {
           @if (canAddItem && item.isGroup) {
             <i class="bi bi-plus me-1" aria-hidden="true"></i>
             <a
@@ -56,7 +56,7 @@
             >
           }
         }
-        @if (canAcceptPicture$ | async; as canAcceptPicture) {
+        @if (canAcceptPicture(); as canAcceptPicture) {
           @if (canAcceptPicture && item.inboxPicturesCount && item.inboxPicturesCount > 0) {
             <i class="bi bi-grid-3x2-gap-fill me-1" aria-hidden="true"></i>
             <a class="me-1" routerLink="/moder/pictures" [queryParams]="{item_id: item.id, status: 'inbox'}">
@@ -98,7 +98,6 @@
   } @else {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
-
   @if (itemsResource.error(); as error) {
     <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
   } @else if (itemsResource.value(); as items) {
@@ -108,7 +107,6 @@
   } @else {
     <div class="spinner-border" role="status"><span class="visually-hidden" i18n>Loading…</span></div>
   }
-
   @if (otherPicturesResource.error(); as error) {
     <p class="alert alert-danger" role="alert">{{ errorMessage(error) }}</p>
   } @else if (otherPicturesResource.value(); as otherPictures) {
@@ -142,7 +140,6 @@
       </a>
     }
   }
-
   @if (itemsData(); as items) {
     @if (items.paginator) {
       <app-paginator [data]="items.paginator" />

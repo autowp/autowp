@@ -3,7 +3,6 @@ import type {Item} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {GetItemVehicleTypesRequest, ItemType, UpdateItemRequest} from '@grpc/spec.pb';
@@ -20,10 +19,9 @@ import type {ItemMetaFormResult} from '../../item-meta-form/item-meta-form';
 import {extractFieldViolations, fieldViolations2InvalidParams} from '../../../../grpc';
 import {ToastsService} from '../../../../toasts/toasts.service';
 import {ItemMetaForm, itemMetaFormResultsToAPIItem} from '../../item-meta-form/item-meta-form';
-
 @Component({
   selector: 'app-moder-items-item-meta',
-  imports: [NgbProgressbar, ItemMetaForm, AsyncPipe],
+  imports: [NgbProgressbar, ItemMetaForm],
   templateUrl: './moder-items-item-meta.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,7 +37,7 @@ export class ModerItemsItemMeta implements OnInit {
 
   protected readonly loadingNumber = signal(false);
 
-  protected readonly canEditMeta$ = this.#auth.hasRole$(Role.CARS_MODER);
+  protected readonly canEditMeta = this.#auth.hasRole(Role.CARS_MODER);
   protected readonly invalidParams = signal<InvalidParams>({});
 
   // Constructed in ngOnInit() (with an explicit injector) rather than as a field initializer:

@@ -178,7 +178,7 @@
           <a routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}">edit specs</a>
         </li>
       }
-      @if (isModer$ | async; as isModer) {
+      @if (isModer(); as isModer) {
         @if (isModer) {
           <li class="list-inline-item">
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>

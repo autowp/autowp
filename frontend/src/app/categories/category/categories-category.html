@@ -39,7 +39,6 @@
     </ol>
   </nav>
 }
-
 @if (!pageEnv.layoutParams().isGalleryPage) {
   @if (current(); as current) {
     <div class="page-header">
@@ -47,16 +46,15 @@
     </div>
   }
 }
-
 @if (current(); as current) {
   <div>
     @if (!pageEnv.layoutParams().isGalleryPage) {
       @if (category(); as category) {
-        @if (isModer$ | async) {
+        @if (isModer()) {
           <p class="mb-4">
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
             <a i18n [routerLink]="['/moder/items/item', current.id]">edit</a>
-            @if (canAddCar$ | async) {
+            @if (canAddCar()) {
               <span>
                 <i class="bi bi-plus me-1" aria-hidden="true"></i>
                 <a routerLink="/moder/items/new" [queryParams]="category.queryParams">{{ category.title }}</a>

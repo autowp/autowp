@@ -1,9 +1,7 @@
 import type {OnInit} from '@angular/core';
 import type {Theme} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
-import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {form, FormField, maxLength, submit} from '@angular/forms/signals';
@@ -27,10 +25,9 @@ import {
 import {ToastsService} from 'app/toasts/toasts.service';
 import {RemarkModule} from 'ngx-remark';
 import {firstValueFrom, map} from 'rxjs';
-
 @Component({
   selector: 'app-forums-new-topic',
-  imports: [RouterLink, FormField, AsyncPipe, InvalidParamsPipe, RemarkModule],
+  imports: [RouterLink, FormField, InvalidParamsPipe, RemarkModule],
   templateUrl: './forums-new-topic.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -70,7 +67,7 @@ export class ForumsNewTopic implements OnInit {
     },
   });
 
-  protected readonly authenticated$: Observable<boolean> = this.auth.authenticated$;
+  protected readonly authenticated = this.auth.authenticated;
 
   // resource.value() throws while its resource is in an error state - hasValue() is the reactive
   // guard against that, so the breadcrumb in the template doesn't blow up on a non-NOT_FOUND

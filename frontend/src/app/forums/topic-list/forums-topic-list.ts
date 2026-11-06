@@ -1,11 +1,9 @@
 import type {Topic} from '@grpc/spec.pb';
 
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
 import {AuthService, Role} from '@services/auth-service';
 
 import {ForumsTopicListItem} from './topic-list-item/forums-topic-list-item';
-
 @Component({
   selector: 'app-forums-topic-list',
   imports: [ForumsTopicListItem],
@@ -21,5 +19,5 @@ export class ForumsTopicList {
 
   readonly reload = output();
 
-  protected readonly forumAdmin = toSignal(this.#auth.hasRole$(Role.FORUMS_MODER), {initialValue: false});
+  protected readonly forumAdmin = this.#auth.hasRole(Role.FORUMS_MODER);
 }

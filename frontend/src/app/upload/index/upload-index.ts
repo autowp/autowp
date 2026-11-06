@@ -48,7 +48,6 @@ import {
   tap,
   throwError,
 } from 'rxjs';
-
 interface UploadProgress {
   failed: boolean;
   filename: string;
@@ -91,7 +90,7 @@ export class UploadIndex implements OnInit {
   protected progress: UploadProgress[] = [];
   protected readonly pictures: InboxPicture[] = [];
   protected readonly formHidden = signal(false);
-  protected readonly authenticated$ = this.auth.authenticated$;
+  protected readonly authenticated = this.auth.authenticated;
 
   protected readonly PictureItemType = PictureItemType;
 

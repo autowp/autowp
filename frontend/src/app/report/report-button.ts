@@ -2,7 +2,7 @@ import type {ContentReportEntityType} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {ContentReportReason, CreateContentReportRequest} from '@grpc/spec.pb';
 import {AutowpClient} from '@grpc/spec.pbsc';
@@ -16,7 +16,6 @@ import {firstValueFrom} from 'rxjs';
 
 import {errorMessage, extractFieldViolations, fieldViolations2InvalidParams} from '../grpc';
 import {ToastsService} from '../toasts/toasts.service';
-
 // Reusable "Report" control for a picture or a comment. Renders a link that expands an inline
 // form (reason + details, plus a captcha for anonymous visitors) and posts a content report
 // (DSA Art. 16). Once submitted it collapses to a short acknowledgement for the session.
@@ -41,7 +40,7 @@ export class ReportButton {
   protected readonly done = signal(false);
   protected readonly invalidParams = signal<InvalidParams>({});
 
-  protected readonly authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  protected readonly authenticated = this.#auth.authenticated;
 
   protected readonly ContentReportReason = ContentReportReason;
   protected readonly reasons: {label: string; value: ContentReportReason}[] = [
@@ -67,7 +66,10 @@ export class ReportButton {
   // captcha, and this keeps the site key off every picture/comment view.
   protected readonly recaptchaKeyResource = rxResource({
     id: 'report-recaptcha-key',
-    params: () => (this.open() && !this.authenticated() ? true : undefined),
+    params: () => {
+      if (this.authenticated() === undefined) return undefined;
+      return this.open() && !this.authenticated() ? true : undefined;
+    },
     stream: () => this.#reCaptcha.get$(),
   });
 

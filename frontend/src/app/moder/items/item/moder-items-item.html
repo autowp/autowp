@@ -29,7 +29,7 @@
     <div class="col-md-5">
       <div class="card card-body mb-4">
         <p i18n>Database id: {{ item.id }}</p>
-        @if (canEditSpecifications$ | async; as canEditSpecifications) {
+        @if (canEditSpecifications(); as canEditSpecifications) {
           @if (specsAllowed() && canEditSpecifications) {
             <p>
               <a class="me-1" routerLink="/cars/specifications-editor" i18n [queryParams]="{item_id: item.id}"
@@ -183,7 +183,6 @@
     @if (vehiclesTab.visible && activeTab === 'vehicles') {
       <app-moder-items-item-vehicles [itemId]="item.id" />
     }
-
     @if (treeTab.visible && activeTab === 'tree') {
       <div class="tree card card-body">
         <app-resource-status [resource]="treeResource" />
@@ -192,7 +191,6 @@
         }
       </div>
     }
-
     @if (picturesTab.visible && activeTab === 'pictures') {
       <app-moder-items-item-pictures [item]="item" />
     }

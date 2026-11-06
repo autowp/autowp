@@ -1,6 +1,5 @@
 import type {Item} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
@@ -15,7 +14,6 @@ import {getItemTypeTranslation} from '@utils/translations';
 
 import {ToastsService} from '../../toasts/toasts.service';
 import {CategoriesService} from '../service';
-
 export interface CategoryPathItem {
   childs: {active: boolean; nameHtml: string; routerLink: string[]}[];
   item: Item;
@@ -26,7 +24,7 @@ export interface CategoryPathItem {
 
 @Component({
   selector: 'app-categories-category',
-  imports: [RouterLink, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLinkActive, RouterOutlet, AsyncPipe],
+  imports: [RouterLink, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, RouterLinkActive, RouterOutlet],
   templateUrl: './categories-category.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,8 +37,8 @@ export class CategoriesCategory {
   readonly #languageService = inject(LanguageService);
   readonly #toastService = inject(ToastsService);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
-  protected readonly canAddCar$ = this.#auth.hasRole$(Role.CARS_MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
+  protected readonly canAddCar = this.#auth.hasRole(Role.CARS_MODER);
 
   // No params function: categoryPipe$'s Observable is itself long-lived and already reacts to
   // route param changes internally (see CategoriesService.categoryPipe$), so the resource's

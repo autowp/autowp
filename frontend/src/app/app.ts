@@ -1,5 +1,4 @@
 import type {Language} from '@services/language';
-import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DOCUMENT, isPlatformBrowser} from '@angular/common';
 import {
@@ -47,7 +46,6 @@ import {TermsGate} from './terms-gate/terms-gate';
 import {ToastContainer} from './toasts/container/toast-container';
 import {ToastsService} from './toasts/toasts.service';
 import {UsersOnline} from './users/online/users-online';
-
 @Component({
   selector: 'app-root',
   imports: [
@@ -90,7 +88,7 @@ export class App {
   readonly #isPrerendering = isPrerendering();
 
   protected readonly languages: Language[] = environment.languages;
-  protected readonly authenticated$: Observable<boolean> = this.#auth.authenticated$;
+  protected readonly authenticated = this.#auth.authenticated;
   protected readonly newPersonalMessages$ = this.#messageService
     .getNew$()
     .pipe(shareReplay({bufferSize: 1, refCount: false}));
@@ -159,7 +157,7 @@ export class App {
   // Blocking Terms-of-Service gate for signed-in users whose accepted version is behind the
   // current one (Me() sets `termsAcceptanceRequired`). #termsAccepted suppresses it for the rest
   // of the session once the user accepts, without waiting for a fresh Me().
-  readonly #currentUser = toSignal(this.#auth.user$);
+  readonly #currentUser = this.#auth.user;
   readonly #termsAccepted = signal(false);
   // The gate itself links to these pages so a user can read them before accepting - without this
   // exemption the gate re-covers the very page it sent the user to.

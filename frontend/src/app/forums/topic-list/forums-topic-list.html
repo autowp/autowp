@@ -18,7 +18,7 @@
         app-forums-topic-list-item
         [topic]="topic"
         [showSubscribe]="showSubscribe()"
-        [forumAdmin]="forumAdmin()"
+        [forumAdmin]="forumAdmin() === true"
         (reload)="reload.emit()"
       ></tr>
     }

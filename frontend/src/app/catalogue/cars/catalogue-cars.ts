@@ -33,7 +33,6 @@ import {map, of, switchMap} from 'rxjs';
 
 import {Paginator} from '../../paginator/paginator/paginator';
 import {convertChildsCounts} from '../catalogue-service';
-
 @Component({
   selector: 'app-catalogue-cars',
   imports: [RouterLink, Paginator, CatalogueItemCard],
@@ -52,7 +51,7 @@ export class CatalogueCars {
   // and a server-side render is anonymous. Without this, hydration adopts the anonymous cached
   // list on the `id` string alone and never refetches once auth resolves. See the long comment
   // on CatalogueIndex.brandResource.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #authenticated = this.#auth.authenticated;
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,
@@ -171,12 +170,15 @@ export class CatalogueCars {
   // params() never changes afterwards.
   protected readonly resultResource = rxResource({
     id: `catalogue-cars-result-${this.#catname() ?? ''}-${this.vehicleTypeCatname() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
-    params: () => ({
-      authenticated: this.#authenticated(),
-      brand: this.brandData(),
-      currentVehicleType: this.currentVehicleType(),
-      page: this.#page(),
-    }),
+    params: () => {
+      if (this.#authenticated() === undefined) return undefined;
+      return {
+        authenticated: this.#authenticated(),
+        brand: this.brandData(),
+        currentVehicleType: this.currentVehicleType(),
+        page: this.#page(),
+      };
+    },
     stream: ({
       params: {brand, currentVehicleType, page},
     }): Observable<undefined | {items: CatalogueListItem[]; paginator: Pages | undefined}> => {

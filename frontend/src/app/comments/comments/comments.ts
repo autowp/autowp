@@ -3,7 +3,7 @@ import type {CommentMessage, CommentMessages, Pages} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, inject, Injector, input} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {
   CommentMessageFields,
@@ -22,7 +22,6 @@ import {Paginator} from '../../paginator/paginator/paginator';
 import {ToastsService} from '../../toasts/toasts.service';
 import {CommentsForm} from '../form/comments-form';
 import {CommentsList} from '../list/comments-list';
-
 @Component({
   selector: 'app-comments',
   imports: [CommentsList, Paginator, CommentsForm, RemarkModule],
@@ -41,7 +40,7 @@ export class Comments implements OnInit {
   readonly limit = input<null | number>();
   readonly page = input<number>();
 
-  protected readonly authenticated = toSignal(this.auth.authenticated$, {initialValue: false});
+  protected readonly authenticated = this.auth.authenticated;
 
   // Chained off the input/auth signals directly rather than raw Observables with debounceTime(10)
   // on four separate sources feeding a combineLatest (the previous shape here). Angular's SSR
@@ -71,16 +70,19 @@ export class Comments implements OnInit {
       // (e.g. a picture page's comments section, for a different picture); a static id would let
       // the new instance match a still-present TransferState entry from the previous item (while
       // Angular's whenStable() hasn't resolved yet) and seed itself with the wrong item's
-      // comments.
-      id: `comments-${this.typeID()}-${this.itemID()}`,
+      // comments. Separate signed-in hydration so view tracking and per-user fields are loaded.
+      id: `comments-${this.typeID()}-${this.itemID()}${this.authenticated() ? '-auth' : ''}`,
       injector: this.#injector,
-      params: () => ({
-        authenticated: this.authenticated(),
-        itemID: this.itemID(),
-        limit: this.limit(),
-        page: this.page(),
-        typeID: this.typeID(),
-      }),
+      params: () => {
+        if (this.authenticated() === undefined) return undefined;
+        return {
+          authenticated: this.authenticated(),
+          itemID: this.itemID(),
+          limit: this.limit(),
+          page: this.page(),
+          typeID: this.typeID(),
+        };
+      },
       stream: ({
         params: {authenticated, itemID, limit, page, typeID},
       }): Observable<undefined | {messages: CommentMessage[]; paginator?: Pages}> => {

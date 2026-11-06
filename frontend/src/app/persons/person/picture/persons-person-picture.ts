@@ -25,7 +25,6 @@ import {map} from 'rxjs';
 
 import {Comments} from '../../../comments/comments/comments';
 import {PictureDetails} from '../../../picture/picture-details';
-
 @Component({
   selector: 'app-persons-person-picture',
   imports: [Comments, PictureDetails],
@@ -42,11 +41,9 @@ export class PersonsPersonPicture {
   readonly #auth = inject(AuthService);
   readonly #isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  // undefined means "not resolved yet", not "anonymous" - authenticated$ only ever emits once
-  // Keycloak reaches a definite Ready/AuthSuccess/etc. state, and NotFoundService.report() can't
-  // be undone short of a navigation, so treating the SSR-only default as a real "anonymous"
-  // answer would permanently 404 a logged-in visitor whose browser just hasn't caught up yet.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: undefined});
+  // Wait for a definite browser auth state before loading per-user data or reporting 404.
+  // SSR is explicitly anonymous; pending browser initialization remains undefined.
+  readonly #authenticated = this.#auth.authenticated;
 
   protected readonly itemID = toSignal(
     requireRouteParent(this.#route).paramMap.pipe(map((params) => params.get('id') ?? '')),
@@ -62,7 +59,10 @@ export class PersonsPersonPicture {
   protected readonly pictureResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: `persons-person-picture-${this.itemID()}-${this.identity() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
-    params: () => ({authenticated: !!this.#authenticated(), identity: this.identity(), itemID: this.itemID()}),
+    params: () => {
+      if (this.#authenticated() === undefined) return undefined;
+      return {authenticated: !!this.#authenticated(), identity: this.identity(), itemID: this.itemID()};
+    },
     stream: ({params: {identity, itemID}}) => {
       if (!identity) {
         return notFoundError();
@@ -129,7 +129,7 @@ export class PersonsPersonPicture {
       // The backend serves inbox pictures to every caller, including an anonymous SSR render,
       // since it has no way to tell an anonymous request from a logged-in visitor's first,
       // not-yet-hydrated one - so an inbox picture is only hidden from a definitely-anonymous
-      // browser (isBrowser guards SSR, since it can never resolve #authenticated to false).
+      // browser (isBrowser keeps the anonymous SSR render visible).
       if (this.#isBrowser && this.#authenticated() === false && picture.status === PictureStatus.PICTURE_STATUS_INBOX) {
         this.#notFound.report();
 

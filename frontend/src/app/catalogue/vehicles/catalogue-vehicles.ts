@@ -2,7 +2,6 @@ import type {Item, Pages, Picture} from '@grpc/spec.pb';
 import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/catalogue-item-card';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -42,10 +41,9 @@ import type {CatalogueData} from '../catalogue-service';
 import {Paginator} from '../../paginator/paginator/paginator';
 import {CatalogueService, convertChildsCounts} from '../catalogue-service';
 import {CatalogueItemMenu} from '../item-menu/catalogue-item-menu';
-
 @Component({
   selector: 'app-catalogue-vehicles',
-  imports: [RouterLink, ItemHeading, CatalogueItemMenu, Paginator, AsyncPipe, CatalogueItemCard, RemarkModule],
+  imports: [RouterLink, ItemHeading, CatalogueItemMenu, Paginator, CatalogueItemCard, RemarkModule],
   templateUrl: './catalogue-vehicles.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -59,15 +57,14 @@ export class CatalogueVehicles {
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
-  protected readonly canAddItem$ = this.#auth.hasRole$(Role.CARS_MODER);
-  protected readonly canAcceptPicture$ = this.#auth.hasRole$(Role.PICTURES_MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
+  protected readonly canAddItem = this.#auth.hasRole(Role.CARS_MODER);
+  protected readonly canAcceptPicture = this.#auth.hasRole(Role.PICTURES_MODER);
 
-  readonly #isModer = toSignal(this.isModer$, {initialValue: false});
   // Also folded into the item/items resource ids: canEditSpecs is per-user but not
   // moderator-only, so a plain signed-in visitor needs the same anonymous-cache refetch that
-  // #isModer already gives moderators.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  // isModer already gives moderators.
+  readonly #authenticated = this.#auth.authenticated;
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,
@@ -134,17 +131,18 @@ export class CatalogueVehicles {
   // Only fetches once catalogueResource has resolved - while it's still loading or in an error
   // state, this stays idle.
   //
-  // `id` folds in #isModer() as read once at construction - see the matching comment on
+  // `id` folds in isModer() as read once at construction - see the matching comment on
   // CatalogueIndex.brandResource for why: isModer is always false during SSR, and for an
   // already-authenticated session it can already read true by the time this component constructs
   // (Keycloak resolving before bootstrap completes), which would otherwise let hydration silently
   // adopt the server's always-non-moderator TransferState snapshot (missing inboxPicturesCount) with
   // no later isModer change left to trigger a refetch.
   protected readonly itemResource = rxResource({
-    id: `catalogue-vehicles-item-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}${this.#authenticated() ? '-auth' : ''}`,
+    id: `catalogue-vehicles-item-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.isModer() ? '-moder' : ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
+      if (this.#authenticated() === undefined) return undefined;
       const data = this.catalogueData();
-      return data ? {authenticated: this.#authenticated(), isModer: this.#isModer(), path: data.path} : undefined;
+      return data ? {authenticated: this.#authenticated(), isModer: this.isModer(), path: data.path} : undefined;
     },
     stream: ({params: {isModer, path}}): Observable<Item> => {
       const last = path[path.length - 1];
@@ -195,10 +193,11 @@ export class CatalogueVehicles {
   // Same reasoning as catalogueData above.
   protected readonly itemData = computed(() => (this.itemResource.hasValue() ? this.itemResource.value() : undefined));
 
-  // `id` folds in #isModer() and #authenticated() - same reasoning as itemResource above.
+  // `id` folds in isModer() and #authenticated() - same reasoning as itemResource above.
   protected readonly itemsResource = rxResource({
-    id: `catalogue-vehicles-items-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.#isModer() ? '-moder' : ''}${this.#authenticated() ? '-auth' : ''}`,
+    id: `catalogue-vehicles-items-${this.#catname() ?? ''}-${this.#pathParam() ?? ''}-${this.#typeParam() ?? ''}${this.isModer() ? '-moder' : ''}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
+      if (this.#authenticated() === undefined) return undefined;
       const data = this.catalogueData();
       const item = this.itemData();
       const routerLink = this.routerLink();
@@ -206,7 +205,7 @@ export class CatalogueVehicles {
       return data && item && routerLink
         ? {
             authenticated: this.#authenticated(),
-            isModer: this.#isModer(),
+            isModer: this.isModer(),
             item,
             page: this.#page(),
             routerLink,

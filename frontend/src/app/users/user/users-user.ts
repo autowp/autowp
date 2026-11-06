@@ -1,6 +1,6 @@
 import type {User} from '@grpc/spec.pb';
 
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {form, FormField, maxLength, required, submit} from '@angular/forms/signals';
@@ -50,10 +50,9 @@ import {MessageDialogService} from '../../message-dialog/message-dialog.service'
 import {SocialContactList} from '../../social-contacts/social-contact-list';
 import {ToastsService} from '../../toasts/toasts.service';
 import {UserLink} from '../../user/user/user-link';
-
 @Component({
   selector: 'app-users-user',
-  imports: [FormField, RouterLink, NgbTooltip, UserLink, AsyncPipe, DatePipe, TimeAgoPipe, SocialContactList],
+  imports: [FormField, RouterLink, NgbTooltip, UserLink, DatePipe, TimeAgoPipe, SocialContactList],
   templateUrl: './users-user.html',
   styleUrl: './users-user.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,10 +90,10 @@ export class UsersUser {
     required(path.period);
     maxLength(path.reason, 50);
   });
-  protected readonly canDeleteUser$ = this.#auth.hasRole$(Role.ADMIN);
-  protected readonly canViewIp$ = this.#auth.hasRole$(Role.MODER);
-  protected readonly canBan$ = this.#auth.hasRole$(Role.USERS_MODER);
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly canDeleteUser = this.#auth.hasRole(Role.ADMIN);
+  protected readonly canViewIp = this.#auth.hasRole(Role.MODER);
+  protected readonly canBan = this.#auth.hasRole(Role.USERS_MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   protected readonly timestampToDate = timestampToDate;
 
@@ -102,7 +101,7 @@ export class UsersUser {
     requireSync: true,
   });
 
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #authenticated = this.#auth.authenticated;
 
   protected readonly userResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
@@ -110,8 +109,11 @@ export class UsersUser {
     // keeps a signed-in visitor off the server's anonymous snapshot: this request asks for
     // moderator-only fields (lastIp), which SSR (always signed out) renders empty.
     id: `users-user-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
-    params: () => this.#identity(),
-    stream: ({params: identity}) =>
+    params: () =>
+      this.#authenticated() === undefined
+        ? undefined
+        : {identity: this.#identity(), authenticated: this.#authenticated()},
+    stream: ({params: {identity}}) =>
       this.#userService
         .getByIdentity$(
           identity,
@@ -189,9 +191,9 @@ export class UsersUser {
         .pipe(map((response) => ({items: response.items ?? [], progress: response.progress ?? []}))),
   });
 
-  readonly #currentUser = toSignal(this.#auth.user$, {initialValue: null});
+  readonly #currentUser = this.#auth.user;
 
-  protected readonly authenticated$ = this.#auth.authenticated$;
+  protected readonly authenticated = this.#auth.authenticated;
 
   protected readonly isNotMe = computed(() => {
     const user = this.userData();
@@ -221,6 +223,8 @@ export class UsersUser {
   protected readonly inContactsResource = rxResource({
     id: `users-user-in-contacts-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
+      if (this.#authenticated() === undefined || (this.#authenticated() && this.#currentUser() === undefined))
+        return undefined;
       const user = this.userData();
 
       return user ? {authenticated: this.#authenticated(), isNotMe: this.isNotMe(), userId: user.id} : undefined;
@@ -238,6 +242,8 @@ export class UsersUser {
   protected readonly userPreferencesResource = rxResource({
     id: `users-user-preferences-${this.#identity()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
+      if (this.#authenticated() === undefined || (this.#authenticated() && this.#currentUser() === undefined))
+        return undefined;
       const user = this.userData();
 
       return user ? {authenticated: this.#authenticated(), isNotMe: this.isNotMe(), userId: user.id} : undefined;

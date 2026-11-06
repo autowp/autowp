@@ -1,13 +1,11 @@
 import type {Image, Item, Picture} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
 import {AuthService, Role} from '@services/auth-service';
 import {ItemHeading} from '@utils/item-header/item-heading';
 import {RemarkModule} from 'ngx-remark';
-
 interface PictureThumbRoute {
   picture: null | Picture;
   route: null | string[];
@@ -16,7 +14,7 @@ interface PictureThumbRoute {
 
 @Component({
   selector: 'app-categories-list-item',
-  imports: [ItemHeading, RouterLink, AsyncPipe, RemarkModule],
+  imports: [ItemHeading, RouterLink, RemarkModule],
   templateUrl: './categories-list-item.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -27,7 +25,7 @@ export class CategoriesListItem {
 
   readonly parentRouterLink = input.required<string[]>();
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
   // item/parentRouterLink are required input()s, always defined.
   protected readonly havePhoto = computed(() => this.isHavePhoto(this.item()));
   protected readonly canHavePhoto = computed(() =>

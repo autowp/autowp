@@ -5,7 +5,7 @@
 } @else if (linksResource.value(); as response) {
   @let links = response.items || [];
   @if (item(); as item) {
-    @if (canEditMeta$ | async) {
+    @if (canEditMeta()) {
       <form method="post" novalidate (submit)="$event.preventDefault(); saveLinks(item.id)">
         <table class="table table-condensed table-striped">
           <caption i18n>
@@ -70,7 +70,7 @@
       </form>
     }
   }
-  @if ((canEditMeta$ | async) === false) {
+  @if (canEditMeta() === false) {
     <table class="table table-condensed table-stripped">
       <caption i18n>
         Links

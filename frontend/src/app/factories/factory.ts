@@ -1,4 +1,3 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -24,10 +23,9 @@ import {map, of, switchMap} from 'rxjs';
 
 import {Thumbnail} from '../thumbnail/thumbnail/thumbnail';
 import {FactoryMap} from './map/factory-map';
-
 @Component({
   selector: 'app-factories',
-  imports: [RouterLink, AsyncPipe, Thumbnail, RemarkModule, FactoryMap],
+  imports: [RouterLink, Thumbnail, RemarkModule, FactoryMap],
   templateUrl: './factory.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,7 +38,7 @@ export class Factory {
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
     requireSync: true,

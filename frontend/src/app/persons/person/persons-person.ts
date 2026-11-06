@@ -1,4 +1,3 @@
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink, RouterOutlet} from '@angular/router';
@@ -11,10 +10,9 @@ import {PageEnvService} from '@services/page-env.service';
 import {PageId} from '@services/page-id';
 import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
-
 @Component({
   selector: 'app-persons-person',
-  imports: [RouterLink, RouterOutlet, AsyncPipe],
+  imports: [RouterLink, RouterOutlet],
   templateUrl: './persons-person.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -26,7 +24,7 @@ export class PersonsPerson {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
     requireSync: true,

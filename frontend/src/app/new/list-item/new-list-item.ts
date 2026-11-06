@@ -1,15 +1,13 @@
 import type {Item, Picture} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {AuthService, Role} from '@services/auth-service';
 import {ItemHeading} from '@utils/item-header/item-heading';
 import {RemarkModule} from 'ngx-remark';
-
 @Component({
   selector: 'app-new-list-item',
-  imports: [ItemHeading, RouterLink, AsyncPipe, RemarkModule],
+  imports: [ItemHeading, RouterLink, RemarkModule],
   templateUrl: './new-list-item.html',
   styleUrl: './new-list-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,7 +15,7 @@ import {RemarkModule} from 'ngx-remark';
 export class NewListItem {
   readonly #auth = inject(AuthService);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   readonly item = input.required<Item>();
   readonly pictures = input.required<Picture[]>();

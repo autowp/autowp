@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {Item, ItemFields, ItemRequest, UpdateItemRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
@@ -25,7 +25,7 @@ export class CarsSpecificationsEditorEngine {
   readonly item = input.required<Item>();
 
   readonly changed = output();
-  protected readonly isAllowedEditEngine = toSignal(this.#auth.hasRole$(Role.CARS_MODER), {initialValue: false});
+  protected readonly isAllowedEditEngine = this.#auth.hasRole(Role.CARS_MODER);
   protected readonly engineResource = rxResource({
     params: () => this.item().engineItemId,
     stream: ({params}) =>

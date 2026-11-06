@@ -22,7 +22,7 @@
   </div>
   <section class="forum-topic-page comments">
     <app-comments [itemID]="topic.id" [typeID]="CommentsType.FORUMS_TYPE_ID" [limit]="limit" [page]="page() || 0" />
-    @if (authenticated$ | async) {
+    @if (authenticated()) {
       <div class="text-end mb-3">
         @if (!topic.subscription) {
           <button type="button" class="btn btn-link subscription" (click)="subscribe(topic)">

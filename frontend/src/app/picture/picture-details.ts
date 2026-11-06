@@ -16,7 +16,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {Router, RouterLink} from '@angular/router';
 import {
@@ -76,7 +76,6 @@ import {Share} from '../share/share';
 import {ToastsService} from '../toasts/toasts.service';
 import {UserLink} from '../user/user/user-link';
 import {PicturePaginator} from './picture-paginator';
-
 @Component({
   selector: 'app-picture',
   imports: [
@@ -187,13 +186,13 @@ export class PictureDetails implements OnInit {
     }));
   });
 
-  protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER), {initialValue: false});
-  protected readonly authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
+  protected readonly authenticated = this.#auth.authenticated;
   protected readonly showShareDialog = signal(false);
   protected readonly location = this.#window?.location;
   protected readonly statusLoading = signal(false);
 
-  protected readonly currentUser = toSignal(this.#auth.user$, {initialValue: null});
+  protected readonly currentUser = this.#auth.user;
   protected readonly isOwner = computed(() => {
     const uid = this.currentUser()?.id;
     const p = this.picture();

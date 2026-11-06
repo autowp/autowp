@@ -2,7 +2,6 @@ import type {OnInit, ResourceRef} from '@angular/core';
 import type {FieldTree} from '@angular/forms/signals';
 import type {Item, ItemLinks} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, Injector, input, linkedSignal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, submit} from '@angular/forms/signals';
@@ -13,7 +12,6 @@ import {errorMessage} from 'app/grpc';
 import {firstValueFrom} from 'rxjs';
 
 import {ToastsService} from '../../../../toasts/toasts.service';
-
 interface LinksFormValue {
   links: {id: string; name: string; type: string; url: string}[];
   newLink: {name: string; type: string; url: string};
@@ -21,7 +19,7 @@ interface LinksFormValue {
 
 @Component({
   selector: 'app-moder-items-item-links',
-  imports: [FormField, AsyncPipe],
+  imports: [FormField],
   templateUrl: './moder-items-item-links.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,7 +31,7 @@ export class ModerItemsItemLinks implements OnInit {
 
   readonly item = input.required<Item>();
 
-  protected readonly canEditMeta$ = this.#auth.hasRole$(Role.CARS_MODER);
+  protected readonly canEditMeta = this.#auth.hasRole(Role.CARS_MODER);
 
   protected editForm!: FieldTree<LinksFormValue>;
 

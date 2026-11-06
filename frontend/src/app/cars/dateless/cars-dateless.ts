@@ -23,7 +23,6 @@ import {map} from 'rxjs';
 
 import {ItemCard} from '../../item/item/item-card';
 import {Paginator} from '../../paginator/paginator/paginator';
-
 @Component({
   selector: 'app-cars-deteless',
   imports: [RouterLink, Paginator, ItemCard],
@@ -40,7 +39,7 @@ export class CarsDateless implements OnInit {
   // Folded into dataResource's id and params: the list carries the per-user canEditSpecs, and a
   // server-side render is anonymous. Without this, hydration adopts the anonymous cached list on
   // the id string alone and never refetches once auth resolves. See CatalogueIndex.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #authenticated = this.#auth.authenticated;
 
   readonly #page = toSignal(this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))), {
     requireSync: true,
@@ -49,7 +48,10 @@ export class CarsDateless implements OnInit {
   protected readonly dataResource = rxResource({
     // Seeds status as resolved from TransferState on hydration, avoiding a loading-state blink.
     id: `cars-dateless-page${this.#authenticated() ? '-auth' : ''}`,
-    params: () => ({authenticated: this.#authenticated(), page: this.#page()}),
+    params: () => {
+      if (this.#authenticated() === undefined) return undefined;
+      return {authenticated: this.#authenticated(), page: this.#page()};
+    },
     stream: ({params: {page}}) =>
       this.#itemsClient.list(
         new ItemsRequest({

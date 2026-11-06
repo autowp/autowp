@@ -3,8 +3,17 @@ import type {InvalidParams} from '@utils/invalid-params.pipe';
 
 import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, computed, inject, linkedSignal, signal, viewChild} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {form, FormField, submit} from '@angular/forms/signals';
 import {environment} from '@environment/environment';
 import {DeleteUserPhotoRequest, MeRequest, UpdateUserRequest, User, UserFields} from '@grpc/spec.pb';
@@ -58,14 +67,7 @@ export class AccountProfile implements OnInit {
     value: language.code,
   }));
 
-  readonly #authUser = toSignal(
-    this.#auth.user$.pipe(
-      tap((user) => {
-        if (!user && this.#window)
-          void this.#keycloak.login({locale: this.#languageService.language, redirectUri: this.#window.location.href});
-      }),
-    ),
-  );
+  readonly #authUser = this.#auth.user;
   protected readonly userResource = rxResource({
     params: () => this.#authUser(),
     stream: ({params}) =>
@@ -103,6 +105,14 @@ export class AccountProfile implements OnInit {
     timezone: this.user()?.timezone ?? '',
   }));
   protected readonly form = form(this.#model);
+
+  constructor() {
+    effect(() => {
+      const user = this.#authUser();
+      if (user === null && this.#window)
+        void this.#keycloak.login({locale: this.#languageService.language, redirectUri: this.#window.location.href});
+    });
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ACCOUNT_PROFILE});

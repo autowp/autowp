@@ -1,7 +1,6 @@
 import type {Item} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 
-import {AsyncPipe} from '@angular/common';
 import {HttpClient, HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, input, output} from '@angular/core';
 import {NgbProgressbar} from '@ng-bootstrap/ng-bootstrap';
@@ -9,10 +8,9 @@ import {AuthService, Role} from '@services/auth-service';
 import {InvalidParamsPipe} from '@utils/invalid-params.pipe';
 import {RemarkModule} from 'ngx-remark';
 import {catchError, EMPTY, switchMap} from 'rxjs';
-
 @Component({
   selector: 'app-moder-items-item-logo',
-  imports: [NgbProgressbar, AsyncPipe, InvalidParamsPipe, RemarkModule],
+  imports: [NgbProgressbar, InvalidParamsPipe, RemarkModule],
   templateUrl: './moder-items-item-logo.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -25,7 +23,7 @@ export class ModerItemsItemLogo {
 
   readonly itemUpdated = output();
 
-  protected readonly canLogo$ = this.#auth.hasRole$(Role.BRANDS_MODER);
+  protected readonly canLogo = this.#auth.hasRole(Role.BRANDS_MODER);
   protected progress: null | {
     failed: boolean;
     filename: string;

@@ -12,7 +12,7 @@ import {
   linkedSignal,
   output,
 } from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {applyEach, disabled, form, FormField, submit} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {PictureItem, PictureItemType, PictureStatus, UpdatePictureItemRequest} from '@grpc/spec.pb';
@@ -24,7 +24,6 @@ import {APIPerspectiveService} from 'app/api/perspective/perspective.service';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {UserLink} from 'app/user/user/user-link';
 import {firstValueFrom} from 'rxjs';
-
 interface ThumbnailAPIPicture extends Picture {
   selected?: boolean;
 }
@@ -54,8 +53,8 @@ export class Thumbnail implements OnInit {
   readonly showSimilar = input(true);
 
   protected readonly perspectiveOptions$ = this.#perspectiveService.options$;
-  protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER));
-  protected readonly isAuthenticated = toSignal(this.#auth.authenticated$);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
+  protected readonly isAuthenticated = this.#auth.authenticated;
 
   // Perspective is a property of what the picture *depicts*, so only CONTENT picture-items get a
   // picker - offering one for an author (or any other non-content link) makes no sense.

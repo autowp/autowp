@@ -1,7 +1,6 @@
 import type {Image} from '@grpc/spec.pb';
 import type {CatalogueListItem, CatalogueListItemPicture} from '@utils/list-item/catalogue-item-card';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -29,10 +28,9 @@ import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {Paginator} from '../../paginator/paginator/paginator';
-
 @Component({
   selector: 'app-factory-items',
-  imports: [RouterLink, Paginator, AsyncPipe, CatalogueItemCard],
+  imports: [RouterLink, Paginator, CatalogueItemCard],
   templateUrl: './factory-items.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -44,12 +42,12 @@ export class FactoryItems {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   // Folded into itemsResource's id and params: the list carries the per-user canEditSpecs, and a
   // server-side render is anonymous. Without this, hydration adopts the anonymous cached list on
   // the id string alone and never refetches once auth resolves. See CatalogueIndex.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #authenticated = this.#auth.authenticated;
 
   readonly #itemID = toSignal(this.#route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
     requireSync: true,
@@ -90,6 +88,7 @@ export class FactoryItems {
   protected readonly itemsResource = rxResource({
     id: `factory-items-list-${this.#itemID()}${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
+      if (this.#authenticated() === undefined) return undefined;
       const factory = this.factoryData();
 
       return factory ? {authenticated: this.#authenticated(), factoryID: factory.id, page: this.#page()} : undefined;

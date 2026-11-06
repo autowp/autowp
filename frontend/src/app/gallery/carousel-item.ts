@@ -11,7 +11,6 @@ import {
   input,
   signal,
 } from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer} from '@angular/platform-browser';
 import {RouterLink} from '@angular/router';
 import {PicturesVoteRequest} from '@grpc/spec.pb';
@@ -22,7 +21,6 @@ import {catchError, EMPTY} from 'rxjs';
 
 import {ToastsService} from '../toasts/toasts.service';
 import {GalleryArea} from './gallery-area';
-
 interface Area {
   pictureItem: PictureItem;
   styles: Record<string, string>;
@@ -106,7 +104,7 @@ export class CarouselItem implements AfterViewInit {
   readonly item = input.required<Picture>();
   readonly prefix = input.required<string[]>();
 
-  protected readonly authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  protected readonly authenticated = this.#auth.authenticated;
 
   protected readonly cropMode = signal(true);
   protected readonly cropModeAvailable = computed(() => !!this.item().imageGallery);

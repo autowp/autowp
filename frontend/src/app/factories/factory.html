@@ -20,7 +20,7 @@
     @if (factory.relatedGroupPictures && factory.relatedGroupPictures.length > 0) {
       <a class="nav-link me-1" i18n [routerLink]="['/factories', factory.id, 'items']">Products</a>
     }
-    @if (isModer$ | async) {
+    @if (isModer()) {
       <a class="nav-link" [routerLink]="['/moder/items/item', factory.id]">
         <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
         <ng-container i18n>edit</ng-container>
@@ -35,14 +35,12 @@
       <div style="height: 300px" class="mb-4 w-100"></div>
     }
   }
-
   @if (factory.fullText) {
     <remark class="card card-body" [markdown]="factory.fullText" />
   } @else if (factory.description) {
     <remark class="card card-body" [markdown]="factory.description" />
   }
 }
-
 @if (picturesData(); as pictures) {
   @if ((pictures.items || []).length > 0) {
     <div>
@@ -57,7 +55,6 @@
     </div>
   }
 }
-
 @if (itemData(); as factory) {
   @if (factory.relatedGroupPictures && factory.relatedGroupPictures.length > 0) {
     <div>

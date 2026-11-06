@@ -83,7 +83,7 @@
           } @else {
             <p i18n>Not upload pictures</p>
           }
-          @if (isModer$ | async) {
+          @if (isModer()) {
             <p>
               <a routerLink="/log" i18n [queryParams]="{user_id: user.id}">User's log</a>
             </p>
@@ -205,7 +205,7 @@
         }
       </div>
       <div class="col-md-6">
-        @if ((authenticated$ | async) && !user.deleted && isNotMe()) {
+        @if (authenticated() && !user.deleted && isNotMe()) {
           <div class="card card-body mb-4">
             <div class="row">
               <div class="col-6">
@@ -261,11 +261,11 @@
             </div>
           </div>
         }
-        @if (canViewIp$ | async) {
+        @if (canViewIp()) {
           <div>
             <h2 i18n>For moderators</h2>
             <div class="card card-body mb-4">
-              @if ((canBan$ | async) && user.photo) {
+              @if (canBan() && user.photo) {
                 <p>
                   <button
                     type="button"
@@ -277,7 +277,7 @@
                   </button>
                 </p>
               }
-              @if (canDeleteUser$ | async; as canDeleteUser) {
+              @if (canDeleteUser(); as canDeleteUser) {
                 @if (canDeleteUser) {
                   <p>
                     <button
@@ -313,7 +313,7 @@
                         </span>
                       }
                     </p>
-                    @if (canBan$ | async) {
+                    @if (canBan()) {
                       <div style="margin: 10px 0">
                         <button type="button" class="btn btn-success" i18n (click)="removeFromBlacklist(ip.address)">
                           unban

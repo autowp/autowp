@@ -44,10 +44,10 @@ export class CarsSpecificationsEditor {
   readonly #itemsClient = inject(ItemsClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
-  protected readonly isSpecsAdmin$ = this.#auth.hasRole$(Role.ADMIN);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
+  protected readonly isSpecsAdmin = this.#auth.hasRole(Role.ADMIN);
   protected readonly tab$ = this.#route.queryParamMap.pipe(map((params) => params.get('tab') ?? 'info'));
-  protected readonly user$ = this.#auth.user$;
+  protected readonly user = this.#auth.user;
 
   readonly #itemID = toSignal(this.#route.queryParamMap.pipe(map((params) => params.get('item_id') ?? '')), {
     requireSync: true,

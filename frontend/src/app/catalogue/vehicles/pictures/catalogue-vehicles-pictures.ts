@@ -1,7 +1,6 @@
 import type {Item, Pages, Picture} from '@grpc/spec.pb';
 import type {Observable} from 'rxjs';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -31,10 +30,9 @@ import {Paginator} from '../../../paginator/paginator/paginator';
 import {Thumbnail} from '../../../thumbnail/thumbnail/thumbnail';
 import {CatalogueService, convertChildsCounts} from '../../catalogue-service';
 import {CatalogueItemMenu} from '../../item-menu/catalogue-item-menu';
-
 @Component({
   selector: 'app-catalogue-vehicles-pictures',
-  imports: [RouterLink, ItemHeading, CatalogueItemMenu, Paginator, AsyncPipe, Thumbnail],
+  imports: [RouterLink, ItemHeading, CatalogueItemMenu, Paginator, Thumbnail],
   templateUrl: './catalogue-vehicles-pictures.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,9 +45,9 @@ export class CatalogueVehiclesPictures {
   readonly #picturesClient = inject(PicturesClient);
   readonly #languageService = inject(LanguageService);
 
-  protected readonly canAcceptPicture$ = this.#auth.hasRole$(Role.PICTURES_MODER);
-  protected readonly canAddItem$ = this.#auth.hasRole$(Role.CARS_MODER);
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly canAcceptPicture = this.#auth.hasRole(Role.PICTURES_MODER);
+  protected readonly canAddItem = this.#auth.hasRole(Role.CARS_MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,

@@ -3,7 +3,7 @@
     @if (loadingNumber()) {
       <ngb-progressbar type="success" class="mb-2" [striped]="true" [animated]="true" [value]="100" />
     }
-    @if (canEditMeta$ | async) {
+    @if (canEditMeta()) {
       @if (vehicleTypeIDsData(); as vehicleTypeIDs) {
         <app-item-meta-form
           [item]="item"
@@ -14,7 +14,7 @@
         />
       }
     }
-    @if ((canEditMeta$ | async) === false) {
+    @if (canEditMeta() === false) {
       <div class="row">
         <div class="col-3 mb-4"><ng-container i18n>Name</ng-container>:</div>
         <div class="col9 mb-4" [innerHTML]="item.nameHtml"></div>

@@ -26,7 +26,6 @@ import {map} from 'rxjs';
 
 import {Comments} from '../../../comments/comments/comments';
 import {TwinsItem} from '../../item/twins-item';
-
 @Component({
   selector: 'app-twins-group-items',
   imports: [TwinsItem, Comments, RemarkModule],
@@ -43,7 +42,7 @@ export class TwinsGroupItems {
   // Folded into childsResource's id and params: the list carries the per-user canEditSpecs, and a
   // server-side render is anonymous. Without this, hydration adopts the anonymous cached list on
   // the id string alone and never refetches once auth resolves. See CatalogueIndex.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #authenticated = this.#auth.authenticated;
 
   protected readonly groupId = toSignal(
     requireRouteParent(this.#route).paramMap.pipe(map((params) => params.get('group') ?? '')),
@@ -73,7 +72,10 @@ export class TwinsGroupItems {
 
   protected readonly childsResource = rxResource({
     id: `twins-group-items-childs-${this.groupId()}${this.#authenticated() ? '-auth' : ''}`,
-    params: () => ({authenticated: this.#authenticated(), groupId: this.groupId()}),
+    params: () => {
+      if (this.#authenticated() === undefined) return undefined;
+      return {authenticated: this.#authenticated(), groupId: this.groupId()};
+    },
     stream: ({params: {groupId}}) =>
       this.#itemsClient.list(
         new ItemsRequest({

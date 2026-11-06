@@ -1,7 +1,6 @@
 import type {Design, Image, Item, Picture, User} from '@grpc/spec.pb';
 import type {APIItemChildsCounts} from '@services/item';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {ItemType} from '@grpc/spec.pb';
@@ -10,7 +9,6 @@ import {RemarkModule} from 'ngx-remark';
 
 import {UserLink} from '../../user/user/user-link';
 import {ItemHeading} from '../item-header/item-heading';
-
 export interface CatalogueListItem {
   acceptedPicturesCount: number | undefined;
   canEditSpecs: boolean | undefined;
@@ -48,7 +46,7 @@ export interface CatalogueListItemPicture {
 
 @Component({
   selector: 'app-catalogue-list-item',
-  imports: [ItemHeading, RouterLink, AsyncPipe, UserLink, RemarkModule],
+  imports: [ItemHeading, RouterLink, UserLink, RemarkModule],
   templateUrl: './catalogue-item-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -57,7 +55,7 @@ export class CatalogueItemCard {
 
   readonly item = input.required<CatalogueListItem>();
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   protected readonly havePhoto = computed(() => this.item().previewPictures.pictures.some(({picture}) => !!picture));
 

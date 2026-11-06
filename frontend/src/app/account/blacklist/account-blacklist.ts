@@ -1,8 +1,8 @@
 import type {OnInit} from '@angular/core';
 
 import {DatePipe} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
 import {UserPreferencesRequest} from '@grpc/spec.pb';
 import {UsersClient} from '@grpc/spec.pbsc';
@@ -35,14 +35,7 @@ export class AccountBlacklist implements OnInit {
   readonly #keycloak = inject(Keycloak);
   readonly #window = browserWindow();
 
-  readonly #authenticated = toSignal(
-    this.#auth.authenticated$.pipe(
-      tap((authenticated) => {
-        if (!authenticated && this.#window)
-          void this.#keycloak.login({locale: this.#languageService.language, redirectUri: this.#window.location.href});
-      }),
-    ),
-  );
+  readonly #authenticated = this.#auth.authenticated;
   protected readonly itemsResource = rxResource({
     params: () => this.#authenticated(),
     stream: ({params}) =>
@@ -58,6 +51,14 @@ export class AccountBlacklist implements OnInit {
         : of(undefined),
   });
   protected readonly items = computed(() => (this.itemsResource.hasValue() ? this.itemsResource.value() : undefined));
+
+  constructor() {
+    effect(() => {
+      const authenticated = this.#authenticated();
+      if (authenticated === false && this.#window)
+        void this.#keycloak.login({locale: this.#languageService.language, redirectUri: this.#window.location.href});
+    });
+  }
 
   ngOnInit(): void {
     this.#pageEnv.set({pageId: PageId.ACCOUNT_BLACKLIST, title: $localize`Blacklist`});

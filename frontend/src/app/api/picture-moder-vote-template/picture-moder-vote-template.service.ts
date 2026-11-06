@@ -2,7 +2,7 @@ import type {ResourceRef} from '@angular/core';
 import type {Observable} from 'rxjs';
 
 import {inject, Injector, Service, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {DeleteModerVoteTemplateRequest, ModerVoteTemplate} from '@grpc/spec.pb';
 import {PicturesClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -19,7 +19,7 @@ export class APIPictureModerVoteTemplateService {
   readonly #pictures = inject(PicturesClient);
 
   readonly #injector = inject(Injector);
-  readonly #authenticated = toSignal(this.#auth.authenticated$);
+  readonly #authenticated = this.#auth.authenticated;
   readonly #revision = signal(0);
   #templatesResource: ResourceRef<ModerVoteTemplate[] | undefined> | undefined;
 
@@ -27,7 +27,7 @@ export class APIPictureModerVoteTemplateService {
     // Creating a template without reading the list must not trigger a background read.
     this.#templatesResource ??= rxResource({
       injector: this.#injector,
-      id: 'picture-moder-vote-templates',
+      id: `picture-moder-vote-templates${this.#authenticated() ? '-auth' : ''}`,
       params: () => {
         const authenticated = this.#authenticated();
         return authenticated === undefined ? undefined : `${Number(authenticated)}:${this.#revision()}`;

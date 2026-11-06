@@ -1,6 +1,5 @@
 import type {Topic} from '@grpc/spec.pb';
 
-import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, effect, inject} from '@angular/core';
 import {rxResource, toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -23,10 +22,9 @@ import {map} from 'rxjs';
 import {Comments} from '../../comments/comments/comments';
 import {ToastsService} from '../../toasts/toasts.service';
 import {MESSAGES_PER_PAGE} from '../forums.module';
-
 @Component({
   selector: 'app-forums-topic',
-  imports: [RouterLink, Comments, AsyncPipe],
+  imports: [RouterLink, Comments],
   templateUrl: './forums-topic.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,7 +38,7 @@ export class ForumsTopic {
   readonly #grpc = inject(ForumsClient);
 
   protected readonly limit = MESSAGES_PER_PAGE;
-  protected readonly authenticated$ = this.auth.authenticated$;
+  protected readonly authenticated = this.auth.authenticated;
   protected readonly page = toSignal(
     this.#route.queryParamMap.pipe(map((params) => parseInt(params.get('page') ?? '', 10))),
     {requireSync: true},

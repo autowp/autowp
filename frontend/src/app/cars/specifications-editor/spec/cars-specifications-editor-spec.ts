@@ -4,7 +4,7 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject, Injector, input, signal} from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {applyEach, disabled, form, FormField, submit, validate} from '@angular/forms/signals';
 import {
   AttrAttributeType,
@@ -105,7 +105,7 @@ export class CarsSpecificationsEditorSpec {
   readonly #languageService = inject(LanguageService);
 
   readonly item = input.required<Item>();
-  readonly #user = toSignal(this.#auth.user$, {initialValue: null});
+  readonly #user = this.#auth.user;
 
   protected readonly AttrAttributeTypeId = AttrAttributeType.Id;
 

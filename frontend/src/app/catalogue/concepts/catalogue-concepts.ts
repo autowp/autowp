@@ -28,7 +28,6 @@ import {errorMessage, isNotFoundError, notFoundError} from 'app/grpc';
 import {map, of, switchMap} from 'rxjs';
 
 import {Paginator} from '../../paginator/paginator/paginator';
-
 @Component({
   selector: 'app-catalogue-concepts',
   imports: [RouterLink, Paginator, CatalogueItemCard],
@@ -47,7 +46,7 @@ export class CatalogueConcepts {
   // and a server-side render is anonymous. Without this, hydration adopts the anonymous cached
   // list on the `id` string alone and never refetches once auth resolves. See the long comment
   // on CatalogueIndex.brandResource.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #authenticated = this.#auth.authenticated;
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,
@@ -108,7 +107,10 @@ export class CatalogueConcepts {
 
   protected readonly dataResource = rxResource({
     id: `catalogue-concepts-data-${this.#catname() ?? ''}${this.#authenticated() ? '-auth' : ''}`,
-    params: () => ({authenticated: this.#authenticated(), brand: this.brandData(), page: this.#page()}),
+    params: () => {
+      if (this.#authenticated() === undefined) return undefined;
+      return {authenticated: this.#authenticated(), brand: this.brandData(), page: this.#page()};
+    },
     stream: ({
       params: {brand, page},
     }): Observable<undefined | {items: CatalogueListItem[]; paginator: Pages | undefined}> => {

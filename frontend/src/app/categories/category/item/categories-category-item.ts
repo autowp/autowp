@@ -32,7 +32,6 @@ import {map, of} from 'rxjs';
 import {Paginator} from '../../../paginator/paginator/paginator';
 import {CategoriesListItem} from '../../categories-list-item';
 import {CategoriesService} from '../../service';
-
 interface PictureRoute {
   picture: Picture;
   route: string[];
@@ -53,13 +52,13 @@ export class CategoriesCategoryItem {
   readonly #languageService = inject(LanguageService);
   readonly #itemsClient = inject(ItemsClient);
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   // Folded into itemParentsResource's and itemResource's id and params: those lists carry the
   // per-user canEditSpecs, and a server-side render is anonymous. Without this, hydration adopts
   // the anonymous cached list on the id string alone and never refetches once auth resolves.
   // See CatalogueIndex.
-  readonly #authenticated = toSignal(this.#auth.authenticated$, {initialValue: false});
+  readonly #authenticated = this.#auth.authenticated;
 
   // No params function: categoryPipe$'s Observable is itself long-lived and already reacts to
   // route param changes internally (see CategoriesService.categoryPipe$).
@@ -85,6 +84,7 @@ export class CategoriesCategoryItem {
   protected readonly itemParentsResource = rxResource({
     id: `categories-category-item-parents${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
+      if (this.#authenticated() === undefined) return undefined;
       const data = this.categoryData();
 
       return data?.current
@@ -226,6 +226,7 @@ export class CategoriesCategoryItem {
   protected readonly itemResource = rxResource({
     id: `categories-category-item-single${this.#authenticated() ? '-auth' : ''}`,
     params: () => {
+      if (this.#authenticated() === undefined) return undefined;
       const data = this.categoryData();
       const itemParents = this.itemParentsData();
 

@@ -62,7 +62,7 @@
           <a [routerLink]="['/category', category.catname]" [innerHTML]="category.nameHtml"></a>
         </li>
       }
-      @if (isModer$ | async; as isModer) {
+      @if (isModer(); as isModer) {
         @if (isModer) {
           <li class="list-inline-item">
             <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>

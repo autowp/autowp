@@ -1,4 +1,4 @@
-@if (canLogo$ | async; as canLogo) {
+@if (canLogo(); as canLogo) {
   @if (item(); as item) {
     <div class="card card-body">
       @if (canLogo) {

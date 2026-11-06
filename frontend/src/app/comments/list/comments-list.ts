@@ -16,7 +16,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {disabled, form, FormField, maxLength, submit} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {
@@ -45,7 +45,6 @@ import {ToastsService} from '../../toasts/toasts.service';
 import {UserLink} from '../../user/user/user-link';
 import {CommentsForm} from '../form/comments-form';
 import {CommentsVotes} from '../votes/comments-votes';
-
 export interface CommentInList extends CommentMessage {
   resolve?: boolean;
   showReply?: boolean;
@@ -73,7 +72,7 @@ export class CommentsList implements OnInit {
 
   readonly sent = output<string>();
 
-  protected readonly currentUser = toSignal(this.auth.user$, {initialValue: null});
+  protected readonly currentUser = this.auth.user;
 
   // Chained off the messages input signal directly rather than a raw Observable stored on an
   // object and subscribed lazily by the template via `| async` (the previous shape here): that
@@ -112,10 +111,10 @@ export class CommentsList implements OnInit {
     }));
   });
 
-  protected readonly canRemoveComments = toSignal(this.auth.hasRole$(Role.COMMENTS_MODER), {initialValue: false});
-  protected readonly canMoveMessage = toSignal(this.auth.hasRole$(Role.FORUMS_MODER), {initialValue: false});
-  protected readonly isModer = toSignal(this.auth.hasRole$(Role.MODER), {initialValue: false});
-  protected readonly authenticated = toSignal(this.auth.authenticated$, {initialValue: false});
+  protected readonly canRemoveComments = this.auth.hasRole(Role.COMMENTS_MODER);
+  protected readonly canMoveMessage = this.auth.hasRole(Role.FORUMS_MODER);
+  protected readonly isModer = this.auth.hasRole(Role.MODER);
+  protected readonly authenticated = this.auth.authenticated;
 
   protected readonly ModeratorAttention = ModeratorAttention;
   protected readonly ContentReportEntityType = ContentReportEntityType;

@@ -34,7 +34,6 @@ import {catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {chunk} from '../../chunk';
 import {CatalogueIndexPictures} from './pictures/catalogue-index-pictures';
-
 // Keep in sync with ACCEPTED_IN_DAYS in ../recent/catalogue-recent.ts.
 const RECENT_PICTURES_ACCEPTED_IN_DAYS = 365;
 
@@ -56,7 +55,7 @@ export class CatalogueIndex {
 
   protected readonly ItemType = ItemType;
 
-  protected readonly isModer = toSignal(this.#auth.hasRole$(Role.MODER), {initialValue: false});
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
 
   readonly #catname = toSignal(this.#route.paramMap.pipe(map((params) => params.get('brand'))), {
     requireSync: true,
@@ -81,24 +80,14 @@ export class CatalogueIndex {
   // which is the single place that reports not-found or toasts off this resource's
   // error()/value() signals.
   //
-  // brandResource's `id` also folds in isModer() *as read once at construction*, which matters for
-  // one specific race: isModer starts as its toSignal initialValue (false) and flips once Keycloak
-  // resolves (app.config.ts's provideKeycloakInAppInitializer blocks bootstrap on it, browser-only -
-  // it's always false during SSR). For a session that's already authenticated, Keycloak can resolve
-  // *before* this component ever constructs, so isModer can already read true on that very first
-  // read. Hydration's TransferState lookup matches purely on the `id` string, with no check that the
-  // params which produced the cached value still match the current ones - so without isModer in
-  // `id`, that fast-resolving-moderator case would silently adopt the server's always-false snapshot
-  // (which never requested inboxPicturesCount/commentsAttentionsCount) and then never notice, since
-  // nothing about isModer changes *afterwards* to trigger a refetch. Folding isModer into `id` here
-  // makes that id deliberately mismatch the server's in that one case, so the resource falls through
-  // to a normal fresh fetch instead of getting stuck. The much more common case - isModer still false
-  // at construction, flipping true only after Keycloak actually finishes - isn't affected by this at
-  // all: `id` is read once and already matches the server's, so hydration proceeds as usual, and the
-  // later isModer change is picked up through the ordinary params()-changed reactive refetch instead.
+  // SSR renders anonymously. Separate moderator hydration data by identity of the request;
+  // the shared role signal is synchronous when Keycloak has already initialized.
   protected readonly brandResource = rxResource({
     id: `catalogue-brand-${this.#catname() ?? ''}${this.isModer() ? '-moder' : ''}`,
-    params: () => ({catname: this.#catname(), isModer: this.isModer()}),
+    params: () => {
+      if (this.isModer() === undefined) return undefined;
+      return {catname: this.#catname(), isModer: this.isModer()};
+    },
     stream: ({params: {catname, isModer}}): Observable<Item> => {
       if (!catname) {
         return notFoundError();

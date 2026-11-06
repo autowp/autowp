@@ -3,7 +3,7 @@ import type {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import type {Observable} from 'rxjs';
 
 import {ChangeDetectionStrategy, Component, computed, inject, input, signal} from '@angular/core';
-import {rxResource, toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource, toObservable} from '@angular/core/rxjs-interop';
 import {form, FormField} from '@angular/forms/signals';
 import {RouterLink} from '@angular/router';
 import {
@@ -24,7 +24,6 @@ import {AuthService, Role} from '@services/auth-service';
 import {LanguageService} from '@services/language';
 import {ToastsService} from 'app/toasts/toasts.service';
 import {debounceTime, distinctUntilChanged, map, of, switchMap} from 'rxjs';
-
 @Component({
   selector: 'app-moder-items-item-catalogue',
   imports: [RouterLink, NgbTypeahead, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, FormField],
@@ -44,7 +43,7 @@ export class ModerItemsItemCatalogue {
 
   protected readonly itemQuery = form(signal(''));
 
-  protected readonly canMove = toSignal(this.#auth.hasRole$(Role.CARS_MODER), {initialValue: false});
+  protected readonly canMove = this.#auth.hasRole(Role.CARS_MODER);
 
   protected readonly organizeTypeId = computed(() => {
     const type = this.item().itemTypeId;
@@ -92,7 +91,10 @@ export class ModerItemsItemCatalogue {
     );
 
   protected readonly childsResource = rxResource({
-    params: () => (this.canMove() ? this.item() : null),
+    params: () => {
+      if (this.canMove() === undefined) return undefined;
+      return this.canMove() ? this.item() : null;
+    },
     stream: ({params: item}) =>
       item === null
         ? of(undefined)
@@ -115,7 +117,10 @@ export class ModerItemsItemCatalogue {
   });
 
   protected readonly parentsResource = rxResource({
-    params: () => (this.canMove() ? this.item() : null),
+    params: () => {
+      if (this.canMove() === undefined) return undefined;
+      return this.canMove() ? this.item() : null;
+    },
     stream: ({params: item}) =>
       item === null
         ? of(undefined)
@@ -138,7 +143,10 @@ export class ModerItemsItemCatalogue {
   });
 
   protected readonly suggestionsResource = rxResource({
-    params: () => (this.canMove() && this.canHaveParents() && this.canHaveParentBrand() ? this.item() : null),
+    params: () => {
+      if (this.canMove() === undefined) return undefined;
+      return this.canMove() && this.canHaveParents() && this.canHaveParentBrand() ? this.item() : null;
+    },
     stream: ({params: item}) =>
       item === null
         ? of(undefined)

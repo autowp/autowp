@@ -91,7 +91,12 @@
                       <ng-container i18n>Affected pictures:</ng-container>&ngsp;
                       @for (pictureId of pictureIds; track pictureId; let last = $last) {
                         <a [routerLink]="['/moder/pictures', pictureId]">{{ pictureId }}</a
-                        >{{ last ? '' : ', ' }}
+                        >{{
+                          last
+                            ? ''
+                            : ',
+              '
+                        }}
                       }
                       @if (row.affectedPictureIdentities(); as pictureIdentities) {
                         <button
@@ -192,7 +197,7 @@
                     <ng-container i18n>View cleanup candidates</ng-container>
                   </button>
                 }
-                @if (isModer$ | async) {
+                @if (isModer()) {
                   <form
                     class="d-flex gap-1 mt-1"
                     novalidate
@@ -239,7 +244,7 @@
               }
             </td>
             <td class="text-nowrap">
-              @if (isModer$ | async) {
+              @if (isModer()) {
                 @if (row.objection.hitCount !== '0') {
                   <button
                     type="button"
@@ -273,8 +278,7 @@
     <app-paginator [data]="data.paginator" />
   }
 }
-
-@if (isModer$ | async) {
+@if (isModer()) {
   <div class="card card-body mb-4" style="max-width: 40rem">
     <h2 class="h5" i18n>Add entry manually</h2>
     <form novalidate (submit)="$event.preventDefault(); create()">

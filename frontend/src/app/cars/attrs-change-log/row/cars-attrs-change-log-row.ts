@@ -1,7 +1,7 @@
 import type {OnInit, ResourceRef} from '@angular/core';
 import type {AttrUserValue, Item, User} from '@grpc/spec.pb';
 
-import {AsyncPipe, DatePipe} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject, Injector, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {RouterLink} from '@angular/router';
@@ -16,7 +16,6 @@ import {map} from 'rxjs';
 import {APIAttrsService} from '../../../api/attrs/attrs.service';
 import {UserLink} from '../../../user/user/user-link';
 import {CarsAttrsChangeLogItemCacheService} from '../item-cache.service';
-
 @Component({
   // Attribute selector on tr, not an element selector - a custom element between <tbody> and its
   // row content would get foster-parented out of the table entirely by the HTML parser (anything
@@ -25,7 +24,7 @@ import {CarsAttrsChangeLogItemCacheService} from '../item-cache.service';
   // in the right position, matching how e.g. Angular Material's mat-row/mat-cell do it.
   // eslint-disable-next-line @angular-eslint/component-selector -- attribute selector needed on tr, see above
   selector: 'tr[app-cars-attrs-change-log-row]',
-  imports: [RouterLink, UserLink, AsyncPipe, DatePipe, TimeAgoPipe, NgbTooltip],
+  imports: [RouterLink, UserLink, DatePipe, TimeAgoPipe, NgbTooltip],
   templateUrl: './cars-attrs-change-log-row.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,7 +39,7 @@ export class CarsAttrsChangeLogRow implements OnInit {
   // resources are built in ngOnInit() with an explicit injector rather than as field initializers.
   readonly userValue = input.required<AttrUserValue>();
 
-  protected readonly isModer$ = this.#auth.hasRole$(Role.MODER);
+  protected readonly isModer = this.#auth.hasRole(Role.MODER);
   protected readonly date = computed(() => timestampToDate(this.userValue().updateTime));
 
   protected itemResource!: ResourceRef<Item | undefined>;
