@@ -1,8 +1,7 @@
-<span [class]="badgeClass()">{{ label() }}</span>
 @if (deedUrl(); as url) {
-  <a class="ms-1" target="_blank" rel="noopener" [href]="url">
-    <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-  </a>
+  <a target="_blank" rel="noopener" [class]="badgeClass()" [href]="url">{{ label() }}</a>
+} @else {
+  <span [class]="badgeClass()">{{ label() }}</span>
 }
 @if (sourceUrl()) {
   <a class="ms-1" target="_blank" rel="noopener" [href]="sourceUrl()">

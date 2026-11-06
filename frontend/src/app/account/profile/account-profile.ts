@@ -148,6 +148,9 @@ export class AccountProfile implements OnInit {
         if (response instanceof GrpcStatusEvent) {
           const fieldViolations = extractFieldViolations(response);
           this.settingsInvalidParams.set(fieldViolations2InvalidParams(fieldViolations));
+          if (fieldViolations.length === 0) {
+            this.#toastService.handleError(response);
+          }
         } else {
           this.#toastService.handleError(response);
         }

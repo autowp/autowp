@@ -73,8 +73,7 @@
                         </select>
                       } @else if (attr.typeId === AttrAttributeTypeId.INTEGER) {
                         <input
-                          type="text"
-                          inputmode="decimal"
+                          type="number"
                           class="form-control form-control-sm"
                           [formField]="control.value"
                           [class.is-invalid]="
@@ -83,9 +82,9 @@
                         />
                       } @else if (attr.typeId === AttrAttributeTypeId.FLOAT) {
                         <input
-                          type="text"
-                          inputmode="decimal"
+                          type="number"
                           class="form-control form-control-sm"
+                          [step]="attr.step"
                           [formField]="control.value"
                           [class.is-invalid]="
                             control.value().invalid() && (control.value().dirty() || control.value().touched())
