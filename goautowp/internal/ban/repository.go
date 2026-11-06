@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"net"
-	"net/netip"
 	"strings"
 	"time"
 
@@ -55,15 +54,6 @@ func (s *Repository) Add(
 	reason string,
 ) error {
 	return s.add(ctx, ip.String(), duration, byUserID, reason)
-}
-
-// AddNetwork blocks an IPv4 /24 or IPv6 /64, including addresses not seen yet.
-func (s *Repository) AddNetwork(ctx context.Context, prefix netip.Prefix, duration time.Duration, reason string) error {
-	if !validNetwork(prefix) {
-		return errInvalidNetwork
-	}
-
-	return s.add(ctx, prefix.Masked().String(), duration, 0, reason)
 }
 
 // Remove IP from list of banned.

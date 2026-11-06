@@ -3,8 +3,10 @@ package ban
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"net/netip"
+	"time"
 
 	"github.com/autowp/goautowp/internal/schema"
 	"github.com/doug-martin/goqu/v9"
@@ -38,6 +40,39 @@ func NetworkPrefix(ip net.IP) netip.Prefix {
 func validNetwork(prefix netip.Prefix) bool {
 	return prefix.IsValid() && ((prefix.Addr().Is4() && prefix.Bits() == IPv4NetworkBits) ||
 		(prefix.Addr().Is6() && !prefix.Addr().Is4In6() && prefix.Bits() == IPv6NetworkBits))
+}
+
+// AddNetwork blocks an IPv4 /24 or IPv6 /64, including addresses not seen yet.
+// Concurrent workers cannot shorten a ban or renew the same active profile.
+func (s *Repository) AddNetwork(ctx context.Context, prefix netip.Prefix, duration time.Duration, reason string) error {
+	if !validNetwork(prefix) {
+		return errInvalidNetwork
+	}
+
+	excludedUntil := schema.Excluded(schema.IPBanTableUntilColName)
+	excludedReason := schema.Excluded(schema.IPBanTableReasonColName)
+
+	_, err := s.db.Insert(schema.IPBanTable).Rows(goqu.Record{
+		schema.IPBanTableIPColName:       prefix.Masked().String(),
+		schema.IPBanTableUntilColName:    time.Now().Add(duration),
+		schema.IPBanTableReasonColName:   reason,
+		schema.IPBanTableByUserIDColName: nil,
+	}).OnConflict(goqu.DoUpdate(schema.IPBanTableIPColName, goqu.Record{
+		schema.IPBanTableUntilColName:    excludedUntil,
+		schema.IPBanTableReasonColName:   excludedReason,
+		schema.IPBanTableByUserIDColName: nil,
+	}).Where(
+		schema.IPBanTableUntilCol.Lt(excludedUntil),
+		goqu.Or(
+			schema.IPBanTableUntilCol.Lt(goqu.Func("NOW")),
+			goqu.And(schema.IPBanTableByUserIDCol.IsNull(), schema.IPBanTableReasonCol.Neq(excludedReason)),
+		),
+	)).Executor().ExecContext(ctx)
+	if err != nil {
+		return fmt.Errorf("store network ban %s: %w", prefix, err)
+	}
+
+	return nil
 }
 
 // NetworkBan returns only the group's ban, without treating its network address as a host.

@@ -22,22 +22,25 @@ const (
 	networkOneMinLimit    = 1000
 	networkCandidateLimit = 1000
 	bitsPerByte           = 8
+	networkTenMinuteBan   = 10 * time.Minute
+	networkMinuteBan      = 2 * time.Minute
 )
 
 // NetworkAutobanProfiles use current calendar windows, like the per-IP profiles.
-// Network bans are short and re-evaluated each minute, rather than lasting days.
+// Each ban outlasts the buckets that can trigger it. The minute profile also
+// checks the previous minute to allow for delayed counter flushes.
 var NetworkAutobanProfiles = []AutobanProfile{
-	{Limit: networkDailyLimit, Reason: "network daily limit", Time: time.Minute},
+	{Limit: networkDailyLimit, Reason: "network daily limit", Time: hoursInDay * time.Hour},
 	{
-		Limit: networkHourlyLimit, Reason: "network hourly limit", Time: time.Minute,
+		Limit: networkHourlyLimit, Reason: "network hourly limit", Time: time.Hour,
 		Group: []interface{}{schema.IPMonitoringTableHourCol},
 	},
 	{
-		Limit: networkTenMinsLimit, Reason: "network ten min limit", Time: time.Minute,
+		Limit: networkTenMinsLimit, Reason: "network ten min limit", Time: networkTenMinuteBan,
 		Group: []interface{}{schema.IPMonitoringTableHourCol, schema.IPMonitoringTableTenminuteCol},
 	},
 	{
-		Limit: networkOneMinLimit, Reason: "network min limit", Time: time.Minute,
+		Limit: networkOneMinLimit, Reason: "network min limit", Time: networkMinuteBan,
 		Group: []interface{}{
 			schema.IPMonitoringTableHourCol, schema.IPMonitoringTableTenminuteCol,
 			schema.IPMonitoringTableMinuteCol,
@@ -173,12 +176,16 @@ func (s *Repository) AutoBanNetworksByProfile(ctx context.Context, profile Autob
 	}
 
 	for _, prefix := range networks {
-		_, err := s.Ban.NetworkBan(ctx, prefix)
+		active, err := s.Ban.NetworkBan(ctx, prefix)
 		if err == nil {
-			continue
+			// Keep an active ban's deadline stable, but allow a stronger quota to
+			// replace a shorter automatic ban. Unknown/manual reasons are preserved.
+			if !canUpgradeNetworkBan(active, prefix, profile.Time) {
+				continue
+			}
 		}
 
-		if !errors.Is(err, ban.ErrBanItemNotFound) {
+		if err != nil && !errors.Is(err, ban.ErrBanItemNotFound) {
 			return err
 		}
 
@@ -197,4 +204,18 @@ func (s *Repository) AutoBanNetworksByProfile(ctx context.Context, profile Autob
 	}
 
 	return nil
+}
+
+func canUpgradeNetworkBan(active *ban.Item, prefix netip.Prefix, duration time.Duration) bool {
+	if active.ByUserID != 0 {
+		return false
+	}
+
+	for _, profile := range NetworkAutobanProfiles {
+		if active.Reason == profile.Reason+" "+prefix.String() {
+			return profile.Time < duration
+		}
+	}
+
+	return false
 }

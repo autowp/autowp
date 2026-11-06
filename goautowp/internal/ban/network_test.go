@@ -74,3 +74,41 @@ func TestNetworkBans(t *testing.T) {
 		errInvalidNetwork,
 	)
 }
+
+func TestNetworkBanDeadline(t *testing.T) {
+	t.Parallel()
+
+	db, sqlDB, _ := testutil.NewPostgres(t, "../..")
+	ctx := t.Context()
+	_, err := sqlDB.ExecContext(ctx, `CREATE TEMP TABLE ip_ban (
+ ip inet PRIMARY KEY, until timestamptz NOT NULL, by_user_id bigint, reason text NOT NULL)`)
+	require.NoError(t, err)
+
+	svc, err := NewRepository(db)
+	require.NoError(t, err)
+
+	prefix := netip.MustParsePrefix("192.0.2.0/24")
+	require.NoError(t, svc.AddNetwork(ctx, prefix, time.Hour, "hourly"))
+	original, err := svc.NetworkBan(ctx, prefix)
+	require.NoError(t, err)
+	// A stale decision by another worker must neither renew this profile nor downgrade it.
+	require.NoError(t, svc.AddNetwork(ctx, prefix, time.Hour, "hourly"))
+	require.NoError(t, svc.AddNetwork(ctx, prefix, time.Minute, "minute"))
+	unchanged, err := svc.NetworkBan(ctx, prefix)
+	require.NoError(t, err)
+	require.Equal(t, original.Until, unchanged.Until)
+	require.Equal(t, original.Reason, unchanged.Reason)
+
+	require.NoError(t, svc.AddNetwork(ctx, prefix, 24*time.Hour, "daily"))
+	upgraded, err := svc.NetworkBan(ctx, prefix)
+	require.NoError(t, err)
+	require.Greater(t, upgraded.Until.UnixNano(), original.Until.UnixNano())
+	require.Equal(t, "daily", upgraded.Reason)
+
+	_, err = sqlDB.ExecContext(ctx, "UPDATE ip_ban SET until = NOW() - INTERVAL '1 second'")
+	require.NoError(t, err)
+	require.NoError(t, svc.AddNetwork(ctx, prefix, time.Minute, "daily"))
+	renewed, err := svc.NetworkBan(ctx, prefix)
+	require.NoError(t, err)
+	require.True(t, renewed.Until.After(time.Now()))
+}

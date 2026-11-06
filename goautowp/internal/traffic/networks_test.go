@@ -110,3 +110,71 @@ func TestNetworkQuotaOnlyCurrentBucket(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, networks, 1)
 }
+
+func TestNetworkAutobanDuration(t *testing.T) {
+	t.Parallel()
+
+	// The minute query retains two buckets; the other profiles retain one calendar window.
+	periods := []time.Duration{24 * time.Hour, time.Hour, 10 * time.Minute, 2 * time.Minute}
+
+	for index, profile := range NetworkAutobanProfiles {
+		t.Run(profile.Reason, func(t *testing.T) {
+			t.Parallel()
+
+			svc, _ := temporaryNetworkTraffic(t)
+			ctx := t.Context()
+			started := time.Now()
+			require.NoError(t, svc.Monitoring.AddCounts(ctx, []MonitoringCount{
+				{IP: "192.0.2.1", Timestamp: started, Count: int64(profile.Limit) + 1},
+			}))
+			require.NoError(t, svc.AutoBanNetworksByProfile(ctx, profile))
+
+			prefix := netip.MustParsePrefix("192.0.2.0/24")
+			blocked, err := svc.Ban.NetworkBan(ctx, prefix)
+			require.NoError(t, err)
+			require.False(
+				t,
+				blocked.Until.Before(started.Add(periods[index])),
+				"ban must outlast the retained counters",
+			)
+
+			require.NoError(t, svc.AutoBanNetworksByProfile(ctx, profile))
+			repeated, err := svc.Ban.NetworkBan(ctx, prefix)
+			require.NoError(t, err)
+			require.Equal(t, blocked.Until, repeated.Until, "polling must not move the deadline")
+		})
+	}
+}
+
+func TestNetworkAutobanUpgrade(t *testing.T) {
+	t.Parallel()
+
+	svc, _ := temporaryNetworkTraffic(t)
+	ctx := t.Context()
+	hourly := NetworkAutobanProfiles[1]
+	minute := NetworkAutobanProfiles[3]
+	prefix := netip.MustParsePrefix("192.0.2.0/24")
+
+	require.NoError(t, svc.Monitoring.AddCounts(ctx, []MonitoringCount{
+		{IP: "192.0.2.1", Timestamp: time.Now(), Count: int64(hourly.Limit) + 1},
+	}))
+	require.NoError(t, svc.AutoBanNetworksByProfile(ctx, minute))
+	short, err := svc.Ban.NetworkBan(ctx, prefix)
+	require.NoError(t, err)
+
+	started := time.Now()
+
+	require.NoError(t, svc.AutoBanNetworksByProfile(ctx, hourly))
+	long, err := svc.Ban.NetworkBan(ctx, prefix)
+	require.NoError(t, err)
+	require.Greater(t, long.Until.UnixNano(), short.Until.UnixNano())
+	require.False(t, long.Until.Before(started.Add(time.Hour)))
+	require.Equal(t, hourly.Reason+" "+prefix.String(), long.Reason)
+
+	require.NoError(t, svc.AutoBanNetworksByProfile(ctx, minute))
+	require.NoError(t, svc.AutoBanNetworksByProfile(ctx, hourly))
+	repeated, err := svc.Ban.NetworkBan(ctx, prefix)
+	require.NoError(t, err)
+	require.Equal(t, long.Until, repeated.Until)
+	require.Equal(t, long.Reason, repeated.Reason)
+}
