@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"net"
+	"net/netip"
 	"strings"
 	"time"
 
@@ -24,6 +25,7 @@ type Item struct {
 	Until    time.Time `json:"up_to"`
 	ByUserID int64     `json:"by_user_id"`
 	Reason   string    `json:"reason"`
+	Network  bool      `json:"network"`
 }
 
 // Repository Main Object.
@@ -52,33 +54,16 @@ func (s *Repository) Add(
 	byUserID int64,
 	reason string,
 ) error {
-	reason = strings.TrimSpace(reason)
-	upTo := time.Now().Add(duration)
+	return s.add(ctx, ip.String(), duration, byUserID, reason)
+}
 
-	ct, err := s.db.Insert(schema.IPBanTable).Rows(goqu.Record{
-		schema.IPBanTableIPColName:       ip.String(),
-		schema.IPBanTableUntilColName:    upTo,
-		schema.IPBanTableByUserIDColName: sql.NullInt64{Int64: byUserID, Valid: byUserID > 0},
-		schema.IPBanTableReasonColName:   reason,
-	}).OnConflict(goqu.DoUpdate(schema.IPBanTableIPColName, goqu.Record{
-		schema.IPBanTableUntilColName:    schema.Excluded(schema.IPBanTableUntilColName),
-		schema.IPBanTableByUserIDColName: schema.Excluded(schema.IPBanTableByUserIDColName),
-		schema.IPBanTableReasonColName:   schema.Excluded(schema.IPBanTableReasonColName),
-	})).Executor().ExecContext(ctx)
-	if err != nil {
-		return err
+// AddNetwork blocks an IPv4 /24 or IPv6 /64, including addresses not seen yet.
+func (s *Repository) AddNetwork(ctx context.Context, prefix netip.Prefix, duration time.Duration, reason string) error {
+	if !validNetwork(prefix) {
+		return errInvalidNetwork
 	}
 
-	affected, err := ct.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if affected == 1 {
-		logging.Infof("%v was banned. Reason: %s", ip.String(), reason)
-	}
-
-	return nil
+	return s.add(ctx, prefix.Masked().String(), duration, 0, reason)
 }
 
 // Remove IP from list of banned.
@@ -99,7 +84,7 @@ func (s *Repository) Exists(ctx context.Context, ip net.IP) (bool, error) {
 	success, err := s.db.Select(goqu.V(true)).
 		From(schema.IPBanTable).
 		Where(
-			schema.IPBanTableIPCol.Eq(ip.String()),
+			s.matchAddress(ip),
 			schema.IPBanTableUntilCol.Gte(goqu.Func("NOW")),
 		).
 		ScanValContext(ctx, &exists)
@@ -119,7 +104,8 @@ func (s *Repository) Get(ctx context.Context, ip net.IP) (*Item, error) {
 	success, err := s.db.Select(schema.IPBanTableIPCol, schema.IPBanTableUntilCol, schema.IPBanTableReasonCol,
 		schema.IPBanTableByUserIDCol).
 		From(schema.IPBanTable).
-		Where(schema.IPBanTableIPCol.Eq(ip.String()), schema.IPBanTableUntilCol.Gte(goqu.Func("NOW"))).
+		Where(s.matchAddress(ip), schema.IPBanTableUntilCol.Gte(goqu.Func("NOW"))).
+		Order(schema.IPBanTableUntilCol.Desc()).
 		Limit(1).
 		Executor().
 		ScanStructContext(ctx, &st)
@@ -140,6 +126,7 @@ func (s *Repository) Get(ctx context.Context, ip net.IP) (*Item, error) {
 
 	if st.PgInet.IsValid() {
 		item.IP = net.IP(st.PgInet.Addr().AsSlice())
+		item.Network = st.PgInet.Bits() < st.PgInet.Addr().BitLen()
 	}
 
 	return &item, nil
@@ -167,4 +154,40 @@ func (s *Repository) Clear(ctx context.Context) error {
 	_, err := s.db.Delete(schema.IPBanTable).Executor().ExecContext(ctx)
 
 	return err
+}
+
+func (s *Repository) add(
+	ctx context.Context,
+	address string,
+	duration time.Duration,
+	byUserID int64,
+	reason string,
+) error {
+	reason = strings.TrimSpace(reason)
+	upTo := time.Now().Add(duration)
+
+	ct, err := s.db.Insert(schema.IPBanTable).Rows(goqu.Record{
+		schema.IPBanTableIPColName:       address,
+		schema.IPBanTableUntilColName:    upTo,
+		schema.IPBanTableByUserIDColName: sql.NullInt64{Int64: byUserID, Valid: byUserID > 0},
+		schema.IPBanTableReasonColName:   reason,
+	}).OnConflict(goqu.DoUpdate(schema.IPBanTableIPColName, goqu.Record{
+		schema.IPBanTableUntilColName:    schema.Excluded(schema.IPBanTableUntilColName),
+		schema.IPBanTableByUserIDColName: schema.Excluded(schema.IPBanTableByUserIDColName),
+		schema.IPBanTableReasonColName:   schema.Excluded(schema.IPBanTableReasonColName),
+	})).Executor().ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	affected, err := ct.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affected == 1 {
+		logging.Infof("%s was banned. Reason: %s", address, reason)
+	}
+
+	return nil
 }

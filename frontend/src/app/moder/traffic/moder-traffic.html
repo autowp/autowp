@@ -14,60 +14,112 @@
 </div>
 
 <div class="nav nav-pills">
-  <a class="nav-link active me-1" routerLink="/moder/traffic">Traffic</a>
+  <a class="nav-link me-1" routerLink="/moder/traffic" [class.active]="!networkView()">
+    <ng-container i18n>IP addresses</ng-container>
+  </a>
+  <a
+    class="nav-link me-1"
+    routerLink="/moder/traffic"
+    [class.active]="networkView()"
+    [queryParams]="{view: 'networks'}"
+  >
+    <ng-container i18n>Networks</ng-container>
+  </a>
   <a class="nav-link" routerLink="/moder/traffic/whitelist">Whitelist</a>
 </div>
 
-<app-resource-status [resource]="itemsResource" [empty]="items()?.length === 0" />
-@if (items(); as items) {
-  @for (item of items; track item) {
-    <div class="row">
-      <div class="col-sm-2">
-        <h3>{{ item.item.count }}</h3>
-      </div>
-      <div class="col-sm-4">
-        <h3>
-          {{ item.item.ipAddress }}
-          <a [href]="item.item.whoisUrl">whois</a>
-        </h3>
-        <p>{{ item.hostname$ | async }}</p>
-      </div>
-      <div class="col-sm-6">
-        @if (item.item.ban) {
-          <div>
-            @if (item.item.ban.until; as date) {
-              <ng-container i18n>until</ng-container> {{ date.toDate() | date: 'fullDate' }}
-            }
-            @if (item.item.ban.byUser) {
-              <span>
-                by
-                <app-user [user]="item.item.ban.byUser" />
-                @if (item.item.ban.reason) {
-                  <span> <ng-container i18n>Reason</ng-container> {{ item.item.ban.reason }} </span>
+<p class="text-muted mt-3"><ng-container i18n>Top 50 by requests today</ng-container></p>
+@if (networkView() && !selectedNetwork()) {
+  <p class="text-muted"><ng-container i18n>IPv4 /24 and IPv6 /64 networks</ng-container></p>
+  <app-resource-status [resource]="networksResource" [empty]="networksResource.value()?.length === 0" />
+  @if (networksResource.value(); as networks) {
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col"><ng-container i18n>Network</ng-container></th>
+          <th scope="col"><ng-container i18n>Requests</ng-container></th>
+          <th scope="col"><ng-container i18n>IP addresses</ng-container></th>
+          <th scope="col"><ng-container i18n>Ban</ng-container></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of networks; track item.network) {
+          <tr>
+            <td>
+              <a routerLink="/moder/traffic" [queryParams]="{view: 'networks', network: item.network}">{{
+                item.network
+              }}</a>
+            </td>
+            <td>{{ item.count }}</td>
+            <td>{{ item.addresses }}</td>
+            <td>
+              @if (item.ban; as ban) {
+                @if (ban.until; as until) {
+                  <ng-container i18n>until</ng-container>&ngsp;{{ until.toDate() | date: 'medium' }}
                 }
-              </span>
+                <div>{{ ban.reason }}</div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+} @else {
+  @if (selectedNetwork(); as network) {
+    <h2>{{ network }}</h2>
+  }
+  <app-resource-status [resource]="itemsResource" [empty]="items()?.length === 0" />
+  @if (items(); as items) {
+    @for (item of items; track item) {
+      <div class="row">
+        <div class="col-sm-2">
+          <h3>{{ item.item.count }}</h3>
+        </div>
+        <div class="col-sm-4">
+          <h3>
+            {{ item.item.ipAddress }}
+            <a [href]="item.item.whoisUrl">whois</a>
+          </h3>
+          <p>{{ item.hostname$ | async }}</p>
+        </div>
+        <div class="col-sm-6">
+          @if (item.item.ban) {
+            <div>
+              @if (item.item.ban.until; as date) {
+                <ng-container i18n>until</ng-container>&ngsp;{{ date.toDate() | date: 'medium' }}
+              }
+              @if (item.item.ban.byUser) {
+                <span>
+                  by
+                  <app-user [user]="item.item.ban.byUser" />
+                </span>
+              }
+              @if (item.item.ban.reason) {
+                <div><ng-container i18n>Reason</ng-container>&ngsp;{{ item.item.ban.reason }}</div>
+              }
+            </div>
+          }
+          <div>
+            @if (item.item.ban && !item.item.networkBan) {
+              <button type="button" class="btn btn-secondary" (click)="removeFromBlacklist(item.item.ipAddress)">
+                <ng-container i18n>unban</ng-container>
+              </button>
+            } @else if (!item.item.ban) {
+              <button type="button" class="btn btn-danger" (click)="addToBlacklist(item.item.ipAddress)">
+                <ng-container i18n>Ban</ng-container>
+              </button>
+            }
+            @if (!item.item.inWhitelist) {
+              <button type="button" class="btn btn-success" (click)="addToWhitelist(item.item.ipAddress)">
+                <ng-container i18n>Whitelist</ng-container>
+              </button>
             }
           </div>
-        }
-        <div>
-          @if (item.item.ban) {
-            <button type="button" class="btn btn-secondary" (click)="removeFromBlacklist(item.item.ipAddress)">
-              <ng-container i18n>unban</ng-container>
-            </button>
-          } @else {
-            <button type="button" class="btn btn-danger" (click)="addToBlacklist(item.item.ipAddress)">
-              <ng-container i18n>Ban</ng-container>
-            </button>
-          }
-          @if (!item.item.inWhitelist) {
-            <button type="button" class="btn btn-success" (click)="addToWhitelist(item.item.ipAddress)">
-              <ng-container i18n>Whitelist</ng-container>
-            </button>
-          }
         </div>
       </div>
-    </div>
-  } @empty {
-    <p class="text-muted" i18n>Nothing found</p>
+    } @empty {
+      <p class="text-muted" i18n>Nothing found</p>
+    }
   }
 }

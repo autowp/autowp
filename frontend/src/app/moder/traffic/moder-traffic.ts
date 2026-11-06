@@ -4,12 +4,13 @@ import type {Observable} from 'rxjs';
 
 import {AsyncPipe, DatePipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
-import {rxResource} from '@angular/core/rxjs-interop';
-import {RouterLink} from '@angular/router';
+import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
   CreateTrafficBlacklistItemRequest,
   CreateTrafficWhitelistItemRequest,
   DeleteTrafficBlacklistItemRequest,
+  GetTrafficNetworkIPsRequest,
 } from '@grpc/spec.pb';
 import {TrafficClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
@@ -38,8 +39,22 @@ export class ModerTraffic implements OnInit {
   readonly #pageEnv = inject(PageEnvService);
   readonly #toastService = inject(ToastsService);
 
+  readonly #route = inject(ActivatedRoute);
+  readonly #queryParams = toSignal(this.#route.queryParamMap, {initialValue: this.#route.snapshot.queryParamMap});
+
+  protected readonly networkView = computed(() => this.#queryParams().get('view') === 'networks');
+  protected readonly selectedNetwork = computed(() => this.#queryParams().get('network') ?? '');
+  protected readonly networksResource = rxResource({
+    params: () => (this.networkView() && !this.selectedNetwork() ? true : undefined),
+    stream: () => this.#trafficClient.getTrafficNetworks(new Empty()).pipe(map((response) => response.items ?? [])),
+  });
   protected readonly itemsResource = rxResource({
-    stream: () => this.#trafficClient.getTrafficTop(new Empty()).pipe(map((response) => response.items ?? [])),
+    params: () => (this.networkView() && !this.selectedNetwork() ? undefined : {network: this.selectedNetwork()}),
+    stream: ({params}) =>
+      (params.network
+        ? this.#trafficClient.getTrafficNetworkIPs(new GetTrafficNetworkIPsRequest({network: params.network}))
+        : this.#trafficClient.getTrafficTop(new Empty())
+      ).pipe(map((response) => response.items ?? [])),
   });
   protected readonly items = computed<ListItem[] | undefined>(() =>
     this.itemsResource.hasValue()

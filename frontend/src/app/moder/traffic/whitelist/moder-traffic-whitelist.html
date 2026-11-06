@@ -18,6 +18,9 @@
 
 <div class="nav nav-pills">
   <a class="nav-link me-1" routerLink="/moder/traffic" i18n>Traffic</a>
+  <a class="nav-link me-1" routerLink="/moder/traffic" [queryParams]="{view: 'networks'}"
+    ><ng-container i18n>Networks</ng-container></a
+  >
   <a class="nav-link active" routerLink="/moder/traffic/whitelist" i18n>Whitelist</a>
 </div>
 @if (itemsResource.error(); as error) {

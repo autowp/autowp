@@ -118,6 +118,8 @@ service Traffic {
       get: "/v3/traffic/top"
     };
   }
+  rpc GetTrafficNetworks(google.protobuf.Empty) returns (TrafficNetworksResponse) {}
+  rpc GetTrafficNetworkIPs(GetTrafficNetworkIPsRequest) returns (TrafficTopResponse) {}
   rpc GetTrafficWhitelistItems(GetTrafficWhitelistItemsRequest) returns (TrafficWhitelistItems) {
     option (google.api.http) = {
       get: "/v3/traffic/whitelist"
@@ -1005,10 +1007,26 @@ message TrafficTopItem {
   BanItem ban = 3;
   bool in_whitelist = 4;
   string whois_url = 5;
+  bool network_ban = 6;
 }
 
 message TrafficTopResponse {
   repeated TrafficTopItem items = 1;
+}
+
+message GetTrafficNetworkIPsRequest {
+  string network = 1;
+}
+
+message TrafficNetworkItem {
+  string network = 1;
+  int64 count = 2;
+  int64 addresses = 3;
+  BanItem ban = 4;
+}
+
+message TrafficNetworksResponse {
+  repeated TrafficNetworkItem items = 1;
 }
 
 message GetIPRequest {

@@ -17392,6 +17392,62 @@ Transmission is not considered</source>
         </context-group>
         <target state="translated">GDPR</target>
       </trans-unit>
+      <trans-unit id="4843683058151671870" datatype="html">
+        <source>IP addresses</source>
+        <target>IPアドレス</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">18,22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">41,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1925218593942075988" datatype="html">
+        <source>Networks</source>
+        <target>ネットワーク</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">26,28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/whitelist/moder-traffic-whitelist.html</context>
+          <context context-type="linenumber">22,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2359540868165355691" datatype="html">
+        <source>Top 50 by requests today</source>
+        <target>本日のリクエスト数上位50件</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">31,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3967537233395151761" datatype="html">
+        <source>IPv4 /24 and IPv6 /64 networks</source>
+        <target>IPv4 /24 および IPv6 /64 ネットワーク</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">33,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1415060111017347427" datatype="html">
+        <source>Network</source>
+        <target>ネットワーク</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">39,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2398407606701767789" datatype="html">
+        <source>Requests</source>
+        <target>リクエスト数</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">40,41</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -165,6 +165,12 @@ func (s *Repository) AutoBan(ctx context.Context) error {
 		}
 	}
 
+	for _, profile := range NetworkAutobanProfiles {
+		if err := s.AutoBanNetworksByProfile(ctx, profile); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

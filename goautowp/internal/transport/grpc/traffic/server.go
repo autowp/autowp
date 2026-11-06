@@ -67,83 +67,7 @@ func (s *Server) GetTrafficTop(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result := make([]*pb.TrafficTopItem, len(items))
-	lookups := make([]func(context.Context) error, 0, 2*len(items))
-
-	for idx, item := range items {
-		resultRow := &pb.TrafficTopItem{
-			IpAddress: item.IP.String(),
-			Count:     int32(item.Count), //nolint: gosec
-			WhoisUrl:  "https://nic.ru/whois/?query=" + url.QueryEscape(item.IP.String()),
-		}
-		result[idx] = resultRow
-
-		// Flatten both independent reads for every IP into the same bounded queue.
-		// The user lookup/extraction stays in the ban branch and inherits its slot.
-		lookups = append(lookups, func(ctx context.Context) error {
-			banItem, banErr := s.traffic.Ban.Get(ctx, item.IP)
-			if banErr != nil && !errors.Is(banErr, ban.ErrBanItemNotFound) {
-				return banErr
-			}
-
-			var (
-				user *schema.UsersRow
-				err  error
-			)
-
-			if banItem != nil {
-				var extractedUser *pb.User
-
-				if banItem.ByUserID > 0 {
-					user, err = s.usersRepository.User(ctx, &query.UserListOptions{
-						ID: banItem.ByUserID,
-					}, users.UserFields{}, users.OrderByNone)
-					if err != nil && !errors.Is(err, users.ErrUserNotFound) {
-						return err
-					}
-
-					if user != nil {
-						extractedUser, err = s.userExtractor.Extract(
-							ctx,
-							user,
-							nil,
-							userCtx.UserID,
-							userCtx.Roles,
-						)
-						if err != nil {
-							return err
-						}
-					}
-				}
-
-				resultRow.Ban = &pb.BanItem{
-					Until:    timestamppb.New(banItem.Until),
-					ByUserId: banItem.ByUserID,
-					ByUser:   extractedUser,
-					Reason:   banItem.Reason,
-				}
-			}
-
-			return nil
-		}, func(ctx context.Context) error {
-			inWhitelist, err := s.traffic.Whitelist.Exists(ctx, item.IP)
-			if err != nil {
-				return err
-			}
-
-			resultRow.InWhitelist = inWhitelist
-
-			return nil
-		})
-	}
-
-	if err := extraction.Run(ctx, lookups); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &pb.TrafficTopResponse{
-		Items: result,
-	}, nil
+	return s.extractTop(ctx, userCtx, items)
 }
 
 func (s *Server) DeleteTrafficBlacklistItem(
@@ -300,5 +224,91 @@ func (s *Server) GetTrafficWhitelistItems(
 			Current:        pages.Current,
 			TotalItemCount: pages.TotalItemCount,
 		},
+	}, nil
+}
+
+func (s *Server) extractTop(
+	ctx context.Context,
+	userCtx authn.User,
+	items []traffic.ListOfTopItem,
+) (*pb.TrafficTopResponse, error) {
+	result := make([]*pb.TrafficTopItem, len(items))
+	lookups := make([]func(context.Context) error, 0, 2*len(items))
+
+	for idx, item := range items {
+		resultRow := &pb.TrafficTopItem{
+			IpAddress: item.IP.String(),
+			Count:     int32(item.Count), //nolint: gosec
+			WhoisUrl:  "https://nic.ru/whois/?query=" + url.QueryEscape(item.IP.String()),
+		}
+		result[idx] = resultRow
+
+		// Flatten both independent reads for every IP into the same bounded queue.
+		// The user lookup/extraction stays in the ban branch and inherits its slot.
+		lookups = append(lookups, func(ctx context.Context) error {
+			banItem, banErr := s.traffic.Ban.Get(ctx, item.IP)
+			if banErr != nil && !errors.Is(banErr, ban.ErrBanItemNotFound) {
+				return banErr
+			}
+
+			var (
+				user *schema.UsersRow
+				err  error
+			)
+
+			if banItem != nil {
+				resultRow.NetworkBan = banItem.Network
+
+				var extractedUser *pb.User
+
+				if banItem.ByUserID > 0 {
+					user, err = s.usersRepository.User(ctx, &query.UserListOptions{
+						ID: banItem.ByUserID,
+					}, users.UserFields{}, users.OrderByNone)
+					if err != nil && !errors.Is(err, users.ErrUserNotFound) {
+						return err
+					}
+
+					if user != nil {
+						extractedUser, err = s.userExtractor.Extract(
+							ctx,
+							user,
+							nil,
+							userCtx.UserID,
+							userCtx.Roles,
+						)
+						if err != nil {
+							return err
+						}
+					}
+				}
+
+				resultRow.Ban = &pb.BanItem{
+					Until:    timestamppb.New(banItem.Until),
+					ByUserId: banItem.ByUserID,
+					ByUser:   extractedUser,
+					Reason:   banItem.Reason,
+				}
+			}
+
+			return nil
+		}, func(ctx context.Context) error {
+			inWhitelist, err := s.traffic.Whitelist.Exists(ctx, item.IP)
+			if err != nil {
+				return err
+			}
+
+			resultRow.InWhitelist = inWhitelist
+
+			return nil
+		})
+	}
+
+	if err := extraction.Run(ctx, lookups); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.TrafficTopResponse{
+		Items: result,
 	}, nil
 }
