@@ -4,7 +4,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: {{ include "autowp.goautowp.serve.fullname" . | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  labels: {{- include "cloudpirates.labels" . | nindent 4 }}
     release: kube-prometheus-stack
 spec:
   podMetricsEndpoints:
@@ -19,6 +19,6 @@ spec:
       scrapeTimeout: {{ .Values.goautowp.podMonitor.scrapeTimeout }}
       {{- end }}
   selector:
-    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 6 }}
+    matchLabels: {{- include "cloudpirates.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: goautowp-serve
 {{- end }}

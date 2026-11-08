@@ -7,7 +7,7 @@ rendering, where they waited tens of seconds behind renders.
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  labels: {{- include "cloudpirates.labels" . | nindent 4 }}
   name: {{ printf "%s-frontend-assets" (include "autowp.goautowp.serve.fullname" .) | quote }}
 data:
   nginx.conf: |

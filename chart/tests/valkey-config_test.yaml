@@ -1,0 +1,34 @@
+suite: Valkey connection configuration
+release:
+  name: autowp
+  namespace: autowp
+templates:
+  - goautowp/cm.yaml
+tests:
+  - it: connects to the write endpoint rather than the service balancing all replicas
+    asserts:
+      - matchRegex:
+          path: stringData["config.yaml"]
+          pattern: 'redis: redis://autowp-valkey-master:6379'
+  - it: follows the subchart name and service port overrides
+    set:
+      valkey.fullnameOverride: custom-cache
+      valkey.service.port: 6380
+    asserts:
+      - matchRegex:
+          path: stringData["config.yaml"]
+          pattern: 'redis: redis://custom-cache-master:6380'
+  - it: supports the standalone service endpoint
+    set:
+      valkey.architecture: standalone
+    asserts:
+      - matchRegex:
+          path: stringData["config.yaml"]
+          pattern: 'redis: redis://autowp-valkey:6379'
+  - it: renders without the optional Valkey subchart
+    set:
+      valkey.enabled: false
+    asserts:
+      - notMatchRegex:
+          path: stringData["config.yaml"]
+          pattern: 'redis: redis://'

@@ -11,19 +11,19 @@
 {{- end }}
 
 {{- define "autowp.imagePullSecrets" -}}
-{{- include "common.images.pullSecrets" (dict "images" (list .Values.frontend.image .Values.goautowp.image) "global" .Values.global) -}}
+{{- include "cloudpirates.images.renderPullSecrets" (dict "images" (list .Values.frontend.image .Values.goautowp.image) "context" .) -}}
 {{- end -}}
 
 {{- define "autowp.frontend.image" -}}
-{{ include "common.images.image" (dict "imageRoot" .Values.frontend.image "global" .Values.global) }}
+{{ include "autowp.image" (dict "imageRoot" .Values.frontend.image "global" .Values.global) }}
 {{- end -}}
 
 {{- define "autowp.frontend.assets.image" -}}
-{{ include "common.images.image" (dict "imageRoot" .Values.frontend.assets.image "global" .Values.global) }}
+{{ include "autowp.image" (dict "imageRoot" .Values.frontend.assets.image "global" .Values.global) }}
 {{- end -}}
 
 {{- define "autowp.goautowp.fullname" -}}
-{{- printf "%s-goautowp" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-goautowp" (include "cloudpirates.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "autowp.goautowp.scheduler-daily.fullname" -}}
@@ -51,15 +51,15 @@
 {{- end -}}
 
 {{- define "autowp.goautowp.image" -}}
-{{ include "common.images.image" (dict "imageRoot" .Values.goautowp.image "global" .Values.global) }}
+{{ include "autowp.image" (dict "imageRoot" .Values.goautowp.image "global" .Values.global) }}
 {{- end -}}
 
 {{- define "autowp.static.fullname" -}}
-{{- printf "%s-static" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-static" (include "cloudpirates.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "autowp.static.image" -}}
-{{ include "common.images.image" (dict "imageRoot" .Values.static.image "global" .Values.global) }}
+{{ include "autowp.image" (dict "imageRoot" .Values.static.image "global" .Values.global) }}
 {{- end -}}
 
 {{/*
@@ -77,7 +77,7 @@ networkPolicy.egress.enabled - see templates/networkpolicy.yaml.
     - port: 53
       protocol: TCP
 {{- if $np.allowSameNamespace }}
-# In-namespace dependencies pulled in as subcharts (redis, rabbitmq) and anything else co-located.
+# In-namespace dependencies pulled in as subcharts (valkey, rabbitmq) and anything else co-located.
 - to:
     - podSelector: {}
 {{- end }}

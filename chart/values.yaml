@@ -300,51 +300,55 @@ localImageCredentials:
   username: someone
   password: sillyness
   email: someone@host.com
-redis:
+## CloudPirates chart using the upstream valkey/valkey image. Redis data is deliberately
+## not migrated; rebuild the catalogue index cache after upgrading (see README.md).
+valkey:
   enabled: true
-  image:
-    repository: bitnamilegacy/redis
+  architecture: replication
+  ## Total instances: one master and two replicas. This chart has no replica autoscaler.
+  replicaCount: 3
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: valkey
+            topologyKey: kubernetes.io/hostname
+  service:
+    annotations:
+      ## The master service selects pod-0 via a label added by the StatefulSet controller.
+      ## kube-linter cannot infer that runtime label from the pod template.
+      ignore-check.kube-linter.io/dangling-service: "StatefulSet controller assigns statefulset.kubernetes.io/pod-name"
   sentinel:
-    image:
-     repository: bitnamilegacy/redis-sentinel
-  commonAnnotations:
-    ignore-check.kube-linter.io/pdb-unhealthy-pod-eviction-policy: "pdb-unhealthy-pod-eviction-policy"
+    enabled: false
   auth:
     enabled: false
-    usePasswordFiles: false
-  master:
+  persistence:
+    enabled: false
+  podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  resources:
+    limits:
+      cpu: "1"
+      memory: "1024Mi"
+    requests:
+      cpu: 100m
+      memory: "100Mi"
+  initContainer:
     resources:
       limits:
-        cpu: "1"
-        memory: "1024Mi"
-      requests:
         cpu: 100m
-        memory: "100Mi"
-    persistence:
-      enabled: false
-    containerSecurityContext:
-      readOnlyRootFilesystem: true
-  replica:
-    replicaCount: 2
-    resources:
-      limits:
-        cpu: "1"
-        memory: "1024Mi"
+        memory: 64Mi
       requests:
-        cpu: 100m
-        memory: "100Mi"
-    persistence:
-      enabled: false
-    autoscaling:
-      enabled: true
-      minReplicas: 1
-      maxReplicas: 5
-    containerSecurityContext:
-      readOnlyRootFilesystem: true
+        cpu: 10m
+        memory: 16Mi
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
   metrics:
     enabled: true
-    image:
-      repository: bitnamilegacy/redis-exporter
     resources:
       limits:
         cpu: "1"
@@ -354,17 +358,7 @@ redis:
         memory: "10Mi"
     serviceMonitor:
       enabled: true
-    containerSecurityContext:
-      readOnlyRootFilesystem: true
-  volumePermissions:
-    image:
-      repository: bitnamilegacy/os-shell
-  kubectl:
-    image:
-      repository: bitnamilegacy/kubectl
-  sysctl:
-    image:
-      repository: bitnamilegacy/os-shell
+
 static:
   image:
     registry: docker.io
@@ -386,7 +380,7 @@ networkPolicy:
   ## Namespace Prometheus runs in - allowed to scrape the :2112 metrics port.
   monitoringNamespace: monitoring
   ## Also allow every pod in this release's namespace to reach the workload pods. Keeps in-cluster
-  ## clients and the redis/rabbitmq subcharts working without listing each one.
+  ## clients and the valkey/rabbitmq subcharts working without listing each one.
   allowSameNamespace: true
   egress:
     ## Egress restriction is much riskier than ingress: the backend reaches external Postgres,

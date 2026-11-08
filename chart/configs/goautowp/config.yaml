@@ -78,7 +78,9 @@ image-storage:
       key: {{ .Values.s3.key | quote }}
       secret: {{ .Values.s3.secret | quote }}
     use_path_style_endpoint: true
-redis: redis://{{ include "common.names.fullname" .Subcharts.redis }}-master:{{ .Values.redis.master.service.ports.redis }}
+{{- if .Values.valkey.enabled }}
+redis: redis://{{ include "valkey.fullname" .Subcharts.valkey }}{{ if eq .Values.valkey.architecture "replication" }}-master{{ end }}:{{ .Values.valkey.service.port }}
+{{- end }}
 telegram:
   access-token: {{ .Values.telegram.accessToken | quote }}
   webhook: {{ (printf "https://www.autowp.ru/telegram/webhook/token/%s" .Values.telegram.webhookToken) | quote }}

@@ -1,0 +1,8 @@
+misconfigurations:
+  - id: AVD-KSV-01010
+    paths:
+      - charts/valkey/templates/configmap.yaml
+    statement: >-
+      False positive: the check matches "key" in the ConfigMap data key
+      "valkey.conf". This configuration contains no credentials; authentication
+      is disabled and the upstream chart injects passwords separately when enabled.

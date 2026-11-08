@@ -46,12 +46,12 @@ metadata:
     ignore-check.kube-linter.io/no-read-only-root-fs: "nginx required temporary files for buffering"
 spec:
   selector:
-    matchLabels: {{ include "common.labels.matchLabels" . | nindent 6 }}
+    matchLabels: {{ include "cloudpirates.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: static
   replicas: 1
   template:
     metadata:
-      labels: {{- include "common.labels.standard" . | nindent 8 }}
+      labels: {{- include "cloudpirates.labels" . | nindent 8 }}
         app.kubernetes.io/component: static
     spec:
       {{- include "autowp.imagePullSecrets" . | nindent 6 }}

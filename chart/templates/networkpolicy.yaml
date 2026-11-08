@@ -15,10 +15,10 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ printf "%s-netpol" (include "autowp.goautowp.serve.fullname" .) | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  labels: {{- include "cloudpirates.labels" . | nindent 4 }}
 spec:
   podSelector:
-    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+    matchLabels: {{- include "cloudpirates.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: goautowp-serve
   policyTypes:
     - Ingress
@@ -63,10 +63,10 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ printf "%s-netpol" (include "autowp.static.fullname" .) | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  labels: {{- include "cloudpirates.labels" . | nindent 4 }}
 spec:
   podSelector:
-    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+    matchLabels: {{- include "cloudpirates.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: static
   policyTypes:
     - Ingress
