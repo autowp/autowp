@@ -21,7 +21,7 @@ func createTemporaryWhitelistService(t *testing.T) *Whitelist {
 	t.Cleanup(func() { require.NoError(t, db.Close()) })
 
 	_, err = db.ExecContext(t.Context(), `CREATE TEMP TABLE ip_whitelist (
-		ip inet PRIMARY KEY, description text NOT NULL
+		ip inet PRIMARY KEY, description text NOT NULL, source_id text
 	)`)
 	require.NoError(t, err)
 
