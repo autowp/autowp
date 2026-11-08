@@ -184,10 +184,6 @@ func (s *Server) CreateTrafficWhitelistItem(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if err = s.traffic.Monitoring.ClearIP(ctx, ip); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
 	return &emptypb.Empty{}, nil
 }
 
@@ -214,6 +210,7 @@ func (s *Server) GetTrafficWhitelistItems(
 		result[idx] = &pb.TrafficWhitelistItem{
 			IpAddress:   i.IP.String(),
 			Description: i.Description,
+			SourceId:    i.SourceID,
 		}
 	}
 

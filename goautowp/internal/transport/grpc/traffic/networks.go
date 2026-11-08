@@ -2,7 +2,6 @@ package traffic
 
 import (
 	"context"
-	"errors"
 	"net/netip"
 
 	"github.com/autowp/goautowp/api/pb"
@@ -13,7 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *Server) GetTrafficNetworks(ctx context.Context, _ *emptypb.Empty) (*pb.TrafficNetworksResponse, error) {
@@ -26,27 +24,25 @@ func (s *Server) GetTrafficNetworks(ctx context.Context, _ *emptypb.Empty) (*pb.
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	rows, err := s.traffic.Monitoring.ListOfTopNetworks(ctx, trafficTopLimit)
+	rows, err := s.traffic.NetworksTraffic(ctx, trafficTopLimit)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	result := &pb.TrafficNetworksResponse{Items: make([]*pb.TrafficNetworkItem, 0, len(rows))}
 	for _, row := range rows {
-		prefix, err := netip.ParsePrefix(row.Network)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
+		item := &pb.TrafficNetworkItem{
+			Network:   row.Network,
+			Count:     row.Count,
+			Addresses: row.Addresses,
+			Bans:      rangeBansToProto(row.Bans),
 		}
+		for _, blocked := range item.GetBans() {
+			if blocked.GetNetwork() == row.Network {
+				item.Ban = blocked.GetBan()
 
-		item := &pb.TrafficNetworkItem{Network: row.Network, Count: row.Count, Addresses: row.Addresses}
-
-		blocked, err := s.traffic.Ban.NetworkBan(ctx, prefix)
-		if err != nil && !errors.Is(err, ban.ErrBanItemNotFound) {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		if blocked != nil {
-			item.Ban = &pb.BanItem{Until: timestamppb.New(blocked.Until), Reason: blocked.Reason}
+				break
+			}
 		}
 
 		result.Items = append(result.Items, item)

@@ -17448,6 +17448,62 @@ Getriebe wird nicht berücksichtigt</target>
           <context context-type="linenumber">40,41</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="8047376263842593535" datatype="html">
+        <source>Known sources</source>
+        <target>Bekannte Quellen</target>
+      </trans-unit>
+      <trans-unit id="4004949605722853827" datatype="html">
+        <source>Add source</source>
+        <target>Quelle hinzufügen</target>
+      </trans-unit>
+      <trans-unit id="775806563382546902" datatype="html">
+        <source>Includes whitelisted traffic. Recognizing a source does not whitelist it.</source>
+        <target>Enthält Datenverkehr der Positivliste. Die Erkennung einer Quelle fügt sie nicht zur Positivliste hinzu.</target>
+      </trans-unit>
+      <trans-unit id="24145207733708815" datatype="html">
+        <source>Whitelisted IP addresses</source>
+        <target>IP-Adressen auf der Positivliste</target>
+      </trans-unit>
+      <trans-unit id="2470622418239063097" datatype="html">
+        <source>Confirm deletion</source>
+        <target>Löschen bestätigen</target>
+      </trans-unit>
+      <trans-unit id="7028698585678408228" datatype="html">
+        <source>Identification rules</source>
+        <target>Erkennungsregeln</target>
+      </trans-unit>
+      <trans-unit id="8755766079611605342" datatype="html">
+        <source>Verified reverse/forward DNS</source>
+        <target>Geprüfte Vorwärts- und Rückwärts-DNS-Auflösung</target>
+      </trans-unit>
+      <trans-unit id="4164796296331721280" datatype="html">
+        <source>Identifier</source>
+        <target>Kennung</target>
+      </trans-unit>
+      <trans-unit id="4675495070249778257" datatype="html">
+        <source>Use a lowercase letter followed by lowercase letters, digits, underscores or hyphens.</source>
+        <target>Mit einem Kleinbuchstaben beginnen; danach sind Kleinbuchstaben, Ziffern, Unterstriche und Bindestriche erlaubt.</target>
+      </trans-unit>
+      <trans-unit id="3833692663709091545" datatype="html">
+        <source>Name is required</source>
+        <target>Name ist erforderlich</target>
+      </trans-unit>
+      <trans-unit id="1428677868761963320" datatype="html">
+        <source>CIDR networks, one per line</source>
+        <target>CIDR-Netze, eines pro Zeile</target>
+      </trans-unit>
+      <trans-unit id="2701866917050399735" datatype="html">
+        <source>DNS suffixes, one per line</source>
+        <target>DNS-Suffixe, eines pro Zeile</target>
+      </trans-unit>
+      <trans-unit id="4587627750254658276" datatype="html">
+        <source>Reference URLs, one per line</source>
+        <target>Referenz-URLs, eine pro Zeile</target>
+      </trans-unit>
+      <trans-unit id="1811241816632872809" datatype="html">
+        <source>Ban for 24 hours</source>
+        <target>Für 24 Stunden sperren</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

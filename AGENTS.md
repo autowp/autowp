@@ -203,6 +203,13 @@ picture-item and distance dependencies. All extractor tests have left the applic
   Shared timezone discovery used by validation and the common API lives in `internal/timezones/`.
 - **`internal/traffic/`** — traffic repository, crawler whitelist, monitoring consumer, and
   buffered request recorder. The container supplies the recorder's service lifecycle context.
+  The recorder includes whitelisted traffic; quota queries exclude it. `traffic_source` stores
+  editable observation groups (CIDRs, DNS suffixes, reference URLs), and `ip_source` stores
+  individually verified DNS identities independently of whitelist exemptions. Migration 57 seeds
+  known operators and imports existing verified whitelist identities. Source statistics aggregate
+  minutes per IP before classification, prefer verified identities then the longest matching CIDR,
+  and count each IP once. Source configuration never grants exemptions or creates group bans;
+  automatic whitelist DNS domains remain explicitly approved in code.
 - **`internal/messaging/`** — personal-message persistence, dialog counts, WebSocket hub, and
   Redis event publication. Application workers own subscriptions and transport wiring.
 - **`internal/usercontacts/`** — external-profile platform registry and handle parsing,

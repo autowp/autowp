@@ -17,9 +17,12 @@
 </div>
 
 <div class="nav nav-pills">
-  <a class="nav-link me-1" routerLink="/moder/traffic" i18n>Traffic</a>
+  <a class="nav-link me-1" routerLink="/moder/traffic"><ng-container i18n>IP addresses</ng-container></a>
   <a class="nav-link me-1" routerLink="/moder/traffic" [queryParams]="{view: 'networks'}"
     ><ng-container i18n>Networks</ng-container></a
+  >
+  <a class="nav-link me-1" routerLink="/moder/traffic" [queryParams]="{view: 'sources'}"
+    ><ng-container i18n>Known sources</ng-container></a
   >
   <a class="nav-link active" routerLink="/moder/traffic/whitelist" i18n>Whitelist</a>
 </div>
@@ -44,7 +47,15 @@
       @for (item of data.items || []; track item.ipAddress) {
         <tr>
           <td>{{ item.ipAddress }}</td>
-          <td>{{ item.description }}</td>
+          <td>
+            @if (item.sourceId) {
+              <a routerLink="/moder/traffic" [queryParams]="{view: 'sources', source: item.sourceId}">{{
+                item.description
+              }}</a>
+            } @else {
+              {{ item.description }}
+            }
+          </td>
           <td>
             <a i18n [href]="'http://nic.ru/whois/?query=' + item.ipAddress">whois</a>
           </td>

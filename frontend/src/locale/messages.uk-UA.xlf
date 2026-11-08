@@ -17083,6 +17083,62 @@ Use the same button or email address to report material that infringes a tradema
           <context context-type="linenumber">40,41</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="8047376263842593535" datatype="html">
+        <source>Known sources</source>
+        <target>Відомі джерела</target>
+      </trans-unit>
+      <trans-unit id="4004949605722853827" datatype="html">
+        <source>Add source</source>
+        <target>Додати джерело</target>
+      </trans-unit>
+      <trans-unit id="775806563382546902" datatype="html">
+        <source>Includes whitelisted traffic. Recognizing a source does not whitelist it.</source>
+        <target>Включає трафік білого списку. Розпізнавання джерела не додає його до білого списку.</target>
+      </trans-unit>
+      <trans-unit id="24145207733708815" datatype="html">
+        <source>Whitelisted IP addresses</source>
+        <target>IP-адреси в білому списку</target>
+      </trans-unit>
+      <trans-unit id="2470622418239063097" datatype="html">
+        <source>Confirm deletion</source>
+        <target>Підтвердити видалення</target>
+      </trans-unit>
+      <trans-unit id="7028698585678408228" datatype="html">
+        <source>Identification rules</source>
+        <target>Правила розпізнавання</target>
+      </trans-unit>
+      <trans-unit id="8755766079611605342" datatype="html">
+        <source>Verified reverse/forward DNS</source>
+        <target>Перевірений прямий і зворотний DNS</target>
+      </trans-unit>
+      <trans-unit id="4164796296331721280" datatype="html">
+        <source>Identifier</source>
+        <target>Ідентифікатор</target>
+      </trans-unit>
+      <trans-unit id="4675495070249778257" datatype="html">
+        <source>Use a lowercase letter followed by lowercase letters, digits, underscores or hyphens.</source>
+        <target>Почніть з малої латинської літери; далі дозволені малі латинські літери, цифри, підкреслення та дефіси.</target>
+      </trans-unit>
+      <trans-unit id="3833692663709091545" datatype="html">
+        <source>Name is required</source>
+        <target>Укажіть назву</target>
+      </trans-unit>
+      <trans-unit id="1428677868761963320" datatype="html">
+        <source>CIDR networks, one per line</source>
+        <target>Мережі CIDR, по одній у рядку</target>
+      </trans-unit>
+      <trans-unit id="2701866917050399735" datatype="html">
+        <source>DNS suffixes, one per line</source>
+        <target>Суфікси DNS, по одному в рядку</target>
+      </trans-unit>
+      <trans-unit id="4587627750254658276" datatype="html">
+        <source>Reference URLs, one per line</source>
+        <target>Посилання на джерела, по одному в рядку</target>
+      </trans-unit>
+      <trans-unit id="1811241816632872809" datatype="html">
+        <source>Ban for 24 hours</source>
+        <target>Заблокувати на 24 години</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

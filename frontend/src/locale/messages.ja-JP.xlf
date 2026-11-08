@@ -17448,6 +17448,62 @@ Transmission is not considered</source>
           <context context-type="linenumber">40,41</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="8047376263842593535" datatype="html">
+        <source>Known sources</source>
+        <target>既知のアクセス元</target>
+      </trans-unit>
+      <trans-unit id="4004949605722853827" datatype="html">
+        <source>Add source</source>
+        <target>アクセス元を追加</target>
+      </trans-unit>
+      <trans-unit id="775806563382546902" datatype="html">
+        <source>Includes whitelisted traffic. Recognizing a source does not whitelist it.</source>
+        <target>許可リストのトラフィックを含みます。アクセス元の識別だけでは許可リストに追加されません。</target>
+      </trans-unit>
+      <trans-unit id="24145207733708815" datatype="html">
+        <source>Whitelisted IP addresses</source>
+        <target>許可リストの IP アドレス</target>
+      </trans-unit>
+      <trans-unit id="2470622418239063097" datatype="html">
+        <source>Confirm deletion</source>
+        <target>削除を確定</target>
+      </trans-unit>
+      <trans-unit id="7028698585678408228" datatype="html">
+        <source>Identification rules</source>
+        <target>識別ルール</target>
+      </trans-unit>
+      <trans-unit id="8755766079611605342" datatype="html">
+        <source>Verified reverse/forward DNS</source>
+        <target>検証済みの正引き・逆引き DNS</target>
+      </trans-unit>
+      <trans-unit id="4164796296331721280" datatype="html">
+        <source>Identifier</source>
+        <target>識別子</target>
+      </trans-unit>
+      <trans-unit id="4675495070249778257" datatype="html">
+        <source>Use a lowercase letter followed by lowercase letters, digits, underscores or hyphens.</source>
+        <target>小文字の英字で始め、以降は小文字の英字、数字、アンダースコア、ハイフンを使用してください。</target>
+      </trans-unit>
+      <trans-unit id="3833692663709091545" datatype="html">
+        <source>Name is required</source>
+        <target>名前は必須です</target>
+      </trans-unit>
+      <trans-unit id="1428677868761963320" datatype="html">
+        <source>CIDR networks, one per line</source>
+        <target>CIDR ネットワーク（1 行に 1 件）</target>
+      </trans-unit>
+      <trans-unit id="2701866917050399735" datatype="html">
+        <source>DNS suffixes, one per line</source>
+        <target>DNS サフィックス（1 行に 1 件）</target>
+      </trans-unit>
+      <trans-unit id="4587627750254658276" datatype="html">
+        <source>Reference URLs, one per line</source>
+        <target>参照 URL（1 行に 1 件）</target>
+      </trans-unit>
+      <trans-unit id="1811241816632872809" datatype="html">
+        <source>Ban for 24 hours</source>
+        <target>24 時間ブロック</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

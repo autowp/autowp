@@ -14,7 +14,7 @@
 </div>
 
 <div class="nav nav-pills">
-  <a class="nav-link me-1" routerLink="/moder/traffic" [class.active]="!networkView()">
+  <a class="nav-link me-1" routerLink="/moder/traffic" [class.active]="!networkView() && !sourceView()">
     <ng-container i18n>IP addresses</ng-container>
   </a>
   <a
@@ -25,11 +25,91 @@
   >
     <ng-container i18n>Networks</ng-container>
   </a>
-  <a class="nav-link" routerLink="/moder/traffic/whitelist">Whitelist</a>
+  <a class="nav-link me-1" routerLink="/moder/traffic" [class.active]="sourceView()" [queryParams]="{view: 'sources'}">
+    <ng-container i18n>Known sources</ng-container>
+  </a>
+  <a class="nav-link" routerLink="/moder/traffic/whitelist"><ng-container i18n>Whitelist</ng-container></a>
 </div>
 
 <p class="text-muted mt-3"><ng-container i18n>Top 50 by requests today</ng-container></p>
-@if (networkView() && !selectedNetwork()) {
+@if (sourceView() && (creatingSource() || editingSource())) {
+  <app-traffic-source-editor
+    [source]="editingSource()"
+    (saved)="sourceSaved()"
+    (cancelled)="creatingSource.set(false); editingSource.set(undefined)"
+  />
+}
+@if (sourceView() && !selectedSource()) {
+  <button type="button" class="btn btn-primary mb-3" (click)="editingSource.set(undefined); creatingSource.set(true)">
+    <ng-container i18n>Add source</ng-container>
+  </button>
+  <p class="text-muted">
+    <ng-container i18n>Includes whitelisted traffic. Recognizing a source does not whitelist it.</ng-container>
+  </p>
+  <app-resource-status [resource]="sourcesResource" />
+  @if (sourcesResource.value(); as sources) {
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col"><ng-container i18n>Source</ng-container></th>
+          <th scope="col"><ng-container i18n>Requests</ng-container></th>
+          <th scope="col"><ng-container i18n>IP addresses</ng-container></th>
+          <th scope="col"><ng-container i18n>Whitelisted IP addresses</ng-container></th>
+          <th scope="col"><ng-container i18n>Ban</ng-container></th>
+          <th scope="col"><ng-container i18n>Action</ng-container></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of sources; track item.id) {
+          <tr>
+            <td>
+              <a routerLink="/moder/traffic" [queryParams]="{view: 'sources', source: item.id}">{{ item.name }}</a>
+            </td>
+            <td>{{ item.count }}</td>
+            <td>{{ item.addresses }}</td>
+            <td>{{ item.whitelistedAddresses }}</td>
+            <td>
+              @for (blocked of item.bans; track blocked.network) {
+                <div class="mb-2">
+                  <code>{{ blocked.network }}</code>
+                  @if (blocked.ban; as ban) {
+                    @if (ban.until; as until) {
+                      <div><ng-container i18n>until</ng-container>&ngsp;{{ until.toDate() | date: 'medium' }}</div>
+                    }
+                    <div>{{ ban.reason }}</div>
+                  }
+                </div>
+              }
+            </td>
+            <td>
+              <div class="d-flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  (click)="creatingSource.set(false); editingSource.set(item)"
+                >
+                  <ng-container i18n>Edit</ng-container>
+                </button>
+                @if (deletingSource() === item.id) {
+                  <button type="button" class="btn btn-sm btn-danger" (click)="deleteSource(item.id)">
+                    <ng-container i18n>Confirm deletion</ng-container>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-secondary" (click)="deletingSource.set('')">
+                    <ng-container i18n>Cancel</ng-container>
+                  </button>
+                } @else {
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="deletingSource.set(item.id)">
+                    <ng-container i18n>Delete</ng-container>
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+} @else if (networkView() && !selectedNetwork()) {
   <p class="text-muted"><ng-container i18n>IPv4 /24 and IPv6 /64 networks</ng-container></p>
   <app-resource-status [resource]="networksResource" [empty]="networksResource.value()?.length === 0" />
   @if (networksResource.value(); as networks) {
@@ -53,11 +133,34 @@
             <td>{{ item.count }}</td>
             <td>{{ item.addresses }}</td>
             <td>
-              @if (item.ban; as ban) {
-                @if (ban.until; as until) {
-                  <ng-container i18n>until</ng-container>&ngsp;{{ until.toDate() | date: 'medium' }}
-                }
-                <div>{{ ban.reason }}</div>
+              @for (blocked of item.bans; track blocked.network) {
+                <div class="mb-2">
+                  <code>{{ blocked.network }}</code>
+                  @if (blocked.ban; as ban) {
+                    @if (ban.until; as until) {
+                      <div><ng-container i18n>until</ng-container>&ngsp;{{ until.toDate() | date: 'medium' }}</div>
+                    }
+                    <div>{{ ban.reason }}</div>
+                  }
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-secondary"
+                    [disabled]="!!networkMutation()"
+                    (click)="unbanRange(blocked.network)"
+                  >
+                    <ng-container i18n>unban</ng-container>
+                  </button>
+                </div>
+              }
+              @if (!item.ban) {
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger"
+                  [disabled]="!!networkMutation()"
+                  (click)="banNetwork(item.network)"
+                >
+                  <ng-container i18n>Ban for 24 hours</ng-container>
+                </button>
               }
             </td>
           </tr>
@@ -66,6 +169,47 @@
     </table>
   }
 } @else {
+  @if (selectedSource()) {
+    <app-resource-status [resource]="sourcesResource" />
+    @if (source(); as source) {
+      <h2>{{ source.name }}</h2>
+      @for (blocked of source.bans; track blocked.network) {
+        <div class="alert alert-warning">
+          <code>{{ blocked.network }}</code>
+          @if (blocked.ban; as ban) {
+            @if (ban.until; as until) {
+              <div><ng-container i18n>until</ng-container>&ngsp;{{ until.toDate() | date: 'medium' }}</div>
+            }
+            <div>{{ ban.reason }}</div>
+          }
+        </div>
+      }
+      <p>
+        <ng-container i18n>Requests</ng-container>: {{ source.count }} · <ng-container i18n>IP addresses</ng-container>:
+        {{ source.addresses }}
+      </p>
+      <details class="mb-3">
+        <summary><ng-container i18n>Identification rules</ng-container></summary>
+        <ul>
+          @for (network of source.networks; track network) {
+            <li>
+              <code>{{ network }}</code>
+            </li>
+          }
+          @for (suffix of source.dnsSuffixes; track suffix) {
+            <li>
+              <code>*.{{ suffix }}</code> — <ng-container i18n>Verified reverse/forward DNS</ng-container>
+            </li>
+          }
+          @for (reference of source.references; track reference) {
+            <li>
+              <a target="_blank" rel="noopener" [href]="reference">{{ reference }}</a>
+            </li>
+          }
+        </ul>
+      </details>
+    }
+  }
   @if (selectedNetwork(); as network) {
     <h2>{{ network }}</h2>
   }

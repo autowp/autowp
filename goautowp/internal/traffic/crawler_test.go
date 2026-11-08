@@ -137,3 +137,36 @@ func TestCrawlerDNSFailurePreservesCallerDeadline(t *testing.T) {
 	require.ErrorIs(t, err, context.DeadlineExceeded)
 	require.False(t, valid)
 }
+
+func TestSourceRecognitionDoesNotGrantExemptions(t *testing.T) {
+	t.Parallel()
+
+	ip := net.ParseIP("192.0.2.1")
+	resolver := &fakeCrawlerResolver{hosts: []string{"bot.attacker.example."}, addresses: []net.IPAddr{{IP: ip}}}
+	matched, id, err := matchSource(
+		t.Context(),
+		resolver,
+		ip,
+		[]Source{{ID: "bingbot", DNSSuffixes: []string{"attacker.example"}}},
+	)
+	require.NoError(t, err)
+	require.True(t, matched)
+	require.Equal(t, "bingbot", id)
+	whitelisted, _, err := matchCrawler(t.Context(), resolver, ip)
+	require.NoError(t, err)
+	require.False(t, whitelisted)
+}
+
+func TestSourceRecognitionPrefersSpecificDomain(t *testing.T) {
+	t.Parallel()
+
+	ip := net.ParseIP("192.0.2.1")
+	resolver := &fakeCrawlerResolver{hosts: []string{"crawl.bot.example.com."}, addresses: []net.IPAddr{{IP: ip}}}
+	matched, id, err := matchSource(t.Context(), resolver, ip, []Source{
+		{ID: "specific", DNSSuffixes: []string{"bot.example.com"}},
+		{ID: "broad", DNSSuffixes: []string{"example.com"}},
+	})
+	require.NoError(t, err)
+	require.True(t, matched)
+	require.Equal(t, "specific", id)
+}

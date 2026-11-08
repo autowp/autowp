@@ -1,0 +1,47 @@
+<form class="card card-body my-3" (submit)="save($event)">
+  <div class="mb-3">
+    <label class="form-label" for="source-id"><ng-container i18n>Identifier</ng-container></label>
+    <input id="source-id" class="form-control" [formField]="fields.id" />
+    @if (fields.id().touched() && fields.id().invalid()) {
+      <p class="text-danger">
+        <ng-container i18n
+          >Use a lowercase letter followed by lowercase letters, digits, underscores or hyphens.</ng-container
+        >
+      </p>
+    }
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="source-name"><ng-container i18n>Name</ng-container></label>
+    <input id="source-name" class="form-control" [formField]="fields.name" />
+    @if (fields.name().touched() && fields.name().invalid()) {
+      <p class="text-danger"><ng-container i18n>Name is required</ng-container></p>
+    }
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="source-networks"
+      ><ng-container i18n>CIDR networks, one per line</ng-container></label
+    >
+    <textarea id="source-networks" class="form-control" rows="5" [formField]="fields.networks"></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="source-domains"><ng-container i18n>DNS suffixes, one per line</ng-container></label>
+    <textarea id="source-domains" class="form-control" rows="3" [formField]="fields.domains"></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="source-references"
+      ><ng-container i18n>Reference URLs, one per line</ng-container></label
+    >
+    <textarea id="source-references" class="form-control" rows="3" [formField]="fields.references"></textarea>
+  </div>
+  @if (failure()) {
+    <p class="alert alert-danger" role="alert">{{ failure() }}</p>
+  }
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" type="submit" [disabled]="fields().submitting()">
+      <ng-container i18n>Save</ng-container>
+    </button>
+    <button class="btn btn-secondary" type="button" [disabled]="fields().submitting()" (click)="cancelled.emit()">
+      <ng-container i18n>Cancel</ng-container>
+    </button>
+  </div>
+</form>

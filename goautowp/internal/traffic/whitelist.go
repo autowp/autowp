@@ -26,15 +26,17 @@ type Whitelist struct {
 type WhitelistItem struct {
 	IP          net.IP `db:"ip"          json:"ip"`
 	Description string `db:"description" json:"description"`
+	SourceID    string `db:"source_id"   json:"source_id"`
 }
 
 type whitelistItemRow struct {
 	IP          schema.NullInet `db:"ip"`
 	Description string          `db:"description"`
+	SourceID    string          `db:"source_id"`
 }
 
 func (row whitelistItemRow) item() *WhitelistItem {
-	item := &WhitelistItem{Description: row.Description}
+	item := &WhitelistItem{Description: row.Description, SourceID: row.SourceID}
 	if row.IP.IsValid() {
 		item.IP = net.IP(row.IP.Addr().AsSlice())
 	}
@@ -65,15 +67,32 @@ type crawlerResolver interface {
 // resolve the approved name back to that address before granting an exemption.
 const (
 	crawlerLookupTimeout = 3 * time.Second
-	crawlerYandex        = "yandex"
 )
 
+// Only these independently approved DNS domains grant automatic exemptions.
+// Editing the observational source registry cannot change whitelist policy.
+var trustedCrawlerSources = []Source{
+	{ID: "googlebot", DNSSuffixes: []string{"googlebot.com"}},
+	{ID: "google", DNSSuffixes: []string{"google.com"}},
+	{ID: "bingbot", DNSSuffixes: []string{"search.msn.com"}},
+	{ID: "yandex", DNSSuffixes: []string{"yandex.ru", "yandex.net", "yandex.com"}},
+}
+
 func matchCrawler(ctx context.Context, resolver crawlerResolver, ip net.IP) (bool, string, error) {
+	matched, id, err := matchSource(ctx, resolver, ip, trustedCrawlerSources)
+	if !matched {
+		return false, "", err
+	}
+
+	return true, id + " verified reverse/forward DNS", err
+}
+
+func matchSource(ctx context.Context, resolver crawlerResolver, ip net.IP, sources []Source) (bool, string, error) {
 	if err := ctx.Err(); err != nil {
 		return false, "", err
 	}
 
-	if ip == nil {
+	if ip == nil || len(sources) == 0 {
 		return false, "", nil
 	}
 
@@ -88,15 +107,14 @@ func matchCrawler(ctx context.Context, resolver crawlerResolver, ip net.IP) (boo
 	for _, host := range hosts {
 		host = strings.ToLower(strings.TrimSuffix(host, "."))
 		crawler := ""
+		longestSuffix := 0
 
-		for domain, name := range map[string]string{
-			"googlebot.com": "googlebot", "google.com": "google",
-			"search.msn.com": "bingbot", "yandex.ru": crawlerYandex, "yandex.net": crawlerYandex, "yandex.com": crawlerYandex,
-		} {
-			if strings.HasSuffix(host, "."+domain) {
-				crawler = name
-
-				break
+		for _, source := range sources {
+			for _, domain := range source.DNSSuffixes {
+				if len(domain) > longestSuffix && strings.HasSuffix(host, "."+domain) {
+					crawler = source.ID
+					longestSuffix = len(domain)
+				}
 			}
 		}
 
@@ -111,7 +129,7 @@ func matchCrawler(ctx context.Context, resolver crawlerResolver, ip net.IP) (boo
 
 		for _, address := range addresses {
 			if address.IP.Equal(ip) {
-				return true, crawler + " verified reverse/forward DNS", nil
+				return true, crawler, nil
 			}
 		}
 	}
@@ -140,23 +158,15 @@ func crawlerLookupError(ctx context.Context, ip net.IP, err error) error {
 
 // Add IP to whitelist.
 func (s *Whitelist) Add(ctx context.Context, ip net.IP, desc string) error {
-	_, err := s.db.Insert(schema.IPWhitelistTable).Rows(goqu.Record{
-		schema.IPWhitelistTableIPColName:          ip.String(),
-		schema.IPWhitelistTableDescriptionColName: desc,
-	}).OnConflict(goqu.DoUpdate(schema.IPWhitelistTableIPColName, goqu.Record{
-		schema.IPWhitelistTableDescriptionColName: schema.Excluded(
-			schema.IPWhitelistTableDescriptionColName,
-		),
-	})).Executor().ExecContext(ctx)
-
-	return err
+	return s.add(ctx, ip, desc, nil)
 }
 
 // Get whitelist item.
 func (s *Whitelist) Get(ctx context.Context, ip net.IP) (*WhitelistItem, error) {
 	var row whitelistItemRow
 
-	success, err := s.db.Select(schema.IPWhitelistTableIPCol, schema.IPWhitelistTableDescriptionCol).
+	success, err := s.db.Select(schema.IPWhitelistTableIPCol, schema.IPWhitelistTableDescriptionCol,
+		goqu.COALESCE(schema.IPWhitelistTableSourceIDCol, "").As("source_id")).
 		From(schema.IPWhitelistTable).
 		Where(schema.IPWhitelistTableIPCol.Eq(ip.String())).
 		Executor().
@@ -177,7 +187,8 @@ func (s *Whitelist) List(ctx context.Context, page int32) ([]*WhitelistItem, *ut
 	var rows []whitelistItemRow
 
 	paginator := util.Paginator{
-		SQLSelect: s.db.Select(schema.IPWhitelistTableIPCol, schema.IPWhitelistTableDescriptionCol).
+		SQLSelect: s.db.Select(schema.IPWhitelistTableIPCol, schema.IPWhitelistTableDescriptionCol,
+			goqu.COALESCE(schema.IPWhitelistTableSourceIDCol, "").As("source_id")).
 			From(schema.IPWhitelistTable).
 			Order(schema.IPWhitelistTableIPCol.Asc()),
 		CurrentPageNumber: page,
@@ -237,18 +248,57 @@ func (s *Whitelist) Remove(ctx context.Context, ip net.IP) error {
 	return err
 }
 
-// IPSet provides a snapshot for request monitoring without a database lookup per request.
-func (s *Whitelist) IPSet(ctx context.Context) (map[string]struct{}, error) {
-	var addresses []string
-	if err := s.db.Select(goqu.Func("HOST", schema.IPWhitelistTableIPCol)).
-		From(schema.IPWhitelistTable).ScanValsContext(ctx, &addresses); err != nil {
-		return nil, err
+func (s *Whitelist) addVerified(ctx context.Context, ip net.IP, description string) error {
+	for _, source := range trustedCrawlerSources {
+		if description != source.ID+" verified reverse/forward DNS" {
+			continue
+		}
+
+		known, err := s.recordSource(ctx, ip, source.ID)
+		if err != nil {
+			return err
+		}
+
+		if known {
+			return s.add(ctx, ip, description, source.ID)
+		}
 	}
 
-	result := make(map[string]struct{}, len(addresses))
-	for _, address := range addresses {
-		result[net.ParseIP(address).String()] = struct{}{}
+	return s.Add(ctx, ip, description)
+}
+
+func (s *Whitelist) recordSource(ctx context.Context, ip net.IP, sourceID string) (bool, error) {
+	result, err := s.db.Insert(schema.IPSourceTable).
+		Cols(schema.IPSourceTableIPColName, schema.IPSourceTableSourceIDColName).
+		FromQuery(s.db.From(schema.TrafficSourceTable).Select(goqu.V(ip.String()), schema.TrafficSourceTableIDCol).
+			Where(schema.TrafficSourceTableIDCol.Eq(sourceID))).
+		OnConflict(goqu.DoUpdate(schema.IPSourceTableIPColName,
+			goqu.Record{
+				schema.IPSourceTableSourceIDColName: schema.Excluded(schema.IPSourceTableSourceIDColName),
+			}),
+		).
+		Executor().
+		ExecContext(ctx)
+	if err != nil {
+		return false, err
 	}
 
-	return result, nil
+	rows, err := result.RowsAffected()
+
+	return rows > 0, err
+}
+
+func (s *Whitelist) add(ctx context.Context, ip net.IP, desc string, sourceID interface{}) error {
+	_, err := s.db.Insert(schema.IPWhitelistTable).Rows(goqu.Record{
+		schema.IPWhitelistTableIPColName:          ip.String(),
+		schema.IPWhitelistTableDescriptionColName: desc,
+		schema.IPWhitelistTableSourceIDColName:    sourceID,
+	}).OnConflict(goqu.DoUpdate(schema.IPWhitelistTableIPColName, goqu.Record{
+		schema.IPWhitelistTableDescriptionColName: schema.Excluded(
+			schema.IPWhitelistTableDescriptionColName,
+		),
+		schema.IPWhitelistTableSourceIDColName: schema.Excluded(schema.IPWhitelistTableSourceIDColName),
+	})).Executor().ExecContext(ctx)
+
+	return err
 }

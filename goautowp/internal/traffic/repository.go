@@ -175,7 +175,12 @@ func (s *Repository) AutoBan(ctx context.Context) error {
 }
 
 func (s *Repository) AutoWhitelist(ctx context.Context) error {
-	items, err := s.Monitoring.ListOfTop(ctx, autowhitelistLimit)
+	sources, err := s.Monitoring.Sources(ctx)
+	if err != nil {
+		return err
+	}
+
+	items, err := s.Monitoring.listOfTop(ctx, autowhitelistLimit, true)
 	if err != nil {
 		return err
 	}
@@ -185,6 +190,17 @@ func (s *Repository) AutoWhitelist(ctx context.Context) error {
 
 		if err = s.AutoWhitelistIP(ctx, item.IP); err != nil {
 			return err
+		}
+
+		matched, sourceID, err := matchSource(ctx, net.DefaultResolver, item.IP, sources)
+		if err != nil {
+			return err
+		}
+
+		if matched {
+			if _, err := s.Whitelist.recordSource(ctx, item.IP, sourceID); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -204,7 +220,7 @@ func (s *Repository) AutoWhitelistIP(ctx context.Context, ip net.IP) error {
 			return err
 		}
 
-		return s.Monitoring.ClearIP(ctx, ip)
+		return nil
 	}
 
 	match, desc, err := matchCrawler(ctx, net.DefaultResolver, ip)
@@ -216,15 +232,11 @@ func (s *Repository) AutoWhitelistIP(ctx context.Context, ip net.IP) error {
 		return nil
 	}
 
-	if err = s.Whitelist.Add(ctx, ip, desc); err != nil {
+	if err = s.Whitelist.addVerified(ctx, ip, desc); err != nil {
 		return err
 	}
 
 	if err = s.Ban.Remove(ctx, ip); err != nil {
-		return err
-	}
-
-	if err = s.Monitoring.ClearIP(ctx, ip); err != nil {
 		return err
 	}
 

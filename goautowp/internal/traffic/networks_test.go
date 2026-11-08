@@ -3,6 +3,8 @@ package traffic
 import (
 	"net"
 	"net/netip"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -22,6 +24,13 @@ func temporaryNetworkTraffic(t *testing.T) (*Repository, *goqu.Database) {
  PRIMARY KEY (ip,day_date,hour,tenminute,minute));
  CREATE TEMP TABLE ip_whitelist (ip inet PRIMARY KEY, description text NOT NULL);
  CREATE TEMP TABLE ip_ban (ip inet PRIMARY KEY, until timestamptz NOT NULL, by_user_id bigint, reason text NOT NULL);`)
+	require.NoError(t, err)
+	migration, err := os.ReadFile("../../migrations/57_traffic-source.up.sql")
+	require.NoError(t, err)
+	_, err = sqlDB.ExecContext(
+		t.Context(),
+		strings.ReplaceAll(string(migration), "CREATE TABLE ", "CREATE TEMP TABLE "),
+	)
 	require.NoError(t, err)
 	bans, err := ban.NewRepository(db)
 	require.NoError(t, err)

@@ -3,6 +3,8 @@ package traffic
 import (
 	"context"
 	"database/sql"
+	"os"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -28,8 +30,8 @@ func newTrafficTopTestServer(t *testing.T) (*Server, *sql.DB, *queryLogger) {
 	db, pool, logger := newTestDB(t)
 	_, err := pool.ExecContext(t.Context(), `
   CREATE TEMP TABLE ip_monitoring (ip inet, count integer, day_date date);
-  CREATE TEMP TABLE ip_ban (ip inet, until timestamptz, reason text, by_user_id bigint);
-  CREATE TEMP TABLE ip_whitelist (ip inet);
+  CREATE TEMP TABLE ip_ban (ip inet PRIMARY KEY, until timestamptz, reason text, by_user_id bigint);
+  CREATE TEMP TABLE ip_whitelist (ip inet PRIMARY KEY, description text NOT NULL DEFAULT '');
   CREATE TEMP TABLE users (
    id bigint, name text, deleted boolean DEFAULT false, identity text, last_online timestamptz,
    green boolean DEFAULT false, specs_weight double precision DEFAULT 1, img integer, e_mail text,
@@ -49,8 +51,13 @@ func newTrafficTopTestServer(t *testing.T) (*Server, *sql.DB, *queryLogger) {
    ('192.0.2.3', NOW() - interval '1 day', 'Expired', 7),
    ('192.0.2.4', NOW() + interval '1 day', 'Automatic', NULL),
    ('2001:db8::1', NOW() + interval '1 day', 'Deleted author', 8);
-  INSERT INTO ip_whitelist VALUES ('192.0.2.2'), ('2001:db8::1');
+  INSERT INTO ip_whitelist (ip) VALUES ('192.0.2.2'), ('2001:db8::1');
  `)
+	require.NoError(t, err)
+
+	migration, err := os.ReadFile("../../../../migrations/57_traffic-source.up.sql")
+	require.NoError(t, err)
+	_, err = pool.ExecContext(t.Context(), strings.ReplaceAll(string(migration), "CREATE TABLE ", "CREATE TEMP TABLE "))
 	require.NoError(t, err)
 
 	bans, err := ban.NewRepository(db)

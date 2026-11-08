@@ -49,9 +49,10 @@ var NetworkAutobanProfiles = []AutobanProfile{
 }
 
 type NetworkTraffic struct {
-	Network   string `db:"network"`
-	Count     int64  `db:"count"`
-	Addresses int64  `db:"addresses"`
+	Network   string         `db:"network"`
+	Count     int64          `db:"count"`
+	Addresses int64          `db:"addresses"`
+	Bans      []ban.RangeBan `db:"-"`
 }
 
 func networkExpression() exp.LiteralExpression {

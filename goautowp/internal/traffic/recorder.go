@@ -10,19 +10,14 @@ import (
 )
 
 const (
-	recorderMaxBuckets               = 10000
-	recorderBatchSize                = 500
-	recorderFlushInterval            = 5 * time.Second
-	recorderWhitelistRefreshInterval = time.Minute
-	recorderDatabaseTimeout          = 5 * time.Second
+	recorderMaxBuckets      = 10000
+	recorderBatchSize       = 500
+	recorderFlushInterval   = 5 * time.Second
+	recorderDatabaseTimeout = 5 * time.Second
 )
 
 type countWriter interface {
 	AddCounts(ctx context.Context, counts []MonitoringCount) error
-}
-
-type whitelistReader interface {
-	IPSet(ctx context.Context) (map[string]struct{}, error)
 }
 
 type minuteKey struct {
@@ -33,19 +28,15 @@ type minuteKey struct {
 // Recorder keeps request handling independent of database latency. Its memory is
 // bounded; overload and failed writes are reported instead of blocking visitors.
 type Recorder struct {
-	mutex       sync.Mutex
-	counts      map[minuteKey]int64
-	dropped     int64
-	writer      countWriter
-	whitelist   whitelistReader
-	whitelisted map[string]struct{}
+	mutex   sync.Mutex
+	counts  map[minuteKey]int64
+	dropped int64
+	writer  countWriter
 }
 
-func NewRecorder(ctx context.Context, writer countWriter, whitelist whitelistReader) *Recorder {
-	recorder := &Recorder{writer: writer, whitelist: whitelist, counts: make(map[minuteKey]int64)}
+func NewRecorder(ctx context.Context, writer countWriter) *Recorder {
+	recorder := &Recorder{writer: writer, counts: make(map[minuteKey]int64)}
 
-	recorder.refreshWhitelist(ctx)
-	go recorder.runWhitelistRefresh(ctx)
 	go recorder.run(ctx)
 
 	return recorder
@@ -61,10 +52,6 @@ func (r *Recorder) Record(ip net.IP) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	if _, exempt := r.whitelisted[address]; exempt {
-		return
-	}
-
 	key := minuteKey{ip: address, minute: time.Now().UTC().Truncate(time.Minute)}
 
 	if _, exists := r.counts[key]; !exists && len(r.counts) >= recorderMaxBuckets {
@@ -74,29 +61,6 @@ func (r *Recorder) Record(ip net.IP) {
 	}
 
 	r.counts[key]++
-}
-
-// Retain the last good snapshot on database errors.
-func (r *Recorder) refreshWhitelist(parent context.Context) {
-	ctx, cancel := context.WithTimeout(parent, recorderDatabaseTimeout)
-	defer cancel()
-
-	snapshot, err := r.whitelist.IPSet(ctx)
-	if err != nil {
-		logging.Errorf("traffic monitoring: whitelist refresh failed: %v", err)
-
-		return
-	}
-
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	r.whitelisted = snapshot
-	for key := range r.counts {
-		if _, exempt := snapshot[key.ip]; exempt {
-			delete(r.counts, key)
-		}
-	}
 }
 
 func (r *Recorder) flush(parent context.Context) {
@@ -145,20 +109,6 @@ func (r *Recorder) run(ctx context.Context) {
 		case <-ctx.Done():
 			r.flush(context.WithoutCancel(ctx))
 
-			return
-		}
-	}
-}
-
-func (r *Recorder) runWhitelistRefresh(ctx context.Context) {
-	ticker := time.NewTicker(recorderWhitelistRefreshInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ticker.C:
-			r.refreshWhitelist(ctx)
-		case <-ctx.Done():
 			return
 		}
 	}

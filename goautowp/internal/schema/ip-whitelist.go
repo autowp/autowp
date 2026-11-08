@@ -6,10 +6,12 @@ const (
 	IPWhitelistTableName               = "ip_whitelist"
 	IPWhitelistTableIPColName          = "ip"
 	IPWhitelistTableDescriptionColName = "description"
+	IPWhitelistTableSourceIDColName    = "source_id"
 )
 
 var (
 	IPWhitelistTable               = goqu.T(IPWhitelistTableName)
 	IPWhitelistTableIPCol          = IPWhitelistTable.Col(IPWhitelistTableIPColName)
 	IPWhitelistTableDescriptionCol = IPWhitelistTable.Col(IPWhitelistTableDescriptionColName)
+	IPWhitelistTableSourceIDCol    = IPWhitelistTable.Col(IPWhitelistTableSourceIDColName)
 )

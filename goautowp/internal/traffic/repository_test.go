@@ -58,7 +58,7 @@ func TestAutoWhitelist(t *testing.T) { //nolint:paralleltest
 
 	require.NoError(t, svc.Whitelist.Add(ctx, ip, "known crawler for cleanup test"))
 
-	err = svc.AutoWhitelist(ctx)
+	err = svc.AutoWhitelistIP(ctx, ip)
 	require.NoError(t, err)
 
 	exists, err = svc.Ban.Exists(ctx, ip)
@@ -67,7 +67,7 @@ func TestAutoWhitelist(t *testing.T) { //nolint:paralleltest
 
 	exists, err = svc.Monitoring.ExistsIP(ctx, ip)
 	require.NoError(t, err)
-	require.False(t, exists)
+	require.True(t, exists)
 
 	exists, err = svc.Whitelist.Exists(ctx, ip)
 	require.NoError(t, err)

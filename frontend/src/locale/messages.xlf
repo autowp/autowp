@@ -15707,6 +15707,108 @@ Transmission is not considered</source>
           <context context-type="linenumber">40,41</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="8047376263842593535" datatype="html">
+        <source>Known sources</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">29,31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/whitelist/moder-traffic-whitelist.html</context>
+          <context context-type="linenumber">25,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4004949605722853827" datatype="html">
+        <source>Add source</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">43,46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="775806563382546902" datatype="html">
+        <source>Includes whitelisted traffic. Recognizing a source does not whitelist it.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="24145207733708815" datatype="html">
+        <source>Whitelisted IP addresses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">56,57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2470622418239063097" datatype="html">
+        <source>Confirm deletion</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">78,80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7028698585678408228" datatype="html">
+        <source>Identification rules</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">134,136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8755766079611605342" datatype="html">
+        <source>Verified reverse/forward DNS</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">139,140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4164796296331721280" datatype="html">
+        <source>Identifier</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/source-editor.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4675495070249778257" datatype="html">
+        <source>Use a lowercase letter followed by lowercase letters, digits, underscores or hyphens.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/source-editor.html</context>
+          <context context-type="linenumber">8,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3833692663709091545" datatype="html">
+        <source>Name is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/source-editor.html</context>
+          <context context-type="linenumber">17,21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1428677868761963320" datatype="html">
+        <source>CIDR networks, one per line</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/source-editor.html</context>
+          <context context-type="linenumber">22,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2701866917050399735" datatype="html">
+        <source>DNS suffixes, one per line</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/source-editor.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4587627750254658276" datatype="html">
+        <source>Reference URLs, one per line</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/source-editor.html</context>
+          <context context-type="linenumber">32,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1811241816632872809" datatype="html">
+        <source>Ban for 24 hours</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moder/traffic/moder-traffic.html</context>
+          <context context-type="linenumber">162,165</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

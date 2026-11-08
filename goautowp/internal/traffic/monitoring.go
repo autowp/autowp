@@ -145,8 +145,8 @@ func (s *Monitoring) AddCounts(ctx context.Context, counts []MonitoringCount) er
 		return nil
 	}
 
-	// Filter against the current whitelist inside the INSERT, including batches queued
-	// before an address was whitelisted and messages from the legacy AMQP consumer.
+	// Record all traffic, including whitelisted crawlers. Exemptions are applied
+	// when selecting autoban candidates, not when collecting observations.
 	const fieldsPerCount = 3
 
 	rows := make([]string, 0, len(counts))
@@ -168,8 +168,7 @@ func (s *Monitoring) AddCounts(ctx context.Context, counts []MonitoringCount) er
 		goqu.L("FLOOR(EXTRACT(MINUTE FROM ?)/10)", seenAt),
 		goqu.L("EXTRACT(MINUTE FROM ?)", seenAt),
 		incoming.Col(schema.IPMonitoringTableCountColName),
-	).Where(goqu.L("NOT EXISTS ?", s.db.From(schema.IPWhitelistTable).
-		Select(goqu.V(1)).Where(schema.IPWhitelistTableIPCol.Eq(incoming.Col(schema.IPMonitoringTableIPColName)))))
+	)
 
 	_, err := s.db.Insert(schema.IPMonitoringTable).Cols(
 		schema.IPMonitoringTableIPColName,
@@ -222,37 +221,7 @@ func (s *Monitoring) ClearIP(ctx context.Context, ip net.IP) error {
 
 // ListOfTop ListOfTop.
 func (s *Monitoring) ListOfTop(ctx context.Context, limit uint) ([]ListOfTopItem, error) {
-	var rows []struct {
-		IP    schema.NullInet `db:"ip"`
-		Count int             `db:"c"`
-	}
-
-	err := s.db.Select(schema.IPMonitoringTableIPCol, goqu.SUM(schema.IPMonitoringTableCountCol).As("c")).
-		From(schema.IPMonitoringTable).
-		Where(schema.IPMonitoringTableDayDateCol.Eq(goqu.L("CURRENT_DATE"))).
-		GroupBy(schema.IPMonitoringTableIPCol).
-		Order(goqu.I("c").Desc()).
-		Limit(limit).
-		ScanStructsContext(ctx, &rows)
-	if err != nil {
-		return nil, err
-	}
-
-	result := make([]ListOfTopItem, 0, len(rows))
-
-	for _, row := range rows {
-		item := ListOfTopItem{
-			Count: row.Count,
-		}
-
-		if row.IP.IsValid() {
-			item.IP = net.IP(row.IP.Addr().AsSlice())
-		}
-
-		result = append(result, item)
-	}
-
-	return result, nil
+	return s.listOfTop(ctx, limit, false)
 }
 
 // ListByBanProfile ListByBanProfile.
@@ -306,4 +275,49 @@ func (s *Monitoring) ExistsIP(ctx context.Context, ip net.IP) (bool, error) {
 	}
 
 	return success && exists, nil
+}
+
+func (s *Monitoring) listOfTop(ctx context.Context, limit uint, excludeWhitelist bool) ([]ListOfTopItem, error) {
+	var rows []struct {
+		IP    schema.NullInet `db:"ip"`
+		Count int             `db:"c"`
+	}
+
+	dataset := s.db.Select(schema.IPMonitoringTableIPCol, goqu.SUM(schema.IPMonitoringTableCountCol).As("c")).
+		From(schema.IPMonitoringTable).
+		Where(schema.IPMonitoringTableDayDateCol.Eq(goqu.L("CURRENT_DATE"))).
+		GroupBy(schema.IPMonitoringTableIPCol).
+		Order(goqu.I("c").Desc()).
+		Limit(limit)
+	if excludeWhitelist {
+		dataset = dataset.Where(
+			goqu.L(
+				"NOT EXISTS ?",
+				s.db.From(schema.IPWhitelistTable).
+					Select(goqu.V(1)).
+					Where(schema.IPWhitelistTableIPCol.Eq(schema.IPMonitoringTableIPCol)),
+			),
+		)
+	}
+
+	err := dataset.ScanStructsContext(ctx, &rows)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]ListOfTopItem, 0, len(rows))
+
+	for _, row := range rows {
+		item := ListOfTopItem{
+			Count: row.Count,
+		}
+
+		if row.IP.IsValid() {
+			item.IP = net.IP(row.IP.Addr().AsSlice())
+		}
+
+		result = append(result, item)
+	}
+
+	return result, nil
 }

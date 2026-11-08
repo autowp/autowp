@@ -115,7 +115,7 @@ func TestMonitoringBatchCounts(t *testing.T) { //nolint:paralleltest // Shares t
 }
 
 //nolint:paralleltest // Shares monitoring tables.
-func TestMonitoringExcludesWhitelistedIP(t *testing.T) {
+func TestMonitoringObservesWhitelistedIPWithoutBanning(t *testing.T) {
 	svc := createTrafficService(t)
 	ctx := t.Context()
 	ip := net.ParseIP("2001:db8::231")
@@ -141,9 +141,9 @@ func TestMonitoringExcludesWhitelistedIP(t *testing.T) {
 	require.NoError(t, svc.AutoWhitelistIP(ctx, ip))
 	exists, err := svc.Monitoring.ExistsIP(ctx, ip)
 	require.NoError(t, err)
-	require.False(t, exists)
+	require.True(t, exists)
 
-	// A buffered batch or legacy AMQP event cannot recreate the cleared rows.
+	// Buffered batches and legacy AMQP events remain observable after whitelisting.
 	require.NoError(
 		t,
 		svc.Monitoring.AddCounts(ctx, []MonitoringCount{{IP: ip.String(), Timestamp: timestamp, Count: 30}}),
@@ -151,11 +151,7 @@ func TestMonitoringExcludesWhitelistedIP(t *testing.T) {
 	require.NoError(t, svc.Monitoring.Add(ctx, ip, timestamp))
 	exists, err = svc.Monitoring.ExistsIP(ctx, ip)
 	require.NoError(t, err)
-	require.False(t, exists)
-
-	snapshot, err := svc.Whitelist.IPSet(ctx)
-	require.NoError(t, err)
-	require.Contains(t, snapshot, ip.String())
+	require.True(t, exists)
 
 	require.NoError(t, svc.Whitelist.Remove(ctx, ip))
 	require.NoError(t, svc.Monitoring.Add(ctx, ip, timestamp))

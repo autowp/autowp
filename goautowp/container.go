@@ -1577,7 +1577,7 @@ func (s *Container) grpcServerWithServicesLocked(ctx context.Context) (*grpc.Ser
 		return nil, err
 	}
 
-	s.trafficRecorder = traffic.NewRecorder(ctx, traf.Monitoring, traf.Whitelist)
+	s.trafficRecorder = traffic.NewRecorder(ctx, traf.Monitoring)
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
