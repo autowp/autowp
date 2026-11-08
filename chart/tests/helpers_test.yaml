@@ -19,11 +19,11 @@ tests:
       - equal:
           path: spec.template.metadata.labels["app.kubernetes.io/name"]
           value: autowp
-  - it: preserves image digest precedence and global registry overrides
+  - it: supports digests in image tags and global registry overrides
     set:
       fullnameOverride: custom
       global.imageRegistry: mirror.example.com
-      goautowp.image.digest: sha256:0123456789abcdef
+      goautowp.image.tag: v6.21.2@sha256:0123456789abcdef
     asserts:
       - equal:
           path: metadata.name
@@ -32,7 +32,7 @@ tests:
           path: spec.template.spec.containers
           content:
             name: goautowp-serve
-            image: mirror.example.com/autowp/autowp/goautowp@sha256:0123456789abcdef
+            image: mirror.example.com/autowp/autowp/goautowp:v6.21.2@sha256:0123456789abcdef
           any: true
   - it: merges string and object pull secrets without duplicates
     set:

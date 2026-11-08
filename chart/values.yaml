@@ -74,7 +74,6 @@ frontend:
     registry: registry.pereslegin.ru
     repository: autowp/autowp/frontend
     tag: v1.245.3
-    digest: ""
     pullPolicy: IfNotPresent
     pullSecrets: []
   ## nginx sidecar that serves the built bundle off disk and proxies only page requests to the SSR
@@ -99,7 +98,6 @@ frontend:
       registry: docker.io
       repository: nginxinc/nginx-unprivileged
       tag: 1-alpine
-      digest: ""
       pullPolicy: IfNotPresent
       pullSecrets: []
   ## Admission control in front of the renderer (frontend/src/render-queue.ts), per worker - so a
@@ -153,7 +151,6 @@ goautowp:
     registry: registry.pereslegin.ru
     repository: autowp/autowp/goautowp
     tag: v6.21.2
-    digest: ""
     pullPolicy: IfNotPresent
     pullSecrets: []
   sentry:
@@ -364,7 +361,6 @@ static:
     registry: docker.io
     repository: nginxinc/nginx-unprivileged
     tag: 1-alpine
-    digest: ""
     pullPolicy: IfNotPresent
     pullSecrets: []
 mostsMinVehiclesCount: 200

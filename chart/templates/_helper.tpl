@@ -15,11 +15,11 @@
 {{- end -}}
 
 {{- define "autowp.frontend.image" -}}
-{{ include "autowp.image" (dict "imageRoot" .Values.frontend.image "global" .Values.global) }}
+{{ include "cloudpirates.image" (dict "image" .Values.frontend.image "global" .Values.global) }}
 {{- end -}}
 
 {{- define "autowp.frontend.assets.image" -}}
-{{ include "autowp.image" (dict "imageRoot" .Values.frontend.assets.image "global" .Values.global) }}
+{{ include "cloudpirates.image" (dict "image" .Values.frontend.assets.image "global" .Values.global) }}
 {{- end -}}
 
 {{- define "autowp.goautowp.fullname" -}}
@@ -51,7 +51,7 @@
 {{- end -}}
 
 {{- define "autowp.goautowp.image" -}}
-{{ include "autowp.image" (dict "imageRoot" .Values.goautowp.image "global" .Values.global) }}
+{{ include "cloudpirates.image" (dict "image" .Values.goautowp.image "global" .Values.global) }}
 {{- end -}}
 
 {{- define "autowp.static.fullname" -}}
@@ -59,7 +59,7 @@
 {{- end -}}
 
 {{- define "autowp.static.image" -}}
-{{ include "autowp.image" (dict "imageRoot" .Values.static.image "global" .Values.global) }}
+{{ include "cloudpirates.image" (dict "image" .Values.static.image "global" .Values.global) }}
 {{- end -}}
 
 {{/*
