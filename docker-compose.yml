@@ -1,7 +1,7 @@
 name: autowp
 services:
   createbuckets:
-    image: amazon/aws-cli:2.37.4
+    image: amazon/aws-cli:2.39.6
     container_name: autowp_test_createbuckets
     depends_on:
       - minio
@@ -54,7 +54,7 @@ services:
     user: "0"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.4
+    image: quay.io/keycloak/keycloak:26.8.2
     container_name: autowp_test_keycloak
     depends_on:
       - postgres
@@ -79,7 +79,7 @@ services:
   minio:
     # RustFS (S3-compatible, Apache-2.0) under the historical "minio" service name/hostname that the
     # goautowp configs point to: MinIO images are no longer anonymously pullable.
-    image: rustfs/rustfs:1.0.0
+    image: rustfs/rustfs:1.0.4
     container_name: autowp_test_minio
     volumes:
       - s3-data:/data
@@ -95,7 +95,7 @@ services:
     restart: always
 
   postgres:
-    image: postgis/postgis:18-3.6-alpine
+    image: postgis/postgis:18-3.7-alpine
     container_name: autowp_test_traffic_postgres
     volumes:
       - ./goautowp/tests/environment/postgres-initdb.d/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
@@ -114,7 +114,7 @@ services:
       - '5432'
 
   rabbitmq:
-    image: rabbitmq:4.2.9-management-alpine
+    image: rabbitmq:4.4.0-management-alpine
     container_name: autowp_test_rabbitmq
     ports:
       - '0.0.0.0:4369:4369'

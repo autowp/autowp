@@ -22,3 +22,9 @@ go test -race ./... -timeout 20m
 Import the baseline once when preparing a fresh database. Individual test runs reuse it.
 The nginx service serves `testdata/images/` for tests that download images over HTTP.
 Container paths such as `/dump.sql` remain independent of the host fixture layout.
+
+Keycloak 26.8.2 requires the `kc-admin-api` client scope for Admin REST API tokens.
+Both realm imports assign it as a default scope to the `autowp` service client. When
+upgrading an existing realm, assign this scope to that client in the Admin Console;
+startup imports skip realms that already exist. See the
+[Keycloak upgrade guide](https://www.keycloak.org/docs/26.8.2/upgrading/#_migrating_to_26_8_2).

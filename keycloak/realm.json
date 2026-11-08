@@ -137,6 +137,15 @@
         {
             "id": "6dd38c6a-6a3d-4ac9-9698-0a5f04bbb200",
             "clientId": "autowp",
+            "defaultClientScopes": [
+                "web-origins",
+                "acr",
+                "roles",
+                "profile",
+                "basic",
+                "email",
+                "kc-admin-api"
+            ],
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
