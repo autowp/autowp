@@ -200,8 +200,7 @@ traffic:
     password: password
 rabbitmq:
   enabled: true
-  image:
-    tag: 4.2.9-alpine
+  ## Use the upstream image and digest pinned by the RabbitMQ chart.
   managementPlugin:
     enabled: false
   replicaCount: 1
@@ -211,11 +210,9 @@ rabbitmq:
     size: 8Gi
     mountPath: /var/lib/rabbitmq
   metrics:
-    enabled: true
+    enabled: false
     serviceMonitor:
-      enabled: true
-      labels:
-        release: kube-prometheus-stack
+      enabled: false
   resources:
     limits:
       cpu: 1000m
@@ -297,8 +294,7 @@ localImageCredentials:
   username: someone
   password: sillyness
   email: someone@host.com
-## CloudPirates chart using the upstream valkey/valkey image. Redis data is deliberately
-## not migrated; rebuild the catalogue index cache after upgrading (see README.md).
+## CloudPirates chart using the upstream valkey/valkey image.
 valkey:
   enabled: true
   architecture: replication
@@ -345,16 +341,9 @@ valkey:
   containerSecurityContext:
     readOnlyRootFilesystem: true
   metrics:
-    enabled: true
-    resources:
-      limits:
-        cpu: "1"
-        memory: "1024Mi"
-      requests:
-        cpu: 10m
-        memory: "10Mi"
+    enabled: false
     serviceMonitor:
-      enabled: true
+      enabled: false
 
 static:
   image:

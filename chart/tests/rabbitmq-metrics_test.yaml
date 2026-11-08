@@ -1,0 +1,16 @@
+suite: RabbitMQ monitoring disabled
+templates:
+  - charts/rabbitmq/templates/configmap.yaml
+tests:
+  - it: disables management and Prometheus plugins without collector configuration
+    asserts:
+      - equal:
+          path: data.enabled_plugins
+          value: |
+            [].
+      - notMatchRegex:
+          path: data["rabbitmq.conf"]
+          pattern: 'management_agent\.|deprecated_features\.'
+      - notMatchRegex:
+          path: data["rabbitmq.conf"]
+          pattern: 'prometheus\.tcp\.port'

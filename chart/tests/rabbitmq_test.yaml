@@ -40,11 +40,11 @@ tests:
           content:
             name: RABBITMQ_NODENAME
             value: rabbit@$(NODE_NAME).autowp-rabbitmq-headless.autowp.svc.cluster.local
-  - it: uses the supported intermediate broker version and default security context
+  - it: uses the chart-pinned broker image and default security context
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/rabbitmq:4.2.9-alpine
+          value: docker.io/rabbitmq:4.4.0-management@sha256:c200fd496482cda18c412be4e6f244830e1e75949b8cf5f0e887cea9ea456109
       - equal:
           path: spec.template.spec.containers[0].securityContext.runAsUser
           value: 999
