@@ -15,19 +15,17 @@ services:
     entrypoint: ["/createbuckets.sh", format, user, brand, picture, files]
 
   frontend:
-    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.53.1
+    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.91.1
     container_name: autowp_test_frontend
     depends_on:
       - goautowp-serve
-    volumes:
-      - ./frontend/dist:/app
     network_mode: "service:goautowp-serve"
     restart: always
     user: "101:101"
     read_only: true
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.53.1
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.91.1
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
@@ -39,7 +37,7 @@ services:
     command: scheduler-generate-index-cache --loglevel=debug
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.53.1
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.91.1
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
