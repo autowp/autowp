@@ -1,0 +1,3 @@
+{{- if .Values.rabbitmq.enabled }}
+RabbitMQ: {{ .Values.rabbitmq.image.tag }} (CloudPirates chart, official RabbitMQ image).
+{{- end }}

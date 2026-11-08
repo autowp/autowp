@@ -116,7 +116,7 @@ services:
       - '5432'
 
   rabbitmq:
-    image: rabbitmq:management-alpine
+    image: rabbitmq:4.2.9-management-alpine
     container_name: autowp_test_rabbitmq
     ports:
       - '0.0.0.0:4369:4369'

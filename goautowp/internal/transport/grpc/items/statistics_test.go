@@ -58,7 +58,7 @@ func newItemsStatsTestServer(t *testing.T) (*Server, *sql.DB, *itemBatchQueryLog
 		repository:      items.NewRepository(db, 0, nil, nil, nil),
 		attrsRepository: attrs.NewRepository(db, nil, nil, nil, nil, nil, nil),
 		picturesRepository: pictures.NewRepository(db, nil, nil, nil, nil,
-			config.DuplicateFinderConfig{}, nil, nil, nil, nil),
+			"", config.DuplicateFinderConfig{}, nil, nil, nil, nil),
 	}, pool, logger
 }
 

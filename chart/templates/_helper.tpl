@@ -98,3 +98,11 @@ networkPolicy.egress.enabled - see templates/networkpolicy.yaml.
   {{- end }}
 {{- end }}
 {{- end -}}
+
+{{- define "autowp.goautowp.rabbitmqEnv" -}}
+- name: RABBITMQ_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "rabbitmq.secretName" .Subcharts.rabbitmq | quote }}
+      key: {{ include "rabbitmq.secretPasswordKey" .Subcharts.rabbitmq | quote }}
+{{- end }}

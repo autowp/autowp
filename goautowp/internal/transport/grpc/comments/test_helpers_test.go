@@ -119,7 +119,7 @@ func newTestServer(
 		nil,
 		nil,
 		nil,
-		config.DuplicateFinderConfig{},
+		"", config.DuplicateFinderConfig{},
 		nil,
 		nil,
 		nil,

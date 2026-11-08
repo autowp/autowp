@@ -49,25 +49,26 @@ const indexDelay = 100 * time.Millisecond
 const fetchImageTimeout = 30 * time.Second
 
 type Finder struct {
-	db     *goqu.Database
-	config config.DuplicateFinderConfig
+	db       *goqu.Database
+	rabbitMQ string
+	config   config.DuplicateFinderConfig
 }
 
 func New(
 	db *goqu.Database,
+	rabbitMQ string,
 	config config.DuplicateFinderConfig,
 ) (*Finder, error) {
-	s := &Finder{
-		db:     db,
-		config: config,
-	}
-
-	return s, nil
+	return &Finder{
+		db:       db,
+		rabbitMQ: rabbitMQ,
+		config:   config,
+	}, nil
 }
 
 // ListenAMQP for incoming messages.
 func (s *Finder) ListenAMQP(ctx context.Context, quitChan chan bool) error {
-	rabbitMQ, err := util.ConnectRabbitMQ(s.config.RabbitMQ)
+	rabbitMQ, err := util.ConnectRabbitMQ(s.rabbitMQ)
 	if err != nil {
 		return err
 	}

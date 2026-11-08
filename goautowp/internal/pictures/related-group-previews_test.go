@@ -41,7 +41,7 @@ func TestRelatedGroupPreviewsBatchSelection(t *testing.T) {
 		schema.PerspectiveFrontStrict, schema.PerspectiveFront)
 	require.NoError(t, err)
 
-	repository := pictures.NewRepository(db, nil, nil, nil, nil, config.DuplicateFinderConfig{}, nil, nil, nil, nil)
+	repository := pictures.NewRepository(db, nil, nil, nil, nil, "", config.DuplicateFinderConfig{}, nil, nil, nil, nil)
 
 	groups := map[int64][]int64{
 		1: {10}, 2: {20}, 3: {10, 20}, 4: {30, 20}, 5: {40}, 6: {999}, 7: {}, 8: {50},

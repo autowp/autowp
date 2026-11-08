@@ -1,0 +1,26 @@
+suite: RabbitMQ connection configuration
+release:
+  name: autowp
+  namespace: autowp
+templates:
+  - goautowp/cm.yaml
+tests:
+  - it: keeps one connection string with a secret password placeholder
+    asserts:
+      - matchRegex:
+          path: stringData["config.yaml"]
+          pattern: 'rabbitmq: "amqp://admin:\$RABBITMQ_PASSWORD@autowp-rabbitmq:5672/"'
+      - notMatchRegex:
+          path: stringData["config.yaml"]
+          pattern: 'rabbitmq-auth|guest:guest|rabbitmq-password-file'
+  - it: escapes the broker username without embedding its password
+    set:
+      rabbitmq.auth.username: 'custom:user@domain space'
+      rabbitmq.auth.password: secret-not-to-copy-into-config
+    asserts:
+      - matchRegex:
+          path: stringData["config.yaml"]
+          pattern: 'amqp://custom%3Auser%40domain%20space:\$RABBITMQ_PASSWORD@'
+      - notMatchRegex:
+          path: stringData["config.yaml"]
+          pattern: secret-not-to-copy-into-config

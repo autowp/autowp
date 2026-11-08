@@ -45,7 +45,7 @@ func newBrandCountsTestServer(t *testing.T) (*Server, *itemBatchQueryLogger) {
 	return &Server{
 		repository: items.NewRepository(db, 0, nil, nil, nil),
 		picturesRepository: pictures.NewRepository(db, nil, nil, nil, nil,
-			config.DuplicateFinderConfig{}, nil, nil, nil, nil),
+			"", config.DuplicateFinderConfig{}, nil, nil, nil, nil),
 		i18n: i18nBundle,
 	}, logger
 }

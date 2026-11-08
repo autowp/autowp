@@ -99,7 +99,7 @@ services:
           memory: 128M
 
   rabbitmq:
-    image: rabbitmq:management-alpine
+    image: rabbitmq:4.2.9-management-alpine
     container_name: goautowp_rabbitmq_test
     ports:
       - '0.0.0.0:5672:5672'

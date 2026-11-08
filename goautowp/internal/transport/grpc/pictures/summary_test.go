@@ -44,7 +44,7 @@ func newPicturesSummaryTestServer(t *testing.T) (*Server, *sql.DB, *itemBatchQue
 	goquDB := goqu.New("postgres", database)
 	goquDB.Logger(logger)
 	repository := pictures.NewRepository(goquDB, nil, nil, nil, nil,
-		config.DuplicateFinderConfig{}, nil, nil, nil, nil)
+		"", config.DuplicateFinderConfig{}, nil, nil, nil, nil)
 
 	return &Server{repository: repository, auth: &authn.Service{}}, database, logger
 }

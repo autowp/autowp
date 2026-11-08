@@ -41,7 +41,7 @@ func newPictureFieldBatchExtractor(
 	texts := textstorage.New(db)
 	itemRepository := items.NewRepository(db, cfg.MostsMinCarsCount, nil, texts, images)
 	pictureRepository := pictures.NewRepository(db, images, texts, itemRepository, nil,
-		cfg.DuplicateFinder, nil, nil, nil, nil)
+		cfg.RabbitMQ, cfg.DuplicateFinder, nil, nil, nil, nil)
 	commentRepository := comments.NewRepository(db, nil, nil, nil, nil)
 	bundle, err := i18nbundle.New()
 	require.NoError(t, err)

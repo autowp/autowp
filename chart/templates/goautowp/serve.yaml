@@ -103,6 +103,10 @@ spec:
           imagePullPolicy: {{ .Values.goautowp.image.pullPolicy | quote }}
           args:
             - migrate-postgres
+          {{- if .Values.rabbitmq.enabled }}
+          env:
+            {{- include "autowp.goautowp.rabbitmqEnv" . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - mountPath: /config.yaml
               name: config
@@ -252,6 +256,10 @@ spec:
               containerPort: 8082
             - name: metrics
               containerPort: 2112
+          {{- if .Values.rabbitmq.enabled }}
+          env:
+            {{- include "autowp.goautowp.rabbitmqEnv" . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - mountPath: /config.yaml
               name: config

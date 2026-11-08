@@ -26,7 +26,7 @@ func TestDuplicateFinder(t *testing.T) {
 	ctx := t.Context()
 	kc := cnt.Keycloak()
 
-	df, err := duplicatefinder.New(goquDB, cfg.DuplicateFinder)
+	df, err := duplicatefinder.New(goquDB, cfg.RabbitMQ, cfg.DuplicateFinder)
 	require.NoError(t, err)
 
 	// admin
@@ -95,7 +95,7 @@ func TestIndexRespectsContextDeadline(t *testing.T) {
 
 	cfg := cnt.Config()
 
-	df, err := duplicatefinder.New(goquDB, cfg.DuplicateFinder)
+	df, err := duplicatefinder.New(goquDB, cfg.RabbitMQ, cfg.DuplicateFinder)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Millisecond)

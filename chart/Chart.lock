@@ -1,12 +1,12 @@
 dependencies:
 - name: rabbitmq
-  repository: oci://registry-1.docker.io/bitnamicharts
-  version: 14.7.0
+  repository: oci://registry-1.docker.io/cloudpirates
+  version: 0.21.32
 - name: common
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 2.31.4
+  version: 2.41.0
 - name: redis
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 20.13.4
-digest: sha256:2900872034656ad1faf85184d0cffeec9b286ac7716b1f539927279433cce750
-generated: "2025-10-11T23:38:41.044489716+03:00"
+digest: sha256:0f69511a06ea868c6cb853171ccaa0ea81291d4dd94843d2e1d0e2739a20a817
+generated: "2026-11-08T03:12:08.623833004+03:00"

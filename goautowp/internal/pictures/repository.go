@@ -115,6 +115,7 @@ type Repository struct {
 	complianceRepository  *compliance.Repository
 	perspectiveCache      map[int32][]int32
 	perspectiveCacheMutex sync.Mutex
+	rabbitMQ              string
 	dfConfig              config.DuplicateFinderConfig
 	beforePictureDeleted  func(id int64) error
 	afterPictureAccepted  func(ctx context.Context) error
@@ -189,6 +190,7 @@ func NewRepository(
 	textStorageRepository *textstorage.Repository,
 	itemsRepository *items.Repository,
 	complianceRepository *compliance.Repository,
+	rabbitMQ string,
 	dfConfig config.DuplicateFinderConfig,
 	beforePictureDeleted func(id int64) error,
 	afterPictureAccepted func(ctx context.Context) error,
@@ -203,6 +205,7 @@ func NewRepository(
 		complianceRepository:  complianceRepository,
 		perspectiveCache:      make(map[int32][]int32),
 		perspectiveCacheMutex: sync.Mutex{},
+		rabbitMQ:              rabbitMQ,
 		dfConfig:              dfConfig,
 		beforePictureDeleted:  beforePictureDeleted,
 		afterPictureAccepted:  afterPictureAccepted,
@@ -2083,7 +2086,7 @@ func (s *Repository) DfIndex(ctx context.Context) error {
 		return err
 	}
 
-	rabbitMQ, err := util.ConnectRabbitMQ(s.dfConfig.RabbitMQ)
+	rabbitMQ, err := util.ConnectRabbitMQ(s.rabbitMQ)
 	if err != nil {
 		return err
 	}
@@ -3149,7 +3152,7 @@ func (s *Repository) updateContentCount(ctx context.Context, pictureID int64) er
 }
 
 func (s *Repository) queueIndexImage(ctx context.Context, id int64, url string) error {
-	rabbitMQ, err := util.ConnectRabbitMQ(s.dfConfig.RabbitMQ)
+	rabbitMQ, err := util.ConnectRabbitMQ(s.rabbitMQ)
 	if err != nil {
 		return err
 	}

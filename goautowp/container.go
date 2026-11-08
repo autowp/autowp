@@ -1038,7 +1038,7 @@ func (s *Container) duplicateFinderLocked(ctx context.Context) (*duplicatefinder
 			return nil, err
 		}
 
-		s.duplicateFinder, err = duplicatefinder.New(db, s.Config().DuplicateFinder)
+		s.duplicateFinder, err = duplicatefinder.New(db, s.Config().RabbitMQ, s.Config().DuplicateFinder)
 		if err != nil {
 			return nil, err
 		}
@@ -1161,7 +1161,13 @@ func (s *Container) picturesRepositoryLocked(ctx context.Context) (*pictures.Rep
 		}
 
 		s.picturesRepository = pictures.NewRepository(
-			db, is, textStorageRepository, itemsRepository, complianceRepository, cfg.DuplicateFinder,
+			db,
+			is,
+			textStorageRepository,
+			itemsRepository,
+			complianceRepository,
+			cfg.RabbitMQ,
+			cfg.DuplicateFinder,
 			func(id int64) error {
 				commentsRepository, err := s.commentsRepositoryLocked(ctx)
 				if err != nil {

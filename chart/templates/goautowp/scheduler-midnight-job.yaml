@@ -29,6 +29,10 @@ spec:
               args:
                 - scheduler-midnight
                 - "--loglevel=info"
+              {{- if .Values.rabbitmq.enabled }}
+              env:
+                {{- include "autowp.goautowp.rabbitmqEnv" . | nindent 16 }}
+              {{- end }}
               volumeMounts:
                 - mountPath: /config.yaml
                   name: config

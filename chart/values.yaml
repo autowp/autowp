@@ -204,16 +204,20 @@ traffic:
 rabbitmq:
   enabled: true
   image:
-    repository: bitnamilegacy/rabbitmq
+    tag: 4.2.9-alpine
+  managementPlugin:
+    enabled: false
   replicaCount: 1
   persistence:
     enabled: true
     storageClass: autowp-rabbitmq
+    size: 8Gi
+    mountPath: /var/lib/rabbitmq
   metrics:
     enabled: true
     serviceMonitor:
       enabled: true
-      additionalLabels:
+      labels:
         release: kube-prometheus-stack
   resources:
     limits:
@@ -222,15 +226,19 @@ rabbitmq:
     requests:
       cpu: 100m
       memory: 100Mi
+  initContainer:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 16Mi
+  pdb:
+    create: true
+    maxUnavailable: "1"
   commonAnnotations:
-    ignore-check.kube-linter.io/no-read-only-root-fs: "The variable RABBITMQ_COMBINED_CERT_PATH must be set to either an existant file or a non-existant file in a writable directory."
     ignore-check.kube-linter.io/pdb-unhealthy-pod-eviction-policy: "pdb-unhealthy-pod-eviction-policy"
-  podSecurityContext:
-    runAsNonRoot: true
-    runAsUser: 101
-  volumePermissions:
-    image:
-      repository: bitnamilegacy/os-shell
 ## The locales the site is served in, and the host each one answers on. One list feeds both
 ## the goautowp config (code -> hostname/aliases) and the SSR sidecar's nginx, which needs to
 ## know which directory of the frontend build a host is served from - `locale` is that

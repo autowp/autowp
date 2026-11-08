@@ -1,0 +1,14 @@
+suite: RabbitMQ service
+release:
+  name: autowp
+  namespace: autowp
+templates:
+  - charts/rabbitmq/templates/service.yaml
+tests:
+  - it: does not expose management in production
+    asserts:
+      - notContains:
+          path: spec.ports
+          content:
+            port: 15672
+          any: true

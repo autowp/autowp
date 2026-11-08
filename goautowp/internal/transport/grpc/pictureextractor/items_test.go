@@ -40,7 +40,7 @@ func TestPictureItemsBatchGroupingAndFilters(t *testing.T) {
 	require.NoError(t, err)
 
 	repository := pictures.NewRepository(goqu.New("postgres", db), nil, nil, nil, nil,
-		config.DuplicateFinderConfig{}, nil, nil, nil, nil)
+		"", config.DuplicateFinderConfig{}, nil, nil, nil, nil)
 	extractor := New(Dependencies{
 		PicturesRepository: func(_ context.Context) (*pictures.Repository, error) { return repository, nil },
 		PictureItemExtractor: func() *pictureitemextractor.Extractor {

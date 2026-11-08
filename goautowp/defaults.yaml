@@ -11,7 +11,6 @@ sentry:
 metrics:
   listen: ":2112"
 duplicate_finder:
-  rabbitmq: amqp://guest:guest@localhost:5672/
   queue: duplicate_finder
 attrs:
   update_values_queue: attrs_update_values

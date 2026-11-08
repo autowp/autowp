@@ -30,6 +30,10 @@ spec:
                 - pictures
                 - clear-queue
                 - "--loglevel=info"
+              {{- if .Values.rabbitmq.enabled }}
+              env:
+                {{- include "autowp.goautowp.rabbitmqEnv" . | nindent 16 }}
+              {{- end }}
               volumeMounts:
                 - mountPath: /config.yaml
                   name: config

@@ -73,8 +73,7 @@ type S3CredentialsConfig struct {
 
 // DuplicateFinderConfig DuplicateFinderConfig.
 type DuplicateFinderConfig struct {
-	RabbitMQ string `mapstructure:"rabbitmq" yaml:"rabbitmq"`
-	Queue    string `mapstructure:"queue"    yaml:"queue"`
+	Queue string `mapstructure:"queue" yaml:"queue"`
 }
 
 // RestCorsConfig RestCorsConfig.
@@ -206,15 +205,16 @@ func LoadConfig(path string) Config {
 		panic(fmt.Errorf("fatal error unmarshal config: %w", err))
 	}
 
+	cfg.RabbitMQ, err = rabbitMQURL(cfg.RabbitMQ)
+	if err != nil {
+		panic(fmt.Errorf("load rabbitmq credentials: %w", err))
+	}
+
 	return cfg
 }
 
 // ValidateConfig ValidateConfig.
 func ValidateConfig(config Config) {
-	if config.DuplicateFinder.RabbitMQ == "" {
-		logging.Error("Address not provided")
-	}
-
 	if config.DuplicateFinder.Queue == "" {
 		logging.Error("DuplicateFinderQueue not provided")
 	}

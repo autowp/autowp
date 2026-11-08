@@ -90,6 +90,7 @@ func TestInboxCommand(t *testing.T) {
 		textStorageRepo,
 		itemRepo,
 		complianceRepo,
+		cfg.RabbitMQ,
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
 		func(context.Context) error { return nil },

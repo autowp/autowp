@@ -1,0 +1,58 @@
+suite: RabbitMQ migration configuration
+release:
+  name: autowp
+  namespace: autowp
+templates:
+  - charts/rabbitmq/templates/statefulset.yaml
+tests:
+  - it: keeps the existing PVC and uses the default database layout
+    asserts:
+      - equal:
+          path: metadata.name
+          value: autowp-rabbitmq
+      - equal:
+          path: spec.serviceName
+          value: autowp-rabbitmq-headless
+      - equal:
+          path: spec.podManagementPolicy
+          value: Parallel
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: autowp
+            app.kubernetes.io/name: rabbitmq
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: data
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: autowp-rabbitmq
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
+          value: 8Gi
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: RABBITMQ_MNESIA_DIR
+          any: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: RABBITMQ_NODENAME
+            value: rabbit@$(NODE_NAME).autowp-rabbitmq-headless.autowp.svc.cluster.local
+  - it: uses the supported intermediate broker version and default security context
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: docker.io/rabbitmq:4.2.9-alpine
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 999
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 999
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: data
+            mountPath: /var/lib/rabbitmq

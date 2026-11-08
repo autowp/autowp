@@ -48,7 +48,7 @@ func newTestExtractor(
 
 	server := New(
 		comments.NewRepository(db, nil, nil, nil, nil),
-		pictures.NewRepository(db, nil, nil, nil, nil, config.DuplicateFinderConfig{}, nil, nil, nil, nil),
+		pictures.NewRepository(db, nil, nil, nil, nil, "", config.DuplicateFinderConfig{}, nil, nil, nil, nil),
 	)
 	row, err := server.repository.Message(t.Context(), 1, true, true, true)
 	require.NoError(t, err)

@@ -98,6 +98,7 @@ func createRepositoryWithCallback(
 		textstorageRepository,
 		itemsRepository,
 		complianceRepository,
+		cfg.RabbitMQ,
 		cfg.DuplicateFinder,
 		func(int64) error { return nil },
 		func(context.Context) error { return nil },

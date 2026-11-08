@@ -111,7 +111,7 @@ func newNewboxTestExtractor(t *testing.T) (
  `)
 	require.NoError(t, err)
 
-	repository := pictures.NewRepository(db, nil, nil, nil, nil, cfg.DuplicateFinder, nil, nil, nil, nil)
+	repository := pictures.NewRepository(db, nil, nil, nil, nil, cfg.RabbitMQ, cfg.DuplicateFinder, nil, nil, nil, nil)
 	images, err := storage.NewStorage(db, cfg.ImageStorage)
 	require.NoError(t, err)
 	bundle, err := i18nbundle.New()

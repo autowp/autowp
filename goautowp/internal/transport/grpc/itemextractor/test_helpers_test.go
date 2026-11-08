@@ -68,7 +68,7 @@ func newTestExtractor(t *testing.T, db *goqu.Database) *testExtractor {
 	itemRepository := items.NewRepository(db, cfg.MostsMinCarsCount,
 		items.NewItemParentLanguageRepository(db, cfg.ContentLanguages), texts, images)
 	pictureRepository := pictures.NewRepository(db, images, texts, itemRepository, nil,
-		cfg.DuplicateFinder, nil, nil, nil, nil)
+		cfg.RabbitMQ, cfg.DuplicateFinder, nil, nil, nil, nil)
 	attributes := attrs.NewRepository(db, bundle, itemRepository, pictureRepository, images, nil, nil)
 	commentRepository := comments.NewRepository(db, nil, nil, nil, nil)
 	dayRepository := itemofday.NewRepository(db)

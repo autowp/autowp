@@ -111,6 +111,7 @@ func newTestServer(t *testing.T, db *goqu.Database) *Server {
 			texts,
 			repository,
 			nil,
+			cfg.RabbitMQ,
 			cfg.DuplicateFinder,
 			nil,
 			nil,
