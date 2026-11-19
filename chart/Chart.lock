@@ -1,12 +1,12 @@
 dependencies:
 - name: rabbitmq
   repository: oci://registry-1.docker.io/cloudpirates
-  version: 0.21.32
+  version: 0.21.34
 - name: common
   repository: oci://registry-1.docker.io/cloudpirates
   version: 2.2.1
 - name: valkey
   repository: oci://registry-1.docker.io/cloudpirates
-  version: 0.25.16
-digest: sha256:bdf84e501eee327a6d05c03e6e4d679a5b218a7d75922a0be6aac13aba412749
-generated: "2026-11-08T21:07:23.815785921+03:00"
+  version: 0.26.1
+digest: sha256:a672b467b261c0de06f1a7624095943a474c466d152e36e0e4bf6a07543bc408
+generated: "2026-11-20T00:16:28.23135751+03:00"

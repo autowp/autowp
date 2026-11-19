@@ -1,4 +1,4 @@
-FROM docker.io/library/node:26-alpine
+FROM docker.io/library/node:26.13.1-alpine
 
 # Pull pending Alpine security updates without waiting for a base-image rebuild.
 RUN apk --no-cache upgrade

@@ -96,6 +96,9 @@
     "vhost": "^3.0.2"
   },
   "overrides": {
-    "dompurify": "^3.4.17"
+    "dompurify": "^3.4.17",
+    "eslint-plugin-sonarjs": {
+      "minimatch": "^11.0.9"
+    }
   }
 }

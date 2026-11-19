@@ -14,6 +14,7 @@ ENTRYPOINT ["/goautowp"]
 WORKDIR /
 
 RUN apt-get update -qqy && \
+    apt-get -qqy upgrade && \
     apt-get -qqy --no-install-recommends install \
         adduser \
         ca-certificates \
