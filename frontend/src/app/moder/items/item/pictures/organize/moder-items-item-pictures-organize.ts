@@ -139,7 +139,7 @@ export class ModerItemsItemPicturesOrganize implements OnInit {
       return undefined;
     }
 
-    const newItem = {...item.toObject()} as Item;
+    const newItem = new Item(item.toObject());
     newItem.isGroup = false;
     return newItem;
   });

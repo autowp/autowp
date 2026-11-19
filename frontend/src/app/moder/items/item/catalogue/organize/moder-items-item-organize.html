@@ -1,3 +1,5 @@
+@let item = item$ | async;
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item">
@@ -9,7 +11,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/moder/items" i18n>Items</a>
     </li>
-    @if (item$ | async; as item) {
+    @if (item) {
       <li class="breadcrumb-item">
         <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.nameHtml"></a>
       </li>
@@ -28,7 +30,7 @@
 
 <remark i18n-markdown markdown="Tool for join few vehicles into sub-model" />
 
-@if (item$ | async; as item) {
+@if (item) {
   @if (newItem$ | async; as newItem) {
     @if (!loading()) {
       <app-item-meta-form

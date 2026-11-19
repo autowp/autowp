@@ -90,8 +90,7 @@
                     <div class="small">
                       <ng-container i18n>Affected pictures:</ng-container>&ngsp;
                       @for (pictureId of pictureIds; track pictureId; let last = $last) {
-                        <a [routerLink]="['/moder/pictures', pictureId]">{{ pictureId }}</a
-                        >{{
+                        <a [routerLink]="['/moder/pictures', pictureId]">{{ pictureId }}</a>{{
                           last
                             ? ''
                             : ',
@@ -145,8 +144,7 @@
                               <i class="bi bi-image me-1" aria-hidden="true"></i>
                               <a [routerLink]="['/moder/pictures', item.candidate.entityId]">{{
                                 '#' + item.candidate.entityId
-                              }}</a
-                              >&ngsp;
+                              }}</a>&ngsp;
                               <span class="text-muted" i18n>(copyrights text)</span>
                             } @else if (
                               item.candidate.entityType ===
@@ -156,8 +154,7 @@
                               @if (getCommentLink$(item.candidate.entityId) | async; as link) {
                                 <a [routerLink]="link.route">{{ link.preview }}</a>
                               } @else {
-                                <span class="text-muted">{{ '#' + item.candidate.entityId }}</span
-                                >&ngsp;
+                                <span class="text-muted">{{ '#' + item.candidate.entityId }}</span>&ngsp;
                                 <span class="text-muted" i18n>(comment not found)</span>
                               }
                             }

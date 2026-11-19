@@ -54,16 +54,14 @@
           }
           @if (row.report.entityType === ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_PICTURE) {
             <i class="bi bi-image" aria-hidden="true"></i>
-            <a [routerLink]="['/moder/pictures', row.report.entityId]">{{ '#' + row.report.entityId }}</a
-            >&ngsp;
+            <a [routerLink]="['/moder/pictures', row.report.entityId]">{{ '#' + row.report.entityId }}</a>&ngsp;
             <span class="text-muted" i18n>(picture)</span>
           } @else if (row.report.entityType === ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_COMMENT) {
             <i class="bi bi-chat" aria-hidden="true"></i>
             @if (getCommentLink$(row.report.entityId) | async; as link) {
               <a [routerLink]="link.route">{{ link.preview }}</a>
             } @else {
-              <span class="text-muted">{{ '#' + row.report.entityId }}</span
-              >&ngsp;
+              <span class="text-muted">{{ '#' + row.report.entityId }}</span>&ngsp;
               <span class="text-muted" i18n>(comment not found)</span>
             }
           } @else if (row.report.entityType === ContentReportEntityType.CONTENT_REPORT_ENTITY_TYPE_OTHER) {

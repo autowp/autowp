@@ -1,3 +1,6 @@
+@let vehicleTypeOptions = vehicleTypeOptions$ | async;
+@let perspectiveOptions = perspectiveOptions$ | async;
+
 <app-resource-status [resource]="dataResource" />
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -111,14 +114,14 @@
           [class.btn-outline-secondary]="vehicleTypeID() === null"
         >
           <ng-container i18n>Vehicle type</ng-container>:
-          @for (option of vehicleTypeOptions$ | async; track option.value) {
+          @for (option of vehicleTypeOptions; track option.value) {
             @if (option.value === vehicleTypeID()) {
               {{ option.name }}
             }
           }
         </button>
         <div ngbDropdownMenu style="max-height: 200px; overflow-y: auto">
-          @for (option of vehicleTypeOptions$ | async; track option.value) {
+          @for (option of vehicleTypeOptions; track option.value) {
             <a
               class="dropdown-item"
               routerLink="."
@@ -139,14 +142,14 @@
           [class.btn-outline-secondary]="perspectiveID() === null"
         >
           <ng-container i18n>Perspective</ng-container>:
-          @for (option of perspectiveOptions$ | async; track option.value) {
+          @for (option of perspectiveOptions; track option.value) {
             @if (option.value === perspectiveID()) {
               {{ option.name }}
             }
           }
         </button>
         <div ngbDropdownMenu style="max-height: 200px; overflow-y: auto">
-          @for (option of perspectiveOptions$ | async; track option.value) {
+          @for (option of perspectiveOptions; track option.value) {
             <a
               class="dropdown-item"
               routerLink="."

@@ -1,5 +1,4 @@
 import type {OnInit} from '@angular/core';
-import type {Item} from '@grpc/spec.pb';
 import type {InvalidParams} from '@utils/invalid-params.pipe';
 import type {Observable} from 'rxjs';
 
@@ -8,6 +7,7 @@ import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core'
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {
   GetItemVehicleTypesRequest,
+  Item,
   ItemFields,
   ItemParent,
   ItemParentFields,
@@ -137,7 +137,7 @@ export class ModerItemsItemOrganize implements OnInit {
 
   protected readonly newItem$: Observable<Item> = combineLatest([this.#itemTypeID$, this.item$]).pipe(
     map(([itemTypeID, item]) => {
-      const newItem = {...item.toObject()} as Item;
+      const newItem = new Item(item.toObject());
       newItem.itemTypeId = itemTypeID;
       return newItem;
     }),

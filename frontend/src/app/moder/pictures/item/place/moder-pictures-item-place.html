@@ -1,3 +1,5 @@
+@let picture = picture$ | async;
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item">
@@ -9,7 +11,7 @@
     <li class="breadcrumb-item">
       <a routerLink="/moder/pictures" i18n>Pictures</a>
     </li>
-    @if (picture$ | async; as picture) {
+    @if (picture) {
       <li class="breadcrumb-item">
         <a i18n [routerLink]="['/moder/pictures', picture.id]">Picture №{{ picture.id }}</a>
       </li>
@@ -17,7 +19,7 @@
   </ol>
 </nav>
 
-@if (picture$ | async; as picture) {
+@if (picture) {
   <div class="page-header">
     <h1 i18n>Location</h1>
   </div>

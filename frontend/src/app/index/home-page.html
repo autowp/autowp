@@ -22,8 +22,7 @@
     </h4>
     <p>
       @for (most of mosts; track most) {
-        <a [routerLink]="most.route">{{ most.name }}</a
-        >,
+        <a [routerLink]="most.route">{{ most.name }}</a>,
       }
       …
     </p>
@@ -50,8 +49,7 @@
     } @else if (contentPersonsResource.value(); as persons) {
       <p>
         @for (person of persons.items; track person.id) {
-          <a [routerLink]="['/persons', person.id]">{{ person.name }}</a
-          >,
+          <a [routerLink]="['/persons', person.id]">{{ person.name }}</a>,
         }
         …
       </p>
@@ -69,8 +67,7 @@
     } @else if (authorPersonsResource.value(); as persons) {
       <p>
         @for (person of persons.items; track person.id) {
-          <a [routerLink]="['/persons', person.id]">{{ person.name }}</a
-          >,
+          <a [routerLink]="['/persons', person.id]">{{ person.name }}</a>,
         }
         …
       </p>

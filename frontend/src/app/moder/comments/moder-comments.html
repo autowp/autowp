@@ -1,3 +1,5 @@
+@let userID = userID$ | async;
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item">
@@ -30,15 +32,10 @@
             [formField]="userQuery"
             [inputFormatter]="userFormatter"
             [resultTemplate]="userTemplate"
-            [class.border-primary]="!!(userID$ | async)"
+            [class.border-primary]="!!userID"
             (selectItem)="userOnSelect($event)"
           />
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            [disabled]="(userID$ | async) === null"
-            (click)="clearUser()"
-          >
+          <button class="btn btn-outline-secondary" type="button" [disabled]="userID === null" (click)="clearUser()">
             <span class="bi bi-x" aria-hidden="true"></span>
           </button>
         </div>

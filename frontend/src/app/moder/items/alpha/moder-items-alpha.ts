@@ -1,10 +1,9 @@
 import type {OnInit} from '@angular/core';
-import type {Item, ItemList} from '@grpc/spec.pb';
 
 import {AsyncPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {ItemFields, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
+import {ItemFields, ItemList, ItemListOptions, ItemsRequest} from '@grpc/spec.pb';
 import {ItemsClient} from '@grpc/spec.pbsc';
 import {Empty} from '@ngx-grpc/well-known-types';
 import {LanguageService} from '@services/language';
@@ -47,10 +46,7 @@ export class ModerItemsAlpha implements OnInit {
               page,
             }),
           )
-        : of({
-            items: [] as Item[],
-            paginator: undefined,
-          } as ItemList),
+        : of(new ItemList()),
     ),
   );
 

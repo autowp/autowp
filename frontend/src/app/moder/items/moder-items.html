@@ -1,3 +1,5 @@
+@let vehicleTypeOptions = vehicleTypeOptions$ | async;
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item">
@@ -79,7 +81,7 @@
         >
           <option i18n value="">Any</option>
           <option value="empty" i18n>Empty</option>
-          @for (item of vehicleTypeOptions$ | async; track item.id) {
+          @for (item of vehicleTypeOptions; track item.id) {
             <option [value]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.name }}</option>
           }
         </select>
@@ -93,7 +95,7 @@
           (change)="onVehicleChildsTypeChanged()"
         >
           <option i18n value="">Any</option>
-          @for (item of vehicleTypeOptions$ | async; track item.id) {
+          @for (item of vehicleTypeOptions; track item.id) {
             <option [value]="item.id">{{ '...'.repeat(item.deep || 0) }}{{ item.name }}</option>
           }
         </select>

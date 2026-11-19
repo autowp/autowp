@@ -32,9 +32,9 @@
         class="text-danger"
         triggers="mouseenter:mouseleave"
         popoverTitle="New {{ brand.name }} vehicles"
+        i18n-popoverTitle
         [hidden]="brand.newItemsCount <= 0"
         [ngbPopover]="popover"
-        i18n-popoverTitle
         (shown)="popoverOpen.set(true)"
         (hidden)="popoverOpen.set(false)"
         >+{{ brand.newItemsCount }}</span

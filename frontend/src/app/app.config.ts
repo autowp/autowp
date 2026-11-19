@@ -5,14 +5,12 @@ import {DecimalPipe, isPlatformBrowser} from '@angular/common';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {
   enableProdMode,
-  EnvironmentInjector,
   ErrorHandler,
   importProvidersFrom,
   inject,
   makeEnvironmentProviders,
   PLATFORM_ID,
   provideAppInitializer,
-  runInInjectionContext,
 } from '@angular/core';
 import {
   BrowserModule,
@@ -95,11 +93,8 @@ const provideKeycloakInAppInitializer = (
       return;
     }
 
-    const injector = inject(EnvironmentInjector);
-    runInInjectionContext(injector, () => {
-      features.forEach((feature) => {
-        feature.configure();
-      });
+    features.forEach((feature) => {
+      feature.configure();
     });
 
     await keycloak.init(initOptions).catch((error: unknown) => {

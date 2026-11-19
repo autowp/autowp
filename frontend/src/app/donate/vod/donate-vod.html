@@ -1,3 +1,7 @@
+@let date = date$ | async;
+@let item = item$ | async;
+@let anonymous = anonymous$ | async;
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item">
@@ -61,7 +65,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
 - the vehicle must have at least 3 photos'
   />
 
-  @if (item$ | async; as item) {
+  @if (item) {
     <p>
       <ng-container i18n>Selection:</ng-container>
       <strong [innerHTML]="item.nameHtml"></strong>
@@ -72,7 +76,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
     routerLink="/donate/vod/select"
     class="btn btn-primary btn-lg"
     i18n
-    [queryParams]="{date: date$ | async, anonymous: (anonymous$ | async) ? 1 : null}"
+    [queryParams]="{date: date, anonymous: anonymous ? 1 : null}"
     >Choose …</a
   >
 </div>
@@ -87,7 +91,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
       class="btn btn-secondary"
       i18n
       [queryParams]="{anonymous: '1'}"
-      [class.active]="anonymous$ | async"
+      [class.active]="anonymous"
       >Anonymously</a
     >
     <a
@@ -96,7 +100,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
       class="btn btn-secondary"
       i18n
       [queryParams]="{anonymous: null}"
-      [class.active]="(anonymous$ | async) === null"
+      [class.active]="anonymous === null"
       [class.disabled]="(userID$ | async) === null"
       >With the name (registration required)</a
     >
@@ -116,7 +120,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
   class="card card-body mb-4"
   (submit)="submit($event)"
 >
-  @if ((date$ | async) && (item$ | async)) {
+  @if (date && item) {
     <div>
       @for (param of formParams$ | async; track param) {
         <input type="hidden" [name]="param.name" [value]="param.value" />
@@ -140,7 +144,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
       >)
     </p>
   }
-  @if ((date$ | async) && (item$ | async)) {
+  @if (date && item) {
     <div>
       <div class="btn-group mb-3" role="group">
         <input type="radio" class="btn-check" name="paymentType" value="AC" autocomplete="off" checked id="btn1" />
@@ -156,7 +160,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
       </div>
     </div>
   }
-  @if ((date$ | async) === null || (item$ | async) === null) {
+  @if (date === null || item === null) {
     <div>
       <button type="button" class="btn btn-secondary" disabled>
         <span class="bi bi-credit-card me-1" aria-hidden="true"></span>
