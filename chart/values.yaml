@@ -73,7 +73,7 @@ frontend:
   image:
     registry: registry.pereslegin.ru
     repository: autowp/autowp/frontend
-    tag: v1.245.3
+    tag: v8.92.1
     pullPolicy: IfNotPresent
     pullSecrets: []
   ## nginx sidecar that serves the built bundle off disk and proxies only page requests to the SSR
@@ -150,7 +150,7 @@ goautowp:
   image:
     registry: registry.pereslegin.ru
     repository: autowp/autowp/goautowp
-    tag: v6.21.2
+    tag: v8.92.1
     pullPolicy: IfNotPresent
     pullSecrets: []
   sentry:

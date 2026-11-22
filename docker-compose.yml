@@ -1,7 +1,7 @@
 name: autowp
 services:
   createbuckets:
-    image: amazon/aws-cli:2.41.2
+    image: amazon/aws-cli:2.42.1
     container_name: autowp_test_createbuckets
     depends_on:
       - minio
@@ -15,7 +15,7 @@ services:
     entrypoint: ["/createbuckets.sh", format, user, brand, picture, files]
 
   frontend:
-    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.91.1
+    image: registry.pereslegin.ru/autowp/autowp/frontend:v8.92.1
     container_name: autowp_test_frontend
     depends_on:
       - goautowp-serve
@@ -25,7 +25,7 @@ services:
     read_only: true
 
   goautowp-scheduler-generate-index-cache:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.91.1
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.92.1
     container_name: autowp_test_goautowp_scheduler_generate_index_cache
     depends_on:
       - keycloak
@@ -37,7 +37,7 @@ services:
     command: scheduler-generate-index-cache --loglevel=debug
 
   goautowp-serve:
-    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.91.1
+    image: registry.pereslegin.ru/autowp/autowp/goautowp:v8.92.1
     container_name: autowp_test_goautowp_serve
     depends_on:
       - keycloak
@@ -114,7 +114,7 @@ services:
       - '5432'
 
   rabbitmq:
-    image: rabbitmq:4.4.0-management-alpine
+    image: rabbitmq:4.4.1-management-alpine
     container_name: autowp_test_rabbitmq
     ports:
       - '0.0.0.0:4369:4369'

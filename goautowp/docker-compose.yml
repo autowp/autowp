@@ -1,7 +1,7 @@
 name: autowp
 services:
   createbuckets:
-    image: amazon/aws-cli:2.41.2
+    image: amazon/aws-cli:2.42.1
     container_name: autowp_test_createbuckets
     depends_on:
       - minio
@@ -99,7 +99,7 @@ services:
           memory: 128M
 
   rabbitmq:
-    image: rabbitmq:4.4.0-management-alpine
+    image: rabbitmq:4.4.1-management-alpine
     container_name: goautowp_rabbitmq_test
     ports:
       - '0.0.0.0:5672:5672'
