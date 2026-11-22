@@ -5,3 +5,6 @@ auth.dump.sql
 cluster-user-config.yaml
 cluster-user.sh
 cluster-user.yaml
+AGENTS.md
+CLAUDE.md
+GEMINI.md

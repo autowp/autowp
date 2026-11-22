@@ -5,7 +5,7 @@ use the registered server over an in-memory `bufconn` connection, with real Post
 Keycloak and other configured backing services.
 
 Run from `goautowp/`, after the normal test database migrations and fixture import described in
-the repository's `AGENTS.md`:
+the [backend agent instructions](../../AGENTS.md#build-and-test):
 
 ```sh
 go test -race ./tests/integration -timeout 10m
