@@ -6,7 +6,7 @@ metadata:
   name: redirect-{{ .to }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
-    nginx.ingress.kubernetes.io/permanent-redirect: $scheme://{{ .to }}$request_uri
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   ingressClassName: nginx
   tls:
@@ -26,7 +26,7 @@ spec:
               service:
                 name: {{ include "autowp.goautowp.serve.fullname" $ | quote }}
                 port:
-                  name: frontend-port
+                  name: assets-port
     {{- end }}
 {{- end }}
 

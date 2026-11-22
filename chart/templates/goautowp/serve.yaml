@@ -15,6 +15,7 @@ spec:
         app.kubernetes.io/component: goautowp-serve
       annotations:
         checksum/config: {{ (tpl (.Files.Glob "configs/goautowp/*").AsConfig . ) | sha256sum }}
+        checksum/frontend-assets: {{ tpl (.Files.Get "configs/frontend-assets/nginx.conf") . | sha256sum }}
     spec:
       {{- include "autowp.imagePullSecrets" . | nindent 6 }}
       # Nothing in these containers talks to the Kubernetes API, so the token is only an
