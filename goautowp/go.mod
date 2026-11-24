@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.33.21
 	github.com/aws/aws-sdk-go-v2/credentials v1.21.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.116.0
-	github.com/aws/smithy-go v1.28.9
+	github.com/aws/smithy-go v1.28.10
 	github.com/dlclark/regexp2/v2 v2.13.2
 	github.com/doug-martin/goqu/v9 v9.27.0
 	github.com/dpapathanasiou/go-recaptcha v0.0.0-20190121160230-be5090b17804
@@ -27,7 +27,7 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/websocket v1.5.3
+	github.com/gorilla/websocket v1.5.4-0.20240701034025-d67f41855da4
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.4
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jackc/pgx/v5 v5.13.0
@@ -38,21 +38,21 @@ require (
 	github.com/prometheus/client_golang v1.25.0
 	github.com/prometheus/client_model v0.6.3
 	github.com/rabbitmq/amqp091-go v1.17.0
-	github.com/redis/go-redis/v9 v9.23.0
+	github.com/redis/go-redis/v9 v9.24.0
 	github.com/shopspring/decimal v1.6.0
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
 	github.com/twpayne/go-geom v1.7.0
 	github.com/urfave/cli/v3 v3.14.0
 	github.com/wneessen/go-mail v0.8.2
-	golang.org/x/exp v0.0.0-20261121134650-e1094eeca1b5
+	golang.org/x/exp v0.0.0-20261124000051-d6646c509b6d
 	golang.org/x/image v0.48.0
 	golang.org/x/net v0.63.0
 	golang.org/x/sync v0.25.0
 	golang.org/x/text v0.44.0
-	google.golang.org/genproto v0.0.0-20261118221215-c8830f628b3f
-	google.golang.org/genproto/googleapis/api v0.0.0-20261118221215-c8830f628b3f
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261118221215-c8830f628b3f
+	google.golang.org/genproto v0.0.0-20261123191846-1e707ab9fbc2
+	google.golang.org/genproto/googleapis/api v0.0.0-20261123191846-1e707ab9fbc2
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261123191846-1e707ab9fbc2
 	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/gographics/imagick.v3 v3.7.3
@@ -112,7 +112,7 @@ require (
 	github.com/prometheus/common v0.74.0 // indirect
 	github.com/prometheus/procfs v0.23.0 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/quic-go/quic-go v0.65.0 // indirect
+	github.com/quic-go/quic-go v0.66.0 // indirect
 	github.com/rogpeppe/go-internal v1.16.0 // indirect
 	github.com/rs/cors v1.11.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
