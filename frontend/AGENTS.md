@@ -27,6 +27,10 @@ in `angular.json`) — don't assume Karma/Jest is set up.
   client/server providers, `app.routes.ts` / `app.routes.server.ts` split client/server routing.
 - **`src/grpc/`** — generated grpc-web client from `spec.proto` (via `@ngx-grpc`); treat as
   read-only/regenerate-only, mirrors the Go server definitions.
+- Keep `@ngx-grpc/protoc-gen-ng` pinned to `3.1.2`. Do not upgrade the generator to `5.x`.
+  Version 5 generates `BinaryReader.readPackableInt64StringInto` calls that the installed
+  `google-protobuf` 3.x runtime lacks. This breaks decoding of packed `int64` lists in
+  `Attrs.GetValues` and `Attrs.GetUserValues` in the specifications editor.
 - **`src/app/grpc.ts`** and **`src/app/grpc-web-client/`** — hand-written glue around the
   generated client (error/status decoding, field-violation extraction for form validation, etc.).
 - **`src/app/<domain>/`** — one directory per feature area (cars, items, pictures, forums,
